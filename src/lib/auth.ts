@@ -52,3 +52,7 @@ export const registerWithEmail = async ({
     return result.user;
   }
 };
+
+// 현재 유저 가져오는 함수
+export const getCurrentUser = () => auth.currentUser;
+
