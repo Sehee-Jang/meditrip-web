@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { auth } from "@/lib/firebase";
+import { useTranslations } from "next-intl";
 import SignupPrompt from "./SignupPrompt";
 import Image from "next/image";
 import Link from "next/link";
@@ -39,7 +40,8 @@ const mockShorts = [
   // 추가 mock 필요시 이어서 작성
 ];
 
-export default function ShortsContentSection() {
+export default function ContentSection() {
+  const t = useTranslations("Theme");
   const [isAnonymous, setIsAnonymous] = useState(true);
   const [showPrompt, setShowPrompt] = useState(false);
   const [viewCount, setViewCount] = useState(0);
@@ -85,7 +87,7 @@ export default function ShortsContentSection() {
 
   return (
     <section className='px-4 py-10'>
-      <h2 className='text-xl font-bold mb-4'>Discover Our Themes</h2>
+      <h2 className='text-xl font-bold mb-4'>{t("title")}</h2>
 
       {/* 카드와 버튼을 flex로 정렬 */}
       <div className='flex flex-wrap gap-4 items-start justify-between'>

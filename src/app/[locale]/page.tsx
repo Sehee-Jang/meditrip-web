@@ -1,15 +1,17 @@
 import HeroSection from "@/components/HeroSection";
-import ShortsContentSection from "@/components/ContentSection";
+import ContentSection from "@/components/ContentSection";
+import CategorySection from "@/components/CategorySection";
+import CommunitySection from "@/components/CommunitySection";
+import FAQSection from "@/components/FaqSection";
 
 export default function Home() {
   return (
     <main>
       <HeroSection />
-      <ShortsContentSection />
-      {/* <CategorySection />
-      <ThemePreviewSection />
-      <CommunityInsights />
-      <FAQSection /> */}
+      <CategorySection />
+      <ContentSection />
+      <CommunitySection />
+      <FAQSection />
     </main>
   );
 }
