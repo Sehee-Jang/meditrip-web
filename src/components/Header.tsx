@@ -17,7 +17,7 @@ export default function Header() {
       {/* 데스크탑 메뉴 */}
       <nav className='hidden md:flex items-center gap-6 text-sm text-gray-800'>
         <Link href='/'>{t("main")}</Link>
-        <Link href='/content'>{t("content")}</Link>
+        <Link href='/contents'>{t("content")}</Link>
         <Link href='/community'>{t("community")}</Link>
         <Link href='/hospital'>{t("hospital")}</Link>
         <Link href='/mypage'>{t("mypage")}</Link>

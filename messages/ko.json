@@ -48,5 +48,18 @@
         "answer": "소개된 한방병원은 무슨 강점이 있는지 확인해보세요."
       }
     ]
+  },
+  "Contents": {
+    "title": "한방 웰니스 영상 보기",
+    "searchPlaceholder": "진료 카테고리 / 해시태그 검색",
+    "searchHelper":"찾고 싶은 영상을 쉽게 검색해보세요.",
+    "categories": {
+      "stress": "스트레스",
+      "diet": "다이어트 & 디톡스",
+      "immunity": "면역관리",
+      "women": "여성질환",
+      "antiaging": "안티에이징"
+    },
+    "viewMore": "더 많은 영상 보기"
   }
 }

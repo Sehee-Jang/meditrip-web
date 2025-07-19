@@ -48,5 +48,18 @@
         "answer": "当サイトでご紹介している漢方病院の魅力や選定ポイントをご確認ください。"
       }
     ]
+  },
+  "Contents": {
+    "title": "韓方ウェルネス動画を見る",
+    "searchPlaceholder": "診療カテゴリ別・タグ検索",
+    "searchHelper": "見つけたい動画を簡単に検索できます。",
+    "categories": {
+      "stress": "ストレスケア",
+      "diet": "ダイエット & デトックス",
+      "immunity": "免疫ケア",
+      "women": "女性特有の不調",
+      "antiaging": "アンチエイジング"
+    },
+    "viewMore": "もっと動画を見る"
   }
 }
