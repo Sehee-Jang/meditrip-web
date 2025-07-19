@@ -2,7 +2,7 @@ import HeroSection from "@/components/HeroSection";
 import ContentSection from "@/components/ContentSection";
 import CategorySection from "@/components/CategorySection";
 import CommunitySection from "@/components/CommunitySection";
-import FAQSection from "@/components/FaqSection";
+import FAQSection from "@/components/FAQSection";
 
 export default function Home() {
   return (
