@@ -89,31 +89,41 @@ export default function ContentSection() {
     <section className='px-4 py-10'>
       <h2 className='text-xl font-bold mb-4'>{t("title")}</h2>
 
-      {/* 카드와 버튼을 flex로 정렬 */}
       <div className='flex flex-wrap gap-4 items-start justify-between'>
-        {mockShorts.map((item) => (
-          <div
-            key={item.id}
-            className='w-[150px] border border-black/10 rounded-lg overflow-hidden bg-white'
-          >
-            <div className='relative w-full h-[150px]'>
-              <Image
-                src={item.thumbnail}
-                alt={item.title}
-                fill
-                className='object-cover'
-              />
+        {mockShorts.map((item) => {
+          const isBlocked = showPrompt && !viewedIds.current.has(item.id);
+          return (
+            <div
+              key={item.id}
+              data-id={item.id}
+              className='shorts-item w-[150px] border border-black/10 rounded-lg overflow-hidden bg-white relative'
+              style={{
+                filter: isBlocked ? "blur(4px)" : "none",
+                pointerEvents: isBlocked ? "none" : "auto",
+                opacity: isBlocked ? 0.5 : 1,
+                transition: "all 0.3s ease",
+              }}
+            >
+              <Link href={item.youtubeUrl} target='_blank'>
+                <div className='relative w-full h-[150px]'>
+                  <Image
+                    src={item.thumbnail}
+                    alt={item.title}
+                    fill
+                    className='object-cover'
+                  />
+                </div>
+                <div className='p-2'>
+                  <p className='text-sm text-gray-800'>{item.category}</p>
+                  <p className='text-sm font-bold mt-1 line-clamp-2'>
+                    {item.title}
+                  </p>
+                </div>
+              </Link>
             </div>
-            <div className='p-2'>
-              <p className='text-sm text-gray-800'>{item.category}</p>
-              <p className='text-sm font-bold mt-1 line-clamp-2'>
-                {item.title}
-              </p>
-            </div>
-          </div>
-        ))}
+          );
+        })}
 
-        {/* ✅ 데스크탑: 카드 옆에 보이는 더보기 버튼 */}
         <div className='hidden md:flex w-[150px] h-[210px] items-center justify-center'>
           <Link
             href='/contents'
@@ -124,7 +134,6 @@ export default function ContentSection() {
         </div>
       </div>
 
-      {/* ✅ 모바일: 콘텐츠 하단에 중앙 정렬된 더보기 버튼 */}
       <div className='mt-8 md:hidden flex justify-center'>
         <Link
           href='/contents'
@@ -133,44 +142,12 @@ export default function ContentSection() {
           더 보기
         </Link>
       </div>
-    </section>
-    // <section className='px-4 py-10'>
-    //   <h2 className='text-xl font-bold mb-4'>Discover Our Themes</h2>
-    //   <div className='grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4'>
-    //     {mockShorts.map((item) => {
-    //       const isBlocked = showPrompt && !viewedIds.current.has(item.id);
-    //       return (
-    //         <div
-    //           key={item.id}
-    //           data-id={item.id}
-    //           className='shorts-item rounded-lg overflow-hidden border shadow-sm hover:shadow-md transition'
-    //           style={{
-    //             filter: isBlocked ? "blur(5px)" : "none",
-    //             pointerEvents: isBlocked ? "none" : "auto",
-    //             opacity: isBlocked ? 0.5 : 1,
-    //             transition: "all 0.3s ease",
-    //           }}
-    //         >
-    //           <Link href={item.youtubeUrl} target='_blank'>
-    //             <div className='relative w-full aspect-[9/16]'>
-    //               <Image
-    //                 src={item.thumbnail}
-    //                 alt={item.title}
-    //                 fill
-    //                 className='object-cover'
-    //               />
-    //             </div>
-    //             <div className='p-2 bg-white'>
-    //               <p className='text-xs text-gray-500'>{item.category}</p>
-    //               <p className='text-sm font-medium'>{item.title}</p>
-    //             </div>
-    //           </Link>
-    //         </div>
-    //       );
-    //     })}
-    //   </div>
 
-    //   {showPrompt && <SignupPrompt />}
-    // </section>
+      {showPrompt && (
+        <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50'>
+          <SignupPrompt />
+        </div>
+      )}
+    </section>
   );
 }

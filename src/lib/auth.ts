@@ -5,6 +5,7 @@ import {
   EmailAuthProvider,
   signInAnonymously,
   onAuthStateChanged,
+  User,
 } from "firebase/auth";
 import { auth } from "./firebase";
 
@@ -17,7 +18,7 @@ export const loginAnonymously = async () => {
   }
 };
 
-export const observeAuth = (callback: (user: any) => void) => {
+export const observeAuth = (callback: (user: User) => void) => {
   onAuthStateChanged(auth, (user) => {
     if (user) {
       callback(user);
@@ -55,4 +56,3 @@ export const registerWithEmail = async ({
 
 // 현재 유저 가져오는 함수
 export const getCurrentUser = () => auth.currentUser;
-

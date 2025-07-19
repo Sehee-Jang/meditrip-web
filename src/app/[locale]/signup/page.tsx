@@ -35,8 +35,12 @@ export default function SignupPage() {
       const user = await registerWithEmail({ email, password: pw, nickname });
       console.log("회원가입 성공:", user);
       setSuccess(true);
-    } catch (err: any) {
-      setError(err.message || "회원가입에 실패했습니다.");
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("회원가입에 실패했습니다.");
+      }
     }
   };
 
