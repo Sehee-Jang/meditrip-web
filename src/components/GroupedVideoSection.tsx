@@ -26,11 +26,12 @@ export default function GroupedVideoSection({ keyword = "" }: Props) {
 
   const grouped = filtered.reduce((acc, video) => {
     const item: VideoItem = {
-      id: String(video.id),
+      id: video.id,
       title: video.title,
       youtubeUrl: video.youtubeUrl,
       thumbnailUrl: video.thumbnail,
       viewCount: Math.floor(Math.random() * 10000 + 500),
+      category: video.category,
     };
 
     if (!acc[video.category]) acc[video.category] = [];

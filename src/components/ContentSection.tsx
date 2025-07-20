@@ -8,6 +8,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { mockShorts } from "@/data/mockData";
 import Container from "./layout/Container";
+import VideoCard from "./VideoCard";
 
 export default function ContentSection() {
   const t = useTranslations("Theme");
@@ -63,34 +64,16 @@ export default function ContentSection() {
           {mockShorts.map((item) => {
             const isBlocked = showPrompt && !viewedIds.current.has(item.id);
             return (
-              <div
+              <VideoCard
                 key={item.id}
-                data-id={item.id}
-                className='shorts-item w-[150px] border border-black/10 rounded-lg overflow-hidden bg-white relative'
-                style={{
-                  filter: isBlocked ? "blur(4px)" : "none",
-                  pointerEvents: isBlocked ? "none" : "auto",
-                  opacity: isBlocked ? 0.5 : 1,
-                  transition: "all 0.3s ease",
-                }}
-              >
-                <Link href={item.youtubeUrl} target='_blank'>
-                  <div className='relative w-full h-[150px]'>
-                    <Image
-                      src={item.thumbnail}
-                      alt={item.title}
-                      fill
-                      className='object-cover'
-                    />
-                  </div>
-                  <div className='p-2'>
-                    <p className='text-sm text-gray-800'>{item.category}</p>
-                    <p className='text-sm font-bold mt-1 line-clamp-2'>
-                      {item.title}
-                    </p>
-                  </div>
-                </Link>
-              </div>
+                id={item.id}
+                title={item.title}
+                thumbnailUrl={item.thumbnail}
+                youtubeUrl={item.youtubeUrl}
+                viewCount={Math.floor(Math.random() * 10000 + 500)}
+                category={item.category}
+                isBlocked={isBlocked}
+              />
             );
           })}
 
