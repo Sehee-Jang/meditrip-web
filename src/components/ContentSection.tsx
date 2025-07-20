@@ -3,10 +3,11 @@
 import { useEffect, useRef, useState } from "react";
 import { auth } from "@/lib/firebase";
 import { useTranslations } from "next-intl";
-import SignupPrompt from "./SignupPrompt";
+// import SignupPrompt from "./SignupPrompt";
 import Image from "next/image";
 import Link from "next/link";
 import { mockShorts } from "@/data/mockData";
+import Container from "./layout/Container";
 
 export default function ContentSection() {
   const t = useTranslations("Theme");
@@ -54,68 +55,70 @@ export default function ContentSection() {
   }, []);
 
   return (
-    <section className='px-4 py-10'>
-      <h2 className='text-xl font-bold mb-4'>{t("title")}</h2>
+    <section className='py-10 bg-white'>
+      <Container>
+        <h2 className='text-xl font-bold mb-4'>{t("title")}</h2>
 
-      <div className='flex flex-wrap gap-4 items-start justify-between'>
-        {mockShorts.map((item) => {
-          const isBlocked = showPrompt && !viewedIds.current.has(item.id);
-          return (
-            <div
-              key={item.id}
-              data-id={item.id}
-              className='shorts-item w-[150px] border border-black/10 rounded-lg overflow-hidden bg-white relative'
-              style={{
-                filter: isBlocked ? "blur(4px)" : "none",
-                pointerEvents: isBlocked ? "none" : "auto",
-                opacity: isBlocked ? 0.5 : 1,
-                transition: "all 0.3s ease",
-              }}
+        <div className='flex flex-wrap gap-4 items-start justify-between'>
+          {mockShorts.map((item) => {
+            const isBlocked = showPrompt && !viewedIds.current.has(item.id);
+            return (
+              <div
+                key={item.id}
+                data-id={item.id}
+                className='shorts-item w-[150px] border border-black/10 rounded-lg overflow-hidden bg-white relative'
+                style={{
+                  filter: isBlocked ? "blur(4px)" : "none",
+                  pointerEvents: isBlocked ? "none" : "auto",
+                  opacity: isBlocked ? 0.5 : 1,
+                  transition: "all 0.3s ease",
+                }}
+              >
+                <Link href={item.youtubeUrl} target='_blank'>
+                  <div className='relative w-full h-[150px]'>
+                    <Image
+                      src={item.thumbnail}
+                      alt={item.title}
+                      fill
+                      className='object-cover'
+                    />
+                  </div>
+                  <div className='p-2'>
+                    <p className='text-sm text-gray-800'>{item.category}</p>
+                    <p className='text-sm font-bold mt-1 line-clamp-2'>
+                      {item.title}
+                    </p>
+                  </div>
+                </Link>
+              </div>
+            );
+          })}
+
+          <div className='hidden md:flex w-[150px] h-[210px] items-center justify-center'>
+            <Link
+              href='/contents'
+              className='px-4 py-2 bg-black text-white text-sm font-medium rounded-md'
             >
-              <Link href={item.youtubeUrl} target='_blank'>
-                <div className='relative w-full h-[150px]'>
-                  <Image
-                    src={item.thumbnail}
-                    alt={item.title}
-                    fill
-                    className='object-cover'
-                  />
-                </div>
-                <div className='p-2'>
-                  <p className='text-sm text-gray-800'>{item.category}</p>
-                  <p className='text-sm font-bold mt-1 line-clamp-2'>
-                    {item.title}
-                  </p>
-                </div>
-              </Link>
-            </div>
-          );
-        })}
+              {t("seeMore")}
+            </Link>
+          </div>
+        </div>
 
-        <div className='hidden md:flex w-[150px] h-[210px] items-center justify-center'>
+        <div className='mt-8 md:hidden flex justify-center'>
           <Link
             href='/contents'
-            className='px-4 py-2 bg-black text-white text-sm font-medium rounded-md'
+            className='block w-full  text-center px-6 py-2 bg-black text-white text-sm font-medium rounded-md'
           >
-            더 보기
+            {t("seeMore")}
           </Link>
         </div>
-      </div>
 
-      <div className='mt-8 md:hidden flex justify-center'>
-        <Link
-          href='/contents'
-          className='block w-full  text-center px-6 py-2 bg-black text-white text-sm font-medium rounded-md'
-        >
-          더 보기
-        </Link>
-      </div>
-
-      {showPrompt && (
+        {/* {showPrompt && (
         <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50'>
           <SignupPrompt />
         </div>
-      )}
+      )} */}
+      </Container>
     </section>
   );
 }

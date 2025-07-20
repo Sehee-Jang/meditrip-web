@@ -8,6 +8,7 @@ import {
   Hourglass,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
+import Container from "./layout/Container";
 
 const categories = [
   { id: 1, icon: Brain, key: "stress" },
@@ -20,21 +21,23 @@ const categories = [
 export default function CategorySection() {
   const t = useTranslations("Categories");
   return (
-    <section className='px-4 py-4 md:px-[170px] md:py-[60px]'>
-      <div className='grid grid-cols-5 gap-2 sm:gap-3 md:gap-4'>
-        {categories.map((cat) => {
-          const Icon = cat.icon;
-          return (
-            <div
-              key={cat.id}
-              className='h-[88px] flex flex-col items-center justify-center border border-gray-200 rounded-md bg-white'
-            >
-              <Icon size={24} className='mb-1 text-gray-700' />
-              <span className='text-xs font-medium'>{t(cat.key)}</span>
-            </div>
-          );
-        })}
-      </div>
+    <section className='py-10 bg-white'>
+      <Container>
+        <div className='grid grid-cols-5 gap-2 sm:gap-3 md:gap-4'>
+          {categories.map((cat) => {
+            const Icon = cat.icon;
+            return (
+              <div
+                key={cat.id}
+                className='h-[88px] flex flex-col items-center justify-center border border-gray-200 rounded-md bg-white'
+              >
+                <Icon size={24} className='mb-1 text-gray-700' />
+                <span className='text-xs font-medium'>{t(cat.key)}</span>
+              </div>
+            );
+          })}
+        </div>
+      </Container>
     </section>
   );
 }

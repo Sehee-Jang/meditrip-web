@@ -49,6 +49,17 @@
       }
     ]
   },
+  "SignupSection": {
+    "title": "会員登録",
+    "description": "無料で会員登録して、さまざまな特典を受け取りましょう。",
+    "emailPlaceholder": "メールアドレスを入力",
+    "passwordPlaceholder": "パスワードを入力",
+    "passwordConfirmPlaceholder": "パスワード確認",
+    "nicknamePlaceholder": "ニックネームを入力",
+    "agreeTermsLabel": "利用規約に同意する（必須）",
+    "agreeMarketingLabel": "マーケティング情報の受信に同意する（任意）",
+    "button": "登録する"
+  },
   "Contents": {
     "title": "韓方ウェルネス動画を見る",
     "searchPlaceholder": "診療カテゴリ別・タグ検索",
