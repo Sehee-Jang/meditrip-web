@@ -15,10 +15,10 @@ export default function HeroSection() {
   const t = useTranslations("Hero");
 
   return (
-    <section className='bg-gray-100 py-10'>
-      <Container className='md:flex md:justify-between md:items-center'>
+    <section className='md:py-10 md:mb-10 md:bg-gray-100 '>
+      <Container className='md:flex md:justify-between md:items-center py-4'>
         {/* Carousel 영역 */}
-        <div className='w-full md:w-1/2 h-64 md:h-[360px]'>
+        <div className='w-full bg-gray-100 md:bg-gray-300 md:w-1/2 h-64 h-[360px]'>
           <Carousel
             opts={{ loop: true }}
             plugins={[
@@ -45,7 +45,7 @@ export default function HeroSection() {
         </div>
 
         {/* 텍스트 영역 */}
-        <div className='w-full md:w-1/2 flex flex-col mt-6 md:mt-0 md:pl-10 gap-6'>
+        <div className='w-full md:w-1/2 flex flex-col mt-6 md:mt-0 md:pl-10 md:gap-6 gap-1'>
           <h2 className='text-l md:text-4xl font-bold whitespace-pre-line'>
             {t("title")}
           </h2>

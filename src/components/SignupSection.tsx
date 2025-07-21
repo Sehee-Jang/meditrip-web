@@ -56,7 +56,7 @@ export default function SignupSection() {
     <section className='w-full bg-white py-[60px]'>
       <Container className='text-center'>
         <div className='w-full max-w-[1440px] px-[20px] md:px-[170px] text-center'>
-          <h2 className='text-2xl md:text-3xl font-bold mb-4'>{t("title")}</h2>
+          <h2 className='text-2xl md:text-4xl font-bold mb-4'>{t("title")}</h2>
           <p className='text-muted-foreground mb-10'>{t("description")}</p>
 
           <form

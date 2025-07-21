@@ -21,8 +21,8 @@ const categories = [
 export default function CategorySection() {
   const t = useTranslations("Categories");
   return (
-    <section className='py-10 bg-white'>
-      <Container>
+    <section className='md:y-10 bg-white'>
+      <Container className='px-0 md:px-6'>
         <div className='grid grid-cols-5 gap-2 sm:gap-3 md:gap-4'>
           {categories.map((cat) => {
             const Icon = cat.icon;
