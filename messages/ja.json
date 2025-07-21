@@ -26,7 +26,7 @@
     "women": "女性特有の不調",
     "antiaging": "アンチエイジング"
   },
-  "Community": {
+  "CommunitySection": {
     "title": "コミュニティインサイト",
     "description": "質問を投稿すると、予約料金が割引になります！",
     "cta": "投稿する"
@@ -72,5 +72,51 @@
       "antiaging": "アンチエイジング"
     },
     "viewMore": "もっと動画を見る"
+  },
+  "CommunityPage": {
+    "title": "専門家に質問する",
+    "board": {
+      "title": "質問一覧",
+      "description": "他の人の気になる質問と、専門家の回答をチェックしてみましょう。"
+    },
+    "questionList": {
+      "q1": {
+        "question": "生理不順が頻繁に起きているのですが、韓国を訪れて一度治療を受けるだけで改善することは可能でしょうか？",
+        "answer": "回答",
+        "meta": "ユーザー：匿名 / 작성 날짜 / カテゴリー：女性疾患"
+      },
+      "q2": {
+        "question": "ストレスでなかなか眠れません。漢方って効くんでしょうか？",
+        "answer": "回答",
+        "meta": "ユーザー：匿名 / 작성 날짜 / カテゴリー：ストレスケア"
+      }
+    },
+    "cta": "+投稿する",
+    "banner": "質問を投稿すると、予約料金が割引になります！"
+  },
+  "HospitalPage": {
+    "title": "병원 정보"
+  },
+  "MyPage": {
+    "title": "My Page",
+    "greeting": "{{name}}さん、こんにちは！ 👋",
+    "reservations": {
+      "title": "私の予約履歴",
+      "completed": "{{hospital}} / 予約完了"
+    },
+    "points": {
+      "title": "ポイントの積算",
+      "use": "ポイント使用",
+      "status": "現在のポイント {{amount}}円分のポイント保有"
+    },
+    "questions": {
+      "title": "私が作成した質問",
+      "answered": "回答完了",
+      "pending": "回答待ち"
+    },
+    "buttons": {
+      "logout": "Log out",
+      "settings": "Settings"
+    }
   }
 }
