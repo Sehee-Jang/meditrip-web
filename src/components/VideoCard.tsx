@@ -15,7 +15,6 @@ export default function VideoCard({
   id,
   title,
   thumbnailUrl,
-  viewCount,
   youtubeUrl,
   category,
   isBlocked = false,
