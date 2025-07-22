@@ -8,7 +8,7 @@ import {
   CarouselItem,
 } from "@/components/ui/carousel";
 import Image from "next/image";
-import CommonButton from "./CommonButton";
+import CommonButton from "./layout/CommonButton";
 import Container from "./layout/Container";
 
 export default function HeroSection() {

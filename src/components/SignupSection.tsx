@@ -3,7 +3,7 @@
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { registerWithEmail } from "@/lib/auth";
-import CommonButton from "./CommonButton";
+import CommonButton from "./layout/CommonButton";
 import Container from "./layout/Container";
 
 export default function SignupSection() {

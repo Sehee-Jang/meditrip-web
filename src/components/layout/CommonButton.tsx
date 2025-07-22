@@ -16,7 +16,7 @@ export default function CommonButton({
 }: Props) {
   return (
     <Button
-      className={`px-6 py-2 bg-black text-white rounded hover:bg-gray-800 ${className}`}
+      className={`px-6 py-2 bg-black text-white rounded hover:bg-gray-800 shadow-none ${className}`}
       {...props}
     >
       {children}
