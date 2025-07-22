@@ -7,7 +7,7 @@ import Container from "./layout/Container";
 const faqIcons = [HelpCircle, Search, ThumbsUp];
 
 export default function FAQSection() {
-  const t = useTranslations("FAQ");
+  const t = useTranslations("FAQSection");
   const items = t.raw("items") as Array<{ question: string; answer: string }>;
 
   return (

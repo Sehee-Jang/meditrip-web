@@ -10,12 +10,12 @@
     "terms": "利用規約",
     "privacy": "個人情報保護方針"
   },
-  "Hero": {
+  "HeroSection": {
     "title": "自然に、美しく。\n韓方で始めるウェルネス習慣",
     "subtitle": "韓方医学で、心と身体のバランスを整えましょう。",
     "button": "無料で始める"
   },
-  "Theme": {
+  "ContentSection": {
     "title": "ウェルネステーマを見つけましょう",
     "seeMore": "もっと見る"
   },
@@ -31,7 +31,7 @@
     "description": "質問を投稿すると、予約料金が割引になります！",
     "cta": "投稿する"
   },
-  "FAQ": {
+  "FAQSection": {
     "title": "よくある質問",
     "description": "よくある質問を見てみましょう",
     "items": [
@@ -60,7 +60,7 @@
     "agreeMarketingLabel": "マーケティング情報の受信に同意する（任意）",
     "button": "登録する"
   },
-  "Contents": {
+  "ContentsPage": {
     "title": "韓方ウェルネス動画を見る",
     "searchPlaceholder": "診療カテゴリ別・タグ検索",
     "searchHelper": "見つけたい動画を簡単に検索できます。",
