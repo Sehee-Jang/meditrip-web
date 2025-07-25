@@ -3,6 +3,7 @@ import PageHeader from "@/components/layout/PageHeader";
 import { getTranslations } from "next-intl/server";
 import QuestionList from "@/components/QuestionList";
 import CommonButton from "@/components/layout/CommonButton";
+import { Link } from "@/i18n/navigation";
 
 export default async function CommunityPage() {
   const t = await getTranslations("community-page");
@@ -23,7 +24,11 @@ export default async function CommunityPage() {
         <QuestionList />
 
         <div className='my-6 flex flex-col items-center'>
-          <CommonButton className='text-sm'>{t("cta")}</CommonButton>
+          <Link href='/community/question' className='w-1/2'>
+            <CommonButton className='w-full text-sm'>{t("cta")}</CommonButton>
+          </Link>
+
+          {/* <CommonButton className='text-sm'>{t("cta")}</CommonButton> */}
           <p className='text-sm text-muted-foreground mt-2'>{t("banner")}</p>
         </div>
       </section>
