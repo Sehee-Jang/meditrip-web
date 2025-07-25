@@ -1,12 +1,5 @@
 "use client";
 
-import {
-  Brain,
-  Salad,
-  ShieldCheck,
-  Stethoscope,
-  Hourglass,
-} from "lucide-react";
 import { useTranslations } from "next-intl";
 import Container from "./layout/Container";
 import {
