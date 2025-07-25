@@ -7,7 +7,7 @@ import CommonButton from "./layout/CommonButton";
 import Container from "./layout/Container";
 
 export default function SignupSection() {
-  const t = useTranslations("SignupSection");
+  const t = useTranslations("signup-section");
 
   const [email, setEmail] = useState("");
   const [pw, setPw] = useState("");

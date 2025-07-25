@@ -2,12 +2,11 @@ import { useTranslations } from "next-intl";
 import Link from "next/link";
 
 export default function Footer() {
-  const t = useTranslations("Footer");
+  const t = useTranslations("footer");
 
   return (
     <footer className='w-full border-t bg-white px-4 py-4 text-sm text-gray-600'>
       <div className='max-w-5xl mx-auto flex flex-col items-center gap-2 md:flex-row md:justify-center md:gap-10'>
-        
         {/* 모바일: 순서 2 / 데스크탑: 왼쪽 */}
         <span className='order-2 md:order-1'>
           ONYU © 2025. All rights reserved.

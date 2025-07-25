@@ -6,7 +6,7 @@ import LanguageSwitcher from "./LanguageSwitcher";
 import { HospitalIcon, UserIcon } from "lucide-react";
 
 export default function Header() {
-  const t = useTranslations("Header");
+  const t = useTranslations("header");
 
   return (
     <header className='flex justify-between items-center px-4 py-3 border-b bg-white'>

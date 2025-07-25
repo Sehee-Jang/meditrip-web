@@ -80,6 +80,10 @@
       "description": "다른 사람들이 궁금해하는 질문과 전문가의 답변을 확인해보세요"
     },
     "questionList": {
+      "user": "사용자",
+      "writtenDate": "작성일",
+      "category": "카테고리",
+      "answer": "답변",
       "q1": {
         "question": "생리불순이 자주 발생하는데, 한국에 방문해서 한번 받는 치료로 개선이 될까요?",
         "answer": "답변",

@@ -6,7 +6,7 @@ import PageHeader from "@/components/layout/PageHeader";
 import SignupSection from "@/components/SignupSection";
 
 export default async function ContentsPage() {
-  const t = await getTranslations("ContentsPage");
+  const t = await getTranslations("contents-page");
 
   return (
     <main className='md:px-4 md:py-8'>

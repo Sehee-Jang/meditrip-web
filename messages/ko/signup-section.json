@@ -1,0 +1,11 @@
+{
+  "title": "회원가입",
+  "description": "무료로 회원가입하여 다양한 혜택을 누리세요.",
+  "emailPlaceholder": "이메일 입력",
+  "passwordPlaceholder": "비밀번호 입력",
+  "passwordConfirmPlaceholder": "비밀번호 확인",
+  "nicknamePlaceholder": "닉네임 입력",
+  "agreeTermsLabel": "이용약관 동의 (필수)",
+  "agreeMarketingLabel": "마케팅 수신 동의 (선택)",
+  "button": "회원가입"
+}

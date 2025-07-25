@@ -12,7 +12,7 @@ import CommonButton from "./layout/CommonButton";
 import Container from "./layout/Container";
 
 export default function HeroSection() {
-  const t = useTranslations("HeroSection");
+  const t = useTranslations("hero-section");
 
   return (
     <section className='md:py-10 md:mb-10 md:bg-gray-100 '>

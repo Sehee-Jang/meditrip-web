@@ -1,0 +1,30 @@
+{
+  "title": "My Page",
+  "greeting": "{name}さん、こんにちは！ 👋",
+  "reservations": {
+    "title": "私の予約履歴",
+    "datetime": "予約日時",
+    "status": "状態",
+    "completed": "予約完了",
+    "pending": "予約保留中",
+    "details": "詳細を見る",
+    "modify": "予約の変更 / キャンセル"
+  },
+  "points": {
+    "title": "ポイントの積算",
+    "use": "ポイント使用",
+    "status": "現在のポイント",
+    "amount": "{amount}円分のポイント"
+  },
+  "questions": {
+    "title": "私が作成した質問",
+    "writtenDate": "作成日",
+    "status": "状態",
+    "answered": "回答完了",
+    "pending": "回答待ち"
+  },
+  "buttons": {
+    "logout": "Log out",
+    "settings": "Settings"
+  }
+}

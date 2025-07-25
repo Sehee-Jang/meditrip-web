@@ -19,7 +19,7 @@ const categories = [
 ];
 
 export default function CategorySection() {
-  const t = useTranslations("Categories");
+  const t = useTranslations("categories");
   return (
     <section className='md:y-10 bg-white'>
       <Container className='px-0 md:px-6'>

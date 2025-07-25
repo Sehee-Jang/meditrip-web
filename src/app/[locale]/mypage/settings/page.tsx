@@ -9,7 +9,7 @@ import { Switch } from "@/components/ui/switch";
 import { Lock, Trash2, Bell, Globe, HelpCircle } from "lucide-react";
 
 export default function SettingsPage() {
-  const t = useTranslations("SettingsPage");
+  const t = useTranslations("settings-page");
   const [nickname, setNickname] = useState("");
   const [marketing, setMarketing] = useState(true);
 
@@ -71,7 +71,11 @@ export default function SettingsPage() {
               <p>{t("app.marketing")}</p>
             </div>
 
-            <Switch checked={marketing} onCheckedChange={setMarketing} className=""/>
+            <Switch
+              checked={marketing}
+              onCheckedChange={setMarketing}
+              className=''
+            />
           </div>
 
           <div className='flex items-center justify-between py-2'>

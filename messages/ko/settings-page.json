@@ -1,0 +1,29 @@
+{
+  "title": "설정",
+  "account": {
+    "title": "계정관리",
+    "password": "비밀번호 변경",
+    "passwordDesc": "비밀번호를 변경합니다.",
+    "delete": "탈퇴하기",
+    "deleteDesc": "계정을 탈퇴하려면 클릭해주세요."
+  },
+  "nickname": {
+    "title": "닉네임 수정",
+    "placeholder": "새 닉네임 입력",
+    "note": "닉네임을 입력하고 아래의 수정 완료 버튼을 눌러주세요."
+  },
+  "app": {
+    "title": "앱 설정",
+    "marketing": "이벤트/마케팅 소식 받기",
+    "language": "언어 설정",
+    "currentLanguage": "현재 언어: 한국어"
+  },
+  "support": {
+    "title": "고객지원",
+    "contact": "1:1 문의하기"
+  },
+  "buttons": {
+    "cancel": "취소",
+    "save": "수정완료"
+  }
+}

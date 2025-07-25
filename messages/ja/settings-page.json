@@ -1,0 +1,29 @@
+{
+  "title": "Settings",
+  "account": {
+    "title": "アカウント管理",
+    "password": "パスワード変更",
+    "passwordDesc": "パスワードを変更します。",
+    "delete": "退会する",
+    "deleteDesc": "アカウントを退会するにはクリックしてください。"
+  },
+  "nickname": {
+    "title": "ニックネームの変更",
+    "placeholder": "新しいニックネームを入力",
+    "note": "ニックネームを入力し、下の「変更完了」ボタンを押してください。"
+  },
+  "app": {
+    "title": "アプリ設定",
+    "marketing": "イベント/マーケティング情報を受け取る",
+    "language": "言語設定",
+    "currentLanguage": "現在の言語：日本語"
+  },
+  "support": {
+    "title": "カスタマーサポート",
+    "contact": "1:1で問い合わせる"
+  },
+  "buttons": {
+    "cancel": "キャンセル",
+    "save": "修正完了"
+  }
+}

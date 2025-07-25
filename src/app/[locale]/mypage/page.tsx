@@ -7,7 +7,7 @@ import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 
 export default async function MyPage() {
-  const t = await getTranslations("MyPage");
+  const t = await getTranslations("mypage");
 
   // 예시 데이터
 

@@ -1,0 +1,30 @@
+{
+  "title": "마이페이지",
+  "greeting": "{name}님, 안녕하세요! 👋",
+  "reservations": {
+    "title": "나의 예약 내역",
+    "datetime": "예약 일시",
+    "status": "상태",
+    "completed": "예약 완료",
+    "pending": "상담 대기",
+    "details": "상세 보기",
+    "modify": "예약 변경/취소"
+  },
+  "points": {
+    "title": "적립 포인트",
+    "use": "포인트 사용",
+    "status": "현재 포인트",
+    "amount": "{amount}엔 포인트"
+  },
+  "questions": {
+    "title": "내가 작성한 질문",
+    "writtenDate": "작성일",
+    "status": "상태",
+    "answered": "답변완료",
+    "pending": "미답변"
+  },
+  "buttons": {
+    "logout": "로그아웃",
+    "settings": "설정"
+  }
+}

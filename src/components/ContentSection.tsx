@@ -10,7 +10,7 @@ import Container from "./layout/Container";
 import VideoCard from "./VideoCard";
 
 export default function ContentSection() {
-  const t = useTranslations("ContentSection");
+  const t = useTranslations("content-section");
   const [isAnonymous, setIsAnonymous] = useState(true);
   const [showPrompt, setShowPrompt] = useState(false);
   const [viewCount, setViewCount] = useState(0);
