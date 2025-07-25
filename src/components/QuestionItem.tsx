@@ -1,9 +1,10 @@
 import { getTranslations } from "next-intl/server";
+import { CategoryKey } from "@/constants/categories";
 
 type QuestionItemProps = {
   username: string;
   date: string;
-  category: string;
+  category: CategoryKey;
   question: string;
   answers: number;
 };
@@ -16,6 +17,7 @@ export default async function QuestionItem({
   answers,
 }: QuestionItemProps) {
   const t = await getTranslations("community-page");
+  const tCategory = await getTranslations("categories");
 
   return (
     <div className='flex items-start gap-3 py-4 border-b'>
@@ -24,8 +26,9 @@ export default async function QuestionItem({
         <p className='font-medium'>{question}</p>
         <div className='text-sm text-gray-500 mt-1'>
           👤 {t("question.user")}: {username} | 🗓 {date} | 📁{" "}
-          {t("question.category")}: {category} | 💬 {t("question.answer")}:{" "}
-          {answers}개
+          {t("question.category")}: {tCategory(category)} | 💬{" "}
+          {t("question.answer")}: {answers}
+          {t("question.qty")}
         </div>
       </div>
     </div>

@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import { mockShorts } from "@/data/mockData";
 import { VideoItem } from "@/types/video";
 import VideoListSection from "./VideoListSection";
+import { CategoryKey } from "@/constants/categories";
 
 type Props = {
   keyword?: string;
@@ -29,7 +30,7 @@ export default function GroupedVideoSection({ keyword = "" }: Props) {
     if (!acc[video.category]) acc[video.category] = [];
     acc[video.category].push(item);
     return acc;
-  }, {} as Record<string, VideoItem[]>);
+  }, {} as Record<CategoryKey, VideoItem[]>);
 
   return (
     <>

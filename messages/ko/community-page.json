@@ -8,7 +8,8 @@
     "user": "사용자",
     "writtenDate": "작성일",
     "category": "카테고리",
-    "answer": "답변"
+    "answer": "답변",
+    "qty": "개"
   },
   "cta": "글쓰기",
   "banner": "질문을 작성하고 예약비 할인을 받으세요!"

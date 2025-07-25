@@ -8,7 +8,8 @@
     "user": "ユーザー",
     "writtenDate": "作成日",
     "category": "カテゴリー",
-    "answer": "回答"
+    "answer": "回答",
+    "qty": "件"
   },
   "cta": "投稿する",
   "banner": "質問を投稿すると、予約料金が割引になります！"
