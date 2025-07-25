@@ -7,7 +7,7 @@ import GroupedVideoSection from "@/components/GroupedVideoSection";
 import CommonButton from "./layout/CommonButton";
 
 const SearchableContents = () => {
-  const t = useTranslations("Contents");
+  const t = useTranslations("contents-page");
   const [keyword, setKeyword] = useState("");
 
   return (

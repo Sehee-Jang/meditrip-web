@@ -5,20 +5,12 @@ import { mockShorts } from "@/data/mockData";
 import { VideoItem } from "@/types/video";
 import VideoListSection from "./VideoListSection";
 
-const categoryMap: Record<string, string> = {
-  스트레스: "stress",
-  다이어트: "diet",
-  면역관리: "immunity",
-  여성질환: "women",
-  안티에이징: "antiaging",
-};
-
 type Props = {
   keyword?: string;
 };
 
 export default function GroupedVideoSection({ keyword = "" }: Props) {
-  const t = useTranslations("Contents");
+  const t = useTranslations("categories");
 
   const filtered = mockShorts.filter(
     (v) => v.title.includes(keyword) || v.category.includes(keyword)
@@ -41,18 +33,13 @@ export default function GroupedVideoSection({ keyword = "" }: Props) {
 
   return (
     <>
-      {Object.entries(grouped).map(([categoryKr, videos]) => {
-        const i18nKey = categoryMap[categoryKr as keyof typeof categoryMap];
-        if (!i18nKey) return null;
-
-        return (
-          <VideoListSection
-            key={i18nKey}
-            title={t(`categories.${i18nKey}`)}
-            videos={videos}
-          />
-        );
-      })}
+      {Object.entries(grouped).map(([categoryKey, videos]) => (
+        <VideoListSection
+          key={categoryKey}
+          title={t(categoryKey)} // t("categories")[categoryKey]와 동일
+          videos={videos}
+        />
+      ))}
     </>
   );
 }

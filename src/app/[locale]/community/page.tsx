@@ -15,18 +15,16 @@ export default async function CommunityPage() {
         center
       />
       <section className='max-w-4xl mx-auto px-4 py-6'>
-        <h2 className='text-lg font-semibold mb-2'>게시판 질문 목록</h2>
+        <h2 className='text-lg font-semibold mb-2'>{t("board.title")}</h2>
         <p className='text-sm text-muted-foreground mb-4'>
-          다른 사람들이 궁금해하는 질문과 전문가의 답변을 확인해보세요
+          {t("board.description")}
         </p>
 
         <QuestionList />
 
         <div className='my-6 flex flex-col items-center'>
           <CommonButton className='text-sm'>{t("cta")}</CommonButton>
-          <p className='text-sm text-muted-foreground mt-2'>
-            질문을 작성하고 예약비 할인을 받으세요!
-          </p>
+          <p className='text-sm text-muted-foreground mt-2'>{t("banner")}</p>
         </div>
       </section>
     </main>

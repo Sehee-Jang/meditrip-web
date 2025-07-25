@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -19,6 +20,8 @@ export default function VideoCard({
   category,
   isBlocked = false,
 }: VideoCardProps) {
+  const t = useTranslations("categories");
+
   return (
     <div
       data-id={id}
@@ -35,7 +38,14 @@ export default function VideoCard({
           <Image src={thumbnailUrl} alt={title} fill className='object-cover' />
         </div>
         <div className='p-2'>
-          <p className='text-sm text-gray-800'>{category}</p>
+          <p className='text-sm text-gray-800'>{t(category)}</p>
+          <p className='text-sm text-gray-800'>
+            {t(category, { fallback: category })}
+          </p>
+
+          {/* <p className='text-sm text-gray-800'>
+           {category}
+          </p> */}
           <p className='text-sm font-bold mt-1 line-clamp-2'>{title}</p>
         </div>
       </Link>

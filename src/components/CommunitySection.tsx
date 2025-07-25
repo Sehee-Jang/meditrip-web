@@ -22,7 +22,7 @@ const mockPosts = [
 ];
 
 export default function CommunitySection() {
-  const t = useTranslations("communit-section");
+  const t = useTranslations("community-section");
 
   return (
     <section className='bg-white py-10'>

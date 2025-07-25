@@ -2,7 +2,7 @@ export type ShortVideo = {
   id: number;
   youtubeUrl: string;
   thumbnail: string;
-  category: "스트레스" | "다이어트" | "면역관리" | "여성질환" | "안티에이징";
+  category: "stress" | "diet" | "immunity" | "women" | "antiaging";
   title: string;
 };
 
@@ -11,56 +11,56 @@ export const mockShorts: ShortVideo[] = [
     id: 1,
     youtubeUrl: "https://www.youtube.com/shorts/pYfr5DhnOak",
     thumbnail: "/images/shorts_thumb2.jpg",
-    category: "스트레스",
+    category: "stress",
     title: "스트레스 완화를 위한 호흡법",
   },
   {
     id: 2,
     youtubeUrl: "https://www.youtube.com/shorts/pYfr5DhnOak",
     thumbnail: "/images/shorts_thumb2.jpg",
-    category: "스트레스",
+    category: "stress",
     title: "스트레스 완화를 위한 호흡법",
   },
   {
     id: 3,
     youtubeUrl: "https://www.youtube.com/shorts/pYfr5DhnOak",
     thumbnail: "/images/shorts_thumb2.jpg",
-    category: "스트레스",
+    category: "stress",
     title: "스트레스 완화를 위한 호흡법",
   },
   {
     id: 4,
     youtubeUrl: "https://www.youtube.com/shorts/pYfr5DhnOak",
     thumbnail: "/images/shorts_thumb2.jpg",
-    category: "스트레스",
+    category: "stress",
     title: "스트레스 완화를 위한 호흡법",
   },
   {
     id: 5,
     youtubeUrl: "https://www.youtube.com/shorts/eedVPzSACkU",
     thumbnail: "/images/shorts_thumb3.jpg",
-    category: "다이어트",
+    category: "diet",
     title: "체지방 감량에 좋은 침자리",
   },
   {
     id: 6,
     youtubeUrl: "https://www.youtube.com/shorts/eedVPzSACkU",
     thumbnail: "/images/shorts_thumb3.jpg",
-    category: "다이어트",
+    category: "diet",
     title: "체지방 감량에 좋은 침자리",
   },
   {
     id: 7,
     youtubeUrl: "https://www.youtube.com/shorts/eedVPzSACkU",
     thumbnail: "/images/shorts_thumb3.jpg",
-    category: "다이어트",
+    category: "diet",
     title: "체지방 감량에 좋은 침자리",
   },
   {
     id: 8,
     youtubeUrl: "https://www.youtube.com/shorts/eedVPzSACkU",
     thumbnail: "/images/shorts_thumb3.jpg",
-    category: "다이어트",
+    category: "diet",
     title: "체지방 감량에 좋은 침자리",
   },
 
@@ -68,56 +68,56 @@ export const mockShorts: ShortVideo[] = [
     id: 9,
     youtubeUrl: "https://www.youtube.com/shorts/1KsyWcipOJA",
     thumbnail: "/images/shorts_thumb1.jpg",
-    category: "면역관리",
+    category: "immunity",
     title: "기침과 가래에 좋은 한방차 만들기",
   },
   {
     id: 10,
     youtubeUrl: "https://www.youtube.com/shorts/1KsyWcipOJA",
     thumbnail: "/images/shorts_thumb1.jpg",
-    category: "면역관리",
+    category: "immunity",
     title: "기침과 가래에 좋은 한방차 만들기",
   },
   {
     id: 11,
     youtubeUrl: "https://www.youtube.com/shorts/1KsyWcipOJA",
     thumbnail: "/images/shorts_thumb1.jpg",
-    category: "면역관리",
+    category: "immunity",
     title: "기침과 가래에 좋은 한방차 만들기",
   },
   {
     id: 12,
     youtubeUrl: "https://www.youtube.com/shorts/1KsyWcipOJA",
     thumbnail: "/images/shorts_thumb1.jpg",
-    category: "면역관리",
+    category: "immunity",
     title: "기침과 가래에 좋은 한방차 만들기",
   },
   {
     id: 13,
     youtubeUrl: "https://www.youtube.com/shorts/KrhhJw9Fq4Y",
     thumbnail: "/images/shorts_thumb4.jpg",
-    category: "안티에이징",
+    category: "antiaging",
     title: "10년 젊어지는 쳐진눈 올리기 마사지",
   },
   {
     id: 14,
     youtubeUrl: "https://www.youtube.com/shorts/KrhhJw9Fq4Y",
     thumbnail: "/images/shorts_thumb4.jpg",
-    category: "안티에이징",
+    category: "antiaging",
     title: "10년 젊어지는 쳐진눈 올리기 마사지",
   },
   {
     id: 15,
     youtubeUrl: "https://www.youtube.com/shorts/KrhhJw9Fq4Y",
     thumbnail: "/images/shorts_thumb4.jpg",
-    category: "안티에이징",
+    category: "antiaging",
     title: "10년 젊어지는 쳐진눈 올리기 마사지",
   },
   {
     id: 16,
     youtubeUrl: "https://www.youtube.com/shorts/KrhhJw9Fq4Y",
     thumbnail: "/images/shorts_thumb4.jpg",
-    category: "안티에이징",
+    category: "antiaging",
     title: "10년 젊어지는 쳐진눈 올리기 마사지",
   },
 ];
