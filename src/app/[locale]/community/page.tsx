@@ -7,6 +7,7 @@ import { Link } from "@/i18n/navigation";
 
 export default async function CommunityPage() {
   const t = await getTranslations("community-page");
+
   return (
     <main className='md:px-4 md:py-8'>
       <PageHeader
@@ -24,7 +25,7 @@ export default async function CommunityPage() {
         <QuestionList />
 
         <div className='my-6 flex flex-col items-center'>
-          <Link href='/community/question' className='w-1/2'>
+          <Link href='/community/questions' className='w-1/2'>
             <CommonButton className='w-full text-sm'>{t("cta")}</CommonButton>
           </Link>
 

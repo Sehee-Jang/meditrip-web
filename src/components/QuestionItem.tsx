@@ -1,5 +1,6 @@
-import { getTranslations } from "next-intl/server";
+"use client";
 import { CategoryKey } from "@/constants/categories";
+import { useTranslations } from "next-intl";
 
 type QuestionItemProps = {
   username: string;
@@ -16,8 +17,8 @@ export default async function QuestionItem({
   question,
   answers,
 }: QuestionItemProps) {
-  const t = await getTranslations("community-page");
-  const tCategory = await getTranslations("categories");
+  const t = await useTranslations("community-page");
+  const tCategory = await useTranslations("categories");
 
   return (
     <div className='flex items-start gap-3 py-4 border-b'>
