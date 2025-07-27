@@ -1,6 +1,5 @@
 "use client";
 
-// import QuestionItem from "./QuestionItem";
 import { mockQuestions } from "@/data/mockData";
 import { useEffect, useState } from "react";
 import { getAllQuestions } from "@/services/questions/getAllQuestions";

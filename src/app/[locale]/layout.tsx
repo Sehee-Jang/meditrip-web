@@ -6,6 +6,7 @@ import { routing } from "@/i18n/routing";
 import { setRequestLocale } from "next-intl/server";
 import AuthObserver from "@/components/AuthObserver";
 import "../globals.css";
+import { Toaster } from "@/components/ui/sonner";
 
 export const metadata = {
   title: "Meditrip",
@@ -37,6 +38,7 @@ export default async function LocaleLayout({
           <Header />
           <AuthObserver />
           {children}
+          <Toaster />
           <Footer />
         </NextIntlClientProvider>
       </body>

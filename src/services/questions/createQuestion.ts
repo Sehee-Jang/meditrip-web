@@ -6,13 +6,29 @@ import { v4 as uuidv4 } from "uuid";
 export async function uploadImageToSupabase(file: File): Promise<string> {
   const ext = file.name.split(".").pop();
   const filename = `${uuidv4()}.${ext}`;
-  const path = `questions/${filename}`;
+  const path = `${filename}`;
 
-  const { error } = await supabase.storage.from("questions").upload(path, file);
-  if (error) throw new Error("이미지 업로드 실패");
+  // 1) upload 결과만 data, error 로 받기 (status 제거)
+  const { data: uploadData, error: uploadError } = await supabase.storage
+    .from("questions")
+    .upload(path, file);
 
-  const { data } = supabase.storage.from("questions").getPublicUrl(path);
-  return data.publicUrl;
+  if (uploadError) {
+    console.error("Supabase upload error:", uploadError);
+    // uploadError.status 제거, message 만 사용
+    throw new Error(`이미지 업로드 실패: ${uploadError.message}`);
+  }
+  // 2) getPublicUrl 은 error 가 없으므로 data 공용 URL만 가져오기
+  const {
+    data: { publicUrl },
+  } = supabase.storage.from("questions").getPublicUrl(path);
+
+  if (!publicUrl) {
+    console.error("Supabase getPublicUrl 실패: publicUrl이 없습니다.");
+    throw new Error("이미지 URL 생성 실패");
+  }
+
+  return publicUrl;
 }
 
 export async function createQuestion({

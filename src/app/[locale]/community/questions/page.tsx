@@ -1,5 +1,5 @@
 import { getTranslations } from "next-intl/server";
-import QuestionForm from "@/components/QuestionForm";
+import QuestionForm from "@/components/questions/QuestionForm";
 import PageHeader from "@/components/layout/PageHeader";
 
 export default async function AskPage() {

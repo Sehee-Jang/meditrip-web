@@ -1,7 +1,7 @@
 import React from "react";
 import PageHeader from "@/components/layout/PageHeader";
 import { getTranslations } from "next-intl/server";
-import QuestionList from "@/components/QuestionList";
+import QuestionList from "@/components/questions/QuestionList";
 import CommonButton from "@/components/layout/CommonButton";
 import { Link } from "@/i18n/navigation";
 

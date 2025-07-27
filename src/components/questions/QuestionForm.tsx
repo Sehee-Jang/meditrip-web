@@ -8,19 +8,23 @@ import { useState } from "react";
 import Image from "next/image";
 import { createQuestion } from "@/services/questions/createQuestion";
 import { useDropzone } from "react-dropzone";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 // i18n 번역 스키마 설정
 const formSchema = z.object({
   title: z.string().min(2),
   category: z.enum(["stress", "diet", "immunity", "women", "antiaging", "etc"]),
-  content: z.string().min(10),
+  content: z.string().min(1),
   file: z.any().optional(),
 });
 
 type FormData = z.infer<typeof formSchema>;
 
 export default function QuestionForm({ userId }: { userId: string }) {
-  const t = useTranslations("question-form");
+  const tForm = useTranslations("question-form");
+  const tToast = useTranslations("question-toast");
+  const router = useRouter();
   const [preview, setPreview] = useState<string | null>(null);
 
   const {
@@ -48,16 +52,41 @@ export default function QuestionForm({ userId }: { userId: string }) {
   const onSubmit = async (data: FormData) => {
     try {
       const file = data.file?.[0];
-      await createQuestion({
+      const id = await createQuestion({
         title: data.title,
         category: data.category,
         content: data.content,
         file,
         userId,
       });
-      alert(t("submit") + " 완료!");
+
       reset();
       setPreview(null);
+
+      if (window.innerWidth < 768) {
+        toast.custom(() => (
+          <div className='toast-minimal'>
+            <p className='font-semibold text-black'>{tToast("success")} 🎉</p>
+            <p className='sonner-description'>{tToast("description")}</p>
+            <div className='flex justify-center gap-2 mt-4'>
+              <button
+                onClick={() => router.push("/")}
+                className='text-sm border px-3 py-1 rounded-md'
+              >
+                {tToast("action.home")}
+              </button>
+              <button
+                onClick={() => router.push("/community")}
+                className='text-sm bg-black text-white px-3 py-1 rounded-md'
+              >
+                {tToast("action.view")}
+              </button>
+            </div>
+          </div>
+        ));
+      } else {
+        router.push(`/community/${id}`);
+      }
     } catch (e) {
       console.error(e);
       alert("등록에 실패했습니다.");
@@ -76,23 +105,25 @@ export default function QuestionForm({ userId }: { userId: string }) {
         className='w-full max-w-2xl mx-auto px-4 md:px-8 py-10 space-y-6'
       >
         <div className='text-center'>
-          <h2 className='text-xl md:text-2xl font-bold'>{t("subtitle")}</h2>
+          <h2 className='text-xl md:text-2xl font-bold'>{tForm("subtitle")}</h2>
         </div>
 
         {/* 제목 */}
         <div>
           <label className='block font-medium mb-1'>
-            {t("form.title.label")}
+            {tForm("form.title.label")}
           </label>
           <input
             {...register("title")}
-            placeholder={t("form.title.placeholder")}
+            placeholder={tForm("form.title.placeholder")}
             className='w-full p-3 border rounded-md'
           />
-          <p className='text-xs text-gray-400 mt-1'>{t("form.title.max")}</p>
+          <p className='text-xs text-gray-400 mt-1'>
+            {tForm("form.title.max")}
+          </p>
           {errors.title && (
             <p className='text-red-500 text-sm mt-1'>
-              {t("form.title.placeholder")}
+              {tForm("form.title.placeholder")}
             </p>
           )}
         </div>
@@ -100,11 +131,11 @@ export default function QuestionForm({ userId }: { userId: string }) {
         {/* 카테고리 선택 */}
         <div>
           <label className='block font-medium mb-1'>
-            {t("form.category.label")}
+            {tForm("form.category.label")}
           </label>
           <div className='flex flex-wrap gap-2'>
             {Object.entries(
-              t.raw("form.category.options") as Record<string, string>
+              tForm.raw("form.category.options") as Record<string, string>
             ).map(([key, value]) => (
               <label
                 key={key}
@@ -122,7 +153,7 @@ export default function QuestionForm({ userId }: { userId: string }) {
           </div>
           {errors.category && (
             <p className='text-red-500 text-sm mt-1'>
-              {t("form.category.placeholder")}
+              {tForm("form.category.placeholder")}
             </p>
           )}
         </div>
@@ -130,17 +161,19 @@ export default function QuestionForm({ userId }: { userId: string }) {
         {/* 질문 내용 */}
         <div>
           <label className='block font-medium mb-1'>
-            {t("form.content.label")}
+            {tForm("form.content.label")}
           </label>
           <textarea
             {...register("content")}
-            placeholder={t("form.content.placeholder")}
+            placeholder={tForm("form.content.placeholder")}
             className='w-full p-3 border rounded-md min-h-[120px]'
           />
-          <p className='text-xs text-gray-400 mt-1'>{t("form.content.max")}</p>
+          <p className='text-xs text-gray-400 mt-1'>
+            {tForm("form.content.max")}
+          </p>
           {errors.content && (
             <p className='text-red-500 text-sm mt-1'>
-              {t("form.content.placeholder")}
+              {tForm("form.content.placeholder")}
             </p>
           )}
         </div>
@@ -148,7 +181,7 @@ export default function QuestionForm({ userId }: { userId: string }) {
         {/* 사진 업로드 */}
         <div>
           <label className='block font-medium mb-1'>
-            {t("form.image.label")}
+            {tForm("form.image.label")}
           </label>
 
           {/* 사진 첨부 */}
@@ -177,7 +210,7 @@ export default function QuestionForm({ userId }: { userId: string }) {
             ) : (
               <p className='text-gray-500 text-sm'>
                 {
-                  t(
+                  tForm(
                     "form.image.helper"
                   ) /* 예: 사진을 드래그 앤 드롭하거나 파일을 선택해 업로드해 주세요. */
                 }
@@ -187,9 +220,9 @@ export default function QuestionForm({ userId }: { userId: string }) {
         </div>
 
         <div className='bg-gray-50 border px-4 py-3 rounded-md'>
-          <p className='font-semibold text-sm'>{t("pointInfo.title")}</p>
+          <p className='font-semibold text-sm'>{tForm("pointInfo.title")}</p>
           <p className='text-sm text-gray-600 mt-1'>
-            {t("pointInfo.description")}
+            {tForm("pointInfo.description")}
           </p>
         </div>
 
@@ -209,7 +242,7 @@ export default function QuestionForm({ userId }: { userId: string }) {
             disabled={isSubmitting}
             className='bg-black text-white py-2 px-4 rounded-md hover:bg-gray-800'
           >
-            {isSubmitting ? t("submit") + "..." : t("submit")}
+            {isSubmitting ? tForm("submit") + "..." : tForm("submit")}
           </button>
         </div>
       </form>
