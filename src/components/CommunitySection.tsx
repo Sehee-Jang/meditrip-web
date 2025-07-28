@@ -5,22 +5,6 @@ import { ChevronRight } from "lucide-react";
 import Container from "./layout/Container";
 import { useQuestions } from "@/hooks/useQuestions";
 import Link from "next/link";
-// const mockPosts = [
-//   {
-//     id: 1,
-//     title: "건강한 다이어트 방법이 궁금해요",
-//     hashtags: ["#다이어트", "#건강관리"],
-//     userId: "user123",
-//     thumbnail: "/images/mock-thumbnail1.jpg",
-//   },
-//   {
-//     id: 2,
-//     title: "여성질환에 좋은 한약이 있을까요?",
-//     hashtags: ["#여성질환", "#한의학"],
-//     userId: "hanidoc88",
-//     thumbnail: "/images/mock-thumbnail2.jpg",
-//   },
-// ];
 
 export default function CommunitySection() {
   const t = useTranslations("community-section");

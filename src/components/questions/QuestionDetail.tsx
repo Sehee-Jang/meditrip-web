@@ -6,6 +6,7 @@ import { Question } from "@/types/Question";
 import CommonButton from "@/components/layout/CommonButton";
 import { useTranslations } from "next-intl";
 import { deleteQuestion } from "@/services/questions/deleteQuestion";
+import { getFormattedDate } from "@/utils/date";
 
 export default function QuestionDetail({ question }: { question: Question }) {
   const router = useRouter();
@@ -31,7 +32,7 @@ export default function QuestionDetail({ question }: { question: Question }) {
       <h1 className='text-2xl font-bold'>{question.title}</h1>
 
       <p className='text-sm text-gray-400'>
-        {question.createdAt?.toDate?.().toLocaleDateString() ?? "날짜 없음"}
+        {getFormattedDate(question.createdAt)}
       </p>
 
       <div className='text-base whitespace-pre-line'>{question.content}</div>
