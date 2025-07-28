@@ -37,7 +37,7 @@ export default function QuestionForm({ userId }: { userId: string }) {
     resolver: zodResolver(formSchema),
   });
 
-  const { getRootProps, getInputProps, acceptedFiles } = useDropzone({
+  const { getRootProps, getInputProps } = useDropzone({
     accept: {
       "image/*": [],
     },
@@ -85,7 +85,7 @@ export default function QuestionForm({ userId }: { userId: string }) {
           </div>
         ));
       } else {
-        router.push(`/community/${id}`);
+        router.push(`/community/questions/${id}`);
       }
     } catch (e) {
       console.error(e);

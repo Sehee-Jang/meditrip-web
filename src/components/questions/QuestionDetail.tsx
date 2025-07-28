@@ -1,11 +1,9 @@
 "use client";
 
-import { useTranslations } from "next-intl";
 import Image from "next/image";
+import { Question } from "@/types/Question";
 
-export default function QuestionDetail({ question }: { question: any }) {
-  const t = useTranslations("question-detail");
-
+export default function QuestionDetail({ question }: { question: Question }) {
   return (
     <article className='max-w-3xl mx-auto px-4 py-6 space-y-4'>
       <p className='text-sm text-gray-500'>{question.category}</p>

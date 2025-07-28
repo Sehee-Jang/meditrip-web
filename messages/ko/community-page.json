@@ -6,9 +6,11 @@
   },
   "question": {
     "user": "사용자",
+    "anonymous": "익명",
     "writtenDate": "작성일",
     "category": "카테고리",
     "answer": "답변",
+    "pending": "답변 대기",
     "qty": "개"
   },
   "cta": "글쓰기",

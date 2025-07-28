@@ -10,15 +10,15 @@ type QuestionItemProps = {
   answers: number;
 };
 
-export default async function QuestionItem({
+export default function QuestionItem({
   username,
   date,
   category,
   question,
   answers,
 }: QuestionItemProps) {
-  const t = await useTranslations("community-page");
-  const tCategory = await useTranslations("categories");
+  const t = useTranslations("community-page");
+  const tCategory = useTranslations("categories");
 
   return (
     <div className='flex items-start gap-3 py-4 border-b'>

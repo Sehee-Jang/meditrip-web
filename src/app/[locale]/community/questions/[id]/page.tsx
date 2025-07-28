@@ -3,18 +3,19 @@ import QuestionDetail from "@/components/questions/QuestionDetail";
 import PageHeader from "@/components/layout/PageHeader";
 import { getTranslations } from "next-intl/server";
 
-interface Props {
-  params: {
-    id: string;
-  };
-}
+type PageParams = Promise<{ id: string }>;
 
-export default async function QuestionDetailPage({ params }: Props) {
-  const question = await getQuestionById(params.id);
+export default async function QuestionDetailPage({
+  params,
+}: {
+  params: PageParams;
+}) {
+  const { id } = await params;
+  const question = await getQuestionById(id);
   const t = await getTranslations("question-detail");
 
   return (
-    <main className='md:px-4 md:py-8'>
+    <main>
       <PageHeader
         desktopTitle={t("title")}
         mobileTitle={t("title")}

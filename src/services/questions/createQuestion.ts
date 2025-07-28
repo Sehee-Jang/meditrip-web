@@ -9,7 +9,7 @@ export async function uploadImageToSupabase(file: File): Promise<string> {
   const path = `${filename}`;
 
   // 1) upload 결과만 data, error 로 받기 (status 제거)
-  const { data: uploadData, error: uploadError } = await supabase.storage
+  const { error: uploadError } = await supabase.storage
     .from("questions")
     .upload(path, file);
 
