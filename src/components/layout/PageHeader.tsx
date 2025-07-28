@@ -1,3 +1,7 @@
+"use client";
+
+import React from "react";
+import { useRouter } from "next/navigation";
 import { ChevronLeft } from "lucide-react";
 
 interface PageHeaderProps {
@@ -13,11 +17,25 @@ export default function PageHeader({
   showBackIcon = false,
   center = false,
 }: PageHeaderProps) {
+  const router = useRouter();
+
+  const handleBack = () => {
+    router.back();
+  };
+
   return (
     <>
       {/* 모바일 헤더 */}
       <h1 className='flex md:hidden w-full shadow-md text-xl font-bold items-center gap-2 py-3 px-4 mb-4'>
-        {showBackIcon && <ChevronLeft size={24} />}
+        {showBackIcon && (
+          <button
+            onClick={handleBack}
+            className='p-2 rounded-lg hover:bg-gray-100 transition'
+            aria-label='뒤로가기'
+          >
+            <ChevronLeft className='w-6 h-6' />
+          </button>
+        )}
         {mobileTitle}
       </h1>
 
