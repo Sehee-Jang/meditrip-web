@@ -14,7 +14,7 @@ export default async function AskPage() {
         center
       />
       {/* <h1 className='text-2xl font-bold text-center'>{t("title")}</h1> */}
-      <QuestionForm userId='abc123' />
+      <QuestionForm userId='' />
     </main>
   );
 }
