@@ -3,13 +3,13 @@ import QuestionForm from "@/components/questions/QuestionForm";
 import PageHeader from "@/components/layout/PageHeader";
 
 export default async function AskPage() {
-  const t = await getTranslations("questions-page"); // preload for SEO
+  const t = await getTranslations("question-form");
 
   return (
     <main className='md:px-4 md:py-8'>
       <PageHeader
-        desktopTitle={t("title")}
-        mobileTitle={t("title")}
+        desktopTitle={t("title.create")}
+        mobileTitle={t("title.create")}
         showBackIcon
         center
       />

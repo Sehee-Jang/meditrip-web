@@ -1,3 +1,9 @@
 {
-  "title": "질문 상세"
+  "title": "질문 상세 보기",
+  "edit": "수정",
+  "delete": "삭제",
+  "back": "목록으로",
+  "confirmDelete": "정말 삭제하시겠어요?",
+  "deleteFailed": "삭제에 실패했습니다.",
+  "noDate": "날짜 없음"
 }

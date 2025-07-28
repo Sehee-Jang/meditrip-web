@@ -231,18 +231,19 @@ export default function QuestionForm({ userId }: { userId: string }) {
             type='button'
             className='border border-gray-400 text-gray-700 py-2 px-4 rounded-md'
             onClick={() => {
-              reset();
-              setPreview(null);
+              router.push("/community");
             }}
           >
-            취소
+            {tForm("cancel")}
           </button>
           <button
             type='submit'
             disabled={isSubmitting}
             className='bg-black text-white py-2 px-4 rounded-md hover:bg-gray-800'
           >
-            {isSubmitting ? tForm("submit") + "..." : tForm("submit")}
+            {isSubmitting
+              ? tForm("submit.create") + "..."
+              : tForm("submit.create")}
           </button>
         </div>
       </form>
