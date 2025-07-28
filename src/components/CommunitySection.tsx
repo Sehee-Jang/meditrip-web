@@ -5,6 +5,7 @@ import { ChevronRight } from "lucide-react";
 import Container from "./layout/Container";
 import { useQuestions } from "@/hooks/useQuestions";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function CommunitySection() {
   const t = useTranslations("community-section");
@@ -41,10 +42,11 @@ export default function CommunitySection() {
               >
                 <div className='aspect-[4/3] bg-gray-200 flex items-center justify-center text-sm text-gray-500'>
                   {q.imageUrl ? (
-                    <img
+                    <Image
                       src={q.imageUrl}
                       alt='preview'
-                      className='w-full h-full object-cover'
+                      fill
+                      className='object-cover'
                     />
                   ) : (
                     "Image Thumb"

@@ -3,10 +3,15 @@ import EditQuestionForm from "@/components/questions/EditQuestionForm";
 import PageHeader from "@/components/layout/PageHeader";
 import { getQuestionById } from "@/services/questions/getQuestionById";
 
-type PageProps = { params: { id: string } };
+type PageProps = Promise<{ id: string }>;
 
-export default async function EditQuestionPage({ params }: PageProps) {
-  const question = await getQuestionById(params.id);
+export default async function EditQuestionPage({
+  params,
+}: {
+  params: PageProps;
+}) {
+  const { id } = await params;
+  const question = await getQuestionById(id);
   const t = await getTranslations("question-form");
 
   return (

@@ -3,9 +3,6 @@ import { doc, getDoc } from "firebase/firestore";
 import { Question } from "@/types/Question";
 import { Timestamp } from "firebase/firestore";
 
-// Firestore Timestamp 대응
-type FirestoreTimestamp = { toDate: () => Date };
-
 export async function getQuestionById(id: string): Promise<Question> {
   const ref = doc(db, "questions", id);
   const snapshot = await getDoc(ref);

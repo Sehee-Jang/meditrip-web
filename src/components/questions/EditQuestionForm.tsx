@@ -32,7 +32,6 @@ export default function EditQuestionForm({ question }: { question: Question }) {
     register,
     handleSubmit,
     setValue,
-    reset,
     formState: { errors, isSubmitting },
   } = useForm<FormData>({
     resolver: zodResolver(formSchema),
