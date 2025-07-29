@@ -1,9 +1,10 @@
 import React from "react";
 import PageHeader from "@/components/layout/PageHeader";
 import { getTranslations } from "next-intl/server";
-import QuestionList from "@/components/questions/QuestionList";
+// import QuestionList from "@/components/questions/QuestionList";
 import CommonButton from "@/components/layout/CommonButton";
 import { Link } from "@/i18n/navigation";
+import PaginatedQuestionList from "@/components/questions/PaginatedQuestionList";
 
 export default async function CommunityPage() {
   const t = await getTranslations("community-page");
@@ -22,7 +23,8 @@ export default async function CommunityPage() {
           {t("board.description")}
         </p>
 
-        <QuestionList />
+        {/* <QuestionList /> */}
+        <PaginatedQuestionList pageSize={5} />
 
         <div className='my-6 flex flex-col items-center'>
           <Link href='/community/questions' className='w-1/2'>

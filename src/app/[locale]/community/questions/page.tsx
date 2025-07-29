@@ -13,7 +13,6 @@ export default async function AskPage() {
         showBackIcon
         center
       />
-      {/* <h1 className='text-2xl font-bold text-center'>{t("title")}</h1> */}
       <QuestionForm userId='' />
     </main>
   );
