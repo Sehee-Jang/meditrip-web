@@ -1,15 +1,17 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { registerWithEmail } from "@/lib/auth";
 import CommonButton from "./common/CommonButton";
 import Container from "./common/Container";
 import { toast } from "sonner";
+import { auth } from "@/lib/firebase";
+import { onAuthStateChanged, User } from "firebase/auth";
 
 export default function SignupSection() {
   const t = useTranslations("signup-section");
-
+  const [user, setUser] = useState<User | null>(null);
   const [email, setEmail] = useState("");
   const [pw, setPw] = useState("");
   const [pwCheck, setPwCheck] = useState("");
@@ -17,7 +19,19 @@ export default function SignupSection() {
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [agreeMarketing, setAgreeMarketing] = useState(false);
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState(false);
+
+  // 1. Auth 상태 관리
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, (u) => {
+      setUser(u);
+    });
+    return () => unsub();
+  }, []);
+
+  // 2. 이미 로그인(회원가입) 완료된 상태면 아무것도 렌더하지 않음
+  if (user && !user.isAnonymous) {
+    return null;
+  }
 
   const validate = () => {
     if (!email.includes("@")) return "이메일 형식이 올바르지 않습니다.";
@@ -45,9 +59,7 @@ export default function SignupSection() {
         agreeTerms,
         agreeMarketing,
       });
-      console.log("회원가입 성공:", user);
       toast.success(t("successToast"));
-      setSuccess(true);
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message);
