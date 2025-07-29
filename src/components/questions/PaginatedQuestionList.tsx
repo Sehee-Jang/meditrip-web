@@ -10,7 +10,10 @@ import {
   PaginationPrevious,
   PaginationNext,
 } from "@/components/ui/pagination";
-import { getQuestions } from "@/services/questions/getQuestions";
+import {
+  getQuestions,
+  getQuestionsCount,
+} from "@/services/questions/getQuestions";
 import type { QueryDocumentSnapshot, DocumentData } from "firebase/firestore";
 import { useTranslations } from "next-intl";
 import { Question } from "@/types/Question";
@@ -31,16 +34,19 @@ export default function PaginatedQuestionList({
   const [questions, setQuestions] = useState<Question[]>([]);
   const [totalCount, setTotalCount] = useState(0);
 
+  // 1) 마운트 시 한 번만 전체 개수 조회
   useEffect(() => {
-    getQuestions(pageSize, cursors[page - 1]).then(
-      ({ questions, lastDoc, totalCount }) => {
-        setQuestions(questions);
-        setTotalCount(totalCount);
-        if (lastDoc && cursors.length === page) {
-          setCursors((prev) => [...prev, lastDoc]);
-        }
+    getQuestionsCount().then((count) => setTotalCount(count));
+  }, []);
+
+  // 2) page 혹은 cursor 변경 시 질문 목록만 조회
+  useEffect(() => {
+    getQuestions(pageSize, cursors[page - 1]).then(({ questions, lastDoc }) => {
+      setQuestions(questions);
+      if (lastDoc && cursors.length === page) {
+        setCursors((prev) => [...prev, lastDoc]);
       }
-    );
+    });
   }, [page, pageSize, cursors]);
 
   const totalPages = Math.ceil(totalCount / pageSize);
@@ -55,7 +61,10 @@ export default function PaginatedQuestionList({
           const hasAnswer = answerCount > 0;
 
           return (
-            <li key={q.id} className='py-6 px-4 border-b hover:bg-gray-50 transition'>
+            <li
+              key={q.id}
+              className='py-6 px-4 border-b hover:bg-gray-50 transition'
+            >
               <Link href={`/community/questions/${q.id}`}>
                 <div className='flex items-center gap-3'>
                   <MessageSquare className='w-5 h-5 text-gray-400' />

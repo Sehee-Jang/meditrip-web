@@ -6,29 +6,25 @@ import {
   limit,
   startAfter,
   getDocs,
-  DocumentData,
+  getCountFromServer,
   QueryDocumentSnapshot,
+  DocumentData,
 } from "firebase/firestore";
 import { Question } from "@/types/Question";
 
 export interface QuestionPage {
   questions: Question[];
   lastDoc: QueryDocumentSnapshot<DocumentData> | null;
-  totalCount: number;
 }
 
 /**
  * pageSize 개씩, cursor 다음 문서부터 불러오는 페이징 함수
+ * totalCount는 반환하지 않습니다.
  */
 export async function getQuestions(
   pageSize: number,
   cursor?: QueryDocumentSnapshot<DocumentData>
 ): Promise<QuestionPage> {
-  // 전체 개수 가져오기
-  const totalSnap = await getDocs(collection(db, "questions"));
-  const totalCount = totalSnap.size;
-
-  // 페이징 쿼리: cursor가 있으면 startAfter(cursor) 추가
   const q = query(
     collection(db, "questions"),
     orderBy("createdAt", "desc"),
@@ -43,5 +39,14 @@ export async function getQuestions(
   })) as Question[];
 
   const lastDoc = snap.docs[snap.docs.length - 1] ?? null;
-  return { questions, lastDoc, totalCount };
+  return { questions, lastDoc };
+}
+
+/**
+ * 전체 질문 개수만 빠르게 조회하는 함수
+ */
+export async function getQuestionsCount(): Promise<number> {
+  const coll = collection(db, "questions");
+  const snapshot = await getCountFromServer(coll);
+  return snapshot.data().count;
 }
