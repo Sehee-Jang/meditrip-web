@@ -14,7 +14,7 @@ export interface Question {
   title: string;
   content: string;
   category: string;
-  createdAt?: { toDate: () => Date };
+  createdAt: string;
   imageUrl?: string;
   userId?: string;
   user?: User;

@@ -25,15 +25,15 @@ export default function QuestionDetail({ question }: { question: Question }) {
     }
   };
 
+  const createdDate = new Date(question.createdAt);
+
   return (
     <article className='max-w-3xl mx-auto px-4 py-6 space-y-4'>
       {/* 본문 */}
       <p className='text-sm text-gray-500'>{question.category}</p>
       <h1 className='text-2xl font-bold'>{question.title}</h1>
 
-      <p className='text-sm text-gray-400'>
-        {getFormattedDate(question.createdAt)}
-      </p>
+      <p className='text-sm text-gray-400'>{getFormattedDate(createdDate)}</p>
 
       <div className='text-base whitespace-pre-line'>{question.content}</div>
 

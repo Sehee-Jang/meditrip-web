@@ -1,27 +1,23 @@
-// utils/date.ts
-export function getFormattedDate(date: unknown): string {
-  if (
-    date &&
-    typeof date === "object" &&
-    "seconds" in date &&
-    typeof (date as { seconds: unknown }).seconds === "number"
-  ) {
-    const { seconds, nanoseconds = 0 } = date as {
-      seconds: number;
-      nanoseconds?: number;
-    };
-    const millis = seconds * 1000 + Math.floor(nanoseconds / 1_000_000);
-    return new Date(millis).toLocaleDateString();
+import { Timestamp } from "firebase/firestore";
+
+export function getFormattedDate(value: Date | string | Timestamp): string {
+  let dateObj: Date;
+
+  if (typeof value === "string") {
+    dateObj = new Date(value);
+  } else if (value instanceof Timestamp) {
+    dateObj = value.toDate();
+  } else {
+    dateObj = value;
   }
 
-  if (
-    date &&
-    typeof date === "object" &&
-    "toDate" in date &&
-    typeof (date as { toDate: () => Date }).toDate === "function"
-  ) {
-    return (date as { toDate: () => Date }).toDate().toLocaleDateString();
+  if (isNaN(dateObj.getTime())) {
+    return "날짜없음";
   }
 
-  return "날짜 없음";
+  // 예: "2025.07.30"
+  const yyyy = dateObj.getFullYear();
+  const mm = String(dateObj.getMonth() + 1).padStart(2, "0");
+  const dd = String(dateObj.getDate()).padStart(2, "0");
+  return `${yyyy}.${mm}.${dd}`;
 }
