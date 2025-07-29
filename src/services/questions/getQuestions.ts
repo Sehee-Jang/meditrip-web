@@ -33,10 +33,13 @@ export async function getQuestions(
   );
   const snap = await getDocs(q);
 
-  const questions = snap.docs.map((doc) => ({
-    id: doc.id,
-    ...(doc.data() as any),
-  })) as Question[];
+  const questions: Question[] = snap.docs.map((doc) => {
+    const data = doc.data() as Omit<Question, "id">;
+    return {
+      id: doc.id,
+      ...data,
+    };
+  });
 
   const lastDoc = snap.docs[snap.docs.length - 1] ?? null;
   return { questions, lastDoc };
