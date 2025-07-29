@@ -2,6 +2,7 @@ import { db } from "@/lib/firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { supabase } from "@/lib/supabase";
 import { v4 as uuidv4 } from "uuid";
+import { auth } from "@/lib/firebase";         
 
 export async function uploadImageToSupabase(file: File): Promise<string> {
   const ext = file.name.split(".").pop();
@@ -43,21 +44,30 @@ export async function createQuestion({
   content: string;
   file?: File;
   userId: string;
-}) {
-  let imageUrl = "";
-  if (file) {
-    imageUrl = await uploadImageToSupabase(file);
+  }) {
+    // 1) 이미지 업로드 로직
+    let imageUrl = "";
+    if (file) {
+      imageUrl = await uploadImageToSupabase(file);
+    }
+
+    // 2) 현재 로그인 유저 정보 읽어오기
+    const currentUser = auth.currentUser;
+    const user = currentUser
+      ? { id: currentUser.uid, name: currentUser.displayName || "익명" }
+      : { id: "", name: "익명" };
+
+    // 3) 질문 문서 생성 시 user 객체도 함께 저장
+    const docRef = await addDoc(collection(db, "questions"), {
+      title,
+      category,
+      content,
+      imageUrl,
+      userId,
+      user,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    });
+
+    return docRef.id;
   }
-
-  const docRef = await addDoc(collection(db, "questions"), {
-    title,
-    category,
-    content,
-    imageUrl,
-    userId,
-    createdAt: serverTimestamp(),
-    updatedAt: serverTimestamp(),
-  });
-
-  return docRef.id;
-}

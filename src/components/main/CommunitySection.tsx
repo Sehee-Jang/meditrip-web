@@ -40,16 +40,19 @@ export default function CommunitySection() {
                 href={`/community/questions/${q.id}`}
                 className='border rounded-lg overflow-hidden shadow-sm bg-gray-50 hover:bg-gray-100 transition'
               >
-                <div className='aspect-[4/3] bg-gray-200 flex items-center justify-center text-sm text-gray-500'>
+                <div className='w-full h-32 sm:h-40 bg-gray-200 relative'>
                   {q.imageUrl ? (
                     <Image
                       src={q.imageUrl}
                       alt='preview'
                       fill
                       className='object-cover'
+                      sizes='(max-width: 640px) 100vw, 400px'
                     />
                   ) : (
-                    "Image Thumb"
+                    <div className='flex items-center justify-center w-full h-full text-sm text-gray-500'>
+                      Image Thumb
+                    </div>
                   )}
                 </div>
                 <div className='p-4'>
