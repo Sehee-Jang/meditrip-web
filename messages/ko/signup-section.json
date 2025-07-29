@@ -7,5 +7,6 @@
   "nicknamePlaceholder": "닉네임 입력",
   "agreeTermsLabel": "이용약관 동의 (필수)",
   "agreeMarketingLabel": "마케팅 수신 동의 (선택)",
-  "button": "회원가입"
+  "button": "회원가입",
+  "successToast": "회원가입이 완료되었습니다!"
 }

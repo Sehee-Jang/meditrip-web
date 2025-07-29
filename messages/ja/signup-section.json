@@ -7,5 +7,6 @@
   "nicknamePlaceholder": "ニックネームを入力",
   "agreeTermsLabel": "利用規約に同意する（必須）",
   "agreeMarketingLabel": "マーケティング情報の受信に同意する（任意）",
-  "button": "登録する"
+  "button": "登録する",
+  "successToast": "会員登録が完了しました！"
 }

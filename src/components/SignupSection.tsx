@@ -5,6 +5,7 @@ import { useState } from "react";
 import { registerWithEmail } from "@/lib/auth";
 import CommonButton from "./common/CommonButton";
 import Container from "./common/Container";
+import { toast } from "sonner";
 
 export default function SignupSection() {
   const t = useTranslations("signup-section");
@@ -37,8 +38,15 @@ export default function SignupSection() {
     }
 
     try {
-      const user = await registerWithEmail({ email, password: pw, nickname });
+      const user = await registerWithEmail({
+        email,
+        password: pw,
+        nickname,
+        agreeTerms,
+        agreeMarketing,
+      });
       console.log("회원가입 성공:", user);
+      toast.success(t("successToast"));
       setSuccess(true);
     } catch (err: unknown) {
       if (err instanceof Error) {
@@ -49,9 +57,6 @@ export default function SignupSection() {
     }
   };
 
-  if (success) {
-    return <div>🎉 회원가입이 완료되었습니다!</div>;
-  }
   return (
     <section id='signup-section' className='w-full bg-white py-[60px]'>
       <Container className='text-center'>
