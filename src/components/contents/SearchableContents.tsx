@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import CategorySection from "@/components/CategorySection";
-import GroupedVideoSection from "@/components/GroupedVideoSection";
-import CommonButton from "./layout/CommonButton";
+import CategorySection from "@/components/main/CategorySection";
+import GroupedVideoSection from "@/components/contents/GroupedVideoSection";
+import CommonButton from "../common/CommonButton";
 
 const SearchableContents = () => {
   const t = useTranslations("contents-page");

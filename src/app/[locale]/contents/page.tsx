@@ -1,8 +1,8 @@
 import { getTranslations } from "next-intl/server";
-import SearchableContents from "@/components/SearchableContents";
-import Container from "@/components/layout/Container";
+import SearchableContents from "@/components/contents/SearchableContents";
+import Container from "@/components/common/Container";
 
-import PageHeader from "@/components/layout/PageHeader";
+import PageHeader from "@/components/common/PageHeader";
 import SignupSection from "@/components/SignupSection";
 
 export default async function ContentsPage() {

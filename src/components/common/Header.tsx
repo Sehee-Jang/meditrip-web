@@ -2,8 +2,13 @@
 
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import LanguageSwitcher from "./LanguageSwitcher";
-import { HospitalIcon, UserIcon } from "lucide-react";
+import LanguageSwitcher from "../LanguageSwitcher";
+import {
+  HospitalIcon,
+  UserIcon,
+  BookOpenIcon,
+  MessageCircleIcon,
+} from "lucide-react";
 
 export default function Header() {
   const t = useTranslations("header");
@@ -26,6 +31,12 @@ export default function Header() {
 
       {/* 모바일 아이콘 메뉴 */}
       <nav className='flex md:hidden items-center gap-4 text-gray-700'>
+        <Link href='/contents' aria-label={t("content")}>
+          <BookOpenIcon size={20} />
+        </Link>
+        <Link href='/community' aria-label={t("community")}>
+          <MessageCircleIcon size={20} />
+        </Link>
         <Link href='/hospital' aria-label='hospital'>
           <HospitalIcon size={20} />
         </Link>

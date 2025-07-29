@@ -10,7 +10,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Image from "next/image";
 import { updateQuestion } from "@/services/questions/updateQuestion";
-import CommonButton from "../layout/CommonButton";
+import CommonButton from "../common/CommonButton";
 
 const formSchema = z.object({
   title: z.string().min(2),

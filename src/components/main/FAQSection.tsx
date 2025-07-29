@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { HelpCircle, Search, ThumbsUp } from "lucide-react";
-import Container from "./layout/Container";
+import Container from "../common/Container";
 
 const faqIcons = [HelpCircle, Search, ThumbsUp];
 

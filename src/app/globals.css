@@ -91,6 +91,12 @@ a {
   }
 }
 
+.page-blur {
+  filter: blur(8px);
+  transition: filter 0.3s ease;
+  pointer-events: none; /* 클릭 방지 */
+}
+
 /* ---break---  */
 
 @layer base {

@@ -1,6 +1,6 @@
 import { getQuestionById } from "@/services/questions/getQuestionById";
 import QuestionDetail from "@/components/questions/QuestionDetail";
-import PageHeader from "@/components/layout/PageHeader";
+import PageHeader from "@/components/common/PageHeader";
 import { getTranslations } from "next-intl/server";
 
 type PageParams = Promise<{ id: string }>;

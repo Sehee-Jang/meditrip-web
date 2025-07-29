@@ -6,8 +6,8 @@ import { useTranslations } from "next-intl";
 // import SignupPrompt from "./SignupPrompt";
 import Link from "next/link";
 import { mockShorts } from "@/data/mockData";
-import Container from "./layout/Container";
-import VideoCard from "./VideoCard";
+import Container from "../common/Container";
+import VideoCard from "../contents/VideoCard";
 
 export default function ContentSection() {
   const t = useTranslations("content-section");

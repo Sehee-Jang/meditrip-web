@@ -8,8 +8,8 @@ import {
   CarouselItem,
 } from "@/components/ui/carousel";
 import Image from "next/image";
-import CommonButton from "./layout/CommonButton";
-import Container from "./layout/Container";
+import CommonButton from "../common/CommonButton";
+import Container from "../common/Container";
 
 export default function HeroSection() {
   const t = useTranslations("hero-section");

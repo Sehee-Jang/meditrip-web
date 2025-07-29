@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Question } from "@/types/Question";
-import CommonButton from "@/components/layout/CommonButton";
+import CommonButton from "@/components/common/CommonButton";
 import { useTranslations } from "next-intl";
 import { deleteQuestion } from "@/services/questions/deleteQuestion";
 import { getFormattedDate } from "@/utils/date";

@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import Container from "./layout/Container";
+import Container from "../common/Container";
 import {
   CATEGORIES,
   CATEGORY_ICONS,

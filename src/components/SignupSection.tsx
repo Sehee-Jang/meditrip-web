@@ -3,8 +3,8 @@
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { registerWithEmail } from "@/lib/auth";
-import CommonButton from "./layout/CommonButton";
-import Container from "./layout/Container";
+import CommonButton from "./common/CommonButton";
+import Container from "./common/Container";
 
 export default function SignupSection() {
   const t = useTranslations("signup-section");
@@ -53,7 +53,7 @@ export default function SignupSection() {
     return <div>🎉 회원가입이 완료되었습니다!</div>;
   }
   return (
-    <section className='w-full bg-white py-[60px]'>
+    <section id='signup-section' className='w-full bg-white py-[60px]'>
       <Container className='text-center'>
         <div className='w-full max-w-[1440px] px-[20px] md:px-[170px] text-center'>
           <h2 className='text-2xl md:text-4xl font-bold mb-4'>{t("title")}</h2>

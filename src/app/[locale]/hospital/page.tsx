@@ -1,5 +1,5 @@
 import React from "react";
-import PageHeader from "@/components/layout/PageHeader";
+import PageHeader from "@/components/common/PageHeader";
 import { getTranslations } from "next-intl/server";
 
 export default async function HospitalPage() {

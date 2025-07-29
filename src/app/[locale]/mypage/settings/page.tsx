@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import PageHeader from "@/components/layout/PageHeader";
-import CommonButton from "@/components/layout/CommonButton";
-import Container from "@/components/layout/Container";
+import PageHeader from "@/components/common/PageHeader";
+import CommonButton from "@/components/common/CommonButton";
+import Container from "@/components/common/Container";
 import { Switch } from "@/components/ui/switch";
 import { Lock, Trash2, Bell, Globe, HelpCircle } from "lucide-react";
 

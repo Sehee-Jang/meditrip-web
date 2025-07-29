@@ -1,8 +1,8 @@
 import React from "react";
-import PageHeader from "@/components/layout/PageHeader";
+import PageHeader from "@/components/common/PageHeader";
 import { getTranslations } from "next-intl/server";
-import CommonButton from "@/components/layout/CommonButton";
-import Container from "@/components/layout/Container";
+import CommonButton from "@/components/common/CommonButton";
+import Container from "@/components/common/Container";
 import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 

@@ -1,6 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import QuestionForm from "@/components/questions/QuestionForm";
-import PageHeader from "@/components/layout/PageHeader";
+import PageHeader from "@/components/common/PageHeader";
 
 export default async function AskPage() {
   const t = await getTranslations("question-form");

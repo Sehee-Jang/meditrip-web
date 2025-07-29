@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { ChevronRight } from "lucide-react";
-import Container from "./layout/Container";
+import Container from "../common/Container";
 import { useQuestions } from "@/hooks/useQuestions";
 import Link from "next/link";
 import Image from "next/image";
