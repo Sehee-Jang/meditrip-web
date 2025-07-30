@@ -13,10 +13,10 @@ export default function SignupTrigger({ children }: Props) {
   const [triggered, setTriggered] = useState(false);
   const [clickCount, setClickCount] = useState(0);
 
-  // 1) 익명 로그인 여부 감지
+  // 1) 익명 로그인  & 비로그인 여부 감지
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, (user) => {
-      setIsAnon(!!user?.isAnonymous);
+      setIsAnon(!!user?.isAnonymous || !user);
     });
     return unsub;
   }, []);

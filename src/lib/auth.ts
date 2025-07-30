@@ -22,12 +22,14 @@ export const loginAnonymously = async () => {
   }
 };
 
-export const observeAuth = (callback: (user: User) => void) => {
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
+export const observeAuth = (callback: (user: User | null) => void) => {
+  return onAuthStateChanged(auth, (user) => {
+    if (user && !user.isAnonymous) {
+      // 실제 로그인된 사용자
       callback(user);
     } else {
-      loginAnonymously();
+      // 익명 또는 로그아웃 상태
+      callback(null);
     }
   });
 };

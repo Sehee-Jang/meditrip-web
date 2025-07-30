@@ -2,7 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
-import { onAuthStateChanged, User as FirebaseUser } from "firebase/auth";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { onAuthStateChanged, signOut } from "firebase/auth";
 import { auth, db } from "@/lib/firebase";
 import {
   doc,
@@ -15,8 +17,8 @@ import {
 } from "firebase/firestore";
 import CommonButton from "@/components/common/CommonButton";
 import Container from "@/components/common/Container";
+import LoadingSpinner from "@/components/common/LoadingSpinner";
 import { ChevronRight } from "lucide-react";
-import Link from "next/link";
 
 interface Reservation {
   id: string;
@@ -33,7 +35,9 @@ interface MyQuestion {
 
 export default function MyPageContent() {
   const t = useTranslations("mypage");
-  const [user, setUser] = useState<FirebaseUser | null>(null);
+  const router = useRouter();
+  const [checkingAuth, setCheckingAuth] = useState(true);
+
   const [nickname, setNickname] = useState<string>("");
   const [points, setPoints] = useState<number>(0);
   const [reservations, setReservations] = useState<Reservation[]>([]);
@@ -42,9 +46,7 @@ export default function MyPageContent() {
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (u) => {
       if (u && !u.isAnonymous) {
-        setUser(u);
-
-        // ─── 1) 프로필 · 포인트 로드 ─────────────────
+        // 1) 프로필 · 포인트 로드
         const userDoc = await getDoc(doc(db, "users", u.uid));
         if (userDoc.exists()) {
           const data = userDoc.data();
@@ -52,7 +54,7 @@ export default function MyPageContent() {
           setPoints(data.points || 0);
         }
 
-        // ─── 2) 예약 내역 로드 ───────────────────────
+        // 2) 예약 내역 로드
         const resSnap = await getDocs(
           query(collection(db, "reservations"), where("userId", "==", u.uid))
         );
@@ -74,7 +76,7 @@ export default function MyPageContent() {
           })
         );
 
-        // ─── 3) 질문(questions) 이중 쿼리 후 병합 ────────
+        // 3) 질문(questions) 이중 쿼리 후 병합
         const snap1 = await getDocs(
           query(collection(db, "questions"), where("userId", "==", u.uid))
         );
@@ -105,14 +107,23 @@ export default function MyPageContent() {
             };
           })
         );
-        // ─────────────────────────────────────────────────
+        //
+      } else {
+        // 미로그인 상태라면 홈으로 보냄
+        router.replace("/");
       }
+      setCheckingAuth(false);
     });
     return () => unsub();
-  }, []);
+  }, [router]);
 
-  if (!user) {
-    return <p className='text-center py-8'>{t("loading")}</p>;
+  if (checkingAuth) {
+    return (
+      <div className='min-h-[50vh] flex flex-col items-center justify-center'>
+        <LoadingSpinner />
+        <p className='mt-4 text-gray-500'>{t("loading")}</p>
+      </div>
+    );
   }
 
   return (
@@ -204,24 +215,33 @@ export default function MyPageContent() {
       <div className='hidden md:flex justify-end gap-2 mt-12'>
         <CommonButton
           className='text-sm bg-white text-black border'
-          onClick={() => auth.signOut()}
+          onClick={async () => {
+            await signOut(auth);
+            router.push("/");
+          }}
         >
           {t("buttons.logout")}
         </CommonButton>
+
         <Link href='/mypage/settings' className='w-1/2'>
           <CommonButton className='text-sm'>
             {t("buttons.settings")}
           </CommonButton>
         </Link>
       </div>
-      {/* 모바일 */}
+
+      {/* 로그아웃·설정 (모바일) */}
       <div className='flex md:hidden justify-between gap-2 mb-8'>
         <CommonButton
           className='w-1/2 text-sm bg-white text-black border hover:bg-gray-100'
-          onClick={() => auth.signOut()}
+          onClick={async () => {
+            await signOut(auth);
+            router.push("/");
+          }}
         >
           {t("buttons.logout")}
         </CommonButton>
+
         <Link href='/mypage/settings' className='w-1/2'>
           <CommonButton className='w-full text-sm'>
             {t("buttons.settings")}

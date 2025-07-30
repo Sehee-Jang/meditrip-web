@@ -6,6 +6,7 @@ import { registerWithEmail } from "@/lib/auth";
 import CommonButton from "./common/CommonButton";
 import Container from "./common/Container";
 import { toast } from "sonner";
+
 import { auth } from "@/lib/firebase";
 import { onAuthStateChanged, User } from "firebase/auth";
 
@@ -52,7 +53,7 @@ export default function SignupSection() {
     }
 
     try {
-      const user = await registerWithEmail({
+      await registerWithEmail({
         email,
         password: pw,
         nickname,
@@ -130,7 +131,7 @@ export default function SignupSection() {
               </label>
             </div>
 
-            <CommonButton>{t("button")}</CommonButton>
+            <CommonButton type='submit'>{t("button")}</CommonButton>
 
             {error && <p className='text-red-500 mt-2'>{error}</p>}
           </form>

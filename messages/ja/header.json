@@ -3,5 +3,7 @@
   "content": "コンテンツ",
   "community": "コミュニティ",
   "hospital": "病院情報",
-  "mypage": "マイページ"
+  "mypage": "マイページ",
+  "login": "login",
+  "logout": "logout"
 }
