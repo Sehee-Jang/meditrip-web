@@ -13,7 +13,7 @@ export default async function AskPage() {
         showBackIcon
         center
       />
-      <QuestionForm userId='' />
+      <QuestionForm />
     </main>
   );
 }

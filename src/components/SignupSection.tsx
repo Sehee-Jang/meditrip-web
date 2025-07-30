@@ -9,6 +9,7 @@ import { toast } from "sonner";
 
 import { auth } from "@/lib/firebase";
 import { onAuthStateChanged, User } from "firebase/auth";
+import Link from "next/link";
 
 export default function SignupSection() {
   const t = useTranslations("signup-section");
@@ -132,6 +133,13 @@ export default function SignupSection() {
             </div>
 
             <CommonButton type='submit'>{t("button")}</CommonButton>
+
+            <Link
+              href='/login'
+              className='bg-black text-white rounded-md px-4 py-2 text-sm'
+            >
+              {t("goToQuestions")}
+            </Link>
 
             {error && <p className='text-red-500 mt-2'>{error}</p>}
           </form>

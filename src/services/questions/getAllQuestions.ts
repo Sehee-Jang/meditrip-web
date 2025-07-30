@@ -16,7 +16,7 @@ export async function getAllQuestions(): Promise<Question[]> {
       title: data.title ?? "제목 없음",
       content: data.content ?? "",
       category: data.category ?? "uncategorized",
-      createdAt: data.createdAt as FirestoreTimestamp,
+      createdAt: (data.createdAt as FirestoreTimestamp).toDate().toISOString(),
       imageUrl: data.imageUrl ?? "",
       userId: data.userId ?? "",
       user: data.user ?? { id: "", name: "익명" },

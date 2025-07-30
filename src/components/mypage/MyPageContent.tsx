@@ -33,6 +33,12 @@ interface MyQuestion {
   answered: boolean;
 }
 
+interface QuestionData {
+  title: string;
+  createdAt: Timestamp;
+  answers?: unknown[];
+}
+
 export default function MyPageContent() {
   const t = useTranslations("mypage");
   const router = useRouter();
@@ -92,7 +98,7 @@ export default function MyPageContent() {
 
         setQuestions(
           unique.map((d) => {
-            const data = d.data() as any;
+            const data = d.data() as QuestionData;
             const created = (data.createdAt as Timestamp).toDate();
             return {
               id: d.id,

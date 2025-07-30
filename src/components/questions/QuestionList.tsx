@@ -6,6 +6,7 @@ import Link from "next/link";
 import { MessageSquare, CheckCircle, Clock } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Question } from "@/types/Question";
+import { getFormattedDate } from "@/utils/date";
 
 export default function QuestionList() {
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -24,8 +25,9 @@ export default function QuestionList() {
     <div className='space-y-2'>
       <ul className='max-w-3xl mx-auto px-4 py-8 space-y-4'>
         {questions.map((q) => {
-          const date =
-            q.createdAt?.toDate?.().toLocaleDateString?.() ?? t("noDate");
+          const date = q.createdAt
+            ? getFormattedDate(q.createdAt)
+            : t("noDate");
           const answerCount = q.answers?.length || 0;
           const hasAnswer = answerCount > 0;
 
