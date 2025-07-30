@@ -1,3 +1,10 @@
 {
-  "title": "병원 정보"
+  "title": "病院一覧",
+  "searchPlaceholder": "病院検索",
+  "categories": {
+    "all": "全て",
+    "traditional": "韓方",
+    "cosmetic": "美容",
+    "wellness": "ウェルネス"
+  }
 }

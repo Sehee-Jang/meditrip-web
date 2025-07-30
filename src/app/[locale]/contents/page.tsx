@@ -3,7 +3,7 @@ import SearchableContents from "@/components/contents/SearchableContents";
 import Container from "@/components/common/Container";
 
 import PageHeader from "@/components/common/PageHeader";
-import SignupSection from "@/components/SignupSection";
+import SignupSection from "@/components/common/signup/SignupSection";
 
 export default async function ContentsPage() {
   const t = await getTranslations("contents-page");

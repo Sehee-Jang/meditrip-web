@@ -1,0 +1,53 @@
+{
+  "clinicList": {
+    "title": "クリニックを探す",
+    "emptyMessage": "登録されたクリニックがありません。",
+    "viewDetails": "상세보기"
+  },
+  "clinicDetail": {
+    "name": "WOOJOOYON clinic",
+    "addressLabel": "住所",
+    "address": "ソウル特別市 鍾路区 北村路12キル 41番地 2階 韓屋",
+    "intro": {
+      "title": "WOOJOOYON clinic",
+      "subtitle": "美とバランス ウェルネス"
+    },
+    "visionLabel": "ビジョン",
+    "vision": "身体を尊重する治療法",
+    "missionLabel": "ミッション",
+    "mission": "韓国医学クリニックは、身体の自然治癒力を最大限に活かし、根本から身体をサポートする方法を提案します",
+    "description": "ウジョヨンクリニックは、患者の全体的な健康を考慮した統合的な治療哲学を追求しています。症状の治療を超えて、医師は患者様の話を聞き、その生活を理解し、崩れた身体のバランスの根本原因を特定し、その治療に焦点を当てます。これは、患者様の魂に触れるような繊細なアプローチで行われ、真の癒しと幸福の実現を目指しています。",
+    "eventsLabel": "予約特典",
+    "event1": "高級ホテル（アンダズ、新羅、ロッテ）との提携による割引特典を提供しています。",
+    "event2": "日本人向けコンシェルジュサービス（医療サービス後のグルメツアー、古宮散策、南大門ショッピングなど）無料",
+    "packagesLabel": "主要診療パッケージ",
+    "packages": {
+      "detoxSlimming": {
+        "title": "デトックス＆スリミング",
+        "subtitle": "酵素ハーブ医学デトックスクリニック",
+        "price": "¥800,000",
+        "duration": "90分"
+      },
+      "naturalLifting": {
+        "title": "ナチュラルリフティング",
+        "subtitle": "フィラー鍼治療",
+        "price": "¥900,000",
+        "duration": "90分"
+      },
+      "innerPeace": {
+        "title": "内なる平和とバランス",
+        "subtitle": "心静まる鍼灸と東洋の音浴",
+        "price": "¥700,000",
+        "duration": "60分"
+      },
+      "senseAwakening": {
+        "title": "感覚の覚醒",
+        "subtitle": "伝統的な韓国の色絵を通じた心理的癒し",
+        "price": "¥700,000",
+        "duration": "60分"
+      }
+    },
+    "bookButton": "予約する",
+    "shareButton": "共有する"
+  }
+}

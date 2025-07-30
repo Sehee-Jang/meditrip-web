@@ -3,8 +3,8 @@
 import { useTranslations } from "next-intl";
 import { useState, useEffect } from "react";
 import { registerWithEmail } from "@/lib/auth";
-import CommonButton from "./common/CommonButton";
-import Container from "./common/Container";
+import CommonButton from "../CommonButton";
+import Container from "../Container";
 import { toast } from "sonner";
 
 import { auth } from "@/lib/firebase";

@@ -1,3 +1,10 @@
 {
-  "title": "병원 정보"
+  "title": "병원 정보",
+  "searchPlaceholder": "병원 검색",
+  "categories": {
+    "all": "전체",
+    "traditional": "한방",
+    "cosmetic": "성형",
+    "wellness": "웰니스"
+  }
 }
