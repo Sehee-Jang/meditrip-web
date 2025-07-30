@@ -17,6 +17,7 @@ import {
 import type { QueryDocumentSnapshot, DocumentData } from "firebase/firestore";
 import { useTranslations } from "next-intl";
 import { Question } from "@/types/Question";
+import { getFormattedDate } from "@/utils/date";
 import { MessageSquare, CheckCircle, Clock } from "lucide-react";
 
 export default function PaginatedQuestionList({
@@ -55,8 +56,12 @@ export default function PaginatedQuestionList({
     <div className='space-y-2'>
       <ul className='mx-auto'>
         {questions.map((q) => {
-          const date =
-            q.createdAt?.toDate().toLocaleDateString() ?? t("noDate");
+          const date = q.createdAt
+            ? // ISO 문자열이면 getFormattedDate, Date 객체면 toLocaleDateString
+              getFormattedDate(q.createdAt)
+            : t("noDate");
+          // const date =
+          //   q.createdAt?.toDate().toLocaleDateString() ?? t("noDate");
           const answerCount = q.answers?.length || 0;
           const hasAnswer = answerCount > 0;
 

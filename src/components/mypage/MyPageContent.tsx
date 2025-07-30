@@ -40,12 +40,11 @@ export default function MyPageContent() {
   const [questions, setQuestions] = useState<MyQuestion[]>([]);
 
   useEffect(() => {
-    // 1) Firebase Auth 상태 구독
-    const unsubAuth = onAuthStateChanged(auth, async (u) => {
+    const unsub = onAuthStateChanged(auth, async (u) => {
       if (u && !u.isAnonymous) {
         setUser(u);
 
-        // 2) users/{uid} 에서 프로필·포인트 읽기
+        // ─── 1) 프로필 · 포인트 로드 ─────────────────
         const userDoc = await getDoc(doc(db, "users", u.uid));
         if (userDoc.exists()) {
           const data = userDoc.data();
@@ -53,47 +52,63 @@ export default function MyPageContent() {
           setPoints(data.points || 0);
         }
 
-        // 3) reservations 컬렉션에서 내 예약만 쿼리
+        // ─── 2) 예약 내역 로드 ───────────────────────
         const resSnap = await getDocs(
           query(collection(db, "reservations"), where("userId", "==", u.uid))
         );
-        const myRes: Reservation[] = resSnap.docs.map((d) => {
-          const dt = (d.data().date as Timestamp).toDate();
-          return {
-            id: d.id,
-            hospital: d.data().hospital,
-            date: dt.toLocaleString("ko-KR", {
-              year: "numeric",
-              month: "2-digit",
-              day: "2-digit",
-              hour: "2-digit",
-              minute: "2-digit",
-            }),
-            status: d.data().status,
-          };
-        });
-        setReservations(myRes);
+        setReservations(
+          resSnap.docs.map((d) => {
+            const dt = (d.data().date as Timestamp).toDate();
+            return {
+              id: d.id,
+              hospital: d.data().hospital,
+              date: dt.toLocaleString("ko-KR", {
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit",
+                hour: "2-digit",
+                minute: "2-digit",
+              }),
+              status: d.data().status,
+            };
+          })
+        );
 
-        // 4) questions 컬렉션에서 내가 쓴 글만 쿼리
-        const qSnap = await getDocs(
+        // ─── 3) 질문(questions) 이중 쿼리 후 병합 ────────
+        const snap1 = await getDocs(
           query(collection(db, "questions"), where("userId", "==", u.uid))
         );
-        const myQs: MyQuestion[] = qSnap.docs.map((d) => {
-          const created = (d.data().createdAt as Timestamp).toDate();
-          return {
-            id: d.id,
-            title: d.data().title,
-            date: `${created.getFullYear()}.${String(
-              created.getMonth() + 1
-            ).padStart(2, "0")}.${String(created.getDate()).padStart(2, "0")}`,
-            answered:
-              Array.isArray(d.data().answers) && d.data().answers.length > 0,
-          };
-        });
-        setQuestions(myQs);
+        const snap2 = await getDocs(
+          query(collection(db, "questions"), where("user.id", "==", u.uid))
+        );
+
+        // 중복 제거
+        const allDocs = [...snap1.docs, ...snap2.docs];
+        const unique = Array.from(
+          new Map(allDocs.map((d) => [d.id, d])).values()
+        );
+
+        setQuestions(
+          unique.map((d) => {
+            const data = d.data() as any;
+            const created = (data.createdAt as Timestamp).toDate();
+            return {
+              id: d.id,
+              title: data.title,
+              date: `${created.getFullYear()}.${String(
+                created.getMonth() + 1
+              ).padStart(2, "0")}.${String(created.getDate()).padStart(
+                2,
+                "0"
+              )}`,
+              answered: Array.isArray(data.answers) && data.answers.length > 0,
+            };
+          })
+        );
+        // ─────────────────────────────────────────────────
       }
     });
-    return () => unsubAuth();
+    return () => unsub();
   }, []);
 
   if (!user) {

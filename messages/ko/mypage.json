@@ -26,5 +26,6 @@
   "buttons": {
     "logout": "로그아웃",
     "settings": "설정"
-  }
+  },
+  "loading": "로딩 중"
 }

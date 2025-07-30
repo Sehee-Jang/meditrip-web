@@ -21,7 +21,7 @@ const formSchema = z.object({
 
 type FormData = z.infer<typeof formSchema>;
 
-export default function QuestionForm({ userId }: { userId: string }) {
+export default function QuestionForm() {
   const tForm = useTranslations("question-form");
   const tToast = useTranslations("question-toast");
   const router = useRouter();
@@ -57,7 +57,6 @@ export default function QuestionForm({ userId }: { userId: string }) {
         category: data.category,
         content: data.content,
         file,
-        userId,
       });
 
       reset();

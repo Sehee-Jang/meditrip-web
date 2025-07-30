@@ -26,5 +26,6 @@
   "buttons": {
     "logout": "Log out",
     "settings": "Settings"
-  }
+  },
+  "loading": "Loading"
 }
