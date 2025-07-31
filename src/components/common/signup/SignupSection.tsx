@@ -82,6 +82,7 @@ export default function SignupSection() {
             onSubmit={handleSubmit}
             className='flex flex-col items-center gap-5 w-full max-w-[360px] md:max-w-[1100px] mx-auto'
           >
+            {/* 개인정보 입력란 */}
             <div className='flex flex-col md:flex-row gap-5 w-full justify-center'>
               <input
                 type='email'
@@ -113,6 +114,7 @@ export default function SignupSection() {
               />
             </div>
 
+            {/* 개인정보 및 마케팅 활용 동의*/}
             <div className='text-left text-sm space-y-2'>
               <label className='flex items-center gap-2'>
                 <input
@@ -132,14 +134,19 @@ export default function SignupSection() {
               </label>
             </div>
 
+            {/* 회원가입 버튼 */}
             <CommonButton type='submit'>{t("button")}</CommonButton>
 
-            <Link
-              href='/login'
-              className='bg-black text-white rounded-md px-4 py-2 text-sm'
-            >
-              {t("goToQuestions")}
-            </Link>
+            {/* 로그인 CTA */}
+            <p className='mt-4 text-sm'>
+              {t("alreadyRegistered.title")}{" "}
+              <Link
+                href='/login'
+                className='font-medium text-blue-600 hover:underline'
+              >
+                {t("alreadyRegistered.login")}
+              </Link>
+            </p>
 
             {error && <p className='text-red-500 mt-2'>{error}</p>}
           </form>

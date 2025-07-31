@@ -9,5 +9,8 @@
   "agreeMarketingLabel": "마케팅 수신 동의 (선택)",
   "button": "회원가입",
   "successToast": "회원가입이 완료되었습니다!",
-  "haveAnAccount": "이미 계정이 있나요?"
+  "alreadyRegistered": {
+    "title": "이미 계정이 있으신가요?",
+    "login": "로그인"
+  }
 }
