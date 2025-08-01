@@ -6,7 +6,11 @@ import {
   signInAnonymously,
   onAuthStateChanged,
   sendEmailVerification,
+  UserCredential,
   User,
+  GoogleAuthProvider,
+  signInWithPopup,
+  getAdditionalUserInfo,
 } from "firebase/auth";
 import { auth, db } from "./firebase";
 import { doc, setDoc, serverTimestamp } from "firebase/firestore";
@@ -94,3 +98,41 @@ export const loginWithEmail = (email: string, password: string) =>
 
 // 로그아웃 함수
 export const logout = () => signOut(auth);
+
+// Google OAuth 로그인 함수
+const googleProvider = new GoogleAuthProvider();
+
+export const loginWithGoogle = async (): Promise<User> => {
+  try {
+    // 1) 팝업으로 로그인
+    const result = await signInWithPopup(auth, googleProvider);
+    const user = result.user;
+
+    // 2) 추가 유저 정보(신규 가입 여부) 조회
+    const info = getAdditionalUserInfo(result);
+    const isNewUser = info?.isNewUser;
+
+    // 3) 신규 사용자라면 Firestore에 프로필 저장
+    if (isNewUser) {
+      await setDoc(
+        doc(db, "users", user.uid),
+        {
+          uid: user.uid,
+          displayName: user.displayName,
+          email: user.email,
+          photoURL: user.photoURL,
+          createdAt: serverTimestamp(),
+          isAnonymous: false,
+          agreeTerms: true, // 필요 시 기본값 설정
+          agreeMarketing: false, // 필요 시 기본값 설정
+        },
+        { merge: true }
+      );
+    }
+
+    return user;
+  } catch (error) {
+    console.error("Google 로그인 실패:", error);
+    throw error;
+  }
+};

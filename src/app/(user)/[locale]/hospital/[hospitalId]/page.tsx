@@ -54,6 +54,8 @@ export default async function HospitalDetailPage(props: Props) {
           </div>
         </section>
 
+        
+
         {/* Vision · Mission · Description */}
         <section className='space-y-2'>
           <div>

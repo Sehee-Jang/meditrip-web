@@ -4,5 +4,9 @@
   "password": "パスワード",
   "login": "ログイン",
   "loading": "ログイン中",
-  "errorGeneric": "ログイン中にエラーが発生しました。"
+  "errorGeneric": "ログイン中にエラーが発生しました。",
+  "googleLogin": "Googleアカウントでログイン",
+  "or": "または",
+  "forgotPassword": "パスワードをお忘れですか？",
+  "noAccount": "アカウントをお持ちでないですか？ 会員登録"
 }
