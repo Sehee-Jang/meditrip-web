@@ -1,0 +1,21 @@
+{
+  "intro": {
+    "title": "クリニック詳細",
+    "subtitle": "クリニック情報をご覧ください",
+    "addressLabel": "住所",
+    "address": "東京都渋谷区..."
+  },
+  "process": {
+    "title": "診療プロセス"
+  },
+  "details": {
+    "title": "診療詳細情報",
+    "stepTitle": "ステップ {step}"
+  },
+  "cautions": {
+    "title": "注意事項"
+  },
+  "reserve": {
+    "button": "予約する"
+  }
+}

@@ -20,8 +20,19 @@ export default function HospitalListClient() {
 
   useEffect(() => {
     setLoading(true);
-    fetchHospitals({ query, category })
-      .then((data) => setClinics(data))
+    fetchHospitals()
+      .then((data) => {
+        // 필터링: 검색어와 카테고리
+        let filtered = data;
+        if (query) {
+          const q = query.toLowerCase();
+          filtered = filtered.filter((h) => h.name.toLowerCase().includes(q));
+        }
+        if (category && category !== "all") {
+          filtered = filtered.filter((h) => h.category === category);
+        }
+        setClinics(filtered);
+      })
       .finally(() => setLoading(false));
   }, [query, category]);
 
@@ -31,7 +42,7 @@ export default function HospitalListClient() {
       <SearchInput
         value={query}
         onChange={setQuery}
-        placeholder={t("searchPlaceholder")}
+        placeholder={t("clinicList.searchPlaceholder")}
         icon='🔍'
       />
 
