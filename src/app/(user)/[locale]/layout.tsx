@@ -5,7 +5,6 @@ import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import { setRequestLocale } from "next-intl/server";
 import AuthObserver from "@/components/AuthObserver";
-import "../globals.css";
 import { Toaster } from "@/components/ui/sonner";
 
 export const metadata = {
