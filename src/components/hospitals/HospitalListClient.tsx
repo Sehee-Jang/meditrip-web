@@ -36,11 +36,9 @@ export default function HospitalListClient() {
       />
 
       {/* 카테고리 필터 */}
-      {/* <CategoryFilter selected={category} onSelect={setCategory} /> */}
       <CategoryFilter
         categories={["all", "traditional", "cosmetic", "wellness"]}
         selected={category}
-        // string|null → HospitalCategoryKey|null 로 강제 변환
         onSelect={(cat) => setCategory(cat as HospitalCategoryKey | null)}
       />
 
