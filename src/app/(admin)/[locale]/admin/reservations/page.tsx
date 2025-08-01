@@ -2,6 +2,7 @@ import React from "react";
 import PageHeader from "@/components/common/PageHeader";
 import { DatePicker } from "@/components/ui/date-picker";
 import { SearchBar } from "@/components/ui/search-bar";
+import ReservationsTable from "@/components/admin/ReservationTable";
 
 export default function ReservationsPage() {
   return (
@@ -58,6 +59,9 @@ export default function ReservationsPage() {
             </tr>
           </tbody>
         </table>
+      </div>
+      <div className='overflow-auto bg-white rounded-lg shadow p-4'>
+        <ReservationsTable />
       </div>
     </div>
   );
