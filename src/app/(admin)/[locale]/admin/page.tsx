@@ -1,13 +1,7 @@
 import React from "react";
 import PageHeader from "@/components/common/PageHeader";
 
-interface AdminDashboardPageProps {
-  params: { locale: string };
-}
-
-export default function AdminDashboardPage({
-  params: { locale },
-}: AdminDashboardPageProps) {
+export default function AdminDashboardPage() {
   return (
     <div className='space-y-6'>
       {/* 1) 헤더 */}

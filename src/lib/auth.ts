@@ -6,7 +6,6 @@ import {
   signInAnonymously,
   onAuthStateChanged,
   sendEmailVerification,
-  UserCredential,
   User,
   GoogleAuthProvider,
   signInWithPopup,

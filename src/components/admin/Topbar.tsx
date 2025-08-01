@@ -1,4 +1,4 @@
-import { CalendarIcon, BellIcon, UserCircleIcon } from "lucide-react";
+import { BellIcon, UserCircleIcon } from "lucide-react";
 import { DatePicker } from "../ui/date-picker";
 
 export default function Topbar() {

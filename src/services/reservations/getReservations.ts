@@ -24,7 +24,8 @@ export async function getReservations(): Promise<Reservation[]> {
   );
   const snap = await getDocs(q);
   return snap.docs.map((doc) => {
-    const data = doc.data() as any;
+    const data = doc.data() as Omit<Reservation, "id">;
+
     return {
       id: doc.id,
       patientName: data.patientName,
