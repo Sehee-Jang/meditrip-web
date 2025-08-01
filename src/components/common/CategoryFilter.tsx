@@ -6,6 +6,12 @@ interface CategoryFilterProps {
   onSelect: (category: string | null) => void;
 }
 
+export type HospitalCategoryKey =
+  | "all"
+  | "traditional"
+  | "cosmetic"
+  | "wellness";
+
 export default function CategoryFilter({
   categories,
   selected,
@@ -20,15 +26,21 @@ export default function CategoryFilter({
             key={cat}
             onClick={() => onSelect(isActive ? null : cat)}
             className={`
-              whitespace-nowrap px-3 py-1 rounded-full border text-sm
+              relative
+              whitespace-nowrap px-4 py-2 rounded-full border text-sm font-medium
+              transition
               ${
                 isActive
-                  ? "bg-primary text-white border-primary"
-                  : "bg-white text-gray-700 border-gray-200"
+                  ? "bg-[#4A90E2] text-white border-primary"
+                  : "bg-white text-gray-700 border-gray-200 hover:bg-gray-100"
               }
             `}
           >
             {cat}
+            {isActive && (
+              // 언더라인
+              <span className='absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-6 h-1 bg-blue rounded-full' />
+            )}
           </button>
         );
       })}

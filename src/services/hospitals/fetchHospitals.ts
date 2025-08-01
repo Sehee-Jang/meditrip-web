@@ -1,25 +1,25 @@
+
 import mockHospitals from "@/data/mockHospitals";
-import { collection, getDocs } from "firebase/firestore";
-import { db } from "@/lib/firebase";
 import type { Hospital } from "@/types/Hospital";
+import type { HospitalCategoryKey } from "@/components/common/CategoryFilter";
 
-/**
- * 개발 중에는 mock 데이터를,
- * 배포 시에는 Firestore 데이터를 사용하도록 분기 처리
- */
-const USE_MOCK = process.env.NODE_ENV === "development";
+interface FetchOpts {
+  query: string;
+  category: HospitalCategoryKey | null;
+}
 
-export async function fetchHospitals(): Promise<Hospital[]> {
-  if (USE_MOCK) {
-    // 1) 목데이터 바로 리턴
-    return Promise.resolve(mockHospitals);
+export async function fetchHospitals(
+  { query, category }: FetchOpts = { query: "", category: null }
+): Promise<Hospital[]> {
+  let list = mockHospitals;
+
+  if (query.trim()) {
+    const q = query.toLowerCase();
+    list = list.filter((h) => h.name.toLowerCase().includes(q));
+  }
+  if (category && category !== "all") {
+    list = list.filter((h) => h.category === category);
   }
 
-  // 2) (실제 배포 시) Firestore 로직
-  const colRef = collection(db, "hospitals");
-  const snapshot = await getDocs(colRef);
-  return snapshot.docs.map((doc) => {
-    const data = doc.data() as Omit<Hospital, "id">;
-    return { id: doc.id, ...data };
-  });
+  return Promise.resolve(list);
 }
