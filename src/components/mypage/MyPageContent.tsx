@@ -14,6 +14,7 @@ import {
   where,
   getDocs,
   Timestamp,
+  orderBy,
 } from "firebase/firestore";
 import CommonButton from "@/components/common/CommonButton";
 import Container from "@/components/common/Container";
@@ -62,7 +63,7 @@ export default function MyPageContent() {
 
         // 2) 예약 내역 로드
         const resSnap = await getDocs(
-          query(collection(db, "reservations"), where("userId", "==", u.uid))
+          query(collection(db, "reservations"), where("user.id", "==", u.uid))
         );
         setReservations(
           resSnap.docs.map((d) => {
@@ -82,24 +83,19 @@ export default function MyPageContent() {
           })
         );
 
-        // 3) 질문(questions) 이중 쿼리 후 병합
-        const snap1 = await getDocs(
-          query(collection(db, "questions"), where("userId", "==", u.uid))
-        );
-        const snap2 = await getDocs(
-          query(collection(db, "questions"), where("user.id", "==", u.uid))
-        );
-
-        // 중복 제거
-        const allDocs = [...snap1.docs, ...snap2.docs];
-        const unique = Array.from(
-          new Map(allDocs.map((d) => [d.id, d])).values()
+        // 3) 질문 내역 로드
+        const qSnap = await getDocs(
+          query(
+            collection(db, "questions"),
+            where("user.id", "==", u.uid),
+            orderBy("createdAt", "desc")
+          )
         );
 
         setQuestions(
-          unique.map((d) => {
+          qSnap.docs.map((d) => {
             const data = d.data() as QuestionData;
-            const created = (data.createdAt as Timestamp).toDate();
+            const created = data.createdAt.toDate();
             return {
               id: d.id,
               title: data.title,
@@ -113,7 +109,6 @@ export default function MyPageContent() {
             };
           })
         );
-        //
       } else {
         // 미로그인 상태라면 홈으로 보냄
         router.replace("/");
@@ -197,22 +192,26 @@ export default function MyPageContent() {
         <h2 className='text-xl font-bold mb-4'>{t("questions.title")}</h2>
         <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
           {questions.map((q) => (
-            <div key={q.id} className='border p-4 rounded-md bg-white'>
-              <div className='font-medium'>{q.title}</div>
-              <div className='text-sm text-gray-600'>
-                {t("questions.writtenDate")}: {q.date}
+            <Link href={`/community/questions/${q.id}`} key={q.id}>
+              <div className='border p-4 rounded-md bg-white'>
+                <div className='font-medium'>{q.title}</div>
+                <div className='text-sm text-gray-600'>
+                  {t("questions.writtenDate")}: {q.date}
+                </div>
+                <div className='text-sm font-semibold'>
+                  {t("questions.status")}:{" "}
+                  {q.answered ? (
+                    <span className='text-green-600'>
+                      {t("questions.answered")}
+                    </span>
+                  ) : (
+                    <span className='text-red-500'>
+                      {t("questions.pending")}
+                    </span>
+                  )}
+                </div>
               </div>
-              <div className='text-sm font-semibold'>
-                {t("questions.status")}:{" "}
-                {q.answered ? (
-                  <span className='text-green-600'>
-                    {t("questions.answered")}
-                  </span>
-                ) : (
-                  <span className='text-red-500'>{t("questions.pending")}</span>
-                )}
-              </div>
-            </div>
+            </Link>
           ))}
         </div>
       </section>

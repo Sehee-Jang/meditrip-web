@@ -64,7 +64,6 @@ export async function createQuestion({
     category,
     content,
     imageUrl,
-    userId,
     user,
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),

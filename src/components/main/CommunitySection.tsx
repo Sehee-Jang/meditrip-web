@@ -60,7 +60,7 @@ export default function CommunitySection() {
                   <div className='text-xs text-gray-500 mt-2'>
                     <div className='flex items-center gap-2'>
                       <div className='w-4 h-4 rounded-full bg-gray-300' />
-                      <span>{q.user?.name || q.userId || t("anonymous")}</span>
+                      <span>{q.user?.name || t("anonymous")}</span>
                     </div>
                   </div>
                 </div>

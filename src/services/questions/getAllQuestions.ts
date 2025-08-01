@@ -18,7 +18,6 @@ export async function getAllQuestions(): Promise<Question[]> {
       category: data.category ?? "uncategorized",
       createdAt: (data.createdAt as FirestoreTimestamp).toDate().toISOString(),
       imageUrl: data.imageUrl ?? "",
-      userId: data.userId ?? "",
       user: data.user ?? { id: "", name: "익명" },
       answers: Array.isArray(data.answers) ? (data.answers as Answer[]) : [], // answers가 없으면 빈 배열
     };

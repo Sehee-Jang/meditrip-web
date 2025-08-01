@@ -1,12 +1,9 @@
+import { User } from "@/types/User";
+
 export interface Answer {
   content: string;
   createdAt?: { toDate: () => Date };
   updatedAt?: { toDate: () => Date };
-}
-
-export interface User {
-  id: string;
-  name: string;
 }
 
 export interface Question {
@@ -16,7 +13,6 @@ export interface Question {
   category: string;
   createdAt: string;
   imageUrl?: string;
-  userId?: string;
   user?: User;
   answers?: Answer[];
 }

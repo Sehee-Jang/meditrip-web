@@ -57,11 +57,9 @@ export default function PaginatedQuestionList({
       <ul className='mx-auto'>
         {questions.map((q) => {
           const date = q.createdAt
-            ? // ISO 문자열이면 getFormattedDate, Date 객체면 toLocaleDateString
-              getFormattedDate(q.createdAt)
+            ? getFormattedDate(q.createdAt)
             : t("noDate");
-          // const date =
-          //   q.createdAt?.toDate().toLocaleDateString() ?? t("noDate");
+
           const answerCount = q.answers?.length || 0;
           const hasAnswer = answerCount > 0;
 

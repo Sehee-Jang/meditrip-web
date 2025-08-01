@@ -24,7 +24,6 @@ export async function getQuestionById(id: string): Promise<Question> {
     category: data.category ?? "uncategorized",
     createdAt: createdAtISO,
     imageUrl: data.imageUrl ?? "",
-    userId: data.userId ?? "",
     user: data.user ?? { id: "", name: "익명" },
     answers: Array.isArray(data.answers) ? data.answers : [],
   };
