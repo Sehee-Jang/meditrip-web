@@ -46,7 +46,7 @@ export default function QuestionList() {
                     <div className='flex flex-wrap items-center gap-2 text-sm text-gray-400'>
                       <span>
                         👤 {t("question.user")}:
-                        {q.user?.name || t("question.anonymous")}
+                        {q.user?.nickname || t("question.anonymous")}
                       </span>
                       <span>|</span>
                       <span>🗓 {date}</span>
