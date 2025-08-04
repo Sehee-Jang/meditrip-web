@@ -4,13 +4,16 @@ import { useEffect, useState } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import CommonButton from "../common/CommonButton";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { useLocale } from "next-intl";
 
 export default function AskQuestionButton() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const t = useTranslations("community-page");
   const router = useRouter();
+  const pathname = usePathname(); // 현재 경로
+  const locale = useLocale();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -19,12 +22,13 @@ export default function AskQuestionButton() {
     });
     return () => unsubscribe();
   }, []);
-
   const handleClick = () => {
     if (isLoggedIn) {
-      router.push("/community/questions");
+      router.push(`/${locale}/community/questions`);
     } else {
-      router.push("/login");
+      // 현재 경로를 redirect 쿼리로 포함하여 locale도 반영
+      const encoded = encodeURIComponent(`/${locale}/community/questions`);
+      router.push(`/${locale}/login?redirect=${encoded}`);
     }
   };
 
