@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import CommonButton from "../common/CommonButton";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useLocale } from "next-intl";
 
@@ -12,7 +12,6 @@ export default function AskQuestionButton() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const t = useTranslations("community-page");
   const router = useRouter();
-  const pathname = usePathname(); // 현재 경로
   const locale = useLocale();
 
   useEffect(() => {

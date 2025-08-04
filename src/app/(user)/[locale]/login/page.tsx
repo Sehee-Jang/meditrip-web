@@ -1,11 +1,10 @@
-"use client";
-
-import LoginForm from "@/components/common/LoginForm";
+import { Suspense } from "react";
+import LoginPageWrapper from "@/components/login/LoginPageWrapper";
 
 export default function LoginPage() {
   return (
-    <div className='min-h-screen flex items-center justify-center bg-gray-50 px-4'>
-      <LoginForm />
-    </div>
+    <Suspense fallback={<div>Loading...</div>}>
+      <LoginPageWrapper />
+    </Suspense>
   );
 }

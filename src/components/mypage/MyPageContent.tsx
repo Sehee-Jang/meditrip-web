@@ -57,7 +57,7 @@ export default function MyPageContent() {
         const userDoc = await getDoc(doc(db, "users", u.uid));
         if (userDoc.exists()) {
           const data = userDoc.data();
-          setNickname(data.displayName || "");
+          setNickname(data.nickname || u.displayName || "");
           setPoints(data.points || 0);
         }
 

@@ -117,7 +117,7 @@ export const loginWithGoogle = async (): Promise<User> => {
         doc(db, "users", user.uid),
         {
           uid: user.uid,
-          displayName: user.displayName,
+          nickname: user.displayName,
           email: user.email,
           photoURL: user.photoURL,
           createdAt: serverTimestamp(),

@@ -1,8 +1,6 @@
 import React from "react";
 import PageHeader from "@/components/common/PageHeader";
 import { getTranslations } from "next-intl/server";
-import CommonButton from "@/components/common/CommonButton";
-import { Link } from "@/i18n/navigation";
 import PaginatedQuestionList from "@/components/questions/PaginatedQuestionList";
 import AskQuestionButton from "@/components/questions/AskQuestionButton";
 
