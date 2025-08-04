@@ -15,24 +15,18 @@ export default function HeroSection() {
   const t = useTranslations("hero-section");
 
   return (
-    <section className='md:py-10 md:mb-10 md:bg-gray-100 '>
-      <Container className='md:flex md:justify-between md:items-center py-4'>
+    <section className='md:py-10 md:mb-10 md:bg-gray-100'>
+      <Container className='md:flex md:justify-between md:items-center md:py-4'>
         {/* Carousel 영역 */}
-        <div className='w-full bg-gray-100 md:bg-gray-300 md:w-1/2 h-64 h-[360px]'>
-          <Carousel
-            opts={{ loop: true }}
-            plugins={[
-              Autoplay({
-                delay: 3000,
-              }),
-            ]}
-          >
+        <div className='w-full md:w-1/2 md:h-[360px]'>
+          <Carousel opts={{ loop: true }} plugins={[Autoplay({ delay: 3000 })]}>
             <CarouselContent>
               {[1, 2, 3].map((item) => (
                 <CarouselItem key={item}>
-                  <div className='relative w-full h-64 md:h-[360px] overflow-hidden rounded-md'>
+                  {/* 모바일: 정사각형 / 데스크탑: 고정 높이 */}
+                  <div className='relative w-full aspect-square md:aspect-auto md:h-[360px] overflow-hidden rounded-md'>
                     <Image
-                      src={`/images/hero${item}.png`} // 실제 이미지 경로로 교체
+                      src={`/images/hero${item}.png`}
                       alt={`슬라이드 ${item}`}
                       fill
                       className='object-cover'
