@@ -6,6 +6,7 @@ import { onAuthStateChanged, type User as FirebaseUser } from "firebase/auth";
 import { auth, db } from "@/lib/firebase";
 import { doc, getDoc } from "firebase/firestore";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
+import { User as AppUser } from "@/types/user";
 
 export default function AdminAuthGuard({
   children,
@@ -28,18 +29,19 @@ export default function AdminAuthGuard({
         // Firestore에서 사용자 문서 읽어서 role 필드 확인
         const userSnap = await getDoc(doc(db, "users", user.uid));
         const data = userSnap.data();
-        if (data?.role !== "admin") {
+
+        if (!data || data.role !== "admin") {
           // 관리자가 아님 → 홈으로
           router.replace(`/${locale}`);
           return;
         }
-        // 관리자 맞음
+        // 관리자 확인 완료
         setAuthorized(true);
       }
     );
 
     return () => unsubscribe();
-  }, [router]);
+  }, [locale, router]);
 
   // 아직 확인 중일 땐 스피너
   if (authorized === null) {

@@ -1,5 +1,8 @@
+export type UserRole = "admin" | "user";
+
 export interface User {
   id: string; // uid
+  role: UserRole;
   nickname: string;
   email: string;
   photoURL?: string; // 구글 로그인 시 포함됨

@@ -10,10 +10,20 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
   getAdditionalUserInfo,
+  signOut,
+  signInWithEmailAndPassword,
 } from "firebase/auth";
 import { auth, db } from "./firebase";
 import { doc, setDoc, serverTimestamp } from "firebase/firestore";
-import { signOut, signInWithEmailAndPassword } from "firebase/auth";
+import { UserRole } from "@/types/user";
+
+export interface RegisterParams {
+  email: string;
+  password: string;
+  nickname: string;
+  agreeTerms: boolean;
+  agreeMarketing: boolean;
+}
 
 // 익명 로그인
 export const loginAnonymously = async () => {
@@ -25,6 +35,7 @@ export const loginAnonymously = async () => {
   }
 };
 
+// Auth 상태 관찰 (firebase User)
 export const observeAuth = (callback: (user: User | null) => void) => {
   return onAuthStateChanged(auth, (user) => {
     if (user && !user.isAnonymous) {
@@ -37,14 +48,7 @@ export const observeAuth = (callback: (user: User | null) => void) => {
   });
 };
 
-export interface RegisterParams {
-  email: string;
-  password: string;
-  nickname: string;
-  agreeTerms: boolean;
-  agreeMarketing: boolean;
-}
-
+// 이메일 회원가입
 export const registerWithEmail = async ({
   email,
   password,
@@ -74,13 +78,15 @@ export const registerWithEmail = async ({
   await setDoc(
     doc(db, "users", user.uid),
     {
-      uid: user.uid,
-      displayName: nickname,
+      role: "user" as UserRole,
+      nickname,
       email,
+      photoURL: user!.photoURL ?? null,
       createdAt: serverTimestamp(),
       isAnonymous: false,
       agreeTerms,
       agreeMarketing,
+      points: 0,
     },
     { merge: true }
   );
@@ -88,15 +94,9 @@ export const registerWithEmail = async ({
   return user;
 };
 
-// 현재 유저 가져오는 함수
-export const getCurrentUser = () => auth.currentUser;
-
 // 이메일 로그인 함수
 export const loginWithEmail = (email: string, password: string) =>
   signInWithEmailAndPassword(auth, email, password);
-
-// 로그아웃 함수
-export const logout = () => signOut(auth);
 
 // Google OAuth 로그인 함수
 const googleProvider = new GoogleAuthProvider();
@@ -135,3 +135,9 @@ export const loginWithGoogle = async (): Promise<User> => {
     throw error;
   }
 };
+
+// 로그아웃 함수
+export const logout = () => signOut(auth);
+
+// 현재 유저 가져오는 함수
+export const getCurrentUser = () => auth.currentUser;
