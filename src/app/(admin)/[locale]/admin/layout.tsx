@@ -2,6 +2,7 @@ import React from "react";
 import Sidebar from "@/components/admin/Sidebar";
 import Topbar from "@/components/admin/Topbar";
 import { routing } from "@/i18n/routing";
+import AdminAuthGuard from "@/components/admin/AdminAuthGuard";
 
 export const metadata = {
   title: "메디트립 백오피스",
@@ -31,7 +32,9 @@ export default async function AdminLayout({
           <Topbar />
 
           {/* 실제 페이지 컨텐츠 */}
-          <main className='flex-1 overflow-auto p-6'>{children}</main>
+          <main className='flex-1 overflow-auto p-6'>
+            <AdminAuthGuard>{children}</AdminAuthGuard>
+          </main>
         </div>
       </body>
     </html>
