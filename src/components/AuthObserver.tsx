@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { observeAuth } from "@/lib/auth";
+import FavoritesInitializer from "@/components/common/FavoritesInitializer";
 
 export default function AuthObserver() {
   useEffect(() => {
@@ -18,5 +19,9 @@ export default function AuthObserver() {
     });
   }, []);
 
-  return null;
+  return (
+    <>
+      <FavoritesInitializer />
+    </>
+  );
 }

@@ -6,8 +6,6 @@ import { onAuthStateChanged, type User as FirebaseUser } from "firebase/auth";
 import { auth, db } from "@/lib/firebase";
 import { doc, getDoc } from "firebase/firestore";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
-import { User as AppUser } from "@/types/user";
-
 export default function AdminAuthGuard({
   children,
 }: {

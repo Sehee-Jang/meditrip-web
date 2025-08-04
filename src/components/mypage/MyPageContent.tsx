@@ -20,6 +20,7 @@ import CommonButton from "@/components/common/CommonButton";
 import Container from "@/components/common/Container";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 import { ChevronRight } from "lucide-react";
+import MyFavoriteClinics from "@/components/mypage/MyFavoriteClinics";
 
 interface Reservation {
   id: string;
@@ -170,6 +171,8 @@ export default function MyPageContent() {
           ))}
         </div>
       </section>
+
+      <MyFavoriteClinics />
 
       {/* 포인트 */}
       <section className='mb-12'>

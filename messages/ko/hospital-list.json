@@ -1,6 +1,5 @@
 {
   "clinicList": {
-    "title": "병원 둘러보기",
     "emptyMessage": "등록된 병원이 없습니다.",
     "viewDetails": "상세보기",
     "searchPlaceholder": "병원 검색"

@@ -1,6 +1,5 @@
 {
   "clinicList": {
-    "title": "クリニックを探す",
     "emptyMessage": "登録されたクリニックがありません。",
     "viewDetails": "상세보기",
     "searchPlaceholder": "병원 검색"

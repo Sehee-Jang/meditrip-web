@@ -1,15 +1,17 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Heart, ChevronRight, Star } from "lucide-react";
+import { ChevronRight, Star } from "lucide-react";
 import { useTranslations } from "next-intl";
 import type { Hospital } from "@/types/hospital";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import FavoriteButton from "@/components/hospitals/FavoriteButton";
 
-interface ClinicListProps {
+interface HospitalListProps {
   clinics: Hospital[];
+  onToggleFavorite?: (hospitalId: string, newStatue: boolean) => void;
 }
 
-export default function ClinicList({ clinics }: ClinicListProps) {
+export default function HospitalList({ clinics }: HospitalListProps) {
   const t = useTranslations("hospital-list");
 
   if (clinics.length === 0) {
@@ -22,8 +24,6 @@ export default function ClinicList({ clinics }: ClinicListProps) {
 
   return (
     <div className='p-4'>
-      <h1 className='text-2xl font-semibold mb-6'>{t("clinicList.title")}</h1>
-
       <ul className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'>
         {clinics.map((c) => (
           <li key={c.id}>
@@ -38,15 +38,7 @@ export default function ClinicList({ clinics }: ClinicListProps) {
                     className='object-cover'
                   />
                   {/* 찜 아이콘 */}
-                  <div className='absolute top-3 right-3'>
-                    <Heart
-                      className={`w-6 h-6 transition ${
-                        c.isFavorite
-                          ? "text-red-500"
-                          : "text-white hover:text-red-500"
-                      }`}
-                    />
-                  </div>
+                  <FavoriteButton hospitalId={c.id} position='absolute' />
                 </div>
 
                 <CardContent className='p-4'>

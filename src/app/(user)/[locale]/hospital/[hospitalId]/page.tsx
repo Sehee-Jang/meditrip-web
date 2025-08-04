@@ -8,6 +8,8 @@ import { fetchHospitals } from "@/services/hospitals/fetchHospitals";
 import HospitalCarousel from "@/components/hospitals/HospitalCarousel";
 import HospitalActions from "@/components/hospitals/HospitalActions";
 
+import FavoriteButton from "@/components/hospitals/FavoriteButton";
+
 interface Props {
   params: Promise<{
     locale: string;
@@ -32,7 +34,9 @@ export default async function HospitalDetailPage(props: Props) {
         mobileTitle={t("clinicDetail.intro.title")}
         showBackIcon
         center
-      />
+      >
+        <FavoriteButton hospitalId={hospitalId} />
+      </PageHeader>
 
       <section className='max-w-4xl mx-auto px-4 py-6 flex flex-col gap-8'>
         {/* 대표 이미지 */}
@@ -46,6 +50,7 @@ export default async function HospitalDetailPage(props: Props) {
           <h3 className='text-lg font-medium'>
             {t("clinicDetail.intro.subtitle")}
           </h3>
+
           <div className='flex items-center text-sm text-gray-600'>
             <span className='font-semibold'>
               {t("clinicDetail.addressLabel")}:
@@ -53,8 +58,6 @@ export default async function HospitalDetailPage(props: Props) {
             <span className='ml-2'>{t("clinicDetail.address")}</span>
           </div>
         </section>
-
-        
 
         {/* Vision · Mission · Description */}
         <section className='space-y-2'>
