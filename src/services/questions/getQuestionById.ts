@@ -1,6 +1,6 @@
 import { db } from "@/lib/firebase";
 import { doc, getDoc } from "firebase/firestore";
-import { Question } from "@/types/Question";
+import { Question } from "@/types/question";
 import { Timestamp } from "firebase/firestore";
 
 export async function getQuestionById(id: string): Promise<Question> {

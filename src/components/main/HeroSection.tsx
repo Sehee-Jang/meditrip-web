@@ -32,7 +32,7 @@ export default function HeroSection() {
                 <CarouselItem key={item}>
                   <div className='relative w-full h-64 md:h-[360px] overflow-hidden rounded-md'>
                     <Image
-                      src={`/images/hero${item}.jpg`} // 실제 이미지 경로로 교체
+                      src={`/images/hero${item}.png`} // 실제 이미지 경로로 교체
                       alt={`슬라이드 ${item}`}
                       fill
                       className='object-cover'

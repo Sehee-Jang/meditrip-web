@@ -5,7 +5,7 @@ import { getAllQuestions } from "@/services/questions/getAllQuestions";
 import Link from "next/link";
 import { MessageSquare, CheckCircle, Clock } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { Question } from "@/types/Question";
+import { Question } from "@/types/question";
 import { getFormattedDate } from "@/utils/date";
 
 export default function QuestionList() {

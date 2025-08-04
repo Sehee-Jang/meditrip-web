@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { db } from "@/lib/firebase";
 import { collection, getDocs, orderBy, query, limit } from "firebase/firestore";
-import { Question } from "@/types/Question";
+import { Question } from "@/types/question";
 
 export function useQuestions(limitCount = 2) {
   const [questions, setQuestions] = useState<Question[]>([]);

@@ -1,4 +1,4 @@
-import type { Hospital } from "@/types/Hospital";
+import type { Hospital } from "@/types/hospital";
 
 const mockHospitals: Hospital[] = [
   {

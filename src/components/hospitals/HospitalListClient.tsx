@@ -8,7 +8,7 @@ import CategoryFilter, {
 } from "@/components/common/CategoryFilter";
 import ClinicList from "./ClinicList";
 import { fetchHospitals } from "@/services/hospitals/fetchHospitals";
-import type { Hospital } from "@/types/Hospital";
+import type { Hospital } from "@/types/hospital";
 
 export default function HospitalListClient() {
   const t = useTranslations("hospital-list");

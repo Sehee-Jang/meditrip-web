@@ -1,6 +1,6 @@
 import { db } from "@/lib/firebase";
 import { collection, getDocs, orderBy, query } from "firebase/firestore";
-import { Question, Answer } from "@/types/Question";
+import { Question, Answer } from "@/types/question";
 
 type FirestoreTimestamp = { toDate: () => Date };
 

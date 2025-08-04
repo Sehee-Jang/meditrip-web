@@ -1,4 +1,22 @@
 {
-  "terms": "利用規約",
-  "privacy": "個人情報保護方針"
+  "footer": {
+    "companyName": "商号: 株式会社ウツビプロパティ",
+    "ceo": "代表者: ウ・ウンギョン",
+    "businessNumber": "事業者登録番号: 716-81-03208",
+    "foreignPatientBusiness": "外国人患者誘致事業:",
+    "address": "住所: ソウル特別市鍾路区鍾路120、306号（鍾路3街）",
+    "contact": "お問い合わせ: wellness.meditrip@gmail.com",
+    "terms": "利用規約",
+    "privacy": "プライバシーポリシー"
+  },
+  "terms-page": {
+    "title": "利用規約",
+    "content": "ここに利用規約の全文を記載してください。"
+  },
+  "privacy-page": {
+    "title": "個人情報取扱方針",
+    "paragraphs": [
+      "【個人情報の収集・利用に関する同意書】\n改定日：2025年8月3日 ONYU（以下「当社」）は ..."
+    ]
+  }
 }

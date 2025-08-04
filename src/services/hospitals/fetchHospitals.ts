@@ -1,6 +1,5 @@
-
 // import mockHospitals from "@/data/mockHospitals";
-// import type { Hospital } from "@/types/Hospital";
+// import type { Hospital } from "@/types/hospital";
 // import type { HospitalCategoryKey } from "@/components/common/CategoryFilter";
 
 // interface FetchOpts {
@@ -23,7 +22,6 @@
 
 //   return Promise.resolve(list);
 // }
-
 
 // // src/services/hospitals/fetchHospitals.ts
 // import { db } from "@/lib/firebase";
@@ -60,7 +58,7 @@
 // }
 
 // src/services/hospitals/fetchHospitals.ts
-import type { Hospital } from "@/types/Hospital";
+import type { Hospital } from "@/types/hospital";
 import mockHospitals from "@/data/mockHospitals";
 
 /**

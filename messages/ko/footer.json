@@ -1,4 +1,25 @@
 {
-  "terms": "이용약관",
-  "privacy": "개인정보처리방침"
+  "footer": {
+    "companyName": "상호명: 주식회사 우츠비프로퍼티",
+    "ceo": "대표자: 우은경",
+    "businessNumber": "사업자등록번호: 716-81-03208",
+    "foreignPatientBusiness": "외국인환자유치업:",
+    "address": "주소: 서울특별시 종로구 종로 120, 306호(종로3가)",
+    "contact": "문의: wellness.meditrip@gmail.com",
+    "terms": "이용약관",
+    "privacy": "개인정보 처리방침"
+  },
+  "terms-page": {
+    "title": "이용약관",
+    "content": ""
+  },
+  "privacy-page": {
+    "title": "개인정보 처리방침",
+    "content": [
+      "[개인정보 수집·이용 동의서]\n개정일: 2025년 8월 3일\n\nONYU (이하 \"회사\")은 …",
+      "※ 본 동의서는 서비스 가입 및 이용 시 필수적이며 …",
+      "1. 수집하는 개인정보 항목\n(필수) 생년월일, 성별, 이메일, …",
+      "2. 개인정보 수집 및 이용 목적\n회원 가입 및 본인 확인 …"
+    ]
+  }
 }

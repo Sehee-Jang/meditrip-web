@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Heart, ChevronRight, Star } from "lucide-react";
 import { useTranslations } from "next-intl";
-import type { Hospital } from "@/types/Hospital";
+import type { Hospital } from "@/types/hospital";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 
 interface ClinicListProps {

@@ -3,7 +3,7 @@
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Question } from "@/types/Question";
+import { Question } from "@/types/question";
 import { useTranslations } from "next-intl";
 import { useDropzone } from "react-dropzone";
 import { useRouter } from "next/navigation";

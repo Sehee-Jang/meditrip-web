@@ -16,7 +16,7 @@ import {
 } from "@/services/questions/getQuestions";
 import type { QueryDocumentSnapshot, DocumentData } from "firebase/firestore";
 import { useTranslations } from "next-intl";
-import { Question } from "@/types/Question";
+import { Question } from "@/types/question";
 import { getFormattedDate } from "@/utils/date";
 import { MessageSquare, CheckCircle, Clock } from "lucide-react";
 

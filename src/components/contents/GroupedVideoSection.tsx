@@ -4,7 +4,7 @@ import { useTranslations } from "next-intl";
 import { mockShorts } from "@/data/mockData";
 import VideoListSection from "./VideoListSection";
 import { CategoryKey } from "@/constants/categories";
-import { VideoItem } from "@/types/Video";
+import { VideoItem } from "@/types/video";
 
 type Props = {
   keyword?: string;

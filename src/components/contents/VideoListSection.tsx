@@ -1,5 +1,5 @@
 import VideoCard from "./VideoCard";
-import { VideoItem } from "@/types/Video";
+import { VideoItem } from "@/types/video";
 
 type Props = {
   title: string;

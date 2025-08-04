@@ -10,7 +10,7 @@ import {
   QueryDocumentSnapshot,
   DocumentData,
 } from "firebase/firestore";
-import { Question } from "@/types/Question";
+import { Question } from "@/types/question";
 
 export interface QuestionPage {
   questions: Question[];
