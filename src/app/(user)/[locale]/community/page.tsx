@@ -4,6 +4,7 @@ import { getTranslations } from "next-intl/server";
 import CommonButton from "@/components/common/CommonButton";
 import { Link } from "@/i18n/navigation";
 import PaginatedQuestionList from "@/components/questions/PaginatedQuestionList";
+import AskQuestionButton from "@/components/questions/AskQuestionButton";
 
 export default async function CommunityPage() {
   const t = await getTranslations("community-page");
@@ -25,14 +26,8 @@ export default async function CommunityPage() {
         {/* <QuestionList /> */}
         <PaginatedQuestionList pageSize={5} />
 
-        <div className='my-6 flex flex-col items-center'>
-          <Link href='/community/questions' className='w-1/2'>
-            <CommonButton className='w-full text-sm'>{t("cta")}</CommonButton>
-          </Link>
-
-          {/* <CommonButton className='text-sm'>{t("cta")}</CommonButton> */}
-          <p className='text-sm text-muted-foreground mt-2'>{t("banner")}</p>
-        </div>
+        {/* 글쓰기 버튼 */}
+        <AskQuestionButton />
       </section>
     </main>
   );

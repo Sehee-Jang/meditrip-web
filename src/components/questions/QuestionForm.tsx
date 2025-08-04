@@ -16,7 +16,7 @@ const formSchema = z.object({
   title: z.string().min(2),
   category: z.enum(["stress", "diet", "immunity", "women", "antiaging", "etc"]),
   content: z.string().min(1),
-  file: z.any().optional(),
+  file: z.array(z.instanceof(File)).optional(),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -44,7 +44,7 @@ export default function QuestionForm() {
     maxFiles: 1,
     onDrop: (accepted) => {
       const file = accepted[0];
-      setValue("file", file); // react-hook-form과 연동
+      setValue("file", [file]); // 배열로 넘겨 react-hook-form에서 일관성 유지
       setPreview(URL.createObjectURL(file));
     },
   });
