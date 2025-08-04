@@ -8,6 +8,7 @@ import Link from "next/link";
 import { mockShorts } from "@/data/mockData";
 import Container from "../common/Container";
 import VideoCard from "../contents/VideoCard";
+import { ChevronRight } from "lucide-react";
 
 export default function ContentSection() {
   const t = useTranslations("content-section");
@@ -52,8 +53,8 @@ export default function ContentSection() {
         const totalAvailable = w - containerPadding * 2;
         const maxItems = Math.floor(totalAvailable / (cardWidth + gap));
 
-        // 카드들 + "더보기" 버튼까지 포함해서 한 줄에 들어갈 수 있도록 조절
-        setVisibleCount(Math.max(maxItems - 1, 1)); // 최소 1개 보장
+        // 카드들이 한 줄에 들어갈 수 있도록 조절
+        setVisibleCount(Math.max(maxItems, 1));
       }
     };
 
@@ -92,12 +93,27 @@ export default function ContentSection() {
   return (
     <section className='py-10 bg-white'>
       <Container>
-        <h2 className='text-xl font-bold mb-4'>{t("title")}</h2>
+        {/* 제목 및 더보기 버튼 */}
+        <div className='flex justify-between items-center mb-4'>
+          <h2 className='text-xl font-bold mb-4'>{t("title")}</h2>
 
+          {/* 더 보기 버튼 (데스크탑) */}
+          {!isMobile && (
+            <Link
+              href='/contents/'
+              className='hidden md:flex items-center gap-1 bg-white text-black border text-sm font-medium px-4 py-2 rounded-md hover:bg-gray-100 hover:border-gray-300 transition'
+            >
+              {t("seeMore")}
+              <ChevronRight size={16} />
+            </Link>
+          )}
+        </div>
+
+        {/* 콘텐츠 카드들 */}
         <div
-          className={`flex items-start ${
+          className={`flex ${
             isMobile
-              ? "flex-wrap gap-x-4 gap-y-8 justify-around"
+              ? "flex-wrap gap-x-4 gap-y-8 justify-between"
               : "flex-nowrap gap-x-4 justify-start"
           }`}
         >
@@ -116,18 +132,6 @@ export default function ContentSection() {
               />
             );
           })}
-
-          {/* 더 보기 버튼 (데스크탑) */}
-          {!isMobile && (
-            <div className='w-[150px] h-[210px] flex items-center justify-center'>
-              <Link
-                href='/contents'
-                className='px-4 py-2 bg-black text-white text-sm font-medium rounded-md'
-              >
-                {t("seeMore")}
-              </Link>
-            </div>
-          )}
         </div>
 
         {/* 더 보기 버튼 (모바일) */}
@@ -135,7 +139,7 @@ export default function ContentSection() {
           <div className='mt-8 flex justify-center'>
             <Link
               href='/contents'
-              className='block w-full text-center px-6 py-2 bg-black text-white text-sm font-medium rounded-md'
+              className='hidden md:flex items-center gap-1 bg-white text-black border text-sm font-medium px-4 py-2 rounded-md hover:bg-gray-100 hover:border-gray-300 transition'
             >
               {t("seeMore")}
             </Link>
