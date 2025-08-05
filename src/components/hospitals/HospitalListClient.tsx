@@ -12,6 +12,7 @@ import type { Hospital } from "@/types/hospital";
 import { auth } from "@/lib/firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { getUserFavoriteHospitalIds } from "@/services/hospitals/favorites";
+import LoadingSpinner from "../common/LoadingSpinner";
 
 export default function HospitalListClient() {
   const t = useTranslations("hospital-list");
@@ -76,8 +77,12 @@ export default function HospitalListClient() {
       />
 
       {/* 로딩 표시 */}
+
       {loading && (
-        <p className='text-center text-gray-500'>{t("clinicList.loading")}</p>
+        <div className='min-h-[50vh] flex flex-col items-center justify-center'>
+          <LoadingSpinner />
+          <p className='mt-4 text-gray-500'>{t("clinicList.loading")}</p>
+        </div>
       )}
 
       {/* 병원 리스트 */}

@@ -1,8 +1,9 @@
 {
   "clinicList": {
     "emptyMessage": "登録されたクリニックがありません。",
-    "viewDetails": "상세보기",
-    "searchPlaceholder": "병원 검색"
+    "viewDetails": "詳細を見る",
+    "searchPlaceholder": "病院検索",
+    "loading": "Loading..."
   },
   "clinicDetail": {
     "name": "WOOJOOYON clinic",
