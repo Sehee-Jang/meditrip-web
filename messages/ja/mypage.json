@@ -16,6 +16,9 @@
     "status": "現在のポイント",
     "amount": "{amount}円分のポイント"
   },
+  "mypage": {
+    "title": "お気に入りの病院"
+  },
   "questions": {
     "title": "私が作成した質問",
     "writtenDate": "作成日",

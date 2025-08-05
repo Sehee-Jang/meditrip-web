@@ -172,6 +172,7 @@ export default function MyPageContent() {
         </div>
       </section>
 
+      {/* 찜한 병원 */}
       <MyFavoriteClinics />
 
       {/* 포인트 */}

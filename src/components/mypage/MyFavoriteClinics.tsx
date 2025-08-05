@@ -10,10 +10,12 @@ import FavoriteButton from "../hospitals/FavoriteButton";
 import Link from "next/link";
 import Image from "next/image";
 import { Star } from "lucide-react";
+import LoadingSpinner from "../common/LoadingSpinner";
+import { useTranslations } from "next-intl";
 
 export default function MyFavoriteClinics() {
+  const t = useTranslations("my-favorite");
   const [clinics, setClinics] = useState<Hospital[]>([]);
-
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -42,15 +44,20 @@ export default function MyFavoriteClinics() {
   }, []);
 
   if (loading)
-    return <p className='text-center text-gray-500'>불러오는 중...</p>;
+    return (
+      <div className='min-h-[50vh] flex flex-col items-center justify-center'>
+        <LoadingSpinner />
+        <p className='mt-4 text-gray-500'>{t("loading")}</p>
+      </div>
+    );
 
   if (clinics.length === 0) {
-    return <p className='text-center text-gray-500'>찜한 병원이 없습니다.</p>;
+    return <p className='text-center text-gray-500'>{t("empty")}</p>;
   }
 
   return (
     <section className='mb-12'>
-      <h2 className='text-lg font-semibold mb-3'>찜한 병원</h2>
+      <h2 className='text-lg font-semibold mb-3'>{t("title")}</h2>
       <div className='space-y-4'>
         {clinics.map((clinic) => (
           <div

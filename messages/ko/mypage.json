@@ -23,6 +23,9 @@
     "answered": "답변완료",
     "pending": "미답변"
   },
+  "mypage": {
+    "title": "찜한 병원"
+  },
   "buttons": {
     "logout": "로그아웃",
     "settings": "설정"
