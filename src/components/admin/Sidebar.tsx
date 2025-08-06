@@ -9,6 +9,8 @@ import {
   UserIcon,
   ChevronLeft,
   ChevronRight,
+  CircleDollarSign,
+  Gift,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -17,6 +19,8 @@ const MENU = [
   { href: "reservations", label: "예약 관리", icon: CalendarIcon },
   { href: "consultations", label: "1:1 상담 관리", icon: MessageCircleMore },
   { href: "users", label: "회원 관리", icon: UserIcon },
+  { href: "event", label: "이벤트 관리", icon: CircleDollarSign },
+  { href: "points", label: "포인트 관리", icon: Gift },
 ];
 
 type Props = { locale: string };

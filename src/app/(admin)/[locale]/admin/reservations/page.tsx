@@ -1,5 +1,4 @@
 import React from "react";
-import PageHeader from "@/components/common/PageHeader";
 import { DatePicker } from "@/components/ui/date-picker";
 import { SearchBar } from "@/components/ui/search-bar";
 import ReservationsTable from "@/components/admin/ReservationTable";
@@ -8,13 +7,8 @@ export default function ReservationsPage() {
   return (
     <div className='space-y-6'>
       {/* 1) 페이지 헤더 */}
-      <PageHeader
-        desktopTitle='예약 관리'
-        mobileTitle='예약 관리'
-        showBackIcon={false}
-        center
-      />
 
+      <h1 className='text-2xl font-bold'>예약 관리 페이지</h1>
       {/* 2) 검색 필터 바 */}
       <div className='flex flex-col md:flex-row md:items-center md:justify-between gap-4'>
         <SearchBar placeholder='예약번호, 환자명으로 검색' />

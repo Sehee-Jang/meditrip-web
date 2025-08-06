@@ -1,16 +1,11 @@
 import React from "react";
-import PageHeader from "@/components/common/PageHeader";
 
 export default function AdminDashboardPage() {
   return (
     <div className='space-y-6'>
       {/* 1) 헤더 */}
-      <PageHeader
-        desktopTitle='관리자 대시보드'
-        mobileTitle='대시보드'
-        showBackIcon={false}
-        center
-      />
+
+      <h1 className='text-2xl font-bold'>관리자 대시보드</h1>
 
       {/* 2) 간단한 위젯 영역 (추후 실제 데이터로 교체) */}
       <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
