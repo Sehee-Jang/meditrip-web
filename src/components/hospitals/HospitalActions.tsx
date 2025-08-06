@@ -29,8 +29,13 @@ export default function HospitalActions({
 
   return (
     <section className='flex justify-center space-x-4 pt-6'>
-      <Link
+      {/* <Link
         href={`/${locale}/hospital/${hospitalId}/package/${packageId}/reservation`}
+      > */}
+      <Link
+        href='https://ko.surveymonkey.com/r/YXDPQ5Q'
+        target='_blank'
+        rel='noopener noreferrer'
       >
         <CommonButton>{t("clinicDetail.bookButton")}</CommonButton>
       </Link>
