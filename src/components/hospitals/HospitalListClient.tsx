@@ -56,7 +56,8 @@ export default function HospitalListClient() {
     });
 
     return () => unsubscribe();
-  }, [query, category, loc]);
+    // }, [query, category, loc]);
+  }, [query, loc]);
 
   return (
     <div className='flex flex-col space-y-4'>
