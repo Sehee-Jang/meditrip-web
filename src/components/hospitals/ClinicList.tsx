@@ -5,7 +5,7 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import Link from "next/link";
 import Image from "next/image";
 import FavoriteButton from "./FavoriteButton";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, Star } from "lucide-react";
 
 interface ClinicListProps {
   clinics: Clinic[];
@@ -45,15 +45,15 @@ export default function ClinicList({ clinics }: ClinicListProps) {
                   </div>
 
                   {/* 리뷰 및 별점 */}
-                  {/* <div className='mt-3 flex items-center text-sm text-gray-700'>
+                  <div className='mt-3 flex items-center text-sm text-gray-700'>
                     <Star className='w-4 h-4 text-yellow-500' />
                     <span className='ml-1 font-medium'>
-                      {c.rating.toFixed(1)}
+                      {typeof c.rating === "number" ? c.rating.toFixed(1) : "-"}
                     </span>
                     <span className='ml-2 text-gray-400'>
-                      ({c.reviewCount})
+                      ({c.reviewCount ?? 0})
                     </span>
-                  </div> */}
+                  </div>
                 </CardContent>
 
                 <CardFooter className='px-4 py-2 border-t'>

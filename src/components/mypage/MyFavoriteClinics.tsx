@@ -86,9 +86,13 @@ export default function MyFavoriteClinics() {
                   </p>
                   <div className='mt-1 text-sm text-gray-600 flex items-center gap-1'>
                     <Star className='w-4 h-4 text-yellow-400' />
-                    <span>{clinic.rating.toFixed(1)}</span>
+                    <span>
+                      {typeof clinic.rating === "number"
+                        ? clinic.rating.toFixed(1)
+                        : "-"}
+                    </span>
                     <span className='text-gray-400'>
-                      ({clinic.reviewCount})
+                      ({clinic.reviewCount ?? 0})
                     </span>
                   </div>
                 </div>
