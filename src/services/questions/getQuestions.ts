@@ -9,8 +9,11 @@ import {
   getCountFromServer,
   QueryDocumentSnapshot,
   DocumentData,
+  doc,
+  getDoc,
 } from "firebase/firestore";
 import { Question } from "@/types/question";
+import { User } from "@/types/user";
 
 export interface QuestionPage {
   questions: Question[];
@@ -33,13 +36,26 @@ export async function getQuestions(
   );
   const snap = await getDocs(q);
 
-  const questions: Question[] = snap.docs.map((doc) => {
-    const data = doc.data() as Omit<Question, "id">;
-    return {
-      id: doc.id,
-      ...data,
-    };
-  });
+  const questions: Question[] = await Promise.all(
+    snap.docs.map(async (docSnap) => {
+      const data = docSnap.data();
+      let user: User | null = null;
+
+      if (data.userId) {
+        const userRef = doc(db, "users", data.userId);
+        const userSnap = await getDoc(userRef);
+        if (userSnap.exists()) {
+          user = userSnap.data() as User;
+        }
+      }
+
+      return {
+        id: docSnap.id,
+        ...data,
+        user,
+      } as Question;
+    })
+  );
 
   const lastDoc = snap.docs[snap.docs.length - 1] ?? null;
   return { questions, lastDoc };

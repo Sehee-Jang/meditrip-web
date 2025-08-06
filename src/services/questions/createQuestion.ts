@@ -55,8 +55,8 @@ export async function createQuestion({
     throw new Error("로그인 후 작성해주세요.");
   }
 
+  // ✅ 3. userId 저장
   const userId = currentUser.uid;
-  const user = { id: userId, name: currentUser.displayName || "익명" };
 
   // 3) 질문 문서 생성 시 user 객체도 함께 저장
   const docRef = await addDoc(collection(db, "questions"), {
@@ -64,7 +64,7 @@ export async function createQuestion({
     category,
     content,
     imageUrl,
-    user,
+    userId,
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
   });

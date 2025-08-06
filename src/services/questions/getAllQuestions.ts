@@ -1,25 +1,29 @@
 import { db } from "@/lib/firebase";
-import { collection, getDocs, orderBy, query } from "firebase/firestore";
-import { Question, Answer } from "@/types/question";
-
-type FirestoreTimestamp = { toDate: () => Date };
+import { getDocs, collection, doc, getDoc } from "firebase/firestore";
+import { Question } from "@/types/question";
+import { User } from "@/types/user";
 
 export async function getAllQuestions(): Promise<Question[]> {
-  const q = query(collection(db, "questions"), orderBy("createdAt", "desc"));
-  const snapshot = await getDocs(q);
+  const snapshot = await getDocs(collection(db, "questions"));
+  const questions = await Promise.all(
+    snapshot.docs.map(async (docSnap) => {
+      const data = docSnap.data();
+      let user = null;
 
-  return snapshot.docs.map((doc) => {
-    const data = doc.data();
+      if (data.userId) {
+        const userSnap = await getDoc(doc(db, "users", data.userId));
+        if (userSnap.exists()) {
+          user = userSnap.data() as User;
+        }
+      }
 
-    return {
-      id: doc.id,
-      title: data.title ?? "제목 없음",
-      content: data.content ?? "",
-      category: data.category ?? "uncategorized",
-      createdAt: (data.createdAt as FirestoreTimestamp).toDate().toISOString(),
-      imageUrl: data.imageUrl ?? "",
-      user: data.user ?? { id: "", name: "익명" },
-      answers: Array.isArray(data.answers) ? (data.answers as Answer[]) : [], // answers가 없으면 빈 배열
-    };
-  });
+      return {
+        id: docSnap.id,
+        ...data,
+        user, // 유저 정보 포함
+      } as Question;
+    })
+  );
+
+  return questions;
 }
