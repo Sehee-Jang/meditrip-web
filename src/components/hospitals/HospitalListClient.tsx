@@ -40,9 +40,9 @@ export default function HospitalListClient() {
       }
 
       // 카테고리 필터링
-      if (category && category !== "all") {
-        filtered = filtered.filter((c) => c.category === category);
-      }
+      // if (category && category !== "all") {
+      //   filtered = filtered.filter((c) => c.category === category);
+      // }
 
       // 찜 여부 추가
       if (user) {
@@ -71,11 +71,11 @@ export default function HospitalListClient() {
       />
 
       {/* 카테고리 필터 */}
-      <CategoryFilter
+      {/* <CategoryFilter
         categories={["all", "traditional", "cosmetic", "wellness"]}
         selected={category}
         onSelect={(cat) => setCategory(cat as HospitalCategoryKey | null)}
-      />
+      /> */}
 
       {/* 로딩 표시 */}
       {loading ? (

@@ -30,7 +30,7 @@ export interface Clinic {
     title: LocalizedField;
     subtitle: LocalizedField;
   };
-
+  category?: "traditional" | "cosmetic" | "wellness";
   vision: LocalizedField;
   mission: LocalizedField;
   description: LocalizedField;
