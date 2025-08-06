@@ -1,14 +1,16 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { HelpCircle, Search, ThumbsUp } from "lucide-react";
 import Container from "../common/Container";
+import Link from "next/link";
 
 const faqIcons = [HelpCircle, Search, ThumbsUp];
 
 export default function FAQSection() {
   const t = useTranslations("faq-section");
   const items = t.raw("items") as Array<{ question: string; answer: string }>;
+  const locale = useLocale();
 
   return (
     <section className='bg-white py-10'>
@@ -16,19 +18,24 @@ export default function FAQSection() {
         <h2 className='text-xl md:text-2xl font-semibold mb-1'>{t("title")}</h2>
         <p className='text-sm text-gray-500 mb-4'>{t("description")}</p>
 
-        <div className='divide-y borde-b rounded-md overflow-hidden bg-white'>
-          {items.map((item, index) => {
-            const Icon = faqIcons[index % faqIcons.length]; // 순환
-            return (
-              <div key={index} className='flex gap-3 px-4 py-3 items-start'>
-                <Icon className='text-red-400 mt-1 shrink-0' size={20} />
-                <div>
-                  <p className='text-sm font-semibold'>{item.question}</p>
-                  <p className='text-sm text-gray-500'>{item.answer}</p>
+        <div className=''>
+          <Link
+            href={`/${locale}/faq`}
+            className='divide-y borde-b rounded-md overflow-hidden bg-white'
+          >
+            {items.map((item, index) => {
+              const Icon = faqIcons[index % faqIcons.length]; // 순환
+              return (
+                <div key={index} className='flex gap-3 px-4 py-3 items-start'>
+                  <Icon className='text-red-400 mt-1 shrink-0' size={20} />
+                  <div>
+                    <p className='text-sm font-semibold'>{item.question}</p>
+                    <p className='text-sm text-gray-500'>{item.answer}</p>
+                  </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </Link>
         </div>
       </Container>
     </section>
