@@ -4,18 +4,21 @@ import { useEffect, useState } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import { getUserFavoriteHospitalIds } from "@/services/hospitals/favorites";
-import { fetchHospitals } from "@/services/hospitals/fetchHospitals";
-import type { Hospital } from "@/types/hospital";
+import { fetchClinics } from "@/services/hospitals/fetchClinics";
+import type { Clinic } from "@/types/clinic";
 import FavoriteButton from "../hospitals/FavoriteButton";
 import Link from "next/link";
 import Image from "next/image";
 import { Star } from "lucide-react";
 import LoadingSpinner from "../common/LoadingSpinner";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 
 export default function MyFavoriteClinics() {
   const t = useTranslations("my-favorite");
-  const [clinics, setClinics] = useState<Hospital[]>([]);
+  const locale = useLocale();
+  const loc: "ko" | "ja" = locale === "ja" ? "ja" : "ko";
+
+  const [clinics, setClinics] = useState<Clinic[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -24,15 +27,15 @@ export default function MyFavoriteClinics() {
 
       setLoading(true);
 
-      const [allHospitals, favoriteIds] = await Promise.all([
-        fetchHospitals(),
+      const [allClinics, favoriteIds] = await Promise.all([
+        fetchClinics(),
         getUserFavoriteHospitalIds(user.uid),
       ]);
 
-      const filtered = allHospitals
-        .filter((h) => favoriteIds.includes(h.id))
-        .map((h) => ({
-          ...h,
+      const filtered = allClinics
+        .filter((c) => favoriteIds.includes(c.id))
+        .map((c) => ({
+          ...c,
           isFavorite: true, // UI 일관성 위해 항상 true
         }));
 
@@ -68,15 +71,19 @@ export default function MyFavoriteClinics() {
               <div className='flex items-center gap-4'>
                 <div className='relative w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden'>
                   <Image
-                    src={clinic.photos[0] || "/images/placeholder.png"}
-                    alt={clinic.name}
+                    src={clinic.images[0] || "/images/placeholder.png"}
+                    alt={clinic.name[loc]}
                     fill
                     className='object-cover'
                   />
                 </div>
                 <div className='flex-1'>
-                  <h3 className='font-semibold text-base'>{clinic.name}</h3>
-                  <p className='text-sm text-gray-500 mt-1'>{clinic.address}</p>
+                  <h3 className='font-semibold text-base'>
+                    {clinic.name[loc]}
+                  </h3>
+                  <p className='text-sm text-gray-500 mt-1'>
+                    {clinic.address[loc]}
+                  </p>
                   <div className='mt-1 text-sm text-gray-600 flex items-center gap-1'>
                     <Star className='w-4 h-4 text-yellow-400' />
                     <span>{clinic.rating.toFixed(1)}</span>
