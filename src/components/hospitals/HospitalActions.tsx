@@ -4,8 +4,18 @@ import Link from "next/link";
 import CommonButton from "@/components/common/CommonButton";
 import { Share2 } from "lucide-react";
 import { useTranslations } from "next-intl";
+/* eslint-disable @typescript-eslint/no-unused-vars */
+interface HospitalActionsProps {
+  locale: string;
+  hospitalId: string;
+  packageId: string;
+}
 
-export default function HospitalActions() {
+export default function HospitalActions({
+  locale,
+  hospitalId,
+  packageId,
+}: HospitalActionsProps) {
   const t = useTranslations("hospital-list");
 
   const share = () => {
@@ -19,6 +29,12 @@ export default function HospitalActions() {
 
   return (
     <section className='flex justify-center space-x-4 pt-6'>
+      {/* 추후 활성화할 예약 링크 */}
+      {/* <Link
+        href={`/${locale}/hospital/${hospitalId}/package/${packageId}/reserve`}
+      >
+        <CommonButton>{t("clinicDetail.bookButton")}</CommonButton>
+      </Link> */}
       <Link
         href='https://ko.surveymonkey.com/r/YXDPQ5Q'
         target='_blank'
@@ -34,3 +50,4 @@ export default function HospitalActions() {
     </section>
   );
 }
+/* eslint-enable @typescript-eslint/no-unused-vars */
