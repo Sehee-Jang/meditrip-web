@@ -1,104 +1,129 @@
 import React from "react";
 import { notFound } from "next/navigation";
 import PageHeader from "@/components/common/PageHeader";
-import HospitalCarousel from "@/components/hospitals/HospitalCarousel";
-import PackageReserveButton from "@/components/hospitals/PackageReserveButton";
 import { getTranslations } from "next-intl/server";
-import { fetchHospitals } from "@/services/hospitals/fetchHospitals";
-import type { Hospital } from "@/types/hospital";
+import { fetchClinics } from "@/services/hospitals/fetchClinics";
+import type { Clinic, Locale } from "@/types/clinic";
 import Image from "next/image";
+import PackageReserveButton from "@/components/hospitals/PackageReserveButton";
 
-type PageParams = Promise<{
-  locale: string;
-  hospitalId: string;
-  packageId: string;
-}>;
+interface Props {
+  params: Promise<{
+    locale: string;
+    hospitalId: string;
+    packageId: string;
+  }>;
+}
 
-export default async function PackageDetailPage({
-  params,
-}: {
-  params: PageParams;
-}) {
+export default async function PackageDetailPage({ params }: Props) {
   const { locale, hospitalId, packageId } = await params;
   const t = await getTranslations("package-detail");
 
-  // mockHospitals 기반 데이터 로드
-  const hospitals: Hospital[] = await fetchHospitals();
-  const hospital = hospitals.find((h) => h.id === hospitalId);
-  if (!hospital) return notFound();
+  const clinics: Clinic[] = await fetchClinics();
+  const clinic = clinics.find((c) => c.id === hospitalId);
+  if (!clinic) return notFound();
 
-  const pkg = hospital.packages.find((p) => p.id === packageId);
+  const pkg = clinic.packages[packageId];
   if (!pkg) return notFound();
+
+  const loc = locale as Locale;
 
   return (
     <main className='md:px-4 md:py-8'>
-      {/* 1) 패키지 이름으로 헤더 제목 설정 */}
       <PageHeader
-        desktopTitle={pkg.title}
-        mobileTitle={pkg.title}
+        desktopTitle={pkg.title[loc]}
+        mobileTitle={pkg.title[loc]}
         showBackIcon
         center
       />
 
-      <section className='max-w-4xl mx-auto space-y-8 px-4'>
-        {/* 이미지 슬라이더 */}
-        <HospitalCarousel photos={pkg.photos} />
+      <section className='max-w-4xl mx-auto space-y-8 px-4 mb-8'>
+        {/* 이미지 슬라이더 or 썸네일 */}
+        {/* <HospitalCarousel photos={pkg.packageImages} /> */}
+        {pkg.packageImages?.length ? (
+          <div className='w-full h-60 sm:h-80 md:h-[360px] rounded overflow-hidden'>
+            {pkg.packageImages.map((img, i) => (
+              <div
+                key={i}
+                className='relative w-full h-60 sm:h-80 md:h-[360px]'
+              >
+                <Image
+                  src={img}
+                  alt={pkg.title[loc]}
+                  fill
+                  className='object-cover'
+                />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className='w-full h-40 bg-gray-100 flex items-center justify-center text-gray-400'>
+            {t("noImage")}
+          </div>
+        )}
 
         {/* 진료 프로세스 */}
-        {pkg.process && (
-          <div className='space-y-2'>
-            <h3 className='text-xl font-semibold'>{t("process.title")}</h3>
-            <div className='grid grid-cols-3 sm:grid-cols-6 gap-4 mt-4'>
-              {pkg.process.map((step, idx) => (
-                <div key={idx} className='flex flex-col items-center'>
-                  <div className='w-12 h-12 rounded-lg border flex items-center justify-center'>
-                    {step.icon}
+        {pkg.treatmentDetails && pkg.treatmentDetails.length > 0 && (
+          <>
+            <h2 className='text-lg font-semibold mb-4'>{t("processTitle")}</h2>
+            <div className='grid grid-cols-3 gap-4 mb-8'>
+              {pkg.treatmentDetails.map((step, i) => (
+                <div
+                  key={i}
+                  className='flex flex-col items-center text-center text-sm text-gray-700'
+                >
+                  <div className='w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center font-bold mb-1'>
+                    {`Step ${String(i + 1).padStart(2, "0")}`}
                   </div>
-                  <span className='mt-2 text-sm text-center'>{step.title}</span>
+                  <p>{step.title[loc]}</p>
                 </div>
               ))}
             </div>
-          </div>
-        )}
 
-        {/* 진료 상세 정보 */}
-        {pkg.details && (
-          <div className='space-y-2'>
-            <h3 className='text-xl font-semibold'>{t("details.title")}</h3>
-            <div className='space-y-6 mt-4'>
-              {pkg.details.map((d, idx) => (
-                <div key={idx} className='flex gap-4'>
-                  <div className='w-24 h-24 rounded-lg overflow-hidden'>
-                    <Image
-                      src={d.image}
-                      alt={d.title}
-                      fill
-                      className='object-cover'
-                    />
-                  </div>
-                  <div className='flex-1 space-y-1'>
-                    <div className='text-sm font-medium text-blue-500'>
-                      {t("details.stepTitle", { step: idx + 1 })}
+            {/* 상세 설명 */}
+            <h2 className='text-lg font-semibold mb-4'>{t("detailsTitle")}</h2>
+            <div className='space-y-6'>
+              {pkg.treatmentDetails.map((step, i) => (
+                <div
+                  key={i}
+                  className='p-4 border rounded-xl space-y-2 shadow-sm bg-white'
+                >
+                  {step.imageUrl && (
+                    <div className='relative w-full h-48 rounded-md overflow-hidden'>
+                      <Image
+                        src={step.imageUrl}
+                        alt={step.title[loc]}
+                        fill
+                        className='object-cover'
+                      />
                     </div>
-                    <h4 className='font-semibold'>{d.title}</h4>
-                    <p className='text-gray-700 text-sm'>{d.description}</p>
-                  </div>
+                  )}
+                  <h3 className='font-semibold text-blue-600'>
+                    {`Step ${String(i + 1).padStart(2, "0")} - ${
+                      step.title[loc]
+                    }`}
+                  </h3>
+                  <p className='text-gray-700'>{step.description[loc]}</p>
                 </div>
               ))}
             </div>
-          </div>
+          </>
         )}
 
-        {/* 주의 사항 */}
-        {pkg.cautions && (
-          <div className='border rounded-lg p-4'>
-            <h4 className='font-semibold'>{t("cautions.title")}</h4>
-            <p className='mt-2 text-gray-700 text-sm'>{pkg.cautions}</p>
-          </div>
+        {/* 주의사항 */}
+        {pkg.precautions?.[loc] && (
+          <>
+            <h2 className='text-lg font-semibold mt-10 mb-2'>
+              {t("noteTitle")}
+            </h2>
+            <div className='bg-gray-50 border rounded-md p-4 text-sm text-gray-600'>
+              {pkg.precautions[loc]}
+            </div>
+          </>
         )}
 
-        {/* 예약하기 버튼 */}
-        <div className='text-center'>
+        {/* 예약 버튼 */}
+        <div className='text-center mb-6'>
           <PackageReserveButton
             locale={locale}
             hospitalId={hospitalId}

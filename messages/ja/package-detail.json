@@ -1,21 +1,8 @@
 {
-  "intro": {
-    "title": "クリニック詳細",
-    "subtitle": "クリニック情報をご覧ください",
-    "addressLabel": "住所",
-    "address": "東京都渋谷区..."
-  },
-  "process": {
-    "title": "診療プロセス"
-  },
-  "details": {
-    "title": "診療詳細情報",
-    "stepTitle": "ステップ {step}"
-  },
-  "cautions": {
-    "title": "注意事項"
-  },
-  "reserve": {
-    "button": "予約する"
-  }
+  "processTitle": "診療プロセス",
+  "detailsTitle": "診療詳細情報",
+  "noteTitle": "注意事項",
+  "noteContent": "予約前に必ずご確認ください！ すべての診療は病院と相談した後、個人に合わせて行われます。",
+  "reserveButton": "予約する",
+  "noImage": "イメージがありません。"
 }

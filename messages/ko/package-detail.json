@@ -1,21 +1,8 @@
 {
-  "intro": {
-    "title": "병원 상세",
-    "subtitle": "클리닉 정보를 확인하세요",
-    "addressLabel": "주소",
-    "address": "서울특별시 강남구..."
-  },
-  "process": {
-    "title": "진료 프로세스"
-  },
-  "details": {
-    "title": "진료 상세 정보",
-    "stepTitle": "Step {step}"
-  },
-  "cautions": {
-    "title": "주의사항"
-  },
-  "reserve": {
-    "button": "예약하기"
-  }
+  "processTitle": "진료 프로세스",
+  "detailsTitle": "진료 상세 정보",
+  "noteTitle": "주의사항",
+  "noteContent": "예약 전 반드시 확인해주세요! 모든 진료는 병원과 상담 후 개인 맞춤으로 진행됩니다.",
+  "reserveButton": "예약하기",
+  "noImage": "이미지가 없습니다"
 }

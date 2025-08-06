@@ -1,54 +1,55 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import SearchInput from "@/components/common/SearchInput";
 import CategoryFilter, {
   HospitalCategoryKey,
 } from "@/components/common/CategoryFilter";
-import HospitalList from "./HospitalList";
-import { fetchHospitals } from "@/services/hospitals/fetchHospitals";
-import type { Hospital } from "@/types/hospital";
 import { auth } from "@/lib/firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { getUserFavoriteHospitalIds } from "@/services/hospitals/favorites";
 import LoadingSpinner from "../common/LoadingSpinner";
+import ClinicList from "./ClinicList";
+import type { Clinic } from "@/types/clinic";
+import { fetchClinics } from "@/services/hospitals/fetchClinics";
 
 export default function HospitalListClient() {
   const t = useTranslations("hospital-list");
+  const locale = useLocale();
+  const loc: "ko" | "ja" = locale === "ja" ? "ja" : "ko";
 
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<HospitalCategoryKey | null>(null);
-  const [clinics, setClinics] = useState<Hospital[]>([]);
+  const [clinics, setClinics] = useState<Clinic[]>([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     setLoading(true);
 
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      let uid: string | null = null;
-      if (user) {
-        uid = user.uid;
-      }
+      const allClinics = await fetchClinics();
+      let filtered = [...allClinics];
 
-      const allHospitals = await fetchHospitals();
-
-      // 필터링: 검색어와 카테고리
-      let filtered = allHospitals;
+      // 검색어 필터링
       if (query) {
         const q = query.toLowerCase();
-        filtered = filtered.filter((h) => h.name.toLowerCase().includes(q));
-      }
-      if (category && category !== "all") {
-        filtered = filtered.filter((h) => h.category === category);
+        filtered = filtered.filter((c) =>
+          c.name[loc].toLowerCase().includes(q)
+        );
       }
 
-      // 로그인 상태일 경우 찜 여부 불러오기
-      if (uid) {
-        const favoriteIds = await getUserFavoriteHospitalIds(uid);
-        filtered = filtered.map((h) => ({
-          ...h,
-          isFavorite: favoriteIds.includes(h.id),
+      // 카테고리 필터링
+      if (category && category !== "all") {
+        filtered = filtered.filter((c) => c.category === category);
+      }
+
+      // 찜 여부 추가
+      if (user) {
+        const favoriteIds = await getUserFavoriteHospitalIds(user.uid);
+        filtered = filtered.map((c) => ({
+          ...c,
+          isFavorite: favoriteIds.includes(c.id),
         }));
       }
 
@@ -57,7 +58,7 @@ export default function HospitalListClient() {
     });
 
     return () => unsubscribe();
-  }, [query, category]);
+  }, [query, category, loc]);
 
   return (
     <div className='flex flex-col space-y-4'>
@@ -77,16 +78,15 @@ export default function HospitalListClient() {
       />
 
       {/* 로딩 표시 */}
-
-      {loading && (
+      {loading ? (
         <div className='min-h-[50vh] flex flex-col items-center justify-center'>
           <LoadingSpinner />
           <p className='mt-4 text-gray-500'>{t("clinicList.loading")}</p>
         </div>
+      ) : (
+        <ClinicList clinics={clinics} />
       )}
-
-      {/* 병원 리스트 */}
-      <HospitalList clinics={clinics} />
+      {/* <HospitalList clinics={clinics} /> */}
     </div>
   );
 }

@@ -1,0 +1,13 @@
+{
+  "visionLabel": "Vision",
+  "missionLabel": "Mission",
+  "eventsLabel": "예약 이벤트",
+  "packagesLabel": "주요 진료 패키지",
+  "bookButton": "예약하기",
+  "shareButton": "공유하기",
+  "about": "병원 소개",
+  "vision": "비전",
+  "mission": "미션",
+  "events": "이벤트 안내",
+  "packages": "한방 웰니스 프로그램"
+}

@@ -42,3 +42,5 @@ next-env.d.ts
 
 # 서비스 계정 키
 /scripts/serviceAccountKey.json
+/scripts/uploadClinic.ts
+/public/data/clinic_woojoo_cleared.json
