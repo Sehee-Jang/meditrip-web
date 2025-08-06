@@ -3,9 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import SearchInput from "@/components/common/SearchInput";
-import CategoryFilter, {
-  HospitalCategoryKey,
-} from "@/components/common/CategoryFilter";
+import { HospitalCategoryKey } from "@/components/common/CategoryFilter";
 import { auth } from "@/lib/firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { getUserFavoriteHospitalIds } from "@/services/hospitals/favorites";
@@ -20,7 +18,7 @@ export default function HospitalListClient() {
   const loc: "ko" | "ja" = locale === "ja" ? "ja" : "ko";
 
   const [query, setQuery] = useState("");
-  const [category, setCategory] = useState<HospitalCategoryKey | null>(null);
+  // const [category, setCategory] = useState<HospitalCategoryKey | null>(null);
   const [clinics, setClinics] = useState<Clinic[]>([]);
   const [loading, setLoading] = useState(false);
 

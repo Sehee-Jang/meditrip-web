@@ -6,6 +6,7 @@ import { fetchClinics } from "@/services/hospitals/fetchClinics";
 import type { Clinic, Locale } from "@/types/clinic";
 import Image from "next/image";
 import PackageReserveButton from "@/components/hospitals/PackageReserveButton";
+import HospitalActions from "@/components/hospitals/HospitalActions";
 
 interface Props {
   params: Promise<{
@@ -130,6 +131,9 @@ export default async function PackageDetailPage({ params }: Props) {
             packageId={packageId}
           />
         </div>
+
+        {/* Actions: 예약 & 공유 */}
+        <HospitalActions locale={locale} hospitalId={hospitalId} />
       </section>
     </main>
   );
