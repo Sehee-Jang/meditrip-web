@@ -5,17 +5,7 @@ import CommonButton from "@/components/common/CommonButton";
 import { Share2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 
-interface HospitalActionsProps {
-  locale: string;
-  hospitalId: string;
-  packageId: string;
-}
-
-export default function HospitalActions({
-  locale,
-  hospitalId,
-  packageId,
-}: HospitalActionsProps) {
+export default function HospitalActions() {
   const t = useTranslations("hospital-list");
 
   const share = () => {
@@ -29,9 +19,6 @@ export default function HospitalActions({
 
   return (
     <section className='flex justify-center space-x-4 pt-6'>
-      {/* <Link
-        href={`/${locale}/hospital/${hospitalId}/package/${packageId}/reservation`}
-      > */}
       <Link
         href='https://ko.surveymonkey.com/r/YXDPQ5Q'
         target='_blank'

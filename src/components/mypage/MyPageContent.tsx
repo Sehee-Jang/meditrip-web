@@ -197,7 +197,7 @@ export default function MyPageContent() {
         <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
           {questions.map((q) => (
             <Link href={`/community/questions/${q.id}`} key={q.id}>
-              <div className='border p-4 rounded-md bg-white'>
+              <div className='border p-4 rounded-md bg-white hover:shadow-md transition'>
                 <div className='font-medium'>{q.title}</div>
                 <div className='text-sm text-gray-600'>
                   {t("questions.writtenDate")}: {q.date}
