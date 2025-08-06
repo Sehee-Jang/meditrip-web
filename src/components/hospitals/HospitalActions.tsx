@@ -8,11 +8,13 @@ import { useTranslations } from "next-intl";
 interface HospitalActionsProps {
   locale: string;
   hospitalId: string;
+  packageId: string;
 }
 
 export default function HospitalActions({
   locale,
   hospitalId,
+  packageId,
 }: HospitalActionsProps) {
   const t = useTranslations("hospital-list");
 
@@ -27,7 +29,9 @@ export default function HospitalActions({
 
   return (
     <section className='flex justify-center space-x-4 pt-6'>
-      <Link href={`/${locale}/hospital/${hospitalId}/reservation`}>
+      <Link
+        href={`/${locale}/hospital/${hospitalId}/package/${packageId}/reservation`}
+      >
         <CommonButton>{t("clinicDetail.bookButton")}</CommonButton>
       </Link>
 

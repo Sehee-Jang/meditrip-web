@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import SearchInput from "@/components/common/SearchInput";
-import { HospitalCategoryKey } from "@/components/common/CategoryFilter";
 import { auth } from "@/lib/firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { getUserFavoriteHospitalIds } from "@/services/hospitals/favorites";
@@ -18,7 +17,6 @@ export default function HospitalListClient() {
   const loc: "ko" | "ja" = locale === "ja" ? "ja" : "ko";
 
   const [query, setQuery] = useState("");
-  // const [category, setCategory] = useState<HospitalCategoryKey | null>(null);
   const [clinics, setClinics] = useState<Clinic[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -37,11 +35,6 @@ export default function HospitalListClient() {
         );
       }
 
-      // 카테고리 필터링
-      // if (category && category !== "all") {
-      //   filtered = filtered.filter((c) => c.category === category);
-      // }
-
       // 찜 여부 추가
       if (user) {
         const favoriteIds = await getUserFavoriteHospitalIds(user.uid);
@@ -56,7 +49,6 @@ export default function HospitalListClient() {
     });
 
     return () => unsubscribe();
-    // }, [query, category, loc]);
   }, [query, loc]);
 
   return (
@@ -69,13 +61,6 @@ export default function HospitalListClient() {
         icon='🔍'
       />
 
-      {/* 카테고리 필터 */}
-      {/* <CategoryFilter
-        categories={["all", "traditional", "cosmetic", "wellness"]}
-        selected={category}
-        onSelect={(cat) => setCategory(cat as HospitalCategoryKey | null)}
-      /> */}
-
       {/* 로딩 표시 */}
       {loading ? (
         <div className='min-h-[50vh] flex flex-col items-center justify-center'>
@@ -85,7 +70,6 @@ export default function HospitalListClient() {
       ) : (
         <ClinicList clinics={clinics} />
       )}
-      {/* <HospitalList clinics={clinics} /> */}
     </div>
   );
 }

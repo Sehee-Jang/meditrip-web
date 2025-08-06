@@ -5,7 +5,6 @@ import { getTranslations } from "next-intl/server";
 import { fetchClinics } from "@/services/hospitals/fetchClinics";
 import type { Clinic, Locale } from "@/types/clinic";
 import Image from "next/image";
-import PackageReserveButton from "@/components/hospitals/PackageReserveButton";
 import HospitalActions from "@/components/hospitals/HospitalActions";
 
 interface Props {
@@ -123,17 +122,12 @@ export default async function PackageDetailPage({ params }: Props) {
           </>
         )}
 
-        {/* 예약 버튼 */}
-        <div className='text-center mb-6'>
-          <PackageReserveButton
-            locale={locale}
-            hospitalId={hospitalId}
-            packageId={packageId}
-          />
-        </div>
-
         {/* Actions: 예약 & 공유 */}
-        <HospitalActions locale={locale} hospitalId={hospitalId} />
+        <HospitalActions
+          locale={locale}
+          hospitalId={hospitalId}
+          packageId={packageId}
+        />
       </section>
     </main>
   );
