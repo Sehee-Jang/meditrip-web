@@ -86,10 +86,11 @@ export default async function PackageDetailPage({ params }: Props) {
               {pkg.treatmentDetails.map((step, i) => (
                 <div
                   key={i}
-                  className='p-4 border rounded-xl space-y-2 shadow-sm bg-white'
+                  className='flex flex-col md:flex-row gap-4 p-4 border rounded-xl shadow-sm bg-white'
                 >
+                  {/* 왼쪽 이미지 */}
                   {step.imageUrl && (
-                    <div className='relative w-full h-48 rounded-md overflow-hidden'>
+                    <div className='relative w-full md:w-56 aspect-square rounded-md overflow-hidden shrink-0'>
                       <Image
                         src={step.imageUrl}
                         alt={step.title[loc]}
@@ -98,12 +99,18 @@ export default async function PackageDetailPage({ params }: Props) {
                       />
                     </div>
                   )}
-                  <h3 className='font-semibold text-blue-600'>
-                    {`Step ${String(i + 1).padStart(2, "0")} - ${
-                      step.title[loc]
-                    }`}
-                  </h3>
-                  <p className='text-gray-700'>{step.description[loc]}</p>
+
+                  {/* 오른쪽 텍스트 */}
+                  <div className='flex-1'>
+                    <h3 className='font-semibold text-blue-600 mb-2'>
+                      {`Step ${String(i + 1).padStart(2, "0")} - ${
+                        step.title[loc]
+                      }`}
+                    </h3>
+                    <p className='text-gray-700 text-sm'>
+                      {step.description[loc]}
+                    </p>
+                  </div>
                 </div>
               ))}
             </div>
