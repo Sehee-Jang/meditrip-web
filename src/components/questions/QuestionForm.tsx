@@ -10,6 +10,8 @@ import { createQuestion } from "@/services/questions/createQuestion";
 import { useDropzone } from "react-dropzone";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { awardPointsIfEligible } from "@/services/points/awardPointsIfEligible";
+import { auth } from "@/lib/firebase";
 
 // i18n 번역 스키마 설정
 const formSchema = z.object({
@@ -26,7 +28,6 @@ const formSchema = z.object({
     }),
 });
 
-// type FormData = z.infer<typeof formSchema>;
 type FormData = {
   title: string;
   category: "stress" | "diet" | "immunity" | "women" | "antiaging" | "etc";
@@ -73,6 +74,12 @@ export default function QuestionForm() {
         category: data.category,
         content: data.content,
         file,
+      });
+
+      // ✅ 포인트 지급 시도
+      await awardPointsIfEligible({
+        userId: auth.currentUser?.uid,
+        triggerType: "community_post",
       });
 
       reset();

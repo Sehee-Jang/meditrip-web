@@ -11,7 +11,7 @@ import {
   serverTimestamp,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import { Event } from "@/types/event";
+import type { Event } from "@/types/event";
 
 export const awardPointsIfEligible = async ({
   userId,
@@ -23,37 +23,42 @@ export const awardPointsIfEligible = async ({
   if (!userId) return;
 
   // 1. 해당 트리거의 활성화된 이벤트 목록 조회
-  const eventsQuery = query(
+  const q = query(
     collection(db, "pointEvents"),
     where("triggerType", "==", triggerType),
     where("active", "==", true)
   );
-  const snapshot = await getDocs(eventsQuery);
-
+  const snapshot = await getDocs(q);
   const now = new Date();
 
-  for (const docSnap of snapshot.docs) {
-    const event = docSnap.data() as Event;
+  for (const eventDoc of snapshot.docs) {
+    const event = eventDoc.data() as Event;
+    const eventId = eventDoc.id;
 
-    const logRef = doc(db, "users", userId, "pointLogs", docSnap.id);
+    const logRef = doc(db, "users", userId, "pointLogs", eventId);
     const logSnap = await getDoc(logRef);
 
-    const alreadyGiven = logSnap.exists();
-    const logData = logSnap.data();
+    const prevDate = logSnap.exists()
+      ? logSnap.data().createdAt?.toDate?.()
+      : null;
 
-    const createdAt = logData?.createdAt?.toDate?.() as Date | undefined;
+    // 조건 분기 처리
+    const isFirstOnly = event.condition === "firstPostOnly" && logSnap.exists();
+    const isOncePerDay =
+      event.condition === "oncePerDay" &&
+      prevDate &&
+      prevDate.toDateString() === now.toDateString();
 
-    // 조건 검사
-    const shouldSkip =
-      (event.condition === "firstPostOnly" && alreadyGiven) ||
-      (event.condition === "oncePerDay" &&
-        createdAt?.toDateString() === now.toDateString());
-
-    if (shouldSkip) continue;
+    if (isFirstOnly || isOncePerDay) {
+      console.log(
+        `⏭ 이벤트 [${event.description}] 조건 불충족으로 지급 건너뜀`
+      );
+      continue;
+    }
 
     // 포인트 로그 작성
     await setDoc(logRef, {
-      eventId: docSnap.id,
+      eventId,
       triggerType,
       description: event.description,
       points: event.points,
@@ -65,5 +70,8 @@ export const awardPointsIfEligible = async ({
     await updateDoc(userRef, {
       points: increment(event.points),
     });
+    console.log(
+      `✅ 포인트 ${event.points}P 지급 완료 → [${event.description}]`
+    );
   }
 };
