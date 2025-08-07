@@ -13,13 +13,26 @@ import { toast } from "sonner";
 
 // i18n 번역 스키마 설정
 const formSchema = z.object({
-  title: z.string().min(2),
+  title: z.string().min(2, { message: "제목은 2자 이상 입력해주세요." }),
   category: z.enum(["stress", "diet", "immunity", "women", "antiaging", "etc"]),
-  content: z.string().min(1),
-  file: z.array(z.instanceof(File)).optional(),
+  content: z.string().min(1, { message: "질문 내용을 입력해주세요." }),
+  file: z
+    .any()
+    .optional()
+    .transform((val) => {
+      if (!val || !Array.isArray(val) || val.length === 0) return undefined;
+      if (val[0] instanceof File) return val;
+      return undefined;
+    }),
 });
 
-type FormData = z.infer<typeof formSchema>;
+// type FormData = z.infer<typeof formSchema>;
+type FormData = {
+  title: string;
+  category: "stress" | "diet" | "immunity" | "women" | "antiaging" | "etc";
+  content: string;
+  file?: File[]; // ✅ file은 optional이고, File[] 또는 undefined
+};
 
 export default function QuestionForm() {
   const tForm = useTranslations("question-form");
@@ -48,8 +61,11 @@ export default function QuestionForm() {
       setPreview(URL.createObjectURL(file));
     },
   });
+  console.log("🔥 tForm raw value:", tForm.raw("form.category.options"));
 
   const onSubmit = async (data: FormData) => {
+    console.log("🔥 form 제출 시도됨");
+
     try {
       const file = data.file?.[0];
       const id = await createQuestion({
@@ -144,6 +160,9 @@ export default function QuestionForm() {
                   type='radio'
                   value={key}
                   {...register("category")}
+                  onChange={(e) => {
+                    console.log("✅ 선택된 카테고리:", e.target.value);
+                  }}
                   className='mr-1'
                 />
                 {value}
