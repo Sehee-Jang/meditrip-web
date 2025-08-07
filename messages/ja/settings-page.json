@@ -3,7 +3,7 @@
   "account": {
     "title": "アカウント管理",
     "password": "パスワード変更",
-    "passwordDesc": "パスワードを変更します。",
+    "passwordDesc": "登録したメールにリセットリンクが送信されます。",
     "delete": "退会する",
     "deleteDesc": "アカウントを退会するにはクリックしてください。"
   },
@@ -24,6 +24,15 @@
   },
   "buttons": {
     "cancel": "キャンセル",
-    "save": "修正完了"
+    "save": "修正",
+    "saving": "修正中"
+  },
+  "toast": {
+    "saveSuccess": "設定が保存されました。",
+    "saveError": "設定の保存中に問題が発生しました。",
+    "deleteError": "退会処理中にエラーが発生しました。",
+    "passwordResetSuccess": "パスワード再設定メールを送信しました。",
+    "passwordResetError": "メールの送信に失敗しました。もう一度お試しください。",
+    "needLogin": "ログインするか、メール情報が必要です。"
   }
 }

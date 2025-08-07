@@ -91,7 +91,7 @@ export default function MyPageContent() {
         const qSnap = await getDocs(
           query(
             collection(db, "questions"),
-            where("user.id", "==", u.uid),
+            where("userId", "==", u.uid),
             orderBy("createdAt", "desc")
           )
         );
@@ -185,7 +185,7 @@ export default function MyPageContent() {
           {/* 포인트 사용 내역 버튼 */}
           <CommonButton
             onClick={() => setShowPointLog(true)}
-            className='rounded border border-gray-800 px-2 py-1 text-sm bg-white text-gray-800 hover:bg-gray-100'
+            className='rounded border px-2 py-1 text-sm bg-white text-gray-800 hover:bg-gray-100'
           >
             {t("points.use")} <ChevronRight size={16} />
           </CommonButton>

@@ -1,9 +1,9 @@
 {
   "title": "설정",
   "account": {
-    "title": "계정관리",
+    "title": "계정 관리",
     "password": "비밀번호 변경",
-    "passwordDesc": "비밀번호를 변경합니다.",
+    "passwordDesc": "가입한 이메일로 재설정 링크가 전송됩니다.",
     "delete": "탈퇴하기",
     "deleteDesc": "계정을 탈퇴하려면 클릭해주세요."
   },
@@ -24,6 +24,15 @@
   },
   "buttons": {
     "cancel": "취소",
-    "save": "수정완료"
+    "save": "수정",
+    "saving": "수정중..."
+  },
+  "toast": {
+    "saveSuccess": "설정이 저장되었어요.",
+    "saveError": "설정 저장 중 문제가 발생했어요.",
+    "deleteError": "탈퇴 중 오류가 발생했어요.",
+    "passwordResetSuccess": "비밀번호 재설정 메일을 전송했어요.",
+    "passwordResetError": "메일 전송에 실패했어요. 다시 시도해주세요.",
+    "needLogin": "로그인이 필요하거나 이메일 정보가 없어요."
   }
 }
