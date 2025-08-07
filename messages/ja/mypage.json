@@ -12,9 +12,15 @@
   },
   "points": {
     "title": "ポイントの積算",
-    "use": "ポイント使用",
+    "use": "ポイント内訳",
     "status": "現在のポイント",
     "amount": "{amount}円分のポイント"
+  },
+  "pointsLog": {
+    "logTitle": "ポイント履歴",
+    "logDescription": "獲得および差し引かれた履歴を確認できます。",
+    "logEmpty": "ポイント履歴がありません。",
+    "logLoading": "読み込み中..."
   },
   "mypage": {
     "title": "お気に入りの病院"

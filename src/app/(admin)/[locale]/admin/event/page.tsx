@@ -1,4 +1,4 @@
-import EventContainer from "@/components/admin/EventContainer";
+import EventContainer from "@/components/admin/events/EventContainer";
 
 export default function EventPage() {
   return (

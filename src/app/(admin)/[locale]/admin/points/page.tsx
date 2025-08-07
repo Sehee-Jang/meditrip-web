@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import UserPointTable from "@/components/admin/UserPointTable";
+import UserPointTable from "@/components/admin/points/UserPointTable";
 
 export default function AdminPointsPage() {
   return (

@@ -21,6 +21,7 @@ import Container from "@/components/common/Container";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 import { ChevronRight } from "lucide-react";
 import MyFavoriteClinics from "@/components/mypage/MyFavoriteClinics";
+import UserPointLogDialog from "@/components/mypage/UserPointLogDialog";
 
 interface Reservation {
   id: string;
@@ -50,6 +51,8 @@ export default function MyPageContent() {
   const [points, setPoints] = useState<number>(0);
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [questions, setQuestions] = useState<MyQuestion[]>([]);
+
+  const [showPointLog, setShowPointLog] = useState(false);
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (u) => {
@@ -179,7 +182,11 @@ export default function MyPageContent() {
       <section className='mb-12'>
         <div className='flex justify-between'>
           <h2 className='text-xl font-bold mb-4'>{t("points.title")}</h2>
-          <CommonButton className='rounded border border-gray-800 px-2 py-1 text-sm bg-white text-gray-800 hover:bg-gray-100'>
+          {/* 포인트 사용 내역 버튼 */}
+          <CommonButton
+            onClick={() => setShowPointLog(true)}
+            className='rounded border border-gray-800 px-2 py-1 text-sm bg-white text-gray-800 hover:bg-gray-100'
+          >
             {t("points.use")} <ChevronRight size={16} />
           </CommonButton>
         </div>
@@ -190,6 +197,12 @@ export default function MyPageContent() {
           </p>
         </div>
       </section>
+
+      {/* 모달 */}
+      <UserPointLogDialog
+        open={showPointLog}
+        onClose={() => setShowPointLog(false)}
+      />
 
       {/* 내가 작성한 질문 */}
       <section className='mb-8'>

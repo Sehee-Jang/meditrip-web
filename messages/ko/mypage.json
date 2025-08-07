@@ -12,9 +12,15 @@
   },
   "points": {
     "title": "적립 포인트",
-    "use": "포인트 사용",
+    "use": "포인트 내역",
     "status": "현재 포인트",
-    "amount": "{amount}엔 포인트"
+    "amount": "{amount} 포인트"
+  },
+  "pointsLog": {
+    "logTitle": "포인트 사용 내역",
+    "logDescription": "적립 및 차감된 내역을 확인할 수 있어요.",
+    "logEmpty": "포인트 내역이 없습니다.",
+    "logLoading": "불러오는 중..."
   },
   "questions": {
     "title": "내가 작성한 질문",

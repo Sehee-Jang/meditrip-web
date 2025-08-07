@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 import { getEvents } from "@/services/events/getEvents";
 import { Event } from "@/types/event";
-import EventSettingsForm from "./EventSettingForm";
-import EventList from "./EventList";
+import EventSettingsForm from "@/components/admin/events/EventSettingForm";
+import EventList from "@/components/admin/events/EventList";
 
 export default function EventSettingCard() {
   const [events, setEvents] = useState<Event[]>([]);

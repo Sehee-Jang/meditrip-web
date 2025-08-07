@@ -1,11 +1,10 @@
-// src/components/admin/UserPointTable.tsx
-
 "use client";
 
 import { useEffect, useState } from "react";
 import { db } from "@/lib/firebase";
 import { collection, getDocs, query, orderBy } from "firebase/firestore";
-import UserPointLogs from "./UserPointLogs";
+import UserPointLogDialog from "@/components/admin/points/UserPointLogDialog";
+import DeductPointDialog from "@/components/admin/points/DeductPointDialog";
 import { Button } from "@/components/ui/button";
 
 interface User {
@@ -17,18 +16,20 @@ interface User {
 
 export default function UserPointTable() {
   const [users, setUsers] = useState<User[]>([]);
-  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [deductTarget, setDeductTarget] = useState<User | null>(null);
+
+  const fetchUsers = async () => {
+    const q = query(collection(db, "users"), orderBy("createdAt", "desc"));
+    const snap = await getDocs(q);
+    const list = snap.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    })) as User[];
+    setUsers(list);
+  };
 
   useEffect(() => {
-    const fetchUsers = async () => {
-      const q = query(collection(db, "users"), orderBy("createdAt", "desc"));
-      const snap = await getDocs(q);
-      const list = snap.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as User[];
-      setUsers(list);
-    };
     fetchUsers();
   }, []);
 
@@ -54,17 +55,20 @@ export default function UserPointTable() {
                   {user.email}
                 </td>
                 <td className='px-4 py-3 font-medium'>{user.points ?? 0}P</td>
-                <td className='px-4 py-3 text-center'>
+                <td className='text-center px-4 py-3 space-x-2'>
                   <Button
                     variant='outline'
                     size='sm'
-                    onClick={() =>
-                      setSelectedUserId(
-                        selectedUserId === user.id ? null : user.id
-                      )
-                    }
+                    onClick={() => setSelectedUser(user)}
                   >
-                    {selectedUserId === user.id ? "닫기" : "보기"}
+                    {selectedUser?.id === user.id ? "닫기" : "보기"}
+                  </Button>
+                  <Button
+                    variant='destructive'
+                    size='sm'
+                    onClick={() => setDeductTarget(user)}
+                  >
+                    사용
                   </Button>
                 </td>
               </tr>
@@ -73,10 +77,27 @@ export default function UserPointTable() {
         </table>
       </div>
 
-      {selectedUserId && (
-        <div className='border-t pt-4'>
-          <UserPointLogs userId={selectedUserId} />
-        </div>
+      {/* 모달창: 포인트 내역 */}
+      {selectedUser && (
+        <UserPointLogDialog
+          userId={selectedUser.id}
+          nickname={selectedUser.nickname}
+          open={true}
+          onClose={() => setSelectedUser(null)}
+        />
+      )}
+
+      {/* 모달창: 포인트 사용 */}
+      {deductTarget && (
+        <DeductPointDialog
+          open={true}
+          userId={deductTarget.id}
+          nickname={deductTarget.nickname}
+          onClose={() => {
+            setDeductTarget(null);
+            fetchUsers();
+          }}
+        />
       )}
     </div>
   );
