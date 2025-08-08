@@ -3,7 +3,7 @@ import { DatePicker } from "@/components/ui/date-picker";
 import { SearchBar } from "@/components/ui/search-bar";
 import ReservationsTable from "@/components/admin/ReservationTable";
 
-export default function ReservationsPage() {
+export default function AdminReservationsPage() {
   return (
     <div className='max-w-5xl mx-auto px-4 py-10 space-y-10'>
       {/* 1) 페이지 헤더 */}

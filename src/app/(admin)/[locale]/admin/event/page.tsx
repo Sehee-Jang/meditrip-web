@@ -1,6 +1,6 @@
 import EventContainer from "@/components/admin/events/EventContainer";
 
-export default function EventPage() {
+export default function AdminEventPage() {
   return (
     <div className='max-w-5xl mx-auto px-4 py-10 space-y-10'>
       <div className='space-y-2'>

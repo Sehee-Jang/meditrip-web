@@ -1,6 +1,15 @@
 import { db } from "@/lib/firebase";
 import { doc, updateDoc, serverTimestamp } from "firebase/firestore";
 import { uploadImageToSupabase } from "./createQuestion"; // 재사용
+import type { CommunityCategory } from "@/types/category";
+
+export interface UpdateQuestionInput {
+  id: string;
+  title: string;
+  category: CommunityCategory;
+  content: string;
+  file?: File;
+}
 
 export async function updateQuestion({
   id,
@@ -8,19 +17,11 @@ export async function updateQuestion({
   category,
   content,
   file,
-}: {
-  id: string;
-  title: string;
-  category: string;
-  content: string;
-  file?: File;
-}) {
+}: UpdateQuestionInput): Promise<void> {
   const docRef = doc(db, "questions", id);
   let imageUrl = "";
 
-  if (file) {
-    imageUrl = await uploadImageToSupabase(file);
-  }
+  if (file) imageUrl = await uploadImageToSupabase(file);
 
   await updateDoc(docRef, {
     title,

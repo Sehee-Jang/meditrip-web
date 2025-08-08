@@ -1,6 +1,6 @@
 import React from "react";
 
-const page = () => {
+const AdminUserPage = () => {
   return (
     <main className='max-w-5xl mx-auto px-4 py-10 space-y-10'>
       <div className='space-y-2'>
@@ -11,4 +11,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default AdminUserPage;

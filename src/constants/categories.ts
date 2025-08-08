@@ -1,3 +1,4 @@
+import type { LucideIcon } from "lucide-react";
 import {
   Brain,
   Salad,
@@ -16,7 +17,15 @@ export const CATEGORIES = {
 
 export type CategoryKey = keyof typeof CATEGORIES;
 
-export const CATEGORY_ICONS: Record<CategoryKey, React.ElementType> = {
+// 값 유니언(미래에 value가 key와 달라져도 안전)
+export type Category = (typeof CATEGORIES)[CategoryKey];
+
+// Zod 등에서 필요한 튜플/배열도 한 번에 제공
+export const CATEGORY_KEYS = Object.keys(CATEGORIES) as CategoryKey[];
+export const CATEGORY_VALUES = Object.values(CATEGORIES) as Category[];
+
+// 아이콘 매핑: React.ElementType 대신 LucideIcon으로 구체화
+export const CATEGORY_ICONS: Record<CategoryKey, LucideIcon> = {
   stress: Brain,
   diet: Salad,
   immunity: ShieldCheck,

@@ -1,44 +1,39 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useState } from "react";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useDropzone } from "react-dropzone";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
-import Image from "next/image";
-import { createQuestion } from "@/services/questions/createQuestion";
-import { useDropzone } from "react-dropzone";
-import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { awardPointsIfEligible } from "@/services/points/awardPointsIfEligible";
+import { useTranslations } from "next-intl";
 import { auth } from "@/lib/firebase";
+import { createQuestion } from "@/services/questions/createQuestion";
+import { awardPointsIfEligible } from "@/services/points/awardPointsIfEligible";
+import {
+  COMMUNITY_CATEGORY_VALUES,
+  COMMUNITY_CATEGORY_KEYS,
+} from "@/constants/communityCategories";
+import type { CommunityCategory, CommunityCategoryKey } from "@/types/category";
 
-// i18n 번역 스키마 설정
 const formSchema = z.object({
   title: z.string().min(2, { message: "제목은 2자 이상 입력해주세요." }),
-  category: z.enum(["stress", "diet", "immunity", "women", "antiaging", "etc"]),
+  category: z.enum(
+    COMMUNITY_CATEGORY_VALUES as [CommunityCategory, ...CommunityCategory[]]
+  ),
   content: z.string().min(1, { message: "질문 내용을 입력해주세요." }),
-  file: z
-    .any()
-    .optional()
-    .transform((val) => {
-      if (!val || !Array.isArray(val) || val.length === 0) return undefined;
-      if (val[0] instanceof File) return val;
-      return undefined;
-    }),
+  file: z.array(z.instanceof(File)).max(1).optional(),
 });
 
-type FormData = {
-  title: string;
-  category: "stress" | "diet" | "immunity" | "women" | "antiaging" | "etc";
-  content: string;
-  file?: File[]; // ✅ file은 optional이고, File[] 또는 undefined
-};
+type FormData = z.infer<typeof formSchema>;
 
 export default function QuestionForm() {
-  const tForm = useTranslations("question-form");
+  const t = useTranslations("question-form");
   const tToast = useTranslations("question-toast");
   const router = useRouter();
+
   const [preview, setPreview] = useState<string | null>(null);
 
   const {
@@ -49,75 +44,63 @@ export default function QuestionForm() {
     reset,
   } = useForm<FormData>({
     resolver: zodResolver(formSchema),
+    defaultValues: { title: "", content: "" },
+    mode: "onBlur",
   });
 
   const { getRootProps, getInputProps } = useDropzone({
-    accept: {
-      "image/*": [],
-    },
+    accept: { "image/*": [] },
     maxFiles: 1,
-    onDrop: (accepted) => {
+    onDrop: (accepted: File[]) => {
       const file = accepted[0];
-      setValue("file", [file]); // 배열로 넘겨 react-hook-form에서 일관성 유지
+      if (!file) return;
+      // RHF 값은 항상 File[] 형태로 유지
+      setValue("file", accepted, { shouldDirty: true, shouldValidate: true });
       setPreview(URL.createObjectURL(file));
     },
   });
-  console.log("🔥 tForm raw value:", tForm.raw("form.category.options"));
 
-  const onSubmit = async (data: FormData) => {
-    console.log("🔥 form 제출 시도됨");
-
-    try {
-      const file = data.file?.[0];
-      const id = await createQuestion({
-        title: data.title,
-        category: data.category,
-        content: data.content,
-        file,
+  const onChangeFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const fl = e.target.files;
+    const file = fl?.[0];
+    if (file && fl) {
+      setValue("file", Array.from(fl), {
+        shouldDirty: true,
+        shouldValidate: true,
       });
-
-      // ✅ 포인트 지급 시도
-      await awardPointsIfEligible({
-        userId: auth.currentUser?.uid,
-        triggerType: "community_post",
-      });
-
-      reset();
-      setPreview(null);
-
-      if (window.innerWidth < 768) {
-        toast.custom(() => (
-          <div className='toast-minimal'>
-            <p className='font-semibold text-black'>{tToast("success")} 🎉</p>
-            <p className='sonner-description'>{tToast("description")}</p>
-            <div className='flex justify-center gap-2 mt-4'>
-              <button
-                onClick={() => router.push("/")}
-                className='text-sm border px-3 py-1 rounded-md'
-              >
-                {tToast("action.home")}
-              </button>
-              <button
-                onClick={() => router.push("/community")}
-                className='text-sm bg-black text-white px-3 py-1 rounded-md'
-              >
-                {tToast("action.view")}
-              </button>
-            </div>
-          </div>
-        ));
-      } else {
-        router.push(`/community/questions/${id}`);
-      }
-    } catch (e) {
-      console.error(e);
-      alert("등록에 실패했습니다.");
+      setPreview(URL.createObjectURL(file));
     }
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) setPreview(URL.createObjectURL(file));
+  const onSubmit = async (data: FormData) => {
+    try {
+      const uid = auth.currentUser?.uid;
+      if (!uid) {
+        toast.error(tToast("loginRequired"));
+        return;
+      }
+
+      const newId = await createQuestion({
+        title: data.title,
+        category: data.category,
+        content: data.content,
+        file: data.file?.[0],
+      });
+
+      // 포인트 이벤트 연동 (존재하는 경우)
+      await awardPointsIfEligible({
+        userId: uid,
+        triggerType: "community_post",
+      });
+
+      toast.success(tToast("success"));
+      reset();
+      setPreview(null);
+      router.push(`/community/questions/${newId}`);
+    } catch (err) {
+      console.error(err);
+      toast.error(tToast("failed"));
+    }
   };
 
   return (
@@ -127,38 +110,32 @@ export default function QuestionForm() {
         className='w-full max-w-2xl mx-auto px-4 md:px-8 py-10 space-y-6'
       >
         <div className='text-center'>
-          <h2 className='text-xl md:text-2xl font-bold'>{tForm("subtitle")}</h2>
+          <h2 className='text-xl md:text-2xl font-bold'>{t("subtitle")}</h2>
         </div>
 
         {/* 제목 */}
         <div>
           <label className='block font-medium mb-1'>
-            {tForm("form.title.label")}
+            {t("form.title.label")}
           </label>
           <input
             {...register("title")}
-            placeholder={tForm("form.title.placeholder")}
+            placeholder={t("form.title.placeholder")}
             className='w-full p-3 border rounded-md'
           />
-          <p className='text-xs text-gray-400 mt-1'>
-            {tForm("form.title.max")}
-          </p>
-          {errors.title && (
-            <p className='text-red-500 text-sm mt-1'>
-              {tForm("form.title.placeholder")}
-            </p>
+          <p className='text-xs text-gray-400 mt-1'>{t("form.title.max")}</p>
+          {errors.title?.message && (
+            <p className='text-red-500 text-sm mt-1'>{errors.title.message}</p>
           )}
         </div>
 
-        {/* 카테고리 선택 */}
+        {/* 카테고리 */}
         <div>
           <label className='block font-medium mb-1'>
-            {tForm("form.category.label")}
+            {t("form.category.label")}
           </label>
           <div className='flex flex-wrap gap-2'>
-            {Object.entries(
-              tForm.raw("form.category.options") as Record<string, string>
-            ).map(([key, value]) => (
+            {COMMUNITY_CATEGORY_KEYS.map((key: CommunityCategoryKey) => (
               <label
                 key={key}
                 className='border px-3 py-1 rounded-full text-sm cursor-pointer hover:bg-gray-100'
@@ -167,61 +144,53 @@ export default function QuestionForm() {
                   type='radio'
                   value={key}
                   {...register("category")}
-                  onChange={(e) => {
-                    console.log("✅ 선택된 카테고리:", e.target.value);
-                  }}
                   className='mr-1'
                 />
-                {value}
+                {t(`form.category.options.${key}`)}
               </label>
             ))}
           </div>
-          {errors.category && (
+          {errors.category?.message && (
             <p className='text-red-500 text-sm mt-1'>
-              {tForm("form.category.placeholder")}
+              {errors.category.message}
             </p>
           )}
         </div>
 
-        {/* 질문 내용 */}
+        {/* 내용 */}
         <div>
           <label className='block font-medium mb-1'>
-            {tForm("form.content.label")}
+            {t("form.content.label")}
           </label>
           <textarea
             {...register("content")}
-            placeholder={tForm("form.content.placeholder")}
+            placeholder={t("form.content.placeholder")}
             className='w-full p-3 border rounded-md min-h-[120px]'
           />
-          <p className='text-xs text-gray-400 mt-1'>
-            {tForm("form.content.max")}
-          </p>
-          {errors.content && (
+          <p className='text-xs text-gray-400 mt-1'>{t("form.content.max")}</p>
+          {errors.content?.message && (
             <p className='text-red-500 text-sm mt-1'>
-              {tForm("form.content.placeholder")}
+              {errors.content.message}
             </p>
           )}
         </div>
 
-        {/* 사진 업로드 */}
+        {/* 이미지 업로드: 파일 입력 + 드롭존 */}
         <div>
           <label className='block font-medium mb-1'>
-            {tForm("form.image.label")}
+            {t("form.image.label")}
           </label>
 
-          {/* 사진 첨부 */}
           <input
             type='file'
             accept='image/*'
-            {...register("file")}
-            onChange={handleFileChange}
+            onChange={onChangeFile}
             className='block w-full'
           />
 
-          {/* 사진 드롭존 */}
           <div
             {...getRootProps()}
-            className='border-2 border-dashed border-gray-300 rounded-md p-6 text-center cursor-pointer hover:bg-gray-50'
+            className='border-2 border-dashed border-gray-300 rounded-md p-6 text-center cursor-pointer hover:bg-gray-50 mt-3'
           >
             <input {...getInputProps()} />
             {preview ? (
@@ -233,21 +202,16 @@ export default function QuestionForm() {
                 className='mx-auto rounded'
               />
             ) : (
-              <p className='text-gray-500 text-sm'>
-                {
-                  tForm(
-                    "form.image.helper"
-                  ) /* 예: 사진을 드래그 앤 드롭하거나 파일을 선택해 업로드해 주세요. */
-                }
-              </p>
+              <p className='text-gray-500 text-sm'>{t("form.image.helper")}</p>
             )}
           </div>
         </div>
 
+        {/* 포인트 안내 */}
         <div className='bg-gray-50 border px-4 py-3 rounded-md'>
-          <p className='font-semibold text-sm'>{tForm("pointInfo.title")}</p>
+          <p className='font-semibold text-sm'>{t("pointInfo.title")}</p>
           <p className='text-sm text-gray-600 mt-1'>
-            {tForm("pointInfo.description")}
+            {t("pointInfo.description")}
           </p>
         </div>
 
@@ -255,20 +219,16 @@ export default function QuestionForm() {
           <button
             type='button'
             className='border border-gray-400 text-gray-700 py-2 px-4 rounded-md'
-            onClick={() => {
-              router.push("/community");
-            }}
+            onClick={() => router.push("/community")}
           >
-            {tForm("cancel")}
+            {t("cancel")}
           </button>
           <button
             type='submit'
             disabled={isSubmitting}
             className='bg-black text-white py-2 px-4 rounded-md hover:bg-gray-800'
           >
-            {isSubmitting
-              ? tForm("submit.create") + "..."
-              : tForm("submit.create")}
+            {isSubmitting ? `${t("submit.create")}...` : t("submit.create")}
           </button>
         </div>
       </form>

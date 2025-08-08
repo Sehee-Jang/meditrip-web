@@ -11,6 +11,7 @@ import {
   DocumentData,
   doc,
   getDoc,
+  Timestamp,
 } from "firebase/firestore";
 import { Question } from "@/types/question";
 import { User } from "@/types/user";
@@ -20,10 +21,9 @@ export interface QuestionPage {
   lastDoc: QueryDocumentSnapshot<DocumentData> | null;
 }
 
-/**
- * pageSize 개씩, cursor 다음 문서부터 불러오는 페이징 함수
- * totalCount는 반환하지 않습니다.
- */
+const toISO = (ts?: Timestamp) =>
+  ts ? ts.toDate().toISOString() : new Date().toISOString();
+
 export async function getQuestions(
   pageSize: number,
   cursor?: QueryDocumentSnapshot<DocumentData>
@@ -39,21 +39,37 @@ export async function getQuestions(
   const questions: Question[] = await Promise.all(
     snap.docs.map(async (docSnap) => {
       const data = docSnap.data();
-      let user: User | null = null;
+      let user: User | undefined;
 
       if (data.userId) {
         const userRef = doc(db, "users", data.userId);
         const userSnap = await getDoc(userRef);
-        if (userSnap.exists()) {
-          user = userSnap.data() as User;
-        }
+        if (userSnap.exists()) user = userSnap.data() as User;
       }
 
       return {
         id: docSnap.id,
-        ...data,
+        title: data.title ?? "",
+        content: data.content ?? "",
+        category: data.category ?? "etc",
+        createdAt: toISO(data.createdAt),
+        imageUrl: data.imageUrl ?? "",
+        userId: data.userId ?? "",
         user,
-      } as Question;
+        answers: Array.isArray(data.answers)
+          ? data.answers.map(
+              (a: {
+                content: string;
+                createdAt?: Timestamp;
+                updatedAt?: Timestamp;
+              }) => ({
+                content: a.content,
+                createdAt: toISO(a.createdAt),
+                updatedAt: toISO(a.updatedAt),
+              })
+            )
+          : [],
+      } satisfies Question;
     })
   );
 
@@ -61,9 +77,6 @@ export async function getQuestions(
   return { questions, lastDoc };
 }
 
-/**
- * 전체 질문 개수만 빠르게 조회하는 함수
- */
 export async function getQuestionsCount(): Promise<number> {
   const coll = collection(db, "questions");
   const snapshot = await getCountFromServer(coll);
