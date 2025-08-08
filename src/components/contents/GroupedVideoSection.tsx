@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { mockShorts } from "@/data/mockData";
 import VideoListSection from "./VideoListSection";
 import { CategoryKey } from "@/constants/categories";
 import { Video } from "@/types/video";
@@ -18,25 +17,11 @@ export default function GroupedVideoSection({
   selectedCategories = [],
 }: Props) {
   const t = useTranslations("categories");
-  const useFs = process.env.NEXT_PUBLIC_USE_FIRESTORE === "1";
   const [items, setItems] = useState<Video[]>([]);
 
   useEffect(() => {
     let cancelled = false;
     const run = async () => {
-      if (!useFs) {
-        // mock → Video 정규화
-        const v: Video[] = mockShorts.map((m) => ({
-          id: String(m.id),
-          title: m.title,
-          youtubeUrl: m.youtubeUrl,
-          thumbnailUrl: m.thumbnail,
-          viewCount: Math.floor(Math.random() * 10000 + 500),
-          category: m.category,
-        }));
-        if (!cancelled) setItems(v);
-        return;
-      }
       const { items: fsItems } = await fetchVideos({
         categories: selectedCategories,
         keyword,
@@ -49,7 +34,7 @@ export default function GroupedVideoSection({
       cancelled = true;
     };
     // 카테고리/키워드 변경 시 갱신
-  }, [useFs, keyword, selectedCategories]);
+  }, [keyword, selectedCategories]);
 
   const byKeyword = items.filter((v) => {
     const kw = keyword.trim();

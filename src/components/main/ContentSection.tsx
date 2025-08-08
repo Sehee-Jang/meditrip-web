@@ -5,10 +5,11 @@ import { auth } from "@/lib/firebase";
 import { useTranslations } from "next-intl";
 // import SignupPrompt from "./SignupPrompt";
 import Link from "next/link";
-import { mockShorts } from "@/data/mockData";
 import Container from "../common/Container";
 import VideoCard from "../contents/VideoCard";
 import { ChevronRight } from "lucide-react";
+import type { Video } from "@/types/video";
+import { fetchVideos } from "@/services/contents/videos.client";
 
 export default function ContentSection() {
   const t = useTranslations("content-section");
@@ -17,9 +18,10 @@ export default function ContentSection() {
   const [viewCount, setViewCount] = useState(0);
   const [visibleCount, setVisibleCount] = useState(6);
   const [isMobile, setIsMobile] = useState(false);
+  const [items, setItems] = useState<Video[]>([]);
 
   const viewedIds = useRef<Set<string>>(new Set());
-  const viewedRatio = viewCount / mockShorts.length;
+  const viewedRatio = viewCount / Math.max(items.length, 1);
 
   // 유저 로그인 정보
   useEffect(() => {
@@ -35,6 +37,18 @@ export default function ContentSection() {
       setShowPrompt(true);
     }
   }, [isAnonymous, viewedRatio, showPrompt]);
+
+  // 첫 로드 시 Firestore에서 최신순으로 넉넉히 가져오기
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const { items: fsItems } = await fetchVideos({ limit: 50 });
+      if (!cancelled) setItems(fsItems);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   // 뷰포트 기준으로 보여줄 카드 개수 계산
   useEffect(() => {
@@ -91,7 +105,7 @@ export default function ContentSection() {
     return () => observer.disconnect();
   }, []);
 
-  const shortsToShow = mockShorts.slice(0, visibleCount);
+  const shortsToShow = items.slice(0, visibleCount);
 
   return (
     <section className='py-10 bg-white'>
@@ -122,14 +136,14 @@ export default function ContentSection() {
         >
           {/* 카드 렌더링 */}
           {shortsToShow.map((item) => {
-            const _id = String(item.id);
+            const _id = item.id;
             const isBlocked = showPrompt && !viewedIds.current.has(_id);
             return (
               <VideoCard
                 key={_id}
                 id={_id}
                 title={item.title}
-                thumbnailUrl={item.thumbnail}
+                thumbnailUrl={item.thumbnailUrl}
                 youtubeUrl={item.youtubeUrl}
                 viewCount={Math.floor(Math.random() * 10000 + 500)}
                 category={item.category}
