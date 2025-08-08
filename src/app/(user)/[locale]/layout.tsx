@@ -6,10 +6,11 @@ import { routing } from "@/i18n/routing";
 import { setRequestLocale } from "next-intl/server";
 import AuthObserver from "@/components/AuthObserver";
 import { Toaster } from "@/components/ui/sonner";
+import { getMessages } from "next-intl/server";
 
 export const metadata = {
   title: "Meditrip",
-  description: "일본 타겟 사전 유입용 웹사이트",
+  description: "메디트립",
 };
 
 export async function generateStaticParams() {
@@ -30,17 +31,14 @@ export default async function LocaleLayout({
   }
   setRequestLocale(locale);
 
+   const messages = await getMessages();
   return (
-    <html lang={locale}>
-      <body>
-        <NextIntlClientProvider>
-          <Header />
-          <AuthObserver />
-          {children}
-          <Toaster />
-          <Footer />
-        </NextIntlClientProvider>
-      </body>
-    </html>
+    <NextIntlClientProvider locale={locale} messages={messages}>
+      <Header />
+      <AuthObserver />
+      {children}
+      <Toaster />
+      <Footer />
+    </NextIntlClientProvider>
   );
 }
