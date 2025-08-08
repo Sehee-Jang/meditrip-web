@@ -17,13 +17,21 @@ type Mode = "link" | "interactive";
 type Props = {
   /** 링크 or 인터랙션 */
   mode?: Mode; // 기본 interactive
+
   /** 아래 4개는 mode==="interactive"일 때만 의미 */
+
+  /** 선택 UI를 켤지 여부 */
   selectable?: boolean;
+  /** 다중 선택 허용 여부 */
   multiple?: boolean;
+  /** 선택된 카테고리들 */
   selected?: CategoryKey[];
+  /** 선택 변경 콜백 */
   onChange?: (nextSelected: CategoryKey[]) => void;
+
   /** mode==="link"일 때 이동할 기본 경로 */
   linkHref?: string; // 기본 "/contents"
+
   className?: string;
 };
 
