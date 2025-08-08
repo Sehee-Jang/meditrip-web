@@ -6,10 +6,14 @@ import SearchInput from "@/components/common/SearchInput";
 import CategorySection from "@/components/main/CategorySection";
 import GroupedVideoSection from "@/components/contents/GroupedVideoSection";
 import CommonButton from "../common/CommonButton";
+import type { CategoryKey } from "@/constants/categories";
 
 const SearchableContents = () => {
   const t = useTranslations("contents-page");
   const [keyword, setKeyword] = useState("");
+  const [selectedCategories, setSelectedCategories] = useState<CategoryKey[]>(
+    []
+  );
 
   return (
     <div className='flex flex-col gap-3 md:gap-11'>
@@ -26,10 +30,19 @@ const SearchableContents = () => {
         </p>
       </div>
 
-      <CategorySection />
-      <GroupedVideoSection keyword={keyword} />
+      {/* ✅ 콘텐츠 페이지에서만 다중 선택 활성화 */}
+      <CategorySection
+        selectable
+        multiple
+        selected={selectedCategories}
+        onChange={setSelectedCategories}
+      />
+      <GroupedVideoSection
+        keyword={keyword}
+        selectedCategories={selectedCategories}
+      />
 
-      {/* 더보기 버튼 */}
+      {/* 더보기 버튼 (추후 서버 연동 시 무한스크롤/페이지네이션으로 교체) */}
       <div className='text-center'>
         <CommonButton className='w-24 w-full md:w-[120px]'>
           {t("viewMore")}

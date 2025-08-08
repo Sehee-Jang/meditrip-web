@@ -17,7 +17,8 @@ export default function ContentSection() {
   const [viewCount, setViewCount] = useState(0);
   const [visibleCount, setVisibleCount] = useState(6);
   const [isMobile, setIsMobile] = useState(false);
-  const viewedIds = useRef<Set<number>>(new Set());
+
+  const viewedIds = useRef<Set<string>>(new Set());
   const viewedRatio = viewCount / mockShorts.length;
 
   // 유저 로그인 정보
@@ -70,9 +71,11 @@ export default function ContentSection() {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          const id = Number(entry.target.getAttribute("data-id"));
+          const id = entry.target.getAttribute("data-id");
+          if (!id) return;
           if (entry.isIntersecting && !viewedIds.current.has(id)) {
             viewedIds.current.add(id);
+
             setViewCount(viewedIds.current.size);
           }
         });
@@ -117,12 +120,14 @@ export default function ContentSection() {
               : "flex-nowrap gap-x-4 justify-start"
           }`}
         >
+          {/* 카드 렌더링 */}
           {shortsToShow.map((item) => {
-            const isBlocked = showPrompt && !viewedIds.current.has(item.id);
+            const _id = String(item.id);
+            const isBlocked = showPrompt && !viewedIds.current.has(_id);
             return (
               <VideoCard
-                key={item.id}
-                id={item.id}
+                key={_id}
+                id={_id}
                 title={item.title}
                 thumbnailUrl={item.thumbnail}
                 youtubeUrl={item.youtubeUrl}

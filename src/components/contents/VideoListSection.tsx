@@ -1,9 +1,9 @@
 import VideoCard from "./VideoCard";
-import { VideoItem } from "@/types/video";
+import type { Video } from "@/types/video";
 
 type Props = {
   title: string;
-  videos: VideoItem[];
+  videos: Video[];
 };
 
 export default function VideoListSection({ title, videos }: Props) {

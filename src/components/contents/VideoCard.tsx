@@ -1,13 +1,13 @@
 import { useTranslations } from "next-intl";
 import Image from "next/image";
 import Link from "next/link";
-import { CategoryKey } from "@/constants/categories";
+import type { CategoryKey } from "@/constants/categories";
 
 type VideoCardProps = {
-  id: number;
+  id: string;
   title: string;
   thumbnailUrl: string;
-  viewCount: number;
+  viewCount?: number;
   youtubeUrl: string;
   category: CategoryKey;
   isBlocked?: boolean;
