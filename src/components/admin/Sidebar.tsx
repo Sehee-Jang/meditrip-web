@@ -49,7 +49,15 @@ export default function Sidebar({ locale }: Props) {
           px-6 py-4 
         `}
       >
-        {!collapsed && <span className='text-xl font-bold'>메디트립</span>}
+        <Link
+          href={`/${locale}/admin`}
+          className={collapsed ? "rounded" : "text-xl font-bold"}
+          aria-label='관리자 대시보드로 이동'
+        >
+          {!collapsed && <span className='text-xl font-bold'>메디트립</span>}
+        </Link>
+
+        {/* {!collapsed && <span className='text-xl font-bold'>메디트립</span>} */}
         <button
           onClick={() => setCollapsed((c) => !c)}
           className='p-1 rounded hover:bg-gray-100'

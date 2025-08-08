@@ -21,7 +21,7 @@ export default async function AdminLayout({
   const { locale } = await params;
 
   return (
-    <div className='flex min-h-dvh bg-gray-50'>
+    <div className='flex h-dvh min-h-screen bg-gray-50'>
       {/* 1) 사이드바 */}
       <Sidebar locale={locale} />
 
