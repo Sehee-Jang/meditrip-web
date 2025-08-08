@@ -7,7 +7,7 @@ export default function Home() {
   return (
     <main>
       <HeroSection />
-      <CategorySection />
+      <CategorySection mode='link' linkHref='/contents' />
       <HomeContent />
       <SignupSection />
     </main>

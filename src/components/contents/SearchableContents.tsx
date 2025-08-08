@@ -7,12 +7,19 @@ import CategorySection from "@/components/main/CategorySection";
 import GroupedVideoSection from "@/components/contents/GroupedVideoSection";
 import CommonButton from "../common/CommonButton";
 import type { CategoryKey } from "@/constants/categories";
+type Props = {
+  initialKeyword?: string;
+  initialSelectedCategories?: CategoryKey[];
+};
 
-const SearchableContents = () => {
+const SearchableContents = ({
+  initialKeyword = "",
+  initialSelectedCategories = [],
+}: Props) => {
   const t = useTranslations("contents-page");
-  const [keyword, setKeyword] = useState("");
+  const [keyword, setKeyword] = useState(initialKeyword);
   const [selectedCategories, setSelectedCategories] = useState<CategoryKey[]>(
-    []
+    initialSelectedCategories
   );
 
   return (
@@ -34,6 +41,7 @@ const SearchableContents = () => {
       <CategorySection
         selectable
         multiple
+        mode='interactive'
         selected={selectedCategories}
         onChange={setSelectedCategories}
       />
