@@ -1,14 +1,5 @@
 import type { CategoryKey } from "@/constants/categories";
 
-// export type VideoItem = {
-//   id: number;
-//   title: string;
-//   thumbnailUrl: string;
-//   viewCount: number;
-//   youtubeUrl: string;
-//   category: CategoryKey;
-// };
-
 export interface Video {
   id: string; // Firestore 문서 ID 기준 (mock에서는 String(video.id)로 매핑)
   title: string;
