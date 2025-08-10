@@ -8,7 +8,8 @@
     "completed": "예약 완료",
     "pending": "상담 대기",
     "details": "상세 보기",
-    "modify": "예약 변경/취소"
+    "modify": "예약 변경/취소",
+    "empty": "예약 없음"
   },
   "points": {
     "title": "적립 포인트",

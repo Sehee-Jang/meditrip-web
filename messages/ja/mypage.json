@@ -8,7 +8,8 @@
     "completed": "予約完了",
     "pending": "予約保留中",
     "details": "詳細を見る",
-    "modify": "予約の変更 / キャンセル"
+    "modify": "予約の変更 / キャンセル",
+    "empty": "予約なし"
   },
   "points": {
     "title": "ポイントの積算",
