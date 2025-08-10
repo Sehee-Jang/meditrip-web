@@ -2,14 +2,19 @@
 "use client";
 
 import { useState } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { ChevronDown, ChevronRight } from "lucide-react";
-
+import { useQueryClient } from "@tanstack/react-query";
+import { Pencil, Trash2, Save, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import type { AnswerItem } from "@/types/question";
-import { listReplies, createReply } from "@/services/community-admin/answers";
+import { updateAnswer, deleteAnswer } from "@/services/community-admin/answers";
 
 export default function AnswerItemCard({
   questionId,
@@ -18,98 +23,127 @@ export default function AnswerItemCard({
   questionId: string;
   answer: AnswerItem;
 }) {
-  const [open, setOpen] = useState(false);
-  const [reply, setReply] = useState("");
   const qc = useQueryClient();
+  const [editing, setEditing] = useState(false);
+  const [content, setContent] = useState(answer.content);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
-  const { data: replies, isLoading } = useQuery({
-    queryKey: ["admin-replies", questionId, answer.id],
-    queryFn: () => listReplies(questionId, answer.id),
-    enabled: open,
-  });
+  const createdAt = new Date(answer.createdAt).toLocaleString();
+
+  const handleSave = async (): Promise<void> => {
+    if (!content.trim()) return;
+    try {
+      setSubmitting(true);
+      await updateAnswer(questionId, answer.id, content.trim());
+      await qc.invalidateQueries({ queryKey: ["admin-answers", questionId] });
+      setEditing(false);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleDelete = async (): Promise<void> => {
+    try {
+      setSubmitting(true);
+      await deleteAnswer(questionId, answer.id);
+      await qc.invalidateQueries({ queryKey: ["admin-answers", questionId] });
+      setConfirmOpen(false);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   return (
     <li className='rounded-xl border p-3'>
       <div className='flex items-start justify-between gap-4'>
-        <div>
-          <div className='text-xs text-muted-foreground mb-1'>
-            {new Date(answer.createdAt).toLocaleString()} · 답글{" "}
-            {answer.repliesCount}개
-          </div>
-          <div className='whitespace-pre-wrap text-sm leading-6'>
-            {answer.content}
-          </div>
-        </div>
+        <div className='flex-1 min-w-0'>
+          <div className='text-xs text-muted-foreground mb-1'>{createdAt}</div>
 
-        <Button
-          variant='ghost'
-          size='sm'
-          onClick={() => setOpen((v) => !v)}
-          className='-mr-2'
-        >
-          {open ? (
-            <ChevronDown className='size-4' />
-          ) : (
-            <ChevronRight className='size-4' />
-          )}
-          <span className='ml-1'>답글</span>
-        </Button>
-      </div>
-
-      {open && (
-        <div className='mt-3 pl-3 border-l'>
-          {/* 답글 입력 */}
-          <div className='flex items-center gap-2'>
-            <Input
-              value={reply}
-              onChange={(e) => setReply(e.target.value)}
-              placeholder='답글 내용을 입력하세요'
-            />
-            <Button
-              size='sm'
-              disabled={!reply.trim()}
-              onClick={async () => {
-                await createReply(questionId, answer.id, reply.trim());
-                setReply("");
-                await qc.invalidateQueries({
-                  queryKey: ["admin-replies", questionId, answer.id],
-                });
-                await qc.invalidateQueries({
-                  queryKey: ["admin-answers", questionId],
-                }); // repliesCount 반영
-              }}
-            >
-              등록
-            </Button>
-          </div>
-
-          {/* 답글 목록 */}
-          <div className='mt-3'>
-            {isLoading ? (
-              <div className='text-xs text-muted-foreground'>답글 로딩 중…</div>
-            ) : !replies || replies.length === 0 ? (
-              <div className='text-xs text-muted-foreground'>
-                등록된 답글이 없습니다.
+          {editing ? (
+            <div className='space-y-2'>
+              <Textarea
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                rows={4}
+                placeholder='답변 내용을 입력하세요'
+              />
+              <div className='flex gap-2'>
+                <Button
+                  size='sm'
+                  variant='outline'
+                  onClick={handleSave}
+                  disabled={submitting || !content.trim()}
+                >
+                  <Save className='mr-1 h-4 w-4' />
+                  저장
+                </Button>
+                <Button
+                  size='sm'
+                  variant='outline'
+                  onClick={() => {
+                    setContent(answer.content);
+                    setEditing(false);
+                  }}
+                  disabled={submitting}
+                >
+                  <X className='mr-1 h-4 w-4' />
+                  취소
+                </Button>
               </div>
-            ) : (
-              <ul className='space-y-2'>
-                {replies.map((r) => (
-                  <li
-                    key={r.id}
-                    className='rounded border px-3 py-2 bg-slate-50'
-                  >
-                    <div className='text-[11px] text-muted-foreground mb-1'>
-                      {new Date(r.createdAt).toLocaleString()}
-                    </div>
-                    <div className='whitespace-pre-wrap text-sm leading-6'>
-                      {r.content}
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
+            </div>
+          ) : (
+            <div className='whitespace-pre-wrap text-sm leading-6'>
+              {answer.content}
+            </div>
+          )}
         </div>
-      )}
+        <div className='flex shrink-0 gap-1'>
+          {!editing && (
+            <Button
+              variant='ghost'
+              size='sm'
+              onClick={() => setEditing(true)}
+              className='-mr-1'
+            >
+              <Pencil className='size-4' />
+              <span className='ml-1'>수정</span>
+            </Button>
+          )}
+          <Button
+            variant='ghost'
+            size='sm'
+            onClick={() => setConfirmOpen(true)}
+            disabled={submitting}
+          >
+            <Trash2 className='size-4' />
+            <span className='ml-1'>삭제</span>
+          </Button>
+        </div>
+      </div>
+      {/* 삭제 확인 다이얼로그 */}
+      <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+        <DialogContent onOpenAutoFocus={(e) => e.preventDefault()}>
+          <DialogTitle>답변을 삭제할까요?</DialogTitle>
+          <DialogDescription>삭제 후에는 되돌릴 수 없습니다.</DialogDescription>
+          <DialogFooter>
+            <Button
+              variant='outline'
+              onClick={() => setConfirmOpen(false)}
+              disabled={submitting}
+            >
+              취소
+            </Button>
+            <Button
+              variant='destructive'
+              onClick={handleDelete}
+              disabled={submitting}
+            >
+              삭제
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </li>
   );
 }

@@ -25,14 +25,4 @@ export interface AnswerItem {
   createdAt: string;
   updatedAt?: string;
   adminId: string; // 답변 작성자(관리자) uid
-  repliesCount: number; // 기본 0
-}
-
-/** 답글(replies 서브컬렉션의 뷰 모델) */
-export interface ReplyItem {
-  id: string;
-  content: string;
-  createdAt: string;
-  updatedAt?: string;
-  adminId: string; // 답글 작성자(관리자) uid
 }
