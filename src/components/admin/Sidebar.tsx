@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   HomeIcon,
   CalendarIcon,
@@ -12,8 +12,12 @@ import {
   CalendarCheck,
   Gift,
   Youtube,
+  LogOut,
+  Loader2,
 } from "lucide-react";
 import { useState } from "react";
+import { signOut } from "firebase/auth";
+import { auth } from "@/lib/firebase";
 
 const MENU = [
   { href: "", label: "대시보드", icon: HomeIcon },
@@ -28,10 +32,24 @@ const MENU = [
 type Props = { locale: string };
 
 export default function Sidebar({ locale }: Props) {
+  const router = useRouter();
   const path = usePathname();
   const segments = path.split("/");
   const activeSegment = segments[3] || "";
   const [collapsed, setCollapsed] = useState(false);
+  const [signingOut, setSigningOut] = useState(false);
+
+  const handleLogout = async () => {
+    if (signingOut) return;
+    setSigningOut(true);
+    try {
+      await signOut(auth);
+      router.replace(`/${locale}/admin/login`);
+    } catch (err) {
+      console.error(err);
+      setSigningOut(false);
+    }
+  };
 
   return (
     <nav
@@ -101,17 +119,30 @@ export default function Sidebar({ locale }: Props) {
       {/* 로그아웃 */}
       <div className='p-4 border-t'>
         <button
+          type='button'
+          onClick={handleLogout}
+          disabled={signingOut}
           className={`
             flex items-center justify-center
             w-full py-2 rounded hover:bg-gray-100
-            text-red-600
+            ${signingOut ? "text-gray-400" : "text-red-600"}
           `}
+          aria-label='로그아웃'
+          title='로그아웃'
         >
-          {/* collapsed 시에도 아이콘만 보여줄 수도 있습니다 */}
           {!collapsed ? (
-            "로그아웃"
+            <span className='inline-flex items-center gap-2'>
+              {signingOut ? (
+                <Loader2 className='w-4 h-4 animate-spin' />
+              ) : (
+                <LogOut className='w-4 h-4' />
+              )}
+              {signingOut ? "로그아웃 중..." : "로그아웃"}
+            </span>
+          ) : signingOut ? (
+            <Loader2 className='w-5 h-5 animate-spin' />
           ) : (
-            <ChevronLeft className='w-5 h-5 rotate-180' />
+            <LogOut className='w-5 h-5' />
           )}
         </button>
       </div>

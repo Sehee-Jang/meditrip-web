@@ -3,9 +3,10 @@
 import React, { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { onAuthStateChanged, type User as FirebaseUser } from "firebase/auth";
-import { auth, db } from "@/lib/firebase";
-import { doc, getDoc } from "firebase/firestore";
+import { auth } from "@/lib/firebase";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
+import { getUserRole, type UserRole } from "@/services/users/getUserRole";
+
 export default function AdminAuthGuard({
   children,
 }: {
@@ -16,29 +17,39 @@ export default function AdminAuthGuard({
   const [authorized, setAuthorized] = useState<boolean | null>(null);
 
   useEffect(() => {
+    let cancelled = false;
+
     const unsubscribe = onAuthStateChanged(
       auth,
       async (user: FirebaseUser | null) => {
+        // 비로그인 → 관리자 로그인 페이지로
         if (!user) {
-          // 로그인되지 않음 → 로그인 페이지로
-          router.replace(`/${locale}/login`);
+          router.replace(`/${locale}/admin/login`);
+          if (!cancelled) setAuthorized(false);
           return;
         }
-        // Firestore에서 사용자 문서 읽어서 role 필드 확인
-        const userSnap = await getDoc(doc(db, "users", user.uid));
-        const data = userSnap.data();
 
-        if (!data || data.role !== "admin") {
-          // 관리자가 아님 → 홈으로
-          router.replace(`/${locale}`);
-          return;
+        try {
+          const role: UserRole | null = await getUserRole(user.uid);
+
+          // 관리자/슈퍼관리자만 통과
+          if (role === "admin" || role === "super_admin") {
+            if (!cancelled) setAuthorized(true);
+          } else {
+            router.replace(`/${locale}/admin/login`);
+            if (!cancelled) setAuthorized(false);
+          }
+        } catch {
+          // 조회 실패 시에도 로그인 페이지로
+          router.replace(`/${locale}/admin/login`);
+          if (!cancelled) setAuthorized(false);
         }
-        // 관리자 확인 완료
-        setAuthorized(true);
       }
     );
-
-    return () => unsubscribe();
+    return () => {
+      cancelled = true;
+      unsubscribe();
+    };
   }, [locale, router]);
 
   // 아직 확인 중일 땐 스피너
