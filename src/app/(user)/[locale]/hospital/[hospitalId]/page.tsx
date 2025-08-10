@@ -4,20 +4,26 @@ import PageHeader from "@/components/common/PageHeader";
 import Image from "next/image";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
-import { fetchClinics } from "@/services/hospitals/fetchClinics";
+import { getClinicById } from "@/services/hospitals/getClinicById";
+
 import type { Clinic } from "@/types/clinic";
 import FavoriteButton from "@/components/hospitals/FavoriteButton";
+import GoogleMapEmbed from "@/components/common/GoogleMapEmbed";
 
-interface Props {
-  params: Promise<{ locale: string; hospitalId: string }>;
-}
+type PageParams = Promise<{ locale: string; hospitalId: string }>;
 
-export default async function ClinicDetailPage({ params }: Props) {
+export const revalidate = 120;
+
+export default async function ClinicDetailPage({
+  params,
+}: {
+  params: PageParams;
+}) {
   const { locale, hospitalId } = await params;
   const t = await getTranslations("hospital-detail");
 
-  const clinics: Clinic[] = await fetchClinics();
-  const clinic = clinics.find((c) => c.id === hospitalId);
+  // 단일 문서만 읽기
+  const clinic: Clinic | null = await getClinicById(hospitalId);
   if (!clinic) return notFound();
 
   const loc = locale as "ko" | "ja";
@@ -63,6 +69,13 @@ export default async function ClinicDetailPage({ params }: Props) {
             {clinic.intro.subtitle[loc]}
           </p>
         </section>
+
+        <GoogleMapEmbed
+          lat={clinic.geo?.lat}
+          lng={clinic.geo?.lng}
+          address={clinic.address[loc]} // 좌표 없을 때만 fallback
+          locale={loc}
+        />
 
         {/* 상세 설명 */}
         <section className='space-y-2'>

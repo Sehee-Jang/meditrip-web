@@ -5,6 +5,13 @@ export interface LocalizedField {
   ja: string;
 }
 
+export interface Geo {
+  lat: number;
+  lng: number;
+  placeId?: string; // 중복 방지 및 정규화에 유용
+  formattedAddress?: string; // 지오코딩 표준 주소(원문)
+}
+
 export interface TreatmentStep {
   title: LocalizedField; // 예: "검사 및 검진"
   description: LocalizedField; // 예: 상세 설명
@@ -26,6 +33,7 @@ export interface Clinic {
   id: string;
   name: LocalizedField;
   address: LocalizedField;
+  geo?: Geo; // 지도는 여기 기반으로
   intro: {
     title: LocalizedField;
     subtitle: LocalizedField;
