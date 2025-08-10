@@ -3,21 +3,32 @@
 import { useEffect } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "@/lib/firebase";
-import { getUserFavoriteHospitalIds } from "@/services/hospitals/favorites";
 import { useFavoritesStore } from "@/stores/useFavoritesStore";
 
 export default function FavoritesInitializer() {
-  const setFavorites = useFavoritesStore((s) => s.setFavorites);
+  const init = useFavoritesStore((s) => s.init);
+  const reset = useFavoritesStore((s) => s.reset);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+    let unsubFav: ReturnType<typeof init> | undefined;
+
+    const unsubAuth = onAuthStateChanged(auth, (user) => {
       if (user) {
-        const ids = await getUserFavoriteHospitalIds(user.uid);
-        setFavorites(ids);
+        unsubFav = init(user.uid);
+      } else {
+        reset();
+        if (unsubFav) {
+          unsubFav();
+          unsubFav = undefined;
+        }
       }
     });
-    return () => unsubscribe();
-  }, [setFavorites]);
+
+    return () => {
+      unsubAuth();
+      if (unsubFav) unsubFav();
+    };
+  }, [init, reset]);
 
   return null;
 }

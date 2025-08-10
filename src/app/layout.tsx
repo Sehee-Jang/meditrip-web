@@ -7,7 +7,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang='ko'>
-      <body className='overflow-x-hidden antialiased'>{children}</body>
+      <body>{children}</body>
     </html>
   );
 }

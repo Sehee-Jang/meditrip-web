@@ -13,8 +13,8 @@ interface ClinicListProps {
 
 export default function ClinicList({ clinics }: ClinicListProps) {
   const t = useTranslations("hospital-list");
-  const locale = useLocale();
-  const loc: "ko" | "ja" = locale === "ja" ? "ja" : "ko";
+  const locale = useLocale(); // 링크 경로용
+  const loc: "ko" | "ja" = locale === "ja" ? "ja" : "ko"; // 다국어 텍스트 선택용
 
   return (
     <div className='p-4'>
@@ -22,26 +22,30 @@ export default function ClinicList({ clinics }: ClinicListProps) {
         {clinics.map((c) => (
           <li key={c.id}>
             <Card className='group hover:shadow-lg transition-shadow rounded-2xl overflow-hidden'>
-              <Link href={`/hospital/${c.id}`} className='block'>
+              <Link href={`/${locale}/hospital/${c.id}`} className='block'>
                 {/* 대표 이미지 */}
                 <div className='relative w-full h-40'>
                   <Image
-                    src={c.images[0] || "/images/placeholder.png"}
-                    alt={c.name[loc]}
+                    src={c.images?.[0] ?? "/images/placeholder.png"}
+                    alt={c.name?.[loc] ?? ""}
                     fill
                     className='object-cover'
+                    sizes='(max-width: 768px) 100vw, 33vw'
                   />
                   {/* 찜 아이콘 */}
-                  <FavoriteButton hospitalId={c.id} position='absolute' />
+                  <FavoriteButton
+                    hospitalId={c.id}
+                    className='absolute top-2 right-2 p-2 rounded-full bg-white/90 hover:bg-white shadow'
+                  />
                 </div>
 
                 <CardContent className='p-4'>
                   {/* 병원 이름, 주소, 설명 */}
                   <div className='flex flex-col justify-between items-start'>
                     <h2 className='text-lg font-medium text-gray-900'>
-                      {c.name[loc]}
+                      {c.name?.[loc]}
                     </h2>
-                    <p className='text-gray-500'>{c.address[loc]}</p>
+                    <p className='text-gray-500'>{c.address?.[loc]}</p>
                   </div>
 
                   {/* 리뷰 및 별점 */}

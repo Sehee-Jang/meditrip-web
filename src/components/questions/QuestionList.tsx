@@ -28,7 +28,7 @@ export default function QuestionList() {
           const date = q.createdAt
             ? getFormattedDate(q.createdAt)
             : t("noDate");
-          const answerCount = q.answers?.length || 0;
+          const answerCount = Number(q.answersCount ?? 0);
           const hasAnswer = answerCount > 0;
 
           return (
@@ -62,7 +62,7 @@ export default function QuestionList() {
                     {hasAnswer ? (
                       <span className='flex items-center text-sm text-green-600'>
                         <CheckCircle className='w-4 h-4 mr-1' />
-                        {t("answer")} ({answerCount})
+                        {t("question.hasAnswer")} ({answerCount})
                       </span>
                     ) : (
                       <span className='flex items-center text-sm text-gray-400'>

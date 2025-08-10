@@ -1,57 +1,40 @@
 import { db } from "@/lib/firebase";
 import {
-  getDocs,
   collection,
-  doc,
-  getDoc,
+  query,
+  where,
+  orderBy,
+  getDocs,
   Timestamp,
 } from "firebase/firestore";
-import { Question } from "@/types/question";
-import { User } from "@/types/user";
+import type { Question } from "@/types/question";
 
 const toISO = (ts?: Timestamp) =>
   ts ? ts.toDate().toISOString() : new Date().toISOString();
 
+/** 공개용 전체 목록(숨김 제외). 필요 시 상위에서 slice/limit 해 사용하세요. */
 export async function getAllQuestions(): Promise<Question[]> {
-  const snapshot = await getDocs(collection(db, "questions"));
-
-  const questions = await Promise.all(
-    snapshot.docs.map(async (docSnap) => {
-      const data = docSnap.data();
-      let user: User | undefined;
-
-      if (data.userId) {
-        const userSnap = await getDoc(doc(db, "users", data.userId));
-        if (userSnap.exists()) {
-          user = userSnap.data() as User;
-        }
-      }
-
-      return {
-        id: docSnap.id,
-        title: data.title ?? "",
-        content: data.content ?? "",
-        category: data.category ?? "etc",
-        createdAt: toISO(data.createdAt),
-        imageUrl: data.imageUrl ?? "",
-        userId: data.userId ?? "",
-        user,
-        answers: Array.isArray(data.answers)
-          ? data.answers.map(
-              (a: {
-                content: string;
-                createdAt?: Timestamp;
-                updatedAt?: Timestamp;
-              }) => ({
-                content: a.content,
-                createdAt: toISO(a.createdAt),
-                updatedAt: toISO(a.updatedAt),
-              })
-            )
-          : [],
-      } satisfies Question;
-    })
+  const q = query(
+    collection(db, "questions"),
+    where("isHidden", "==", false),
+    orderBy("createdAt", "desc")
   );
 
-  return questions;
+  const snap = await getDocs(q);
+
+  return snap.docs.map((d) => {
+    const x = d.data();
+    return {
+      id: d.id,
+      title: x.title ?? "",
+      content: x.content ?? "",
+      category: x.category,
+      createdAt: toISO(x.createdAt),
+      updatedAt: toISO(x.updatedAt),
+      imageUrl: x.imageUrl ?? "",
+      userId: x.userId ?? "",
+      answersCount: Number(x.answersCount ?? 0),
+      isHidden: Boolean(x.isHidden ?? false),
+    };
+  });
 }

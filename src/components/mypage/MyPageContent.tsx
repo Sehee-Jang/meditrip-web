@@ -15,6 +15,7 @@ import {
   getDocs,
   Timestamp,
   orderBy,
+  getCountFromServer,
 } from "firebase/firestore";
 import CommonButton from "@/components/common/CommonButton";
 import Container from "@/components/common/Container";
@@ -40,6 +41,7 @@ interface QuestionData {
   title: string;
   createdAt: Timestamp;
   answers?: unknown[];
+  answersCount?: number;
 }
 
 export default function MyPageContent() {
@@ -87,7 +89,7 @@ export default function MyPageContent() {
           })
         );
 
-        // 3) 질문 내역 로드
+        // 3) 내가 작성한 질문 + 답변 상태 로드
         const qSnap = await getDocs(
           query(
             collection(db, "questions"),
@@ -96,10 +98,25 @@ export default function MyPageContent() {
           )
         );
 
-        setQuestions(
-          qSnap.docs.map((d) => {
+        const questionItems: MyQuestion[] = await Promise.all(
+          qSnap.docs.map(async (d) => {
             const data = d.data() as QuestionData;
             const created = data.createdAt.toDate();
+
+            // --- 답변 여부 계산(우선순위: answersCount > answers 배열 > subcollection count)
+            let answered = false;
+
+            if (typeof data.answersCount === "number") {
+              answered = data.answersCount > 0;
+            } else if (Array.isArray(data.answers)) {
+              answered = data.answers.length > 0;
+            } else {
+              // 마지막 백업: answers 서브컬렉션 개수 카운트
+              const cntSnap = await getCountFromServer(
+                collection(db, "questions", d.id, "answers")
+              );
+              answered = cntSnap.data().count > 0;
+            }
             return {
               id: d.id,
               title: data.title,
@@ -109,12 +126,13 @@ export default function MyPageContent() {
                 2,
                 "0"
               )}`,
-              answered: Array.isArray(data.answers) && data.answers.length > 0,
+              answered,
             };
           })
         );
+
+        setQuestions(questionItems);
       } else {
-        // 미로그인 상태라면 홈으로 보냄
         router.replace("/");
       }
       setCheckingAuth(false);

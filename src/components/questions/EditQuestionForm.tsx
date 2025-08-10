@@ -16,7 +16,7 @@ const formSchema = z.object({
   title: z.string().min(2),
   category: z.enum(["stress", "diet", "immunity", "women", "antiaging", "etc"]),
   content: z.string().min(1),
-  file: z.any().optional(),
+  file: z.array(z.instanceof(File)).max(1).optional(),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -47,17 +47,17 @@ export default function EditQuestionForm({ question }: { question: Question }) {
     maxFiles: 1,
     onDrop: (accepted) => {
       const file = accepted[0];
-      setValue("file", file);
+      if (!file) return;
+      setValue("file", accepted, { shouldDirty: true, shouldValidate: true });
       setPreview(URL.createObjectURL(file));
     },
   });
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      setValue("file", file);
-      setPreview(URL.createObjectURL(file));
-    }
+    if (!file) return;
+    setValue("file", [file], { shouldDirty: true, shouldValidate: true });
+    setPreview(URL.createObjectURL(file));
   };
 
   const onSubmit = async (data: FormData) => {
@@ -154,12 +154,8 @@ export default function EditQuestionForm({ question }: { question: Question }) {
           <label className='block font-medium mb-1'>
             {t("form.image.label")}
           </label>
-          <input
-            type='file'
-            accept='image/*'
-            {...register("file")}
-            onChange={handleFileChange}
-          />
+
+          <input type='file' accept='image/*' onChange={handleFileChange} />
           <div
             {...getRootProps()}
             className='border-2 border-dashed border-gray-300 rounded-md p-6 text-center cursor-pointer hover:bg-gray-50 mt-2'

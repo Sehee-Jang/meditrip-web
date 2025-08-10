@@ -9,7 +9,7 @@
     "anonymous": "匿名",
     "writtenDate": "作成日",
     "category": "カテゴリー",
-    "answer": "回答",
+    "hasAnswer": "回答完了",
     "pending": "回答待ち",
     "qty": "件"
   },

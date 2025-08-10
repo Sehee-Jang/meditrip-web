@@ -1,30 +1,36 @@
 import { db } from "@/lib/firebase";
-import { doc, getDoc } from "firebase/firestore";
-import { Question } from "@/types/question";
-import { Timestamp } from "firebase/firestore";
+import { doc, getDoc, Timestamp } from "firebase/firestore";
+import type { Question } from "@/types/question";
 
-export async function getQuestionById(id: string): Promise<Question> {
+const toISO = (ts?: Timestamp) =>
+  ts ? ts.toDate().toISOString() : new Date().toISOString();
+
+export async function getQuestionById(
+  id: string,
+  opts?: { includeHidden?: boolean }
+): Promise<Question | null> {
   const ref = doc(db, "questions", id);
-  const snapshot = await getDoc(ref);
+  const snap = await getDoc(ref);
+  if (!snap.exists()) return null;
 
-  if (!snapshot.exists()) throw new Error("질문을 찾을 수 없습니다.");
+  const x = snap.data();
 
-  const data = snapshot.data();
-
-  // Firestore Timestamp → ISO 문자열
-  const createdAtTimestamp = data.createdAt as Timestamp;
-  const createdAtISO = createdAtTimestamp
-    ? createdAtTimestamp.toDate().toISOString()
-    : new Date().toISOString();
-
-  return {
-    id: snapshot.id,
-    title: data.title ?? "제목 없음",
-    content: data.content ?? "",
-    category: data.category ?? "uncategorized",
-    createdAt: createdAtISO,
-    imageUrl: data.imageUrl ?? "",
-    user: data.user ?? { id: "", name: "익명" },
-    answers: Array.isArray(data.answers) ? data.answers : [],
+  const q: Question = {
+    id: snap.id,
+    title: x.title ?? "",
+    content: x.content ?? "",
+    category: x.category,
+    createdAt: toISO(x.createdAt),
+    updatedAt: toISO(x.updatedAt),
+    imageUrl: x.imageUrl ?? "",
+    userId: x.userId ?? "",
+    answersCount: Number(x.answersCount ?? 0),
+    isHidden: Boolean(x.isHidden ?? false),
   };
+
+  // 공개용: 숨김 글이면 노출하지 않음
+  if (q.isHidden) return null;
+  if (!opts?.includeHidden && q.isHidden) return null;
+
+  return q;
 }

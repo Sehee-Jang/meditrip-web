@@ -1,11 +1,8 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import SearchInput from "@/components/common/SearchInput";
-import { auth } from "@/lib/firebase";
-import { onAuthStateChanged } from "firebase/auth";
-import { getUserFavoriteHospitalIds } from "@/services/hospitals/favorites";
 import LoadingSpinner from "../common/LoadingSpinner";
 import ClinicList from "./ClinicList";
 import type { Clinic } from "@/types/clinic";
@@ -21,35 +18,28 @@ export default function HospitalListClient() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    setLoading(true);
-
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      const allClinics = await fetchClinics();
-      let filtered = [...allClinics];
-
-      // 검색어 필터링
-      if (query) {
-        const q = query.toLowerCase();
-        filtered = filtered.filter((c) =>
-          c.name[loc].toLowerCase().includes(q)
-        );
+    let mounted = true;
+    (async () => {
+      setLoading(true);
+      try {
+        const all = await fetchClinics();
+        if (mounted) setClinics(all);
+      } finally {
+        if (mounted) setLoading(false);
       }
+    })();
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
-      // 찜 여부 추가
-      if (user) {
-        const favoriteIds = await getUserFavoriteHospitalIds(user.uid);
-        filtered = filtered.map((c) => ({
-          ...c,
-          isFavorite: favoriteIds.includes(c.id),
-        }));
-      }
-
-      setClinics(filtered);
-      setLoading(false);
-    });
-
-    return () => unsubscribe();
-  }, [query, loc]);
+  const filtered = useMemo(() => {
+    if (!query) return clinics;
+    const q = query.toLowerCase();
+    return clinics.filter((c) =>
+      (c.name?.[loc] ?? "").toLowerCase().includes(q)
+    );
+  }, [clinics, query, loc]);
 
   return (
     <div className='flex flex-col space-y-4'>
@@ -68,7 +58,7 @@ export default function HospitalListClient() {
           <p className='mt-4 text-gray-500'>{t("clinicList.loading")}</p>
         </div>
       ) : (
-        <ClinicList clinics={clinics} />
+        <ClinicList clinics={filtered} />
       )}
     </div>
   );

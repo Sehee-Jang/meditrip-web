@@ -1,84 +1,47 @@
-import { db } from "@/lib/firebase";
+// src/services/questions/getQuestions.ts
 import {
   collection,
-  query,
+  getDocs,
   orderBy,
   limit,
+  query,
   startAfter,
-  getDocs,
+  type QueryDocumentSnapshot,
+  type DocumentData,
   getCountFromServer,
-  QueryDocumentSnapshot,
-  DocumentData,
-  doc,
-  getDoc,
-  Timestamp,
 } from "firebase/firestore";
-import { Question } from "@/types/question";
-import { User } from "@/types/user";
-
-export interface QuestionPage {
-  questions: Question[];
-  lastDoc: QueryDocumentSnapshot<DocumentData> | null;
-}
-
-const toISO = (ts?: Timestamp) =>
-  ts ? ts.toDate().toISOString() : new Date().toISOString();
+import { db } from "@/lib/firebase";
+import type { Question } from "@/types/question";
 
 export async function getQuestions(
   pageSize: number,
   cursor?: QueryDocumentSnapshot<DocumentData>
-): Promise<QuestionPage> {
-  const q = query(
-    collection(db, "questions"),
-    orderBy("createdAt", "desc"),
-    limit(pageSize),
-    ...(cursor ? [startAfter(cursor)] : [])
-  );
+): Promise<{
+  questions: Question[];
+  lastDoc?: QueryDocumentSnapshot<DocumentData>;
+}> {
+  const col = collection(db, "questions"); // 컬렉션 경로 확인!
+  const base = query(col, orderBy("createdAt", "desc"), limit(pageSize));
+  const q = cursor
+    ? query(
+        col,
+        orderBy("createdAt", "desc"),
+        startAfter(cursor),
+        limit(pageSize)
+      )
+    : base;
+
   const snap = await getDocs(q);
-
-  const questions: Question[] = await Promise.all(
-    snap.docs.map(async (docSnap) => {
-      const data = docSnap.data();
-      let user: User | undefined;
-
-      if (data.userId) {
-        const userRef = doc(db, "users", data.userId);
-        const userSnap = await getDoc(userRef);
-        if (userSnap.exists()) user = userSnap.data() as User;
-      }
-
-      return {
-        id: docSnap.id,
-        title: data.title ?? "",
-        content: data.content ?? "",
-        category: data.category ?? "etc",
-        createdAt: toISO(data.createdAt),
-        imageUrl: data.imageUrl ?? "",
-        userId: data.userId ?? "",
-        user,
-        answers: Array.isArray(data.answers)
-          ? data.answers.map(
-              (a: {
-                content: string;
-                createdAt?: Timestamp;
-                updatedAt?: Timestamp;
-              }) => ({
-                content: a.content,
-                createdAt: toISO(a.createdAt),
-                updatedAt: toISO(a.updatedAt),
-              })
-            )
-          : [],
-      } satisfies Question;
-    })
-  );
-
-  const lastDoc = snap.docs[snap.docs.length - 1] ?? null;
-  return { questions, lastDoc };
+  const items: Question[] = snap.docs.map((d) => {
+    const data = d.data() as Omit<Question, "id">;
+    return { id: d.id, ...data };
+  });
+  const lastDoc = snap.docs[snap.docs.length - 1];
+  return { questions: items, lastDoc };
 }
 
 export async function getQuestionsCount(): Promise<number> {
-  const coll = collection(db, "questions");
-  const snapshot = await getCountFromServer(coll);
-  return snapshot.data().count;
+  const col = collection(db, "questions"); // 컬렉션 경로 확인!
+  const agg = await getCountFromServer(col);
+  return agg.data().count;
 }

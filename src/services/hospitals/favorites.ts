@@ -1,47 +1,47 @@
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import {
+  collection,
+  deleteDoc,
+  doc,
+  getDoc,
+  getDocs,
+  onSnapshot,
+  serverTimestamp,
+  setDoc,
+  type DocumentData,
+  type QuerySnapshot,
+  type Unsubscribe,
+} from "firebase/firestore";
 import { db } from "@/lib/firebase";
 
-/**
- * 사용자의 찜한 병원 목록 가져오기
- */
+export function subscribeFavoriteHospitalIds(
+  uid: string,
+  onChange: (ids: string[]) => void
+): Unsubscribe {
+  const colRef = collection(db, "users", uid, "favorites");
+  return onSnapshot(colRef, (qs: QuerySnapshot<DocumentData>) => {
+    const ids = qs.docs.map((d) => d.id);
+    onChange(ids);
+  });
+}
+
 export async function getUserFavoriteHospitalIds(
-  userId: string
+  uid: string
 ): Promise<string[]> {
-  const ref = doc(db, "favorites", userId);
-  const snap = await getDoc(ref);
-  if (!snap.exists()) return [];
-  return snap.data().hospitalIds || [];
+  const colRef = collection(db, "users", uid, "favorites");
+  const qs = await getDocs(colRef);
+  return qs.docs.map((d) => d.id);
 }
 
-/**
- * 병원 찜/취소 토글
- */
 export async function toggleFavoriteHospital(
-  userId: string,
-  hospitalId: string
-): Promise<void> {
-  const ref = doc(db, "favorites", userId);
-  const snap = await getDoc(ref);
-  let hospitalIds: string[] = snap.exists()
-    ? snap.data().hospitalIds || []
-    : [];
-
-  if (hospitalIds.includes(hospitalId)) {
-    hospitalIds = hospitalIds.filter((id) => id !== hospitalId);
-  } else {
-    hospitalIds.push(hospitalId);
-  }
-
-  await setDoc(ref, { hospitalIds }, { merge: true });
-}
-
-/**
- * 특정 병원이 찜되어 있는지 여부 확인
- */
-export async function isHospitalFavorited(
-  userId: string,
+  uid: string,
   hospitalId: string
 ): Promise<boolean> {
-  const ids = await getUserFavoriteHospitalIds(userId);
-  return ids.includes(hospitalId);
+  const ref = doc(db, "users", uid, "favorites", hospitalId);
+  const snap = await getDoc(ref);
+  if (snap.exists()) {
+    await deleteDoc(ref);
+    return false;
+  }
+  await setDoc(ref, { createdAt: serverTimestamp() });
+  return true;
 }

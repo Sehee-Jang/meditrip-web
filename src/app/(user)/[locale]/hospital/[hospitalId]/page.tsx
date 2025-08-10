@@ -30,7 +30,10 @@ export default async function ClinicDetailPage({ params }: Props) {
         showBackIcon
         center
       >
-        <FavoriteButton hospitalId={hospitalId} />
+        {/* 모바일 전용 하트(헤더 내부) */}
+        <div className='md:hidden'>
+          <FavoriteButton hospitalId={hospitalId} className='p-1' />
+        </div>
       </PageHeader>
 
       <section className='max-w-4xl mx-auto px-4 py-6 flex flex-col gap-8'>
@@ -42,8 +45,13 @@ export default async function ClinicDetailPage({ params }: Props) {
             fill
             className='object-cover'
           />
-          <div className='absolute top-2 right-2'>
-            <FavoriteButton hospitalId={clinic.id} position='absolute' />
+
+          {/* 데스크탑 전용 하트(이미지 우상단 오버레이) */}
+          <div className='absolute top-3 right-3 hidden md:block'>
+            <FavoriteButton
+              hospitalId={clinic.id}
+              className='p-2 rounded-full bg-white/90 hover:bg-white shadow'
+            />
           </div>
         </div>
 

@@ -19,7 +19,7 @@ const MENU = [
   { href: "", label: "대시보드", icon: HomeIcon },
   { href: "reservations", label: "예약 관리", icon: CalendarIcon },
   { href: "contents", label: "컨텐츠 관리", icon: Youtube },
-  { href: "consultant", label: "1:1 상담 관리", icon: MessageCircleMore },
+  { href: "community", label: "1:1 상담 관리", icon: MessageCircleMore },
   { href: "users", label: "회원 관리", icon: UserIcon },
   { href: "event", label: "이벤트 관리", icon: CalendarCheck },
   { href: "points", label: "포인트 관리", icon: Gift },

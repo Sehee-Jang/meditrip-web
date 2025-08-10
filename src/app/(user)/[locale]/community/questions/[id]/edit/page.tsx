@@ -1,3 +1,4 @@
+import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import EditQuestionForm from "@/components/questions/EditQuestionForm";
 import PageHeader from "@/components/common/PageHeader";
@@ -11,8 +12,10 @@ export default async function EditQuestionPage({
   params: PageProps;
 }) {
   const { id } = await params;
-  const question = await getQuestionById(id);
   const t = await getTranslations("question-form");
+
+  const question = await getQuestionById(id);
+  if (!question) return notFound();
 
   return (
     <main className='md:px-4 md:py-8'>
