@@ -18,21 +18,23 @@ import {
 } from "@/constants/communityCategories";
 import type { CommunityCategory, CommunityCategoryKey } from "@/types/category";
 
-const formSchema = z.object({
-  title: z.string().min(2, { message: "제목은 2자 이상 입력해주세요." }),
-  category: z.enum(
-    COMMUNITY_CATEGORY_VALUES as [CommunityCategory, ...CommunityCategory[]]
-  ),
-  content: z.string().min(1, { message: "질문 내용을 입력해주세요." }),
-  file: z.array(z.instanceof(File)).max(1).optional(),
-});
-
-type FormData = z.infer<typeof formSchema>;
-
 export default function QuestionForm() {
   const t = useTranslations("question-form");
   const tToast = useTranslations("question-toast");
   const router = useRouter();
+
+  const formSchema = z.object({
+    title: z.string().min(2, { message: t("form.content.errors.titleMin") }),
+    category: z.enum(
+      COMMUNITY_CATEGORY_VALUES as [CommunityCategory, ...CommunityCategory[]]
+    ),
+    content: z
+      .string()
+      .min(1, { message: t("form.content.errors.contentRequired") }),
+    file: z.array(z.instanceof(File)).max(1).optional(),
+  });
+
+  type FormData = z.infer<typeof formSchema>;
 
   const [preview, setPreview] = useState<string | null>(null);
 
@@ -196,7 +198,7 @@ export default function QuestionForm() {
             {preview ? (
               <Image
                 src={preview}
-                alt='preview'
+                alt={t("form.image.previewAlt")}
                 width={300}
                 height={200}
                 className='mx-auto rounded'

@@ -23,14 +23,19 @@
       }
     },
     "content": {
-      "label": "질문 내용",
-      "placeholder": "질문 내용을 입력해주세요.",
-      "max": "최대 200자"
+      "label": "내용",
+      "placeholder": "궁금한 내용을 입력하세요",
+      "max": "최대 1,000자",
+      "errors": {
+        "titleMin": "제목은 2자 이상 입력해주세요.",
+        "contentRequired": "질문 내용을 입력해주세요."
+      }
     },
     "image": {
       "label": "사진 업로드 (선택)",
       "helper": "사진을 드래그 앤 드롭하거나 파일을 선택해 업로드해 주세요.",
-      "button": "사진 업로드"
+      "button": "사진 업로드",
+      "previewAlt": "이미지 미리보기"
     }
   },
   "pointInfo": {
@@ -39,7 +44,7 @@
   },
   "cancel": "취소",
   "submit": {
-    "create": "질문 등록하기",
-    "edit": "질문 수정하기"
+    "create": "등록",
+    "edit": "수정"
   }
 }

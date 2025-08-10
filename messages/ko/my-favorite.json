@@ -2,6 +2,10 @@
   "title": "찜한 병원",
   "empty": "찜한 병원이 없습니다.",
   "loading": "불러오는 중입니다...",
+  "aria": {
+    "favorite": "즐겨찾기 추가",
+    "unfavorite": "즐겨찾기 해제"
+  },
   "dialog": {
     "title": "찜 해제",
     "description": "정말 이 병원을 찜 해제할까요?",

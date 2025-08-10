@@ -19,6 +19,7 @@ import { useTranslations } from "next-intl";
 import { Question } from "@/types/question";
 import { getFormattedDate } from "@/utils/date";
 import { MessageSquare, CheckCircle, Clock } from "lucide-react";
+import UserNameById from "@/components/common/UserNameById";
 
 export default function PaginatedQuestionList({
   pageSize = 5,
@@ -63,6 +64,8 @@ export default function PaginatedQuestionList({
           const answerCount = Number(q.answersCount ?? 0);
           const hasAnswer = answerCount > 0;
 
+          const userId = q.userId;
+
           return (
             <li
               key={q.id}
@@ -76,7 +79,14 @@ export default function PaginatedQuestionList({
                     <div className='flex flex-wrap items-center gap-2 text-sm text-gray-400'>
                       <span>
                         👤 {t("question.user")}:{" "}
-                        {q.user?.nickname ?? t("question.anonymous")}
+                        {userId ? (
+                          <UserNameById
+                            userId={userId}
+                            fallbackName={t("question.anonymous")}
+                          />
+                        ) : (
+                          t("question.anonymous")
+                        )}
                       </span>
                       <span>|</span>
                       <span>🗓 {date}</span>

@@ -1,6 +1,16 @@
 {
   "title": "마이페이지",
   "greeting": "{name}님, 안녕하세요! 👋",
+  "avatar": {
+    "alt": "프로필 이미지",
+    "change": "프로필 변경",
+    "toasts": {
+      "invalidType": "이미지 파일만 업로드할 수 있어요.",
+      "tooLarge": "최대 5MB까지 업로드할 수 있어요.",
+      "success": "프로필 이미지가 업데이트 되었어요.",
+      "error": "업로드에 실패했어요. 잠시 후 다시 시도해주세요."
+    }
+  },
   "reservations": {
     "title": "나의 예약 내역",
     "datetime": "예약 일시",

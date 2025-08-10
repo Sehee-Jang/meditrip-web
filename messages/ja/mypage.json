@@ -1,6 +1,16 @@
 {
   "title": "My Page",
   "greeting": "{name}さん、こんにちは！ 👋",
+  "avatar": {
+    "alt": "プロフィール画像",
+    "change": "プロフィールを変更",
+    "toasts": {
+      "invalidType": "画像ファイルのみアップロードできます。",
+      "tooLarge": "最大5MBまでアップロードできます。",
+      "success": "プロフィール画像を更新しました。",
+      "error": "アップロードに失敗しました。しばらくしてからお試しください。"
+    }
+  },
   "reservations": {
     "title": "私の予約履歴",
     "datetime": "予約日時",

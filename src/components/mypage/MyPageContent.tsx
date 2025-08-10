@@ -40,6 +40,7 @@ export default function MyPageContent() {
   const router = useRouter();
 
   const [checkingAuth, setCheckingAuth] = useState(true);
+  const [photoURL, setPhotoURL] = useState<string | undefined>();
   const [nickname, setNickname] = useState<string>("");
   const [points, setPoints] = useState<number>(0);
   const [reservations, setReservations] = useState<Reservation[]>([]);
@@ -57,6 +58,7 @@ export default function MyPageContent() {
       const userDoc = await getDoc(doc(db, "users", u.uid));
       if (userDoc.exists()) {
         const data = userDoc.data();
+        setPhotoURL((data.profileImage as string) || u.photoURL || undefined);
         setNickname((data.nickname as string) || u.displayName || "");
         setPoints((data.points as number) || 0);
       }
@@ -144,7 +146,11 @@ export default function MyPageContent() {
   return (
     <Container className='mx-auto max-w-3xl px-4 sm:px-6 lg:px-8'>
       {/* 인삿말 */}
-      <ProfileHeader name={nickname} />
+      <ProfileHeader
+        name={nickname}
+        photoURL={photoURL}
+        onAvatarUpdated={(url) => setPhotoURL(url)}
+      />
 
       <div className='space-y-10'>
         {/* 예약 내역 */}

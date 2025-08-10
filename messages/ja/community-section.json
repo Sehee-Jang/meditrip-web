@@ -2,5 +2,7 @@
   "title": "コミュニティインサイト",
   "anonymous": "匿名",
   "description": "質問を投稿すると、予約料金が割引になります！",
-  "cta": "投稿する"
+  "cta": "投稿する",
+  "imagePlaceholder": "イメージプレビュー",
+  "avatarAlt": "{name}さんのプロフィール画像"
 }

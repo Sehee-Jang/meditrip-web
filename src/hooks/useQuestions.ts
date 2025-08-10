@@ -5,64 +5,82 @@ import { db } from "@/lib/firebase";
 import {
   collection,
   getDocs,
-  getDoc,
-  doc,
   query,
   orderBy,
-  limit,
+  limit as fsLimit,
 } from "firebase/firestore";
-import { Question } from "@/types/question";
-import type { User } from "@/types/user";
+import type { Timestamp } from "firebase/firestore";
+import type { Question } from "@/types/question";
+import type { CommunityCategory } from "@/types/category";
+
+type FirestoreQuestionDoc = {
+  title: string;
+  content: string;
+  category: CommunityCategory | string;
+  createdAt?: Timestamp;
+  updatedAt?: Timestamp;
+  imageUrl?: string;
+  userId?: string;
+  answersCount?: number;
+  isHidden?: boolean;
+  // 과거 필드(폐기): user?: unknown;
+};
 
 export function useQuestions(limitCount = 2) {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    console.log("Questions:", questions); // 🔍 user?.nickname 확인
-  }, [questions]);
+    let alive = true;
 
-  useEffect(() => {
     const fetchQuestions = async () => {
       try {
-        const q = query(
+        setLoading(true);
+
+        const qRef = query(
           collection(db, "questions"),
           orderBy("createdAt", "desc"),
-          limit(limitCount)
-        );
-        const snapshot = await getDocs(q);
-
-        const enrichedQuestions: Question[] = await Promise.all(
-          snapshot.docs.map(async (docSnap) => {
-            const data = docSnap.data();
-            let user = null;
-
-            if (data.userId) {
-              const userRef = doc(db, "users", data.userId);
-              const userSnap = await getDoc(userRef);
-              if (userSnap.exists()) {
-                user = userSnap.data() as User;
-                console.log("Fetched user:", user);
-              }
-            }
-
-            return {
-              id: docSnap.id,
-              ...data,
-              user, // 유저 정보 포함
-            } as Question;
-          })
+          fsLimit(limitCount)
         );
 
-        setQuestions(enrichedQuestions);
+        const snapshot = await getDocs(qRef);
+
+        const items: Question[] = snapshot.docs.map((docSnap) => {
+          const raw = docSnap.data() as FirestoreQuestionDoc;
+
+          const createdAt = raw.createdAt?.toDate().toISOString() ?? "";
+          const updatedAt = raw.updatedAt?.toDate().toISOString() ?? undefined;
+
+          return {
+            id: docSnap.id,
+            title: raw.title,
+            content: raw.content,
+            category: raw.category as Question["category"],
+            createdAt,
+            updatedAt,
+            imageUrl: raw.imageUrl,
+            userId: raw.userId ?? "", // 매우 오래된 문서 대비
+            answersCount:
+              typeof raw.answersCount === "number" ? raw.answersCount : 0,
+            isHidden: typeof raw.isHidden === "boolean" ? raw.isHidden : false,
+          };
+        });
+
+        if (!alive) return;
+        setQuestions(items);
       } catch (error) {
+        // 콘솔만 남기고, 사용자 노출 문구는 i18n 사용하는 화면에서 처리
+        // eslint-disable-next-line no-console
         console.error("Failed to fetch questions:", error);
       } finally {
-        setLoading(false);
+        if (alive) setLoading(false);
       }
     };
 
-    fetchQuestions();
+    void fetchQuestions();
+    return () => {
+      alive = false;
+    };
   }, [limitCount]);
 
   return { questions, loading };

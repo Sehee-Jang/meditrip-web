@@ -6,6 +6,7 @@ import Container from "../common/Container";
 import { useQuestions } from "@/hooks/useQuestions";
 import Link from "next/link";
 import Image from "next/image";
+import UserChip from "../common/UserChip";
 
 export default function CommunitySection() {
   const t = useTranslations("community-section");
@@ -34,38 +35,54 @@ export default function CommunitySection() {
           {loading ? (
             <p>Loading...</p> // 필요시 skeleton 컴포넌트로 교체 가능
           ) : (
-            questions.map((q) => (
-              <Link
-                key={q.id}
-                href={`/community/questions/${q.id}`}
-                className='border rounded-lg overflow-hidden shadow-sm bg-gray-50 hover:bg-gray-100 transition'
-              >
-                <div className='w-full h-32 sm:h-40 bg-gray-200 relative'>
-                  {q.imageUrl ? (
-                    <Image
-                      src={q.imageUrl}
-                      alt='preview'
-                      fill
-                      className='object-cover'
-                      sizes='(max-width: 640px) 100vw, 400px'
-                    />
-                  ) : (
-                    <div className='flex items-center justify-center w-full h-full text-sm text-gray-500'>
-                      Image Thumb
-                    </div>
-                  )}
-                </div>
-                <div className='p-4'>
-                  <h3 className='text-sm font-semibold'>{q.title}</h3>
-                  <div className='text-xs text-gray-500 mt-2'>
-                    <div className='flex items-center gap-2'>
-                      <div className='w-4 h-4 rounded-full bg-gray-300' />
-                      <span>{q.user?.nickname || t("anonymous")}</span>
+            questions.map((q) => {
+              const userId =
+                (q as { userId?: string }).userId ??
+                (q as { user?: { id?: string } }).user?.id ??
+                "";
+
+              const fallbackName =
+                ((q as { user?: { nickname?: string } }).user?.nickname as
+                  | string
+                  | undefined) ?? t("anonymous");
+
+              return (
+                <Link
+                  key={q.id}
+                  href={`/community/questions/${q.id}`}
+                  className='border rounded-lg overflow-hidden shadow-sm bg-gray-50 hover:bg-gray-100 transition'
+                >
+                  <div className='w-full h-32 sm:h-40 bg-gray-200 relative'>
+                    {q.imageUrl ? (
+                      <Image
+                        src={q.imageUrl}
+                        alt={t("imagePlaceholder")}
+                        fill
+                        className='object-cover'
+                        sizes='(max-width: 640px) 100vw, 400px'
+                      />
+                    ) : (
+                      <div className='flex items-center justify-center w-full h-full text-sm text-gray-500'>
+                        {t("imagePlaceholder")}
+                      </div>
+                    )}
+                  </div>
+                  <div className='p-4'>
+                    <h3 className='text-sm font-semibold'>{q.title}</h3>
+                    <div className='text-xs text-gray-500 mt-2'>
+                      <div className='flex items-center gap-2'>
+                        {/* 아바타 */}
+                        <UserChip
+                          userId={userId}
+                          fallbackName={fallbackName}
+                          size={24}
+                        />
+                      </div>
                     </div>
                   </div>
-                </div>
-              </Link>
-            ))
+                </Link>
+              );
+            })
           )}
         </div>
 

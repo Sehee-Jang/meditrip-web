@@ -1,9 +1,16 @@
 {
   "title": "質問の詳細",
+  "image": { "alt": "添付画像" },
+  "answers": {
+    "title": "回答",
+    "none": "まだ回答はありません。",
+    "updated": "更新"
+  },
+  "anonymous": "匿名",
   "back": "一覧へ戻る",
   "edit": "編集",
   "delete": "削除",
-  "confirmDelete": "この質問を削除してもよろしいですか？",
-  "deleteFailed": "削除に失敗しました。もう一度お試しください。",
+  "confirmDelete": "本当に削除しますか？",
+  "deleteFailed": "削除に失敗しました。しばらくしてから再度お試しください。",
   "noDate": "日付なし"
 }

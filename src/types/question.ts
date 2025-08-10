@@ -1,4 +1,3 @@
-import { User } from "@/types/user";
 import type { CommunityCategory } from "@/types/category";
 
 export interface Question {
@@ -10,8 +9,8 @@ export interface Question {
   updatedAt?: string;
 
   imageUrl?: string;
-  userId?: string;
-  user?: Partial<User>; // 선택: 조회 시 작성자 정보 합쳐서 내려줄 때
+  userId: string;
+  // user?: Partial<User>; // 선택: 조회 시 작성자 정보 합쳐서 내려줄 때
 
   // 배열 집계 필드
   answersCount: number; // 기본 0

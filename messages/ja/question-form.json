@@ -25,12 +25,17 @@
     "content": {
       "label": "質問内容",
       "placeholder": "質問したい内容をご記入ください。",
-      "max": "最大200文字"
+      "max": "最大200文字",
+      "errors": {
+        "titleMin": "タイトルは2文字以上で入力してください。",
+        "contentRequired": "内容を入力してください。"
+      }
     },
     "image": {
       "label": "画像を追加(任意)",
       "helper": "写真をドラッグ＆ドロップするか、ファイルを選択してアップロードしてください。",
-      "button": "画像を追加"
+      "button": "画像を追加",
+      "previewAlt": "画像プレビュー"
     }
   },
   "pointInfo": {
@@ -38,8 +43,5 @@
     "description": "問するだけで、予約割引ポイントプレゼント！"
   },
   "cancel": "キャンセル",
-  "submit": {
-    "create": "質問を投稿する",
-    "edit": "質問を編集する"
-  }
+  "submit": { "create": "投稿", "edit": "編集" }
 }

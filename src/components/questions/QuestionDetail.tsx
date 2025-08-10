@@ -10,10 +10,12 @@ import { useTranslations } from "next-intl";
 import { deleteQuestion } from "@/services/questions/deleteQuestion";
 import { getFormattedDate } from "@/utils/date";
 import { listAnswers } from "@/services/community-admin/answers";
+import UserNameById from "@/components/common/UserNameById";
 
 export default function QuestionDetail({ question }: { question: Question }) {
   const router = useRouter();
   const t = useTranslations("question-detail");
+  const tCat = useTranslations("categories"); // ⬅️ 카테고리 i18n
 
   const [answers, setAnswers] = useState<AnswerItem[]>([]);
   const [loadingAnswers, setLoadingAnswers] = useState(false);
@@ -51,25 +53,33 @@ export default function QuestionDetail({ question }: { question: Question }) {
 
   return (
     <article className='max-w-3xl mx-auto px-4 py-8 space-y-8'>
-      {/* 헤더: 카테고리 배지 + 제목 + 메타 */}
+      {/* 헤더 */}
       <header className='space-y-3'>
-        <div className='inline-flex items-center gap-2'>
-          <span className='rounded-full bg-gray-100 text-gray-700 text-xs px-2.5 py-1'>
-            {question.category}
-          </span>
-          {question.user?.nickname ? (
-            <span className='text-xs text-gray-500'>
-              · {question.user.nickname}
-            </span>
-          ) : null}
-        </div>
-
-        <h1 className='text-[22px] md:text-2xl font-semibold tracking-[-0.01em] text-gray-900'>
+        <h1 className='text-2xl md:text-3xl font-bold tracking-[-0.01em] text-gray-900'>
           {question.title}
         </h1>
 
-        <div className='text-[13px] text-gray-500'>
-          {getFormattedDate(createdDate)}
+        {/* 메타: 카테고리 · 작성자 · 날짜 */}
+        <div className='flex flex-wrap items-center gap-2 text-xs text-gray-500'>
+          <span className='inline-flex items-center rounded-full bg-gray-100 text-gray-700 px-2.5 py-1'>
+            {tCat(question.category)} {/* ⬅️ 로컬라이즈된 카테고리 */}
+          </span>
+
+          {question.userId && <span className='text-gray-300'>•</span>}
+
+          {question.userId ? (
+            <span className='truncate'>
+              <UserNameById
+                userId={question.userId}
+                fallbackName={t("anonymous")}
+              />
+            </span>
+          ) : null}
+
+          <span className='text-gray-300'>•</span>
+          <time dateTime={createdDate.toISOString()}>
+            {getFormattedDate(createdDate)}
+          </time>
         </div>
       </header>
 
@@ -83,7 +93,7 @@ export default function QuestionDetail({ question }: { question: Question }) {
           <div className='relative w-full overflow-hidden rounded-2xl border border-gray-200'>
             <Image
               src={question.imageUrl}
-              alt='첨부 이미지'
+              alt={t("image.alt")}
               width={1200}
               height={800}
               className='w-full h-auto object-cover'
@@ -93,13 +103,14 @@ export default function QuestionDetail({ question }: { question: Question }) {
         )}
       </section>
 
-      {/* 구분선 */}
       <hr className='border-gray-100' />
 
       {/* 운영자 답변 */}
       <section className='space-y-4'>
         <div className='flex items-center justify-between'>
-          <h2 className='text-[17px] font-semibold text-gray-900'>답변</h2>
+          <h2 className='text-[17px] font-semibold text-gray-900'>
+            {t("answers.title")}
+          </h2>
         </div>
 
         {loadingAnswers ? (
@@ -116,9 +127,7 @@ export default function QuestionDetail({ question }: { question: Question }) {
             ))}
           </ul>
         ) : answers.length === 0 ? (
-          <div className='text-sm text-gray-500'>
-            아직 등록된 답변이 없습니다.
-          </div>
+          <div className='text-sm text-gray-500'>{t("answers.none")}</div>
         ) : (
           <ul className='space-y-3'>
             {answers.map((a) => (
@@ -130,7 +139,8 @@ export default function QuestionDetail({ question }: { question: Question }) {
                   {getFormattedDate(new Date(a.createdAt))}
                   {a.updatedAt && (
                     <span className='ml-2'>
-                      · 수정 {getFormattedDate(new Date(a.updatedAt))}
+                      · {t("answers.updated")}{" "}
+                      {getFormattedDate(new Date(a.updatedAt))}
                     </span>
                   )}
                 </div>
@@ -143,7 +153,7 @@ export default function QuestionDetail({ question }: { question: Question }) {
         )}
       </section>
 
-      {/* 버튼 영역 */}
+      {/* 버튼 */}
       <div className='pt-2 flex flex-col sm:flex-row gap-2 justify-end'>
         <CommonButton
           className='sm:w-auto w-full bg-white text-gray-900 border border-gray-200 hover:bg-gray-50'

@@ -11,22 +11,31 @@ import { useState } from "react";
 import Image from "next/image";
 import { updateQuestion } from "@/services/questions/updateQuestion";
 import CommonButton from "../common/CommonButton";
-
-const formSchema = z.object({
-  title: z.string().min(2),
-  category: z.enum(["stress", "diet", "immunity", "women", "antiaging", "etc"]),
-  content: z.string().min(1),
-  file: z.array(z.instanceof(File)).max(1).optional(),
-});
-
-type FormData = z.infer<typeof formSchema>;
+import { toast } from "sonner";
 
 export default function EditQuestionForm({ question }: { question: Question }) {
   const t = useTranslations("question-form");
+  const tToast = useTranslations("question-toast");
   const router = useRouter();
   const [preview, setPreview] = useState<string | null>(
     question.imageUrl || null
   );
+
+  const formSchema = z.object({
+    title: z.string().min(2),
+    category: z.enum([
+      "stress",
+      "diet",
+      "immunity",
+      "women",
+      "antiaging",
+      "etc",
+    ]),
+    content: z.string().min(1),
+    file: z.array(z.instanceof(File)).max(1).optional(),
+  });
+
+  type FormData = z.infer<typeof formSchema>;
 
   const {
     register,
@@ -72,8 +81,8 @@ export default function EditQuestionForm({ question }: { question: Question }) {
 
       router.push(`/community/questions/${question.id}`);
     } catch (err) {
-      alert("수정에 실패했습니다.");
       console.error(err);
+      toast.error(tToast("editFailed"));
     }
   };
 
@@ -164,7 +173,7 @@ export default function EditQuestionForm({ question }: { question: Question }) {
             {preview ? (
               <Image
                 src={preview}
-                alt='이미지 미리보기'
+                alt={t("form.image.previewAlt")}
                 width={300}
                 height={200}
                 className='mx-auto rounded'
