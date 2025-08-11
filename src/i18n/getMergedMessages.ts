@@ -40,6 +40,7 @@ export const NAMESPACES = [
   "hospital-page",
   "login-page",
   "my-favorite",
+  "mypage",
   "package-detail",
   "privacy-page",
   "question-detail",
