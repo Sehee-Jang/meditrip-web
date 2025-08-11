@@ -4,8 +4,6 @@ import Topbar from "@/components/admin/Topbar";
 import { routing } from "@/i18n/routing";
 import AdminAuthGuard from "@/components/admin/AdminAuthGuard";
 import QueryProvider from "@/providers/QueryProvider";
-import { NextIntlClientProvider } from "next-intl";
-import { getMessages } from "next-intl/server";
 
 export const metadata = {
   title: "메디트립 백오피스",
@@ -22,10 +20,9 @@ export default async function AdminLayout({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  const messages = await getMessages();
 
   return (
-    <NextIntlClientProvider locale={locale} messages={messages}>
+    
       <QueryProvider>
         <div className='flex h-dvh min-h-screen bg-gray-50'>
           {/* 1) 사이드바 */}
@@ -43,6 +40,6 @@ export default async function AdminLayout({
           </div>
         </div>
       </QueryProvider>
-    </NextIntlClientProvider>
+
   );
 }
