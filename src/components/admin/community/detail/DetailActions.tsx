@@ -12,10 +12,8 @@ import { createAnswer } from "@/services/community-admin/answers";
 
 export default function DetailActions({
   questionId,
-  locale,
 }: {
   questionId: string;
-  locale: string;
 }) {
   const qc = useQueryClient();
   const router = useRouter();
@@ -61,7 +59,7 @@ export default function DetailActions({
         onClick={async () => {
           if (!confirm("정말 삭제할까요?")) return;
           await deleteQuestion(questionId);
-          router.push(`/${locale}/admin/community`);
+          router.push(`/admin/community`);
         }}
       >
         <Trash2 className='mr-1.5 size-4' />

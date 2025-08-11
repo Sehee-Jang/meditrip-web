@@ -15,10 +15,8 @@ import { deleteQuestion } from "@/services/community-admin/deleteQuestion";
 
 export default function RowActions({
   questionId,
-  locale,
 }: {
   questionId: string;
-  locale: string;
 }) {
   const qc = useQueryClient();
   const router = useRouter();
@@ -33,7 +31,7 @@ export default function RowActions({
       <DropdownMenuContent align='end' className='w-36'>
         <DropdownMenuItem
           onClick={() =>
-            router.push(`/${locale}/admin/community/${questionId}`)
+            router.push(`/admin/community/${questionId}`)
           }
         >
           답변 작성

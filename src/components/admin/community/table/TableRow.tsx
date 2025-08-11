@@ -9,17 +9,15 @@ import type { CommunityCategoryKey } from "@/types/category";
 
 export default function TableRow({
   q,
-  locale,
 }: {
   q: Question;
-  locale: string;
 }) {
   const router = useRouter();
 
   return (
     <tr
       className='border-b hover:bg-slate-50 cursor-pointer'
-      onClick={() => router.push(`/${locale}/admin/community/${q.id}`)}
+      onClick={() => router.push(`/admin/community/${q.id}`)}
     >
       <td className='px-4 py-3'>
         <div className='flex items-center gap-2'>
@@ -47,7 +45,7 @@ export default function TableRow({
         )}
       </td>
 
-      {/* ✅ 숫자만 표시 */}
+      {/* 숫자만 표시 */}
       <td className='px-4 py-3 text-center'>{q.answersCount}</td>
 
       <td className='px-4 py-3'>{new Date(q.createdAt).toLocaleString()}</td>
@@ -56,7 +54,7 @@ export default function TableRow({
         className='px-4 py-3 text-center'
         onClick={(e) => e.stopPropagation()}
       >
-        <RowActions questionId={q.id} locale={locale} />
+        <RowActions questionId={q.id} />
       </td>
     </tr>
   );

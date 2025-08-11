@@ -7,14 +7,11 @@ type SearchParams = {
   visibility?: "all" | "visible" | "hidden";
 };
 
-export default async function AdminConsultantPage({
-  params,
+export default async function AdminCommunityPage({
   searchParams,
 }: {
-  params: Promise<{ locale: string }>;
   searchParams: Promise<SearchParams>;
 }) {
-  const { locale } = await params;
   const sp = await searchParams;
 
   return (
@@ -24,7 +21,7 @@ export default async function AdminConsultantPage({
         <p className='text-gray-500 text-sm'>
           커뮤니티 페이지에 등록된 문의 내용을 확인하고 관리하세요.
         </p>
-        <CommunityAdminClient initialSearchParams={sp} locale={locale} />
+        <CommunityAdminClient initialSearchParams={sp} />
       </div>
     </div>
   );

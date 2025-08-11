@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { auth } from "@/lib/firebase";
 import {
   signInWithEmailAndPassword,
@@ -26,7 +26,6 @@ import { Loader2, Shield, Mail, Lock, LogIn, Chrome } from "lucide-react";
 
 export default function AdminLoginForm() {
   const router = useRouter();
-  const { locale } = useParams() as { locale: string };
 
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -39,13 +38,13 @@ export default function AdminLoginForm() {
       if (!user) return;
       const role = await getUserRole(user.uid);
       if (role === "admin" || role === "super_admin") {
-        router.replace(`/${locale}/admin`);
+        router.replace(`/admin`);
       }
     });
     return () => unsub();
-  }, [locale, router]);
+  }, [router]);
 
-  const goAdmin = () => router.replace(`/${locale}/admin`);
+  const goAdmin = () => router.replace(`/admin`);
 
   const handleSignIn = async () => {
     setError("");

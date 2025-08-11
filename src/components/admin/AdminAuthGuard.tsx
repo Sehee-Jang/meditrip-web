@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { onAuthStateChanged, type User as FirebaseUser } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
@@ -13,7 +13,6 @@ export default function AdminAuthGuard({
   children: React.ReactNode;
 }) {
   const router = useRouter();
-  const { locale } = useParams() as { locale: string };
   const [authorized, setAuthorized] = useState<boolean | null>(null);
 
   useEffect(() => {
@@ -24,7 +23,7 @@ export default function AdminAuthGuard({
       async (user: FirebaseUser | null) => {
         // 비로그인 → 관리자 로그인 페이지로
         if (!user) {
-          router.replace(`/${locale}/admin/login`);
+          router.replace(`/admin/login`);
           if (!cancelled) setAuthorized(false);
           return;
         }
@@ -36,12 +35,12 @@ export default function AdminAuthGuard({
           if (role === "admin" || role === "super_admin") {
             if (!cancelled) setAuthorized(true);
           } else {
-            router.replace(`/${locale}/admin/login`);
+            router.replace(`/admin/login`);
             if (!cancelled) setAuthorized(false);
           }
         } catch {
           // 조회 실패 시에도 로그인 페이지로
-          router.replace(`/${locale}/admin/login`);
+          router.replace(`/admin/login`);
           if (!cancelled) setAuthorized(false);
         }
       }
@@ -50,7 +49,7 @@ export default function AdminAuthGuard({
       cancelled = true;
       unsubscribe();
     };
-  }, [locale, router]);
+  }, [router]);
 
   // 아직 확인 중일 땐 스피너
   if (authorized === null) {

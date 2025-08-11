@@ -17,10 +17,8 @@ import TableRow from "./TableRow";
 
 export default function CommunityAdminTable({
   filter,
-  locale,
 }: {
   filter: AdminQuestionFilter;
-  locale: string;
 }) {
   const [cursor, setCursor] =
     useState<QueryDocumentSnapshot<DocumentData> | null>(null);
@@ -62,7 +60,7 @@ export default function CommunityAdminTable({
                 </td>
               </tr>
             ) : (
-              items.map((q) => <TableRow key={q.id} q={q} locale={locale} />)
+              items.map((q) => <TableRow key={q.id} q={q} />)
             )}
           </tbody>
         </table>

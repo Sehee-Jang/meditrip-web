@@ -19,8 +19,15 @@ import { useState } from "react";
 import { signOut } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 
-const MENU = [
-  { href: "", label: "대시보드", icon: HomeIcon },
+type MenuItem = {
+  href: string; // "" | "reservations" | ...
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+  exact?: boolean; // ← true 이면 정확히 일치할 때만 활성화
+};
+
+const MENU: ReadonlyArray<MenuItem> = [
+  { href: "", label: "대시보드", icon: HomeIcon, exact: true },
   { href: "reservations", label: "예약 관리", icon: CalendarIcon },
   { href: "contents", label: "컨텐츠 관리", icon: Youtube },
   { href: "community", label: "1:1 상담 관리", icon: MessageCircleMore },
@@ -29,22 +36,30 @@ const MENU = [
   { href: "points", label: "포인트 관리", icon: Gift },
 ];
 
-type Props = { locale: string };
+const itemPath = (href: string) => (href === "" ? "/admin" : `/admin/${href}`);
+const normalize = (p: string) =>
+  p.length > 1 && p.endsWith("/") ? p.slice(0, -1) : p;
 
-export default function Sidebar({ locale }: Props) {
+
+export default function Sidebar() {
   const router = useRouter();
-  const path = usePathname();
-  const segments = path.split("/");
-  const activeSegment = segments[3] || "";
+  const pathname = normalize(usePathname());
   const [collapsed, setCollapsed] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
+
+   const isActive = (href: string, exact?: boolean) => {
+     const target = itemPath(href);
+     if (exact) return pathname === target; // 정확히 /admin 일 때만 활성
+     return pathname === target || pathname.startsWith(`${target}/`);
+   };
+
 
   const handleLogout = async () => {
     if (signingOut) return;
     setSigningOut(true);
     try {
       await signOut(auth);
-      router.replace(`/${locale}/admin/login`);
+      router.replace(`/admin/login`);
     } catch (err) {
       console.error(err);
       setSigningOut(false);
@@ -53,33 +68,23 @@ export default function Sidebar({ locale }: Props) {
 
   return (
     <nav
-      className={`
-        h-full bg-white border-r
-        flex flex-col 
-        transition-width duration-200
-        ${collapsed ? "w-16 justify-center items-center" : "w-64"}
-      `}
+      className={`${
+        collapsed ? "w-16" : "w-64"
+      } h-full bg-white border-r flex flex-col transition-[width]`}
     >
       {/* 상단: 로고 + 토글 */}
-      <div
-        className={`
-          flex items-center justify-between
-          px-6 py-4 
-        `}
-      >
+      <div className='flex items-center justify-between px-6 py-4'>
         <Link
-          href={`/${locale}/admin`}
+          href='/admin'
           className={collapsed ? "rounded" : "text-xl font-bold"}
-          aria-label='관리자 대시보드로 이동'
         >
-          {!collapsed && <span className='text-xl font-bold'>메디트립</span>}
+          {" "}
+          {!collapsed && "메디트립"}{" "}
         </Link>
-
-        {/* {!collapsed && <span className='text-xl font-bold'>메디트립</span>} */}
         <button
-          onClick={() => setCollapsed((c) => !c)}
+          onClick={() => setCollapsed((v) => !v)}
           className='p-1 rounded hover:bg-gray-100'
-          aria-label={collapsed ? "사이드바 확장" : "사이드바 축소"}
+          aria-label='사이드바 토글'
         >
           {collapsed ? (
             <ChevronRight className='w-5 h-5' />
@@ -89,24 +94,23 @@ export default function Sidebar({ locale }: Props) {
         </button>
       </div>
 
-      {/* 메뉴 리스트 */}
-      <ul className='flex-1 mt-4'>
-        {MENU.map(({ href, label, icon: Icon }) => {
-          const isActive = href === activeSegment;
-          const linkPath =
-            href === "" ? `/${locale}/admin` : `/${locale}/admin/${href}`;
-
+      {/* 메뉴 */}
+      <ul className='flex-1 mt-2'>
+        {MENU.map(({ href, label, icon: Icon, exact }) => {
+          const target = itemPath(href);
+          const active = isActive(href, exact);
           return (
-            <li key={href}>
+            <li key={target}>
               <Link
-                href={linkPath}
-                className={`
-                  flex items-center
-                  ${collapsed ? "justify-center" : "px-6"}
-                  py-3 hover:bg-gray-100  transition-colors
-                  ${isActive ? "bg-blue-50 font-medium" : "text-gray-700"}
-                 
-                `}
+                href={target}
+                className={`flex items-center ${
+                  collapsed ? "justify-center" : "px-6"
+                } py-3 transition-colors
+                  ${
+                    active
+                      ? "bg-blue-50 font-medium text-blue-700"
+                      : "text-gray-700 hover:bg-gray-100"
+                  }`}
               >
                 <Icon className='w-5 h-5' />
                 {!collapsed && <span className='ml-3'>{label}</span>}
@@ -122,27 +126,18 @@ export default function Sidebar({ locale }: Props) {
           type='button'
           onClick={handleLogout}
           disabled={signingOut}
-          className={`
-            flex items-center justify-center
-            w-full py-2 rounded hover:bg-gray-100
-            ${signingOut ? "text-gray-400" : "text-red-600"}
-          `}
-          aria-label='로그아웃'
-          title='로그아웃'
+          className={`flex items-center justify-center w-full py-2 rounded hover:bg-gray-100
+            ${signingOut ? "text-gray-400" : "text-red-600"}`}
         >
-          {!collapsed ? (
-            <span className='inline-flex items-center gap-2'>
-              {signingOut ? (
-                <Loader2 className='w-4 h-4 animate-spin' />
-              ) : (
-                <LogOut className='w-4 h-4' />
-              )}
+          {signingOut ? (
+            <Loader2 className='w-4 h-4 animate-spin' />
+          ) : (
+            <LogOut className='w-4 h-4' />
+          )}
+          {!collapsed && (
+            <span className='ml-2'>
               {signingOut ? "로그아웃 중..." : "로그아웃"}
             </span>
-          ) : signingOut ? (
-            <Loader2 className='w-5 h-5 animate-spin' />
-          ) : (
-            <LogOut className='w-5 h-5' />
           )}
         </button>
       </div>

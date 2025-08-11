@@ -22,10 +22,8 @@ function toCategoryOption(v?: string): CategoryOption {
 
 export default function CommunityAdminClient({
   initialSearchParams,
-  locale,
 }: {
   initialSearchParams: AdminSearchParams;
-  locale: string;
 }) {
   const [category, setCategory] = useState<CategoryOption>(
     toCategoryOption(initialSearchParams.category)
@@ -78,7 +76,6 @@ export default function CommunityAdminClient({
 
       <CommunityAdminTable
         filter={{ category, answered, visibility }}
-        locale={locale}
       />
     </div>
   );

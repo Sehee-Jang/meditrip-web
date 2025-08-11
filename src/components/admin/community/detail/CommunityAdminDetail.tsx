@@ -10,10 +10,8 @@ import DetailActions from "./DetailActions";
 import AnswerSection from "./AnswerSection";
 export default function CommunityAdminDetail({
   questionId,
-  locale,
 }: {
   questionId: string;
-  locale: string;
 }) {
   const router = useRouter();
 
@@ -43,7 +41,7 @@ export default function CommunityAdminDetail({
         <Button
           variant='ghost'
           size='sm'
-          onClick={() => router.push(`/${locale}/admin/community`)}
+          onClick={() => router.push(`/admin/community`)}
           className='-ml-2'
         >
           <ArrowLeft className='mr-1.5 size-4' />
@@ -55,7 +53,7 @@ export default function CommunityAdminDetail({
       <div className='rounded-2xl border bg-white shadow-sm'>
         <div className='flex items-start justify-between gap-4 px-6 py-5 border-b'>
           <DetailHeader question={question} />
-          <DetailActions questionId={question.id} locale={locale} />
+          <DetailActions questionId={question.id} />
         </div>
 
         {/* 콘텐츠 영역 */}

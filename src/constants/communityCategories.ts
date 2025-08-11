@@ -30,3 +30,12 @@ export const COMMUNITY_CATEGORY_ICONS: Record<
   ...(CATEGORY_ICONS as Record<CategoryKey, LucideIcon>),
   etc: Ellipsis,
 };
+
+export const COMMUNITY_CATEGORY_LABELS: Record<CommunityCategoryKey, string> = {
+  stress: "스트레스",
+  diet: "다이어트",
+  immunity: "면역관리",
+  women: "여성질환",
+  antiaging: "안티에이징",
+  etc: "기타",
+};
