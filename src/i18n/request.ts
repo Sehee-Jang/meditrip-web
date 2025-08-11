@@ -13,6 +13,6 @@ export default getRequestConfig(async ({ requestLocale }) => {
   return {
     locale,
     // messages: (await import(`../../messages/${locale}.json`)).default,
-    messages: await getMergedMessages(locale),
+    messages: await getMergedMessages(locale as "ko" | "ja"),
   };
 });

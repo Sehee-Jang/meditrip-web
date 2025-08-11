@@ -1,23 +1,69 @@
+// import { promises as fs } from "fs";
+// import path from "path";
+
+// export async function getMergedMessages(locale: string) {
+//   const messagesDir = path.join(process.cwd(), "messages", locale);
+//   const files = await fs.readdir(messagesDir);
+
+//   const merged: Record<string, unknown> = {};
+
+//   for (const file of files) {
+//     if (!file.endsWith(".json")) continue;
+
+//     const filePath = path.join(messagesDir, file);
+//     const content = await fs.readFile(filePath, "utf-8");
+//     const json = JSON.parse(content);
+
+//     const namespace = file.replace(/\.json$/, "");
+//     merged[namespace] = json;
+//   }
+
+//   return merged;
+// }
+
 // src/i18n/getMergedMessages.ts
-import { promises as fs } from "fs";
-import path from "path";
+// "fs" 사용 금지! Edge 호환 버전
 
-export async function getMergedMessages(locale: string) {
-  const messagesDir = path.join(process.cwd(), "messages", locale);
-  const files = await fs.readdir(messagesDir);
+export const NAMESPACES = [
+  "categories",
+  "community-page",
+  "community-section",
+  "content-section",
+  "contents-page",
+  "faq-page",
+  "faq-section",
+  "footer",
+  "header",
+  "hero-section",
+  "hospital-detail",
+  "hospital-list",
+  "hospital-page",
+  "login-page",
+  "my-favorite",
+  "package-detail",
+  "privacy-page",
+  "question-detail",
+  "question-form",
+  "question-toast",
+  "questions-page",
+  "settings-page",
+  "signup-section",
+  "terms-page",
+] as const;
 
-  const merged: Record<string, unknown> = {};
+type Namespace = (typeof NAMESPACES)[number];
+type Dict = Record<string, unknown>;
 
-  for (const file of files) {
-    if (!file.endsWith(".json")) continue;
+export async function getMergedMessages(locale: "ko" | "ja") {
+  const entries = await Promise.all(
+    NAMESPACES.map(async (ns: Namespace) => {
+      // request.ts가 src/i18n/ 안에 있으므로, messages는 프로젝트 루트 기준 경로에 맞춰 조정
+      // messages/<locale>/<ns>.json
+      const mod = await import(`../../messages/${locale}/${ns}.json`);
+      return [ns, mod.default as Dict] as const;
+    })
+  );
 
-    const filePath = path.join(messagesDir, file);
-    const content = await fs.readFile(filePath, "utf-8");
-    const json = JSON.parse(content);
-
-    const namespace = file.replace(/\.json$/, "");
-    merged[namespace] = json;
-  }
-
-  return merged;
+  // { "<ns>": { ... } } 형태로 합쳐서 반환
+  return Object.fromEntries(entries) as Record<Namespace, Dict>;
 }
