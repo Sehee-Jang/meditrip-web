@@ -7,24 +7,21 @@ import {
   type DocumentData,
 } from "firebase/firestore";
 import { Button } from "@/components/ui/button";
-import {
-  getAdminQuestions,
-  type AdminQuestionFilter,
-} from "@/services/community-admin/getAdminQuestions";
 import TableHeader from "./TableHeader";
 import TableRow from "./TableRow";
+import {
+  listVideosPage,
+  type FireVideoAdminCursor,
+} from "@/services/contents/videos.client";
 
-export default function CommunityAdminTable({
-  filter,
-}: {
-  filter: AdminQuestionFilter;
-}) {
+export default function VideoAdminTable() {
   const [cursor, setCursor] =
     useState<QueryDocumentSnapshot<DocumentData> | null>(null);
 
-  const { data, isLoading } = useQuery({
-    queryKey: ["admin-questions", filter, cursor?.id ?? null],
-    queryFn: async () => getAdminQuestions(20, filter, cursor ?? undefined),
+  const { data, isLoading, refetch } = useQuery({
+    queryKey: ["admin-videos", cursor?.id ?? null],
+    queryFn: async () =>
+      listVideosPage(20, (cursor as FireVideoAdminCursor) ?? undefined),
   });
 
   const items = data?.items ?? [];
@@ -32,7 +29,7 @@ export default function CommunityAdminTable({
   return (
     <div className='rounded-2xl border bg-white shadow-sm'>
       <div className='flex items-center justify-between px-4 py-3 border-b'>
-        <div className='font-medium'>문의 목록</div>
+        <div className='font-medium'>콘텐츠 목록</div>
         <div className='text-sm text-muted-foreground'>총 {items.length}건</div>
       </div>
 
@@ -59,7 +56,17 @@ export default function CommunityAdminTable({
                 </td>
               </tr>
             ) : (
-              items.map((q) => <TableRow key={q.id} q={q} />)
+              items.map((v) => (
+                <TableRow
+                  key={v.id}
+                  v={v}
+                  onDeleted={() => {
+                    // 삭제 후 첫 페이지부터 다시 로드
+                    setCursor(null);
+                    void refetch();
+                  }}
+                />
+              ))
             )}
           </tbody>
         </table>

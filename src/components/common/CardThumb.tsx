@@ -19,6 +19,7 @@ export default function CardThumb({ src, alt, className }: Props) {
       <Image
         src='/images/placeholders/community_default_img.webp'
         alt={alt}
+        fill
         loading='lazy'
         className={`absolute inset-0 h-full w-full object-cover ${
           className ?? ""

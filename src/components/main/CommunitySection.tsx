@@ -38,7 +38,7 @@ export default function CommunitySection() {
               <CommunityCard
                 key={q.id}
                 question={q as CommunityCardQuestion}
-                alt={t("imageAlt")}
+                alt={t("imagePlaceholder")}
                 anonymousLabel={t("anonymous")}
               />
             ))

@@ -15,6 +15,14 @@ export const CATEGORIES = {
   antiaging: "antiaging",
 } as const;
 
+export const CATEGORY_VALUES_TUPLE = [
+  CATEGORIES.stress,
+  CATEGORIES.diet,
+  CATEGORIES.immunity,
+  CATEGORIES.women,
+  CATEGORIES.antiaging,
+] as const;
+
 export type CategoryKey = keyof typeof CATEGORIES;
 
 // 값 유니언(미래에 value가 key와 달라져도 안전)
@@ -32,3 +40,15 @@ export const CATEGORY_ICONS: Record<CategoryKey, LucideIcon> = {
   women: Stethoscope,
   antiaging: Hourglass,
 };
+
+export const CATEGORY_LABELS_KO: Record<CategoryKey, string> = {
+  stress: "스트레스",
+  diet: "다이어트",
+  immunity: "면역관리",
+  women: "여성질환",
+  antiaging: "안티에이징",
+};
+
+export function getCategoryLabelKo(key: CategoryKey): string {
+  return CATEGORY_LABELS_KO[key] ?? key;
+}

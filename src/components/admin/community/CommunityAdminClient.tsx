@@ -74,9 +74,7 @@ export default function CommunityAdminClient({
         </select>
       </div>
 
-      <CommunityAdminTable
-        filter={{ category, answered, visibility }}
-      />
+      <CommunityAdminTable filter={{ category, answered, visibility }} />
     </div>
   );
 }

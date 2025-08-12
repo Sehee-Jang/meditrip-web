@@ -3,13 +3,12 @@
 import { useEffect, useRef, useState } from "react";
 import { auth } from "@/lib/firebase";
 import { useTranslations } from "next-intl";
-// import SignupPrompt from "./SignupPrompt";
 import Link from "next/link";
 import Container from "../common/Container";
 import VideoCard from "../contents/VideoCard";
 import { ChevronRight } from "lucide-react";
 import type { Video } from "@/types/video";
-import { fetchVideos } from "@/services/contents/videos.client";
+import { listVideos } from "@/services/contents/videos.client";
 
 export default function ContentSection() {
   const t = useTranslations("content-section");
@@ -38,11 +37,10 @@ export default function ContentSection() {
     }
   }, [isAnonymous, viewedRatio, showPrompt]);
 
-  // 첫 로드 시 Firestore에서 최신순으로 넉넉히 가져오기
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const { items: fsItems } = await fetchVideos({ limit: 50 });
+      const fsItems = await listVideos({ limit: 50 });
       if (!cancelled) setItems(fsItems);
     })();
     return () => {

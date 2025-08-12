@@ -6,7 +6,7 @@ import {
 } from "@/constants/communityCategories";
 import type { CommunityCategoryKey } from "@/types/category";
 
-export default function CategoryPill({
+export default function CommunityCategoryPill({
   category,
 }: {
   category: CommunityCategoryKey;

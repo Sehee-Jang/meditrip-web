@@ -23,7 +23,6 @@ type FirestoreQuestionDoc = {
   userId?: string;
   answersCount?: number;
   isHidden?: boolean;
-  // 과거 필드(폐기): user?: unknown;
 };
 
 export function useQuestions(limitCount = 2) {

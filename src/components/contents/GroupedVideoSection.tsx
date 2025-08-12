@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import VideoListSection from "./VideoListSection";
 import { CategoryKey } from "@/constants/categories";
 import { Video } from "@/types/video";
-import { fetchVideos } from "@/services/contents/videos.client";
+import { listVideos } from "@/services/contents/videos.client";
 
 type Props = {
   keyword?: string;
@@ -19,21 +19,18 @@ export default function GroupedVideoSection({
   const t = useTranslations("categories");
   const [items, setItems] = useState<Video[]>([]);
 
+  // 최초 1회만 Firestore에서 최신순으로 가져오고,
+  // 아래에서 keyword/selectedCategories로 클라이언트 필터링
   useEffect(() => {
     let cancelled = false;
     const run = async () => {
-      const { items: fsItems } = await fetchVideos({
-        categories: selectedCategories,
-        keyword,
-        limit: 50,
-      });
+      const fsItems = await listVideos({ limit: 50 });
       if (!cancelled) setItems(fsItems);
     };
     run();
     return () => {
       cancelled = true;
     };
-    // 카테고리/키워드 변경 시 갱신
   }, [keyword, selectedCategories]);
 
   const byKeyword = items.filter((v) => {
