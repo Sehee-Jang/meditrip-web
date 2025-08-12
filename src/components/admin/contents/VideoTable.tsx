@@ -29,6 +29,23 @@ import Image from "next/image";
 
 type CatFilter = CategoryKey | "all";
 
+const FALLBACK_THUMB = "/images/placeholders/community_default_img.webp";
+function Thumb({ src, alt }: { src: string; alt: string }) {
+  const [s, setS] = useState(src);
+  return (
+    <div className='relative w-20 h-12'>
+      <Image
+        src={s}
+        alt={alt}
+        fill
+        sizes='80px' // 최적화
+        className='object-cover rounded-md '
+        onError={() => setS(FALLBACK_THUMB)}
+      />
+    </div>
+  );
+}
+
 export default function VideoTable() {
   const [items, setItems] = useState<Video[]>([]);
   const [q, setQ] = useState<string>("");
@@ -128,12 +145,7 @@ export default function VideoTable() {
             <TableRow key={v.id}>
               <TableCell>
                 {v.thumbnailUrl ? (
-                  <Image
-                    src={v.thumbnailUrl}
-                    alt={v.title}
-                    fill
-                    className='w-20 h-12 object-cover rounded-md'
-                  />
+                  <Thumb src={v.thumbnailUrl} alt={v.title} />
                 ) : (
                   <div className='w-20 h-12 bg-slate-100 rounded-md' />
                 )}
