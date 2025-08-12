@@ -2,10 +2,14 @@
 
 import { useState } from "react";
 import CommunityAdminTable from "./table/CommunityAdminTable";
-import { COMMUNITY_CATEGORY_KEYS } from "@/constants/communityCategories";
-import type { CommunityCategory } from "@/types/category";
+import {
+  type CommunityCategoryKey,
+  COMMUNITY_CATEGORY_KEYS,
+  COMMUNITY_CATEGORY_LABELS,
+} from "@/constants/communityCategories";
+// import type { CommunityCategory } from "@/types/category";
 
-type CategoryOption = "all" | CommunityCategory;
+type CategoryOption = "all" | CommunityCategoryKey; 
 
 export interface AdminSearchParams {
   category?: string; // URL에서 들어와서 string 그대로 둠
@@ -16,7 +20,7 @@ export interface AdminSearchParams {
 function toCategoryOption(v?: string): CategoryOption {
   if (!v || v === "all") return "all";
   return (COMMUNITY_CATEGORY_KEYS as readonly string[]).includes(v)
-    ? (v as CategoryOption)
+    ? (v as CommunityCategoryKey)
     : "all";
 }
 
@@ -46,7 +50,7 @@ export default function CommunityAdminClient({
           <option value='all'>전체 카테고리</option>
           {COMMUNITY_CATEGORY_KEYS.map((k) => (
             <option key={k} value={k}>
-              {k}
+              {COMMUNITY_CATEGORY_LABELS[k]}
             </option>
           ))}
         </select>
