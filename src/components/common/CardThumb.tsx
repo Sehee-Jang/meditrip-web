@@ -16,7 +16,7 @@ export default function CardThumb({ src, alt, className }: Props) {
 
   if (!showRemote) {
     return (
-      <img
+      <Image
         src='/images/placeholders/community_default_img.webp'
         alt={alt}
         loading='lazy'
