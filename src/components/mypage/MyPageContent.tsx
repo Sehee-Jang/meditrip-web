@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
+import { useTranslations, useLocale } from "next-intl";
+import { useRouter, usePathname } from "@/i18n/navigation";
 import { onAuthStateChanged, signOut as firebaseSignOut } from "firebase/auth";
 import { auth, db } from "@/lib/firebase";
 import {
@@ -21,7 +21,6 @@ import LoadingSpinner from "@/components/common/LoadingSpinner";
 import MyFavoriteClinics from "@/components/mypage/MyFavoriteClinics";
 import type { Reservation, MyQuestion } from "@/types/mypage";
 
-// 섹션 컴포넌트
 import ProfileHeader from "./sections/ProfileHeader";
 import ReservationsSection from "./sections/ReservationsSection";
 import PointsSection from "./sections/PointsSection";
@@ -38,8 +37,10 @@ interface QuestionData {
 export default function MyPageContent() {
   const t = useTranslations("mypage");
   const router = useRouter();
+  const pathname = usePathname();
+  const currentLocale = useLocale();
 
-  const [checkingAuth, setCheckingAuth] = useState(true);
+  const [checkingAuth, setCheckingAuth] = useState<boolean>(true);
   const [photoURL, setPhotoURL] = useState<string | undefined>();
   const [nickname, setNickname] = useState<string>("");
   const [points, setPoints] = useState<number>(0);
@@ -49,21 +50,28 @@ export default function MyPageContent() {
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (u) => {
       if (!u || u.isAnonymous) {
-        router.replace("/");
+        router.replace("/", { locale: "ko" }); // 👈 명시
         setCheckingAuth(false);
         return;
       }
 
-      // 1) 프로필/포인트
       const userDoc = await getDoc(doc(db, "users", u.uid));
+      let preferredLocale: "ko" | "ja" | undefined;
+
       if (userDoc.exists()) {
-        const data = userDoc.data();
+        const data = userDoc.data() as {
+          profileImage?: string;
+          nickname?: string;
+          points?: number;
+          preferredLocale?: "ko" | "ja";
+        };
         setPhotoURL((data.profileImage as string) || u.photoURL || undefined);
         setNickname((data.nickname as string) || u.displayName || "");
         setPoints((data.points as number) || 0);
+        preferredLocale = data.preferredLocale;
       }
 
-      // 2) 예약
+      // 예약
       const resSnap = await getDocs(
         query(collection(db, "reservations"), where("user.id", "==", u.uid))
       );
@@ -85,7 +93,7 @@ export default function MyPageContent() {
         })
       );
 
-      // 3) 질문
+      // 질문
       const qSnap = await getDocs(
         query(
           collection(db, "questions"),
@@ -122,16 +130,24 @@ export default function MyPageContent() {
         })
       );
 
+      // 로그인 상태에서만 선호 언어 강제 적용
+      if (preferredLocale && preferredLocale !== currentLocale) {
+        document.cookie = `NEXT_LOCALE=${preferredLocale}; path=/; max-age=31536000; samesite=lax`;
+        router.replace(pathname, { locale: preferredLocale });
+        return;
+      }
+
       setQuestions(questionItems);
       setCheckingAuth(false);
     });
 
     return () => unsub();
-  }, [router]);
+  }, [router, pathname, currentLocale]);
 
-  const signOut = async () => {
+  const signOut = async (): Promise<void> => {
     await firebaseSignOut(auth);
-    router.push("/");
+    document.cookie = "NEXT_LOCALE=; path=/; max-age=0; samesite=lax";
+    router.push("/", { locale: "ko" });
   };
 
   if (checkingAuth) {

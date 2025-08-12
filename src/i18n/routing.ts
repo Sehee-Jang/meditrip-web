@@ -6,4 +6,5 @@ export const routing = defineRouting({
 
   // Used when no locale matches
   defaultLocale: "ko",
+  localePrefix: "always", //  접두 항상 유지
 });
