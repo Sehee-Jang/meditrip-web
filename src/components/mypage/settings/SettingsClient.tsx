@@ -117,6 +117,13 @@ export default function SettingsClient() {
     }
   };
 
+  // 취소 버튼 핸들러
+  const handleCancel = (): void => {
+    // 현재 locale 유지한 채 마이페이지로 이동
+    router.push("/mypage", { locale });
+  };
+
+  // 저장 버튼 핸들러
   const handleSave = async (): Promise<void> => {
     const user = auth.currentUser;
     if (!user) {
@@ -148,10 +155,11 @@ export default function SettingsClient() {
     }
   };
 
+  // 고객지원 버튼 핸들러
   const handleContactClick = (): void => {
     router.push("/community/questions", { locale });
   };
-  
+
   return (
     <>
       {/* 계정 관리 */}
@@ -259,15 +267,52 @@ export default function SettingsClient() {
         </div>
       </section>
 
-      {/* 하단 버튼 (모바일/데스크탑 공통) */}
-      <div className='flex justify-between gap-2 mt-8'>
-        <CommonButton className='w-1/2 bg-white text-black border'>
+      {/* 하단 저장/취소 버튼  */}
+      {/* 데스크탑 */}
+      <div className='hidden md:flex justify-end gap-2'>
+        <CommonButton
+          className='text-sm bg-white text-gray-900 border hover:bg-gray-100'
+          onClick={handleCancel}
+        >
+          {t("buttons.cancel")}
+        </CommonButton>
+        <CommonButton
+          className='text-sm'
+          onClick={handleSave}
+          disabled={saving}
+        >
+          {saving ? t("buttons.saving") : t("buttons.save")}
+        </CommonButton>
+      </div>
+
+      {/* 모바일 */}
+      <div className='md:hidden grid grid-cols-2 gap-2 mb-8'>
+        <CommonButton
+          className='text-sm bg-white text-gray-900 border hover:bg-gray-100'
+          onClick={handleCancel}
+        >
+          {t("buttons.cancel")}
+        </CommonButton>
+
+        <CommonButton
+          className='text-sm w-full'
+          onClick={handleSave}
+          disabled={saving}
+        >
+          {saving ? t("buttons.saving") : t("buttons.save")}
+        </CommonButton>
+      </div>
+      {/* <div className='flex justify-between gap-2 mt-8'>
+        <CommonButton
+          className='w-1/2 bg-white text-black border'
+          onClick={handleCancel}
+        >
           {t("buttons.cancel")}
         </CommonButton>
         <CommonButton className='w-1/2' onClick={handleSave} disabled={saving}>
           {saving ? t("buttons.saving") : t("buttons.save")}
         </CommonButton>
-      </div>
+      </div> */}
 
       {/* 회원 탈퇴 모달 */}
       <Dialog open={showDialog} onOpenChange={setShowDialog}>
