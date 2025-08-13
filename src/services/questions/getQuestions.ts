@@ -1,4 +1,3 @@
-// src/services/questions/getQuestions.ts
 import {
   collection,
   getDocs,

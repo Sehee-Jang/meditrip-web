@@ -1,5 +1,3 @@
-// src/app/[locale]/community/questions/success/page.tsx
-
 import { getTranslations } from "next-intl/server";
 import PageHeader from "@/components/common/PageHeader";
 import Link from "next/link";

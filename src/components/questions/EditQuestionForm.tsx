@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Question } from "@/types/question";
 import { useTranslations } from "next-intl";
 import { useDropzone } from "react-dropzone";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
 import { useState } from "react";
 import Image from "next/image";
 import { updateQuestion } from "@/services/questions/updateQuestion";
