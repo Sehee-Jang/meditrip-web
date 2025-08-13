@@ -2,7 +2,8 @@
 
 import { useRouter } from "next/navigation";
 import { Image as ImageIcon, Minus } from "lucide-react";
-import CategoryPill from "./CategoryPill";
+import CommunityCategoryPill from "./CommunityCategoryPill";
+
 import RowActions from "./RowActions";
 import type { Question } from "@/types/question";
 import type { CommunityCategoryKey } from "@/types/category";
@@ -34,7 +35,7 @@ export default function TableRow({
       </td>
 
       <td className='px-4 py-3'>
-        <CategoryPill category={q.category as CommunityCategoryKey} />
+        <CommunityCategoryPill category={q.category as CommunityCategoryKey} />
       </td>
 
       <td className='px-4 py-3 text-center'>

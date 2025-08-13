@@ -1,5 +1,7 @@
 export type UserRole = "admin" | "user";
 
+export type AppLocale = "ko" | "ja";
+
 export interface User {
   id: string; // uid
   role: UserRole;
@@ -11,4 +13,5 @@ export interface User {
   agreeMarketing: boolean;
   createdAt?: Date | string;
   isAnonymous?: boolean;
+  preferredLocale?: AppLocale;
 }

@@ -9,8 +9,8 @@ export const COMMUNITY_CATEGORIES = {
   etc: "etc",
 } as const;
 
-export type CommunityCategoryKey = CategoryKey | "etc";
 export type CommunityCategory = (typeof CATEGORIES)[CategoryKey] | "etc";
+export type CommunityCategoryKey = CategoryKey | "etc";
 
 export const COMMUNITY_CATEGORY_KEYS = [
   ...(Object.keys(CATEGORIES) as CategoryKey[]),

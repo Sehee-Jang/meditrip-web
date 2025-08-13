@@ -19,7 +19,7 @@
     "pending": "予約保留中",
     "details": "詳細を見る",
     "modify": "予約の変更 / キャンセル",
-    "empty": "予約なし"
+    "empty": "予約はありません。"
   },
   "points": {
     "title": "ポイントの積算",
@@ -41,7 +41,8 @@
     "writtenDate": "作成日",
     "status": "状態",
     "answered": "回答完了",
-    "pending": "回答待ち"
+    "pending": "回答待ち",
+    "empty": "作成した質問がありません。"
   },
   "buttons": {
     "logout": "Log out",

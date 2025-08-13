@@ -10,21 +10,17 @@ export default function VideoListSection({ title, videos }: Props) {
   return (
     <section className='mb-8'>
       <h2 className='text-lg font-bold mb-4'>{title}</h2>
+
       {/* 사이트 공통 좌우 여백 + 중앙 정렬 */}
       <div className='mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8'>
-        {/* 핵심: 고정 카드폭 트랙 + 왼쪽 정렬 */}
-        <div
-          className='
-            [--card:160px] sm:[--card:180px] lg:[--card:220px]
-            grid justify-start md:justify-center
-            gap-x-4 gap-y-6
-            [grid-template-columns:repeat(auto-fill,minmax(var(--card),var(--card)))]
-          '
-        >
+        {/* 기본: 2열(모바일 전 기기). 태블릿 3열, 데스크탑 4~5열 */}
+        <ul className='grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5'>
           {videos.map((video) => (
-            <VideoCard key={video.id} {...video} />
+            <li key={video.id} className='h-full'>
+              <VideoCard {...video} />
+            </li>
           ))}
-        </div>
+        </ul>
       </div>
     </section>
   );

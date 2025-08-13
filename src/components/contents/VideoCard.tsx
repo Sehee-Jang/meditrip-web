@@ -26,7 +26,7 @@ export default function VideoCard({
   return (
     <div
       data-id={id}
-      className='shorts-item w-[150px] border border-black/10 rounded-lg overflow-hidden bg-white relative'
+      className='shorts-item w-full h-full border border-black/10 rounded-lg overflow-hidden bg-white relative'
       style={{
         filter: isBlocked ? "blur(4px)" : "none",
         pointerEvents: isBlocked ? "none" : "auto",
@@ -35,11 +35,20 @@ export default function VideoCard({
       }}
     >
       <Link href={youtubeUrl} target='_blank'>
-        <div className='relative w-full h-[150px]'>
-          <Image src={thumbnailUrl} alt={title} fill className='object-cover' />
+        {/* 고정 높이/너비 제거 → 비율로 통일 */}
+        <div className='relative w-full aspect-[9/16]'>
+          <Image
+            src={thumbnailUrl}
+            alt={title}
+            fill
+            className='object-cover'
+            sizes='(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1280px) 25vw, 20vw'
+            priority={false}
+          />
         </div>
+
         <div className='p-2'>
-          <p className='text-sm text-gray-800'>
+          <p className='text-xs text-gray-500'>
             {t(category, { fallback: category })}
           </p>
           <p className='text-sm font-bold mt-1 line-clamp-2'>{title}</p>

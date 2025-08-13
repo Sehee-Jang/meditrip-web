@@ -12,11 +12,17 @@ import {
   CalendarCheck,
   Gift,
   Youtube,
+  LogIn,
   LogOut,
   Loader2,
 } from "lucide-react";
-import { useState } from "react";
-import { signOut } from "firebase/auth";
+import { useEffect, useState } from "react";
+import {
+  onAuthStateChanged,
+  signOut,
+  type User as FirebaseUser,
+} from "firebase/auth";
+
 import { auth } from "@/lib/firebase";
 
 type MenuItem = {
@@ -40,20 +46,34 @@ const itemPath = (href: string) => (href === "" ? "/admin" : `/admin/${href}`);
 const normalize = (p: string) =>
   p.length > 1 && p.endsWith("/") ? p.slice(0, -1) : p;
 
-
 export default function Sidebar() {
   const router = useRouter();
   const pathname = normalize(usePathname());
   const [collapsed, setCollapsed] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
 
-   const isActive = (href: string, exact?: boolean) => {
-     const target = itemPath(href);
-     if (exact) return pathname === target; // 정확히 /admin 일 때만 활성
-     return pathname === target || pathname.startsWith(`${target}/`);
-   };
+  // 로그인 상태 구독
+  const [user, setUser] = useState<FirebaseUser | null>(auth.currentUser);
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, setUser);
+    return () => unsub();
+  }, []);
 
+  const isActive = (href: string, exact?: boolean) => {
+    const target = itemPath(href);
+    if (exact) return pathname === target;
+    return pathname === target || pathname.startsWith(`${target}/`);
+  };
 
+  // 로그인 핸들러
+  const handleLogin = () => {
+    // 이미 로그인 페이지면 굳이 push 안 해도 됨
+    if (pathname !== "/admin/login") {
+      router.push(`/admin/login?next=${encodeURIComponent(pathname)}`);
+    }
+  };
+
+  // 로그아웃 핸들러
   const handleLogout = async () => {
     if (signingOut) return;
     setSigningOut(true);
@@ -62,6 +82,8 @@ export default function Sidebar() {
       router.replace(`/admin/login`);
     } catch (err) {
       console.error(err);
+    } finally {
+      // 상태 복구 (레이아웃이 그대로일 때 대비)
       setSigningOut(false);
     }
   };
@@ -122,24 +144,35 @@ export default function Sidebar() {
 
       {/* 로그아웃 */}
       <div className='p-4 border-t'>
-        <button
-          type='button'
-          onClick={handleLogout}
-          disabled={signingOut}
-          className={`flex items-center justify-center w-full py-2 rounded hover:bg-gray-100
+        {user ? (
+          <button
+            type='button'
+            onClick={handleLogout}
+            disabled={signingOut}
+            className={`flex items-center justify-center w-full py-2 rounded hover:bg-gray-100
             ${signingOut ? "text-gray-400" : "text-red-600"}`}
-        >
-          {signingOut ? (
-            <Loader2 className='w-4 h-4 animate-spin' />
-          ) : (
-            <LogOut className='w-4 h-4' />
-          )}
-          {!collapsed && (
-            <span className='ml-2'>
-              {signingOut ? "로그아웃 중..." : "로그아웃"}
-            </span>
-          )}
-        </button>
+          >
+            {signingOut ? (
+              <Loader2 className='w-4 h-4 animate-spin' />
+            ) : (
+              <LogOut className='w-4 h-4' />
+            )}
+            {!collapsed && (
+              <span className='ml-2'>
+                {signingOut ? "로그아웃 중..." : "로그아웃"}
+              </span>
+            )}
+          </button>
+        ) : (
+          <button
+            type='button'
+            onClick={handleLogin}
+            className='flex items-center justify-center w-full py-2 rounded hover:bg-gray-100 text-gray-800'
+          >
+            <LogIn className='w-4 h-4' />
+            {!collapsed && <span className='ml-2'>로그인</span>}
+          </button>
+        )}
       </div>
     </nav>
   );

@@ -1,16 +1,15 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
+import { useRouter, usePathname } from "@/i18n/navigation";
 import CommonButton from "@/components/common/CommonButton";
 import { Switch } from "@/components/ui/switch";
 import { Lock, Trash2, Bell, Globe, HelpCircle } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { doc, deleteDoc, updateDoc, getDoc } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
 import { toast } from "sonner";
 import type { User } from "@/types/user";
-import { useLocale } from "next-intl";
 import { sendPasswordResetEmail } from "firebase/auth";
 import {
   Dialog,
@@ -21,7 +20,6 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-
 import {
   EmailAuthProvider,
   reauthenticateWithCredential,
@@ -31,18 +29,47 @@ import {
 
 export default function SettingsClient() {
   const t = useTranslations("settings-page");
-  const [nickname, setNickname] = useState("");
-  const [marketing, setMarketing] = useState(true);
-
-  const [showDialog, setShowDialog] = useState(false);
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [errorMsg, setErrorMsg] = useState("");
-  const [saving, setSaving] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
   const locale = useLocale();
 
-  // 비밀번호 변경 핸들러
+  const [nickname, setNickname] = useState<string>("");
+  const [marketing, setMarketing] = useState<boolean>(true);
+  const [preferredLocale, setPreferredLocale] = useState<"ko" | "ja">(
+    locale as "ko" | "ja"
+  );
+  const [showDialog, setShowDialog] = useState<boolean>(false);
+  const [password, setPassword] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
+  const [errorMsg, setErrorMsg] = useState<string>("");
+  const [saving, setSaving] = useState<boolean>(false);
+
+  useEffect(() => {
+    const fetchUserData = async (): Promise<void> => {
+      const currentUser = auth.currentUser;
+      if (!currentUser) return;
+
+      try {
+        const snap = await getDoc(doc(db, "users", currentUser.uid));
+        if (snap.exists()) {
+          const data = snap.data() as Pick<
+            User,
+            "nickname" | "agreeMarketing" | "preferredLocale"
+          >;
+          setNickname(data.nickname || "");
+          setMarketing(data.agreeMarketing ?? false);
+          if (data.preferredLocale === "ko" || data.preferredLocale === "ja") {
+            setPreferredLocale(data.preferredLocale);
+          }
+        }
+      } catch (err) {
+        console.error("유저 정보 불러오기 실패:", err);
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
   const handlePasswordReset = async (): Promise<void> => {
     const user = auth.currentUser;
     if (!user || !user.email) {
@@ -51,7 +78,6 @@ export default function SettingsClient() {
     }
 
     setSaving(true);
-
     try {
       await sendPasswordResetEmail(auth, user.email);
       toast.success(t("toast.passwordResetSuccess"));
@@ -63,32 +89,23 @@ export default function SettingsClient() {
     }
   };
 
-  // 회원탈퇴 핸들러
   const handleDeleteAccount = async (): Promise<void> => {
     const user = auth.currentUser;
     if (!user || !user.email) return;
-
     setLoading(true);
     setErrorMsg("");
 
     try {
-      // 1. 자격 증명 생성
       const credential = EmailAuthProvider.credential(user.email, password);
-
-      // 2. 재인증
       await reauthenticateWithCredential(user, credential);
-
-      // 3. Firestore 유저 문서 삭제
       await deleteDoc(doc(db, "users", user.uid));
-
-      // 4. Auth 계정 삭제
       await deleteUser(user);
 
-      // 5. 이동
-      router.push("/login");
+      // 쿠키 제거 후 한국어 로그인으로 이동
+      document.cookie = "NEXT_LOCALE=; path=/; max-age=0; samesite=lax";
+      router.push("/login", { locale: "ko" });
     } catch (error) {
       const authError = error as AuthError;
-
       if (authError.code === "auth/wrong-password") {
         setErrorMsg("비밀번호가 일치하지 않아요.");
       } else {
@@ -100,59 +117,49 @@ export default function SettingsClient() {
     }
   };
 
-  // 닉네임 변경 핸들러
+  // 취소 버튼 핸들러
+  const handleCancel = (): void => {
+    // 현재 locale 유지한 채 마이페이지로 이동
+    router.push("/mypage", { locale });
+  };
+
+  // 저장 버튼 핸들러
   const handleSave = async (): Promise<void> => {
     const user = auth.currentUser;
     if (!user) {
       toast.error(t("toast.needLogin"));
       return;
     }
-
+    setSaving(true);
     try {
-      const userRef = doc(db, "users", user.uid);
-
-      await updateDoc(userRef, {
+      await updateDoc(doc(db, "users", user.uid), {
         nickname,
         agreeMarketing: marketing,
+        preferredLocale,
       });
-      console.log("🔥 저장 성공");
+
+      // NEXT_LOCALE 쿠키 동기화
+      document.cookie = `NEXT_LOCALE=${preferredLocale}; path=/; max-age=31536000; samesite=lax`;
+
       toast.success(t("toast.saveSuccess"));
+
+      // 현재 언어와 다르면 같은 경로로 즉시 전환
+      if (preferredLocale !== locale) {
+        router.replace(pathname, { locale: preferredLocale });
+      }
     } catch (err) {
       console.error("설정 저장 오류:", err);
       toast.error(t("toast.saveError"));
+    } finally {
+      setSaving(false);
     }
   };
 
-  // 사용자 정보 불러오기
-  useEffect(() => {
-    const fetchUserData = async () => {
-      const currentUser = auth.currentUser;
-      if (!currentUser) return;
-
-      try {
-        const userDoc = await getDoc(doc(db, "users", currentUser.uid));
-
-        if (userDoc.exists()) {
-          const userData = userDoc.data() as Pick<
-            User,
-            "nickname" | "agreeMarketing"
-          >;
-
-          setNickname(userData.nickname || "");
-          setMarketing(userData.agreeMarketing ?? false);
-        }
-      } catch (err) {
-        console.error("유저 정보 불러오기 실패:", err);
-      }
-    };
-
-    fetchUserData();
-  }, []);
-
-  // 1:1 문의 핸들러
-  const handleContactClick = () => {
-    router.push(`/${locale}/community/questions`);
+  // 고객지원 버튼 핸들러
+  const handleContactClick = (): void => {
+    router.push("/community/questions", { locale });
   };
+
   return (
     <>
       {/* 계정 관리 */}
@@ -203,17 +210,14 @@ export default function SettingsClient() {
       {/* 앱 설정 */}
       <section className='mb-8'>
         <h2 className='font-bold text-lg mb-4'>{t("app.title")}</h2>
+
+        {/* 마케팅 수신 */}
         <div className='flex items-center justify-between py-2'>
           <div className='flex items-center gap-2'>
             <Bell className='w-5 h-5 text-gray-600' />
             <p>{t("app.marketing")}</p>
           </div>
-
-          <Switch
-            checked={marketing}
-            onCheckedChange={setMarketing}
-            className=''
-          />
+          <Switch checked={marketing} onCheckedChange={setMarketing} />
         </div>
 
         {/* 언어 설정 */}
@@ -222,7 +226,32 @@ export default function SettingsClient() {
             <Globe className='w-5 h-5 text-gray-600' />
             <p>{t("app.language")}</p>
           </div>
-          <p className='text-sm text-gray-500'>{t("app.currentLanguage")}</p>
+          {/* <p className='text-sm text-gray-500'>{t("app.currentLanguage")}</p> */}
+          {/* 간단한 세그먼트 토글 */}
+          <div className='flex gap-1 rounded-md border p-1'>
+            <button
+              type='button'
+              onClick={() => setPreferredLocale("ko")}
+              className={`px-3 py-1 rounded ${
+                preferredLocale === "ko"
+                  ? "bg-black text-white"
+                  : "text-gray-700"
+              }`}
+            >
+              한국어
+            </button>
+            <button
+              type='button'
+              onClick={() => setPreferredLocale("ja")}
+              className={`px-3 py-1 rounded ${
+                preferredLocale === "ja"
+                  ? "bg-black text-white"
+                  : "text-gray-700"
+              }`}
+            >
+              日本語
+            </button>
+          </div>
         </div>
       </section>
 
@@ -238,15 +267,52 @@ export default function SettingsClient() {
         </div>
       </section>
 
-      {/* 하단 버튼 (모바일/데스크탑 공통) */}
-      <div className='flex justify-between gap-2 mt-8'>
-        <CommonButton className='w-1/2 bg-white text-black border'>
+      {/* 하단 저장/취소 버튼  */}
+      {/* 데스크탑 */}
+      <div className='hidden md:flex justify-end gap-2'>
+        <CommonButton
+          className='text-sm bg-white text-gray-900 border hover:bg-gray-100'
+          onClick={handleCancel}
+        >
+          {t("buttons.cancel")}
+        </CommonButton>
+        <CommonButton
+          className='text-sm'
+          onClick={handleSave}
+          disabled={saving}
+        >
+          {saving ? t("buttons.saving") : t("buttons.save")}
+        </CommonButton>
+      </div>
+
+      {/* 모바일 */}
+      <div className='md:hidden grid grid-cols-2 gap-2 mb-8'>
+        <CommonButton
+          className='text-sm bg-white text-gray-900 border hover:bg-gray-100'
+          onClick={handleCancel}
+        >
+          {t("buttons.cancel")}
+        </CommonButton>
+
+        <CommonButton
+          className='text-sm w-full'
+          onClick={handleSave}
+          disabled={saving}
+        >
+          {saving ? t("buttons.saving") : t("buttons.save")}
+        </CommonButton>
+      </div>
+      {/* <div className='flex justify-between gap-2 mt-8'>
+        <CommonButton
+          className='w-1/2 bg-white text-black border'
+          onClick={handleCancel}
+        >
           {t("buttons.cancel")}
         </CommonButton>
         <CommonButton className='w-1/2' onClick={handleSave} disabled={saving}>
           {saving ? t("buttons.saving") : t("buttons.save")}
         </CommonButton>
-      </div>
+      </div> */}
 
       {/* 회원 탈퇴 모달 */}
       <Dialog open={showDialog} onOpenChange={setShowDialog}>

@@ -79,20 +79,20 @@ export default async function ClinicDetailPage({
 
         {/* 상세 설명 */}
         <section className='space-y-2'>
-          <h2 className='text-xl font-semibold'>{t("about")}</h2>
+          <h2 className='text-xl font-semibold'>{t("aboutLabel")}</h2>
           <p>{clinic.description[loc]}</p>
 
-          <h2 className='text-xl font-semibold'>{t("vision")}</h2>
+          <h2 className='text-xl font-semibold'>{t("visionLabel")}</h2>
           <p>{clinic.vision[loc]}</p>
 
-          <h2 className='text-xl font-semibold'>{t("mission")}</h2>
+          <h2 className='text-xl font-semibold'>{t("missionLabel")}</h2>
           <p>{clinic.mission[loc]}</p>
         </section>
 
         {/* 이벤트 안내 */}
         {clinic.events?.[loc]?.length > 0 && (
           <section className='space-y-2'>
-            <h2 className='text-xl font-semibold'>{t("events")}</h2>
+            <h2 className='text-xl font-semibold'>{t("eventsLabel")}</h2>
             <ul className='list-disc list-inside text-gray-700'>
               {clinic.events[loc].map((e: string, i: number) => (
                 <li key={i}>{e}</li>

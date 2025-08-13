@@ -19,7 +19,7 @@
     "pending": "상담 대기",
     "details": "상세 보기",
     "modify": "예약 변경/취소",
-    "empty": "예약 없음"
+    "empty": "예약이 없습니다."
   },
   "points": {
     "title": "적립 포인트",
@@ -38,7 +38,8 @@
     "writtenDate": "작성일",
     "status": "상태",
     "answered": "답변완료",
-    "pending": "미답변"
+    "pending": "미답변",
+    "empty": "작성한 질문이 없습니다."
   },
   "mypage": {
     "title": "찜한 병원"

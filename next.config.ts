@@ -11,6 +11,7 @@ const nextConfig: NextConfig = {
       "i.ytimg.com",
       "img.youtube.com",
       "yt3.ggpht.com",
+      "i.ytimg.com",
     ],
   },
   webpack(config) {
