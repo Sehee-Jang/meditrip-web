@@ -7,6 +7,7 @@ import LoadingSpinner from "../common/LoadingSpinner";
 import ClinicList from "./ClinicList";
 import type { Clinic } from "@/types/clinic";
 import { fetchClinics } from "@/services/hospitals/fetchClinics";
+import Container from "../common/Container";
 
 export default function HospitalListClient() {
   const t = useTranslations("hospital-list");
@@ -42,24 +43,26 @@ export default function HospitalListClient() {
   }, [clinics, query, loc]);
 
   return (
-    <div className='flex flex-col space-y-4'>
-      {/* 검색창 */}
-      <SearchInput
-        value={query}
-        onChange={setQuery}
-        placeholder={t("clinicList.searchPlaceholder")}
-        icon='🔍'
-      />
+    <Container>
+      <div className='flex flex-col space-y-4'>
+        {/* 검색창 */}
+        <SearchInput
+          value={query}
+          onChange={setQuery}
+          placeholder={t("clinicList.searchPlaceholder")}
+          icon='🔍'
+        />
 
-      {/* 로딩 표시 */}
-      {loading ? (
-        <div className='min-h-[50vh] flex flex-col items-center justify-center'>
-          <LoadingSpinner />
-          <p className='mt-4 text-gray-500'>{t("clinicList.loading")}</p>
-        </div>
-      ) : (
-        <ClinicList clinics={filtered} />
-      )}
-    </div>
+        {/* 로딩 표시 */}
+        {loading ? (
+          <div className='min-h-[50vh] flex flex-col items-center justify-center'>
+            <LoadingSpinner />
+            <p className='mt-4 text-gray-500'>{t("clinicList.loading")}</p>
+          </div>
+        ) : (
+          <ClinicList clinics={filtered} />
+        )}
+      </div>
+    </Container>
   );
 }

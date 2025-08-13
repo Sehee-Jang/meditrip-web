@@ -28,7 +28,7 @@ export default function PageHeader({
   return (
     <>
       {/* 모바일 헤더 */}
-      <div className='flex md:hidden w-full shadow-md items-center justify-between py-3 px-4 mb-4'>
+      <div className='flex md:hidden w-full shadow-md items-center justify-between py-3 px-4 mb-6'>
         <div className='flex items-center gap-2'>
           {showBackIcon && (
             <button

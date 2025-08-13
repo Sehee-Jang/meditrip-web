@@ -2,6 +2,7 @@ import React from "react";
 import PageHeader from "@/components/common/PageHeader";
 import { getTranslations } from "next-intl/server";
 import HospitalListClient from "@/components/hospitals/HospitalListClient";
+import Container from "@/components/common/Container";
 
 export default async function HospitalPage() {
   const t = await getTranslations("hospital-page");
@@ -14,6 +15,7 @@ export default async function HospitalPage() {
         showBackIcon
         center
       />
+
       {/* 병원 카드 목록 */}
       <HospitalListClient />
     </main>

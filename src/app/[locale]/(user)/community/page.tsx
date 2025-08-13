@@ -3,6 +3,7 @@ import PageHeader from "@/components/common/PageHeader";
 import { getTranslations } from "next-intl/server";
 import PaginatedQuestionList from "@/components/questions/PaginatedQuestionList";
 import AskQuestionButton from "@/components/questions/AskQuestionButton";
+import Container from "@/components/common/Container";
 
 export default async function CommunityPage() {
   const t = await getTranslations("community-page");
@@ -15,7 +16,8 @@ export default async function CommunityPage() {
         showBackIcon
         center
       />
-      <section className='max-w-4xl mx-auto px-4 py-6'>
+
+      <Container>
         <h2 className='text-lg font-semibold mb-2'>{t("board.title")}</h2>
         <p className='text-sm text-muted-foreground mb-4'>
           {t("board.description")}
@@ -26,7 +28,7 @@ export default async function CommunityPage() {
 
         {/* 글쓰기 버튼 */}
         <AskQuestionButton />
-      </section>
+      </Container>
     </main>
   );
 }

@@ -160,7 +160,7 @@ export default function MyPageContent() {
   }
 
   return (
-    <Container className='mx-auto max-w-3xl px-4 sm:px-6 lg:px-8'>
+    <Container>
       {/* 인삿말 */}
       <ProfileHeader
         name={nickname}
