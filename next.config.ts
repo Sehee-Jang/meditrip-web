@@ -5,7 +5,13 @@ import createNextIntlPlugin from "next-intl/plugin";
 const nextConfig: NextConfig = {
   /* config options here */
   images: {
-    domains: ["lh3.googleusercontent.com", "pfzwkpvubunanobhsicu.supabase.co"],
+    domains: [
+      "lh3.googleusercontent.com",
+      "pfzwkpvubunanobhsicu.supabase.co",
+      "i.ytimg.com",
+      "img.youtube.com",
+      "yt3.ggpht.com",
+    ],
   },
   webpack(config) {
     // @ → src 로 매핑
