@@ -1,16 +1,15 @@
 "use client";
 
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import { HelpCircle, Search, ThumbsUp } from "lucide-react";
 import Container from "../common/Container";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 
 const faqIcons = [HelpCircle, Search, ThumbsUp];
 
 export default function FAQSection() {
   const t = useTranslations("faq-section");
   const items = t.raw("items") as Array<{ question: string; answer: string }>;
-  const locale = useLocale();
 
   return (
     <section className='bg-white py-10'>
@@ -20,7 +19,7 @@ export default function FAQSection() {
 
         <div className=''>
           <Link
-            href={`/${locale}/faq`}
+            href={`/faq`}
             className='divide-y borde-b rounded-md overflow-hidden bg-white'
           >
             {items.map((item, index) => {

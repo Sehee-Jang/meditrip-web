@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { fetchClinics } from "@/services/hospitals/fetchClinics";
 import type { Clinic } from "@/types/clinic";
 import FavoriteButton from "../hospitals/FavoriteButton";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import Image from "next/image";
 import { ChevronRight, Star } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
@@ -37,7 +37,7 @@ export default function MyFavoriteClinics() {
           {favorites.map((c) => (
             <li key={c.id} className='relative'>
               <Link
-                href={`/${locale}/hospital/${c.id}`}
+                href={`/hospital/${c.id}`}
                 className='group block rounded-2xl border bg-white shadow-sm p-4 hover:bg-gray-50 transition'
               >
                 <div className='flex items-center gap-4'>

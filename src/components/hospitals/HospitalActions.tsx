@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
 import { useAuthCheck } from "@/hooks/useAuthCheck";
 import CommonButton from "@/components/common/CommonButton";
 import { Share2 } from "lucide-react";
