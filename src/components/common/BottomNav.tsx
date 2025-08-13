@@ -1,5 +1,5 @@
 import React from "react";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { Home, List, Package, User } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 

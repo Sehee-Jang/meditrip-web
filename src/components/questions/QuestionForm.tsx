@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+
 import { useRouter } from "@/i18n/navigation";
 import { useDropzone } from "react-dropzone";
 import { useForm } from "react-hook-form";

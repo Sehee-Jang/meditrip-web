@@ -2,7 +2,7 @@
 import { useLocale, useTranslations } from "next-intl";
 import type { Clinic } from "@/types/clinic";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import Image from "next/image";
 import FavoriteButton from "./FavoriteButton";
 import { ChevronRight, Star } from "lucide-react";
@@ -22,7 +22,7 @@ export default function ClinicList({ clinics }: ClinicListProps) {
         {clinics.map((c) => (
           <li key={c.id}>
             <Card className='group hover:shadow-lg transition-shadow rounded-2xl overflow-hidden'>
-              <Link href={`/${locale}/hospital/${c.id}`} className='block'>
+              <Link href={`/hospital/${c.id}`} className='block'>
                 {/* 대표 이미지 */}
                 <div className='relative w-full h-40'>
                   <Image

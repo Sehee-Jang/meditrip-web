@@ -6,10 +6,9 @@ import { registerWithEmail } from "@/lib/auth";
 import CommonButton from "../CommonButton";
 import Container from "../Container";
 import { toast } from "sonner";
-
 import { auth } from "@/lib/firebase";
 import { onAuthStateChanged, User } from "firebase/auth";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 
 export default function SignupSection() {
   const t = useTranslations("signup-section");

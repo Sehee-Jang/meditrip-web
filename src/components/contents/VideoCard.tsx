@@ -1,6 +1,5 @@
 import { useTranslations } from "next-intl";
 import Image from "next/image";
-import Link from "next/link";
 import type { CategoryKey } from "@/constants/categories";
 
 type VideoCardProps = {
@@ -34,7 +33,7 @@ export default function VideoCard({
         transition: "all 0.3s ease",
       }}
     >
-      <Link href={youtubeUrl} target='_blank'>
+      <a href={youtubeUrl} target='_blank' rel='noopener noreferrer'>
         {/* 고정 높이/너비 제거 → 비율로 통일 */}
         <div className='relative w-full aspect-[9/16]'>
           <Image
@@ -53,7 +52,7 @@ export default function VideoCard({
           </p>
           <p className='text-sm font-bold mt-1 line-clamp-2'>{title}</p>
         </div>
-      </Link>
+      </a>
     </div>
   );
 }

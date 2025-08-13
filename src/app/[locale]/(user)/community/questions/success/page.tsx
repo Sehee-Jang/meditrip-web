@@ -1,6 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import PageHeader from "@/components/common/PageHeader";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 
 export default async function QuestionSuccessPage() {
   const t = await getTranslations("question-success");
