@@ -1,12 +1,13 @@
 "use client";
 
-import React, { ReactNode } from "react";
+import React from "react";
+import { Search } from "lucide-react";
 
 interface SearchInputProps {
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
-  icon?: ReactNode;
+  icon?: boolean;
   className?: string;
 }
 
@@ -21,7 +22,7 @@ export default function SearchInput({
     <div className={`relative ${className}`}>
       {icon && (
         <span className='absolute left-3 top-1/2 -translate-y-1/2 text-gray-400'>
-          {icon}
+          <Search className='w-4 h-4' />
         </span>
       )}
       <input

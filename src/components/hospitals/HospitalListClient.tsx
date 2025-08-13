@@ -46,12 +46,17 @@ export default function HospitalListClient() {
     <Container>
       <div className='flex flex-col space-y-4'>
         {/* 검색창 */}
-        <SearchInput
-          value={query}
-          onChange={setQuery}
-          placeholder={t("clinicList.searchPlaceholder")}
-          icon='🔍'
-        />
+        <div className='w-full md:max-w-lg mx-auto mb-4'>
+          <SearchInput
+            value={query}
+            onChange={setQuery}
+            placeholder={t("clinicList.searchPlaceholder")}
+            icon
+          />
+          <p className='text-sm text-center text-gray-500 mt-2'>
+            {t("clinicList.searchHelper")}
+          </p>
+        </div>
 
         {/* 로딩 표시 */}
         {loading ? (

@@ -1,7 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import SearchableContents from "@/components/contents/SearchableContents";
 import Container from "@/components/common/Container";
-
 import PageHeader from "@/components/common/PageHeader";
 import SignupSection from "@/components/common/signup/SignupSection";
 import type { CategoryKey } from "@/constants/categories";

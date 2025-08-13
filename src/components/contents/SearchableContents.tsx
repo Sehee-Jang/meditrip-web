@@ -70,11 +70,12 @@ const SearchableContents = ({
   return (
     <div className='flex flex-col gap-3 md:gap-11'>
       {/* 검색창 */}
-      <div className='w-full md:max-w-md mx-auto mb-4'>
+      <div className='w-full md:max-w-lg mx-auto mb-4'>
         <SearchInput
           value={keyword}
           onChange={setKeyword}
           placeholder={t("searchPlaceholder")}
+          icon
           className='mb-1'
         />
         <p className='text-sm text-center text-gray-500 mt-2'>
@@ -82,7 +83,7 @@ const SearchableContents = ({
         </p>
       </div>
 
-      {/* ✅ 콘텐츠 페이지에서만 다중 선택 활성화 */}
+      {/* 콘텐츠 페이지에서만 다중 선택 활성화 */}
       <CategorySection
         selectable
         multiple

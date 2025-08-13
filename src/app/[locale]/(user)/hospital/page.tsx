@@ -2,7 +2,6 @@ import React from "react";
 import PageHeader from "@/components/common/PageHeader";
 import { getTranslations } from "next-intl/server";
 import HospitalListClient from "@/components/hospitals/HospitalListClient";
-import Container from "@/components/common/Container";
 
 export default async function HospitalPage() {
   const t = await getTranslations("hospital-page");
