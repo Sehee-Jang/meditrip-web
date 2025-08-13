@@ -2,6 +2,7 @@
   "title": "한방 웰니스 영상 보기",
   "searchPlaceholder": "진료 카테고리 / 해시태그 검색",
   "searchHelper": "찾고 싶은 영상을 쉽게 검색해보세요.",
-
-  "viewMore": "더 많은 영상 보기"
+  "viewMore": "더 많은 영상 보기",
+  "allContents": "전체 콘텐츠",
+  "noContentMessage": "표시할 콘텐츠가 없습니다."
 }

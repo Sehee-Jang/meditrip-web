@@ -16,7 +16,8 @@ export default function GroupedVideoSection({
   keyword = "",
   selectedCategories = [],
 }: Props) {
-  const t = useTranslations("categories");
+  const tCat = useTranslations("categories");
+  const tCont = useTranslations("contents-page");
   const [items, setItems] = useState<Video[]>([]);
 
   // 최초 1회만 Firestore에서 최신순으로 가져오고,
@@ -52,10 +53,10 @@ export default function GroupedVideoSection({
   if (selectedCategories.length === 0) {
     return byKeyword.length === 0 ? (
       <p className='text-center text-sm text-gray-500 py-8'>
-        표시할 콘텐츠가 없습니다.
+        {tCont("noContentMessage")}
       </p>
     ) : (
-      <VideoListSection title='전체 콘텐츠' videos={byKeyword} />
+      <VideoListSection title={tCont("allContents")} videos={byKeyword} />
     );
   }
 
@@ -70,14 +71,14 @@ export default function GroupedVideoSection({
 
   return entries.length === 0 ? (
     <p className='text-center text-sm text-gray-500 py-8'>
-      표시할 콘텐츠가 없습니다.
+      {tCont("noContentMessage")}
     </p>
   ) : (
     <>
       {entries.map(([categoryKey, videos]) => (
         <VideoListSection
           key={categoryKey}
-          title={t(categoryKey as CategoryKey)}
+          title={tCat(categoryKey as CategoryKey)}
           videos={videos}
         />
       ))}

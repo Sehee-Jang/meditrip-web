@@ -2,6 +2,7 @@
   "title": "韓方ウェルネス動画を見る",
   "searchPlaceholder": "診療カテゴリ別・タグ検索",
   "searchHelper": "見つけたい動画を簡単に検索できます。",
-
-  "viewMore": "もっと動画を見る"
+  "viewMore": "もっと動画を見る",
+  "allContents": "すべてのコンテンツ",
+  "noContentMessage": "表示するコンテンツがありません。"
 }
