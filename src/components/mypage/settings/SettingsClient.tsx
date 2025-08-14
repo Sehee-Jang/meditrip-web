@@ -13,10 +13,17 @@ import {
   HelpCircle,
   ClipboardList,
 } from "lucide-react";
-import { doc, deleteDoc, updateDoc, getDoc } from "firebase/firestore";
+import {
+  doc,
+  deleteDoc,
+  updateDoc,
+  getDoc,
+  setDoc,
+  serverTimestamp,
+} from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
 import { toast } from "sonner";
-import type { User } from "@/types/user";
+import type { User as AppUser } from "@/types/user";
 import { sendPasswordResetEmail } from "firebase/auth";
 import {
   Dialog,
@@ -31,25 +38,37 @@ import {
   EmailAuthProvider,
   reauthenticateWithCredential,
   deleteUser,
-  AuthError,
+  type AuthError,
 } from "firebase/auth";
+
+type SettingsPayload = {
+  nickname?: string;
+  agreeMarketing?: boolean;
+  preferredLocale?: "ko" | "ja";
+  updatedAt?: ReturnType<typeof serverTimestamp>; // FieldValue
+};
 
 export default function SettingsClient() {
   const t = useTranslations("settings-page");
   const router = useRouter();
   const pathname = usePathname();
-  const locale = useLocale();
+  const locale = useLocale() as "ko" | "ja";
 
   const [nickname, setNickname] = useState<string>("");
   const [marketing, setMarketing] = useState<boolean>(true);
-  const [preferredLocale, setPreferredLocale] = useState<"ko" | "ja">(
-    locale as "ko" | "ja"
-  );
+  const [preferredLocale, setPreferredLocale] = useState<"ko" | "ja">(locale);
   const [showDialog, setShowDialog] = useState<boolean>(false);
   const [password, setPassword] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string>("");
   const [saving, setSaving] = useState<boolean>(false);
+
+  // 초기 스냅샷(변경 감지용)
+  const [initial, setInitial] = useState<{
+    nickname: string;
+    agreeMarketing: boolean;
+    preferredLocale: "ko" | "ja";
+  } | null>(null);
 
   useEffect(() => {
     const fetchUserData = async (): Promise<void> => {
@@ -60,14 +79,23 @@ export default function SettingsClient() {
         const snap = await getDoc(doc(db, "users", currentUser.uid));
         if (snap.exists()) {
           const data = snap.data() as Pick<
-            User,
+            AppUser,
             "nickname" | "agreeMarketing" | "preferredLocale"
           >;
-          setNickname(data.nickname || "");
-          setMarketing(data.agreeMarketing ?? false);
-          if (data.preferredLocale === "ko" || data.preferredLocale === "ja") {
-            setPreferredLocale(data.preferredLocale);
-          }
+
+          const next = {
+            nickname: data.nickname || "",
+            agreeMarketing: data.agreeMarketing ?? false,
+            preferredLocale:
+              data.preferredLocale === "ko" || data.preferredLocale === "ja"
+                ? data.preferredLocale
+                : locale,
+          };
+
+          setNickname(next.nickname);
+          setMarketing(next.agreeMarketing);
+          setPreferredLocale(next.preferredLocale);
+          setInitial(next);
         }
       } catch (err) {
         console.error("유저 정보 불러오기 실패:", err);
@@ -75,7 +103,7 @@ export default function SettingsClient() {
     };
 
     fetchUserData();
-  }, []);
+  }, [locale]);
 
   // 비밀번호 초기화 버튼 핸들러
   const handlePasswordReset = async (): Promise<void> => {
@@ -139,23 +167,58 @@ export default function SettingsClient() {
       toast.error(t("toast.needLogin"));
       return;
     }
+    if (!initial) {
+      toast.error(t("toast.saveError"));
+      return;
+    }
+
+    const payload: SettingsPayload = {};
+    const trimmedNickname = nickname.trim();
+
+    if (trimmedNickname !== initial.nickname)
+      payload.nickname = trimmedNickname;
+    if (marketing !== initial.agreeMarketing)
+      payload.agreeMarketing = marketing;
+    if (preferredLocale !== initial.preferredLocale)
+      payload.preferredLocale = preferredLocale;
+
+    // 변경 없음 → 저장 스킵
+    if (Object.keys(payload).length === 0) {
+      return;
+    }
+
+    payload.updatedAt = serverTimestamp(); // 규칙 허용 키
+
     setSaving(true);
     try {
-      await updateDoc(doc(db, "users", user.uid), {
-        nickname,
-        agreeMarketing: marketing,
-        preferredLocale,
-      });
+      const ref = doc(db, "users", user.uid);
+      const snap = await getDoc(ref);
+
+      if (snap.exists()) {
+        await updateDoc(ref, payload);
+      } else {
+        // 혹시 문서가 없으면 허용 키만 생성
+        await setDoc(ref, payload, { merge: true });
+      }
 
       // NEXT_LOCALE 쿠키 동기화
-      document.cookie = `NEXT_LOCALE=${preferredLocale}; path=/; max-age=31536000; samesite=lax`;
+      if ("preferredLocale" in payload) {
+        document.cookie = `NEXT_LOCALE=${preferredLocale}; path=/; max-age=31536000; samesite=lax`;
+      }
 
       toast.success(t("toast.saveSuccess"));
 
-      // 현재 언어와 다르면 같은 경로로 즉시 전환
+      // 언어 변경 시 같은 경로로 즉시 전환
       if (preferredLocale !== locale) {
         router.replace(pathname, { locale: preferredLocale });
       }
+
+      // 초기 스냅샷 갱신
+      setInitial({
+        nickname: trimmedNickname,
+        agreeMarketing: marketing,
+        preferredLocale,
+      });
     } catch (err) {
       console.error("설정 저장 오류:", err);
       toast.error(t("toast.saveError"));
@@ -168,6 +231,12 @@ export default function SettingsClient() {
   const handleContactClick = (): void => {
     router.push("/community/questions", { locale });
   };
+
+  const dirty =
+    !!initial &&
+    (nickname.trim() !== initial.nickname ||
+      marketing !== initial.agreeMarketing ||
+      preferredLocale !== initial.preferredLocale);
 
   return (
     <>
@@ -235,8 +304,7 @@ export default function SettingsClient() {
             <Globe className='w-5 h-5 text-gray-600' />
             <p>{t("app.language")}</p>
           </div>
-          {/* <p className='text-sm text-gray-500'>{t("app.currentLanguage")}</p> */}
-          {/* 간단한 세그먼트 토글 */}
+
           <div className='flex gap-1 rounded-md border p-1'>
             <button
               type='button'
@@ -306,7 +374,7 @@ export default function SettingsClient() {
         <CommonButton
           className='text-sm'
           onClick={handleSave}
-          disabled={saving}
+          disabled={saving || !dirty}
         >
           {saving ? t("buttons.saving") : t("buttons.save")}
         </CommonButton>
@@ -324,22 +392,11 @@ export default function SettingsClient() {
         <CommonButton
           className='text-sm w-full'
           onClick={handleSave}
-          disabled={saving}
+          disabled={saving || !dirty}
         >
           {saving ? t("buttons.saving") : t("buttons.save")}
         </CommonButton>
       </div>
-      {/* <div className='flex justify-between gap-2 mt-8'>
-        <CommonButton
-          className='w-1/2 bg-white text-black border'
-          onClick={handleCancel}
-        >
-          {t("buttons.cancel")}
-        </CommonButton>
-        <CommonButton className='w-1/2' onClick={handleSave} disabled={saving}>
-          {saving ? t("buttons.saving") : t("buttons.save")}
-        </CommonButton>
-      </div> */}
 
       {/* 회원 탈퇴 모달 */}
       <Dialog open={showDialog} onOpenChange={setShowDialog}>

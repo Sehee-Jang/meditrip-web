@@ -1,6 +1,6 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { useState, useEffect } from "react";
 import { registerWithEmail } from "@/lib/auth";
 import CommonButton from "../CommonButton";
@@ -12,6 +12,8 @@ import { Link } from "@/i18n/navigation";
 
 export default function SignupSection() {
   const t = useTranslations("signup-section");
+  const locale = useLocale() as "ko" | "ja"; // 현재 UI 언어를 기본값으로 사용
+
   const [user, setUser] = useState<User | null>(null);
   const [email, setEmail] = useState("");
   const [pw, setPw] = useState("");
@@ -59,6 +61,7 @@ export default function SignupSection() {
         nickname,
         agreeTerms,
         agreeMarketing,
+        preferredLocale: locale,
       });
       toast.success(t("successToast"));
     } catch (err: unknown) {

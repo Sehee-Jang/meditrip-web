@@ -14,8 +14,14 @@ import {
   signInWithEmailAndPassword,
 } from "firebase/auth";
 import { auth, db } from "./firebase";
-import { doc, setDoc, serverTimestamp } from "firebase/firestore";
-import { UserRole } from "@/types/user";
+import {
+  doc,
+  setDoc,
+  serverTimestamp,
+  getDoc,
+  updateDoc,
+} from "firebase/firestore";
+import { UserRole, AppLocale } from "@/types/user";
 
 export interface RegisterParams {
   email: string;
@@ -23,12 +29,14 @@ export interface RegisterParams {
   nickname: string;
   agreeTerms: boolean;
   agreeMarketing: boolean;
+  preferredLocale: AppLocale;
 }
 
 // 익명 로그인
 export const loginAnonymously = async () => {
   try {
-    await signInAnonymously(auth);
+    const result = await signInAnonymously(auth);
+    console.log("✅ 익명 로그인 성공:", result.user);
   } catch (error) {
     console.error("익명 로그인 실패:", error);
   }
@@ -54,6 +62,7 @@ export const registerWithEmail = async ({
   nickname,
   agreeTerms,
   agreeMarketing,
+  preferredLocale,
 }: RegisterParams): Promise<User> => {
   const currentUser = auth.currentUser;
   const credential = EmailAuthProvider.credential(email, password);
@@ -74,19 +83,29 @@ export const registerWithEmail = async ({
   await sendEmailVerification(user);
 
   // 4) Firestore에 사용자 프로필 저장 (merge: 중복 호출 대비)
+  const ref = doc(db, "users", user.uid);
+  const snap = await getDoc(ref);
+  const isNewDoc = !snap.exists();
+
+  const base = {
+    id: user.uid,
+    role: "user" as UserRole,
+    nickname,
+    email,
+    photoURL: user.photoURL ?? null,
+    isAnonymous: false,
+    agreeTerms,
+    agreeMarketing,
+    points: 0,
+    preferredLocale,
+    updatedAt: serverTimestamp(),
+  };
+
   await setDoc(
-    doc(db, "users", user.uid),
-    {
-      role: "user" as UserRole,
-      nickname,
-      email,
-      photoURL: user!.photoURL ?? null,
-      createdAt: serverTimestamp(),
-      isAnonymous: false,
-      agreeTerms,
-      agreeMarketing,
-      points: 0,
-    },
+    ref,
+    isNewDoc
+      ? { ...base, createdAt: serverTimestamp() } // 새 문서일 때만 createdAt 세팅
+      : base,
     { merge: true }
   );
 
@@ -100,7 +119,9 @@ export const loginWithEmail = (email: string, password: string) =>
 // Google OAuth 로그인 함수
 const googleProvider = new GoogleAuthProvider();
 
-export const loginWithGoogle = async (): Promise<User> => {
+export const loginWithGoogle = async (
+  preferredLocale?: AppLocale
+): Promise<User> => {
   try {
     // 1) 팝업으로 로그인
     const result = await signInWithPopup(auth, googleProvider);
@@ -109,23 +130,37 @@ export const loginWithGoogle = async (): Promise<User> => {
     // 2) 추가 유저 정보(신규 가입 여부) 조회
     const info = getAdditionalUserInfo(result);
     const isNewUser = info?.isNewUser;
-
+    const ref = doc(db, "users", user.uid);
     // 3) 신규 사용자라면 Firestore에 프로필 저장
     if (isNewUser) {
       await setDoc(
-        doc(db, "users", user.uid),
+        ref,
         {
           uid: user.uid,
+          role: "user" as UserRole,
           nickname: user.displayName,
           email: user.email,
           photoURL: user.photoURL,
-          createdAt: serverTimestamp(),
           isAnonymous: false,
           agreeTerms: true, // 필요 시 기본값 설정
           agreeMarketing: false, // 필요 시 기본값 설정
+          points: 0,
+          preferredLocale: preferredLocale ?? "ko",
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
         },
         { merge: true }
       );
+    } else if (preferredLocale) {
+      // 3-b) 기존 유저: preferredLocale 없으면 한 번 백필
+      const snap = await getDoc(ref);
+      const data = snap.data() ?? {};
+      if (!("preferredLocale" in data)) {
+        await updateDoc(ref, {
+          preferredLocale,
+          updatedAt: serverTimestamp(),
+        });
+      }
     }
 
     return user;
