@@ -4,6 +4,9 @@ import { usePathname, useRouter } from "@/i18n/navigation";
 import { useLocale } from "next-intl";
 import { useEffect, useRef, useState, useTransition } from "react";
 import { GlobeIcon } from "lucide-react";
+import { auth, db } from "@/lib/firebase";
+import { doc, updateDoc, serverTimestamp } from "firebase/firestore";
+import type { AppLocale } from "@/types/user";
 
 type Props = { mobileOnly?: boolean };
 
@@ -15,12 +18,38 @@ export default function LanguageSwitcher({ mobileOnly = false }: Props) {
   const [open, setOpen] = useState(false);
   const popRef = useRef<HTMLDivElement>(null);
 
-  const changeLanguage = (newLocale: "ko" | "ja") => {
-    if (newLocale === locale) return setOpen(false);
+  const syncLocale = async (next: AppLocale) => {
+    // 1) URL locale 변경 (UI 즉시 반응)
     startTransition(() => {
-      router.replace(pathname, { locale: newLocale });
+      router.replace(pathname, { locale: next });
       setOpen(false);
     });
+
+    // 2) 쿠키 동기화 (next-intl의 "마지막 언어 기억" 시나리오 대비)
+    document.cookie = `NEXT_LOCALE=${next}; path=/; max-age=31536000; samesite=lax`;
+
+    // 3) 로그인 유저면 Firestore에도 저장 (소스들 간 일관성 유지)
+    const uid = auth.currentUser?.uid;
+    if (uid) {
+      updateDoc(doc(db, "users", uid), {
+        preferredLocale: next,
+        updatedAt: serverTimestamp(),
+      }).catch((e) => {
+        // 실패해도 UI는 이미 바뀌었으므로 경고만 남김
+        console.warn(
+          "[locale-sync] failed to update users/{uid}.preferredLocale:",
+          e
+        );
+      });
+    }
+  };
+
+  const changeLanguage = (next: AppLocale) => {
+    if (next === locale) {
+      setOpen(false);
+      return;
+    }
+    void syncLocale(next);
   };
 
   // 모바일: 커스텀 메뉴(옵션 위치/크기 완전 제어)
@@ -50,6 +79,7 @@ export default function LanguageSwitcher({ mobileOnly = false }: Props) {
     );
   }
 
+  // 모바일: 팝오버 메뉴
   return (
     <div className='relative' ref={popRef}>
       <button
