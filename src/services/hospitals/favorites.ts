@@ -12,7 +12,6 @@ import {
   type Unsubscribe,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import { getApp } from "firebase/app";
 
 export function subscribeFavoriteHospitalIds(
   uid: string,
@@ -20,11 +19,9 @@ export function subscribeFavoriteHospitalIds(
 ): Unsubscribe {
   if (!uid) throw new Error("subscribeFavoriteHospitalIds: uid가 비어 있음");
 
-  const app = getApp();
-  const projectId = String(app.options.projectId ?? "");
   const colRef = collection(db, "users", uid, "favorites");
 
-  // 프리플라이트: 권한 거절이면 여기서 바로 오류 원인이 보입니다.
+  // ✅ 프리플라이트: 권한 거절이면 여기서 바로 오류 원인이 보입니다.
   //    성공하면 실제 구독(onSnapshot) 시작
   void getDocs(colRef)
     .then(() => {
