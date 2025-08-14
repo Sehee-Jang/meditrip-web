@@ -1,6 +1,6 @@
 import { db } from "@/lib/firebase";
 import { doc, updateDoc, serverTimestamp } from "firebase/firestore";
-import { uploadImageToSupabase } from "./createQuestion"; // 재사용
+import { uploadImageToSupabase } from "./createQuestion";
 import type { CommunityCategory } from "@/types/category";
 
 export interface UpdateQuestionInput {

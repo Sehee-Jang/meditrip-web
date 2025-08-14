@@ -1,37 +1,104 @@
-import { NextRequest } from "next/server";
 import * as admin from "firebase-admin";
+import { NextRequest } from "next/server";
 
-let app: admin.app.App | null = null;
+type ServiceAccountLike = {
+  project_id: string;
+  client_email: string;
+  private_key: string;
+};
 
-function getEnv(name: string): string | undefined {
-  const v = process.env[name];
-  return typeof v === "string" && v.length > 0 ? v : undefined;
+// dev/HMR에서도 살아남는 전역 캐시
+declare global {
+  // eslint-disable-next-line no-var
+  var __FIREBASE_ADMIN_APP__: admin.app.App | undefined;
 }
 
-function normalizePrivateKey(key: string): string {
-  return key.includes("\\n") ? key.replace(/\\n/g, "\n") : key;
+function stripWrappingQuotes(s: string): string {
+  const t = s.trim();
+  if (
+    (t.startsWith('"') && t.endsWith('"')) ||
+    (t.startsWith("'") && t.endsWith("'"))
+  ) {
+    return t.slice(1, -1);
+  }
+  return t;
 }
 
-/** 요청 시점에만 초기화 */
-export function getAdminApp(): admin.app.App {
-  if (app) return app;
+function cleanPrivateKey(k: string): string {
+  let key = stripWrappingQuotes(k);
+  key = key.replace(/\\n/g, "\n").replace(/\\r/g, "\n").replace(/\r\n/g, "\n");
+  if (key.startsWith("\\-----BEGIN ")) key = key.slice(1); // 실수 방어
+  return key;
+}
 
-  const projectId = getEnv("FIREBASE_ADMIN_PROJECT_ID");
-  const clientEmail = getEnv("FIREBASE_ADMIN_CLIENT_EMAIL");
-  const rawKey = getEnv("FIREBASE_ADMIN_PRIVATE_KEY");
-
-  if (!projectId || !clientEmail || !rawKey) {
-    // 빌드 시점에 throw되지 않도록, 라우트에서 try/catch로 처리
-    throw new Error("FIREBASE_ADMIN_ENV_MISSING");
+function readAdminCreds(): ServiceAccountLike {
+  const b64 = process.env.FIREBASE_ADMIN_CREDENTIALS_BASE64;
+  if (b64) {
+    const json = Buffer.from(b64, "base64").toString("utf8");
+    const parsed = JSON.parse(json) as ServiceAccountLike;
+    return {
+      project_id: parsed.project_id,
+      client_email: parsed.client_email,
+      private_key: cleanPrivateKey(parsed.private_key),
+    };
   }
 
-  const privateKey = normalizePrivateKey(rawKey);
+  const rawJson = process.env.FIREBASE_ADMIN_CREDENTIALS;
+  if (rawJson) {
+    const parsed = JSON.parse(
+      stripWrappingQuotes(rawJson)
+    ) as ServiceAccountLike;
+    return {
+      project_id: parsed.project_id,
+      client_email: parsed.client_email,
+      private_key: cleanPrivateKey(parsed.private_key),
+    };
+  }
 
-  app = admin.initializeApp({
-    credential: admin.credential.cert({ projectId, clientEmail, privateKey }),
-  });
+  const projectId = process.env.FIREBASE_ADMIN_PROJECT_ID ?? "";
+  const clientEmail = process.env.FIREBASE_ADMIN_CLIENT_EMAIL ?? "";
+  const rawKey = process.env.FIREBASE_ADMIN_PRIVATE_KEY ?? "";
+  if (!projectId || !clientEmail || !rawKey) {
+    throw new Error("FIREBASE_ADMIN_ENV_MISSING");
+  }
+  return {
+    project_id: projectId,
+    client_email: clientEmail,
+    private_key: cleanPrivateKey(rawKey),
+  };
+}
 
-  return app;
+function initAdminApp(): admin.app.App {
+  const sa = readAdminCreds();
+
+  // 이름 없는 default 앱을 우선 사용(이미 있으면 재사용)
+  if (admin.apps.length > 0) {
+    return admin.app();
+  }
+
+  // race(동시 초기화) 대비: duplicate-app 캐치
+  try {
+    return admin.initializeApp({
+      credential: admin.credential.cert({
+        projectId: sa.project_id,
+        clientEmail: sa.client_email,
+        privateKey: sa.private_key,
+      }),
+    });
+  } catch (e) {
+    if (e instanceof Error && e.message.includes("already exists")) {
+      return admin.app();
+    }
+    throw e;
+  }
+}
+
+/** 요청 시점에만 초기화 (전역 캐시) */
+export function getAdminApp(): admin.app.App {
+  if (!globalThis.__FIREBASE_ADMIN_APP__) {
+    globalThis.__FIREBASE_ADMIN_APP__ = initAdminApp();
+  }
+  return globalThis.__FIREBASE_ADMIN_APP__;
 }
 
 export async function getFirebaseUserFromRequest(
@@ -48,9 +115,8 @@ export async function getFirebaseUserFromRequest(
     const decoded = await admin.auth(a).verifyIdToken(token);
     return decoded;
   } catch (e) {
-    // env 누락은 라우트로 전파해서 500 처리
     if (e instanceof Error && e.message === "FIREBASE_ADMIN_ENV_MISSING") {
-      throw e;
+      throw e; // 라우트에서 500 처리
     }
     // 그 외(만료/형식 오류 등)는 인증 실패로 처리
     return null;

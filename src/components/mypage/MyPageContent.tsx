@@ -74,7 +74,7 @@ export default function MyPageContent() {
       // 예약
       const resSnap = await getDocs(
         query(collection(db, "reservations"), where("user.id", "==", u.uid))
-      );
+      )
       setReservations(
         resSnap.docs.map((d) => {
           const dt = (d.data().date as Timestamp).toDate();

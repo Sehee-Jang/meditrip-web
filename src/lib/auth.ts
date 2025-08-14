@@ -28,8 +28,7 @@ export interface RegisterParams {
 // 익명 로그인
 export const loginAnonymously = async () => {
   try {
-    const result = await signInAnonymously(auth);
-    console.log("✅ 익명 로그인 성공:", result.user);
+    await signInAnonymously(auth);
   } catch (error) {
     console.error("익명 로그인 실패:", error);
   }

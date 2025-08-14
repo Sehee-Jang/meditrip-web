@@ -3,8 +3,15 @@
 import { useEffect } from "react";
 import { observeAuth } from "@/lib/auth";
 import FavoritesInitializer from "@/components/common/FavoritesInitializer";
+import { exposeAuthDebug } from "@/utils/exposeAuthDebug";
 
 export default function AuthObserver() {
+  useEffect(() => {
+    if (process.env.NODE_ENV !== "production") {
+      exposeAuthDebug();
+    }
+  }, []);
+
   useEffect(() => {
     observeAuth((user) => {
       if (!user) {

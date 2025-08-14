@@ -51,7 +51,7 @@ export const awardPointsIfEligible = async ({
 
     if (isFirstOnly || isOncePerDay) {
       console.log(
-        `⏭ 이벤트 [${event.description}] 조건 불충족으로 지급 건너뜀`
+        `⛔️ 이벤트 [${event.description}] 조건 불충족으로 지급 건너뜀`
       );
       continue;
     }

@@ -9,6 +9,7 @@ type FavoritesState = {
   ids: Set<string>;
   init: (uid: string) => Unsubscribe | undefined;
   setFavorites: (ids: string[]) => void;
+  setIds: (ids: string[]) => void;
   isFavorited: (hospitalId: string) => boolean;
   toggleFavoriteLocal: (hospitalId: string) => void;
   toggleAndSync: (uid: string, hospitalId: string) => Promise<boolean>;
@@ -26,7 +27,7 @@ export const useFavoritesStore = create<FavoritesState>((set, get) => ({
   },
 
   setFavorites: (ids: string[]) => set({ ids: new Set(ids) }),
-
+  setIds: (ids: string[]) => set({ ids: new Set(ids) }),
   isFavorited: (hospitalId: string) => get().ids.has(hospitalId),
 
   toggleFavoriteLocal: (hospitalId: string) => {

@@ -12,12 +12,12 @@ import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 import { auth } from "@/lib/firebase";
 import { createQuestion } from "@/services/questions/createQuestion";
-import { awardPointsIfEligible } from "@/services/points/awardPointsIfEligible";
 import {
   COMMUNITY_CATEGORY_VALUES,
   COMMUNITY_CATEGORY_KEYS,
 } from "@/constants/communityCategories";
 import type { CommunityCategory, CommunityCategoryKey } from "@/types/category";
+import { awardViaApi } from "@/services/points/awardViaApi";
 
 export default function QuestionForm() {
   const t = useTranslations("question-form");
@@ -90,11 +90,12 @@ export default function QuestionForm() {
         file: data.file?.[0],
       });
 
-      // 포인트 이벤트 연동 (존재하는 경우)
-      await awardPointsIfEligible({
-        userId: uid,
-        triggerType: "community_post",
-      });
+      // 포인트 적립(서버 위임)
+      try {
+        await awardViaApi({ triggerType: "community_post", subjectId: newId });
+      } catch (e) {
+        console.warn("[points] award failed:", e);
+      }
 
       toast.success(tToast("success"));
       reset();
