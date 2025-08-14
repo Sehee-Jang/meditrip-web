@@ -7,6 +7,7 @@ import { setRequestLocale } from "next-intl/server";
 import AuthObserver from "@/components/AuthObserver";
 import { Toaster } from "@/components/ui/sonner";
 import { getMessages } from "next-intl/server";
+import FeedbackFab from "@/components/common/FeedbackFab";
 
 export const metadata = {
   title: "Meditrip",
@@ -38,6 +39,15 @@ export default async function LocaleLayout({
       <AuthObserver />
       {children}
       <Toaster />
+      {/* 전역 피드백 FAB/탭: 기본 새 탭 이동, 필요 시 mode="modal" */}
+      <FeedbackFab
+        // mode='link'
+        mode='modal'
+        excludeIncludes={["/package/", "/packages/", "/some-path/fragment"]}
+        excludeStartsWith={["/ko/admin", "/ja/admin"]}
+        excludeExact={["/ko/login", "/ja/login"]}
+      />
+
       <Footer />
     </NextIntlClientProvider>
   );
