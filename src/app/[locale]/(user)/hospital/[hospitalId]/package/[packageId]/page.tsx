@@ -70,9 +70,9 @@ export default async function PackageDetailPage({ params }: Props) {
               {pkg.treatmentDetails.map((step, i) => (
                 <div
                   key={i}
-                  className='flex flex-col items-center text-center text-sm text-gray-700'
+                  className='h-full rounded-2xl border border-gray-200 bg-white shadow-sm px-5 py-6 flex flex-col items-center text-center'
                 >
-                  <div className='w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center font-bold mb-1'>
+                  <div className='text-blue-600  text-sm font-semibold mb-2'>
                     {`Step ${String(i + 1).padStart(2, "0")}`}
                   </div>
                   <p>{step.title[loc]}</p>
@@ -82,38 +82,58 @@ export default async function PackageDetailPage({ params }: Props) {
 
             {/* 상세 설명 */}
             <h2 className='text-lg font-semibold mb-4'>{t("detailsTitle")}</h2>
-            <div className='space-y-6'>
-              {pkg.treatmentDetails.map((step, i) => (
-                <div
-                  key={i}
-                  className='flex flex-col md:flex-row gap-4 p-4 border rounded-xl shadow-sm bg-white'
-                >
-                  {/* 왼쪽 이미지 */}
-                  {step.imageUrl && (
-                    <div className='relative w-full md:w-56 aspect-square rounded-md overflow-hidden shrink-0'>
-                      <Image
-                        src={step.imageUrl}
-                        alt={step.title[loc]}
-                        fill
-                        className='object-cover'
-                      />
-                    </div>
-                  )}
 
-                  {/* 오른쪽 텍스트 */}
-                  <div className='flex-1'>
-                    <h3 className='font-semibold text-blue-600 mb-2'>
-                      {`Step ${String(i + 1).padStart(2, "0")} - ${
+            <ol className='space-y-3'>
+              {pkg.treatmentDetails.map((step, i) => {
+                const hasImg = Boolean(step.imageUrl);
+                return (
+                  <li key={i}>
+                    <article
+                      className='group rounded-2xl border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md'
+                      aria-label={`Step ${String(i + 1).padStart(2, "0")} - ${
                         step.title[loc]
                       }`}
-                    </h3>
-                    <p className='text-gray-700 text-sm'>
-                      {step.description[loc]}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
+                    >
+                      <div className='grid grid-cols-1 md:grid-cols-[160px,1fr]'>
+                        {/* 왼쪽 썸네일 */}
+                        {hasImg ? (
+                          <div className='relative md:rounded-l-2xl overflow-hidden aspect-[4/3] md:aspect-square'>
+                            <Image
+                              src={step.imageUrl!}
+                              alt={step.title[loc]}
+                              fill
+                              className='object-cover transition-transform duration-300 group-hover:scale-[1.02]'
+                              sizes='(min-width: 768px) 160px, 100vw'
+                            />
+                          </div>
+                        ) : (
+                          // 이미지가 없을 때는 공간을 차지하지 않음(모바일/데스크 공통)
+                          <div className='hidden md:block md:rounded-l-2xl bg-gray-50' />
+                        )}
+
+                        {/* 오른쪽 본문 */}
+                        <div className='p-4 md:p-6'>
+                          <div className='flex items-center gap-3 mb-2'>
+                            <span className='inline-flex items-center rounded-full bg-blue-50 text-blue-600 text-xs font-semibold px-3 py-1'>
+                              {`Step ${String(i + 1).padStart(2, "0")}`}
+                            </span>
+                            <h3 className='text-base md:text-lg font-semibold text-gray-900'>
+                              {step.title[loc]}
+                            </h3>
+                          </div>
+
+                          {step.description?.[loc] && (
+                            <p className='text-sm md:text-base leading-6 text-gray-700'>
+                              {step.description[loc]}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </article>
+                  </li>
+                );
+              })}
+            </ol>
           </>
         )}
 

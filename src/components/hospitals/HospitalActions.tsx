@@ -2,8 +2,7 @@
 
 import { useRouter } from "@/i18n/navigation";
 import { useAuthCheck } from "@/hooks/useAuthCheck";
-import CommonButton from "@/components/common/CommonButton";
-import { Share2 } from "lucide-react";
+import { CalendarCheck, Share2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 /* eslint-disable @typescript-eslint/no-unused-vars */
 interface HospitalActionsProps {
@@ -42,25 +41,64 @@ export default function HospitalActions({
   };
 
   return (
-    <section className='flex justify-center space-x-4 pt-6'>
-      {/* 추후 활성화할 예약 링크 */}
-      {/* <Link
-        href={`/${locale}/hospital/${hospitalId}/package/${packageId}/reserve`}
-      >
-        <CommonButton>{t("clinicDetail.bookButton")}</CommonButton>
-      </Link> */}
+    <div
+      className='
+        fixed z-50 right-4 md:right-6
+        bottom-[calc(env(safe-area-inset-bottom)+16px)]
+        md:bottom-[calc(env(safe-area-inset-bottom)+24px)]
+      '
+      aria-label='floating-actions'
+    >
+      <div className='flex flex-col items-center gap-2'>
+        {/* 예약하기 버튼 */}
+        <button
+          type='button'
+          onClick={handleBookClick}
+          disabled={loading}
+          className='
+              inline-flex items-center justify-center
+              rounded-full px-5 py-3 text-white font-semibold
+              bg-gradient-to-r from-blue-500 to-blue-600
+              hover:from-blue-600 hover:to-blue-700
+              focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300
+              shadow-sm disabled:opacity-70
+            '
+        >
+          <CalendarCheck className='w-5 h-5' />
+          <span className='hidden sm:inline ml-2'>
+            {t("clinicDetail.bookButton")}
+          </span>
+        </button>
 
-      {/* 예약 버튼 */}
-      <CommonButton onClick={handleBookClick} disabled={loading}>
-        {t("clinicDetail.bookButton")}
-      </CommonButton>
+        {/* 공유하기 버튼 */}
+        <button
+          type='button'
+          onClick={handleShare}
+          className='
+              inline-flex items-center justify-center
+              rounded-full px-4 py-3 border border-gray-300
+              text-gray-800 bg-white hover:bg-gray-50
+              focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-300
+            '
+          aria-label={t("clinicDetail.shareButton")}
+        >
+          <Share2 className='w-5 h-5' />
+          <span className='hidden sm:inline ml-2'>
+            {t("clinicDetail.shareButton")}
+          </span>
+        </button>
+      </div>
 
-      {/* 공유 버튼 */}
-      <CommonButton variant='outline' onClick={handleShare}>
-        <Share2 className='w-5 h-5 mr-2' />
-        {t("clinicDetail.shareButton")}
-      </CommonButton>
-    </section>
+      {/* 내부 예약 링크(추후 활성화) */}
+      {/* <div className='mt-2 text-center'>
+          <Link
+            href={`/hospital/${hospitalId}/package/${packageId}/reserve`}
+            className='text-xs text-gray-600 hover:text-gray-800 underline underline-offset-4'
+          >
+            {t("clinicDetail.reservePageLink")}
+          </Link>
+        </div> */}
+    </div>
   );
 }
 /* eslint-enable @typescript-eslint/no-unused-vars */
