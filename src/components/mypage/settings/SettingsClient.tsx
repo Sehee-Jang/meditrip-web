@@ -5,7 +5,14 @@ import { useTranslations, useLocale } from "next-intl";
 import { useRouter, usePathname } from "@/i18n/navigation";
 import CommonButton from "@/components/common/CommonButton";
 import { Switch } from "@/components/ui/switch";
-import { Lock, Trash2, Bell, Globe, HelpCircle } from "lucide-react";
+import {
+  Lock,
+  Trash2,
+  Bell,
+  Globe,
+  HelpCircle,
+  ClipboardList,
+} from "lucide-react";
 import { doc, deleteDoc, updateDoc, getDoc } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase";
 import { toast } from "sonner";
@@ -70,6 +77,7 @@ export default function SettingsClient() {
     fetchUserData();
   }, []);
 
+  // 비밀번호 초기화 버튼 핸들러
   const handlePasswordReset = async (): Promise<void> => {
     const user = auth.currentUser;
     if (!user || !user.email) {
@@ -89,6 +97,7 @@ export default function SettingsClient() {
     }
   };
 
+  // 계정탈퇴 버튼 핸들러
   const handleDeleteAccount = async (): Promise<void> => {
     const user = auth.currentUser;
     if (!user || !user.email) return;
@@ -258,12 +267,30 @@ export default function SettingsClient() {
       {/* 고객 지원 */}
       <section className='mb-8'>
         <h2 className='font-bold text-lg mb-4'>{t("support.title")}</h2>
+
+        {/* 1:1 문의 */}
         <div
-          className='flex items-center gap-2 cursor-pointer hover:underline'
+          className='flex items-center py-2 gap-2 cursor-pointer hover:underline'
           onClick={handleContactClick}
         >
           <HelpCircle className='w-5 h-5 text-gray-600' />
           <p>{t("support.contact")}</p>
+        </div>
+
+        {/* 서비스 개선 */}
+        <div
+          className='flex items-center py-2 gap-2 cursor-pointer hover:underline'
+          onClick={handleContactClick}
+        >
+          <a
+            href='https://jp.surveymonkey.com/r/87BV3N9'
+            target='_blank'
+            rel='noopener noreferrer'
+            className='flex items-center gap-2 hover:underline'
+          >
+            <ClipboardList className='w-5 h-5 text-gray-600' />
+            <p>{t("support.improve")}</p>
+          </a>
         </div>
       </section>
 

@@ -20,7 +20,8 @@
   },
   "support": {
     "title": "고객지원",
-    "contact": "1:1 문의하기"
+    "contact": "1:1 문의하기",
+    "improve": "서비스 개선 설문"
   },
   "buttons": {
     "cancel": "취소",

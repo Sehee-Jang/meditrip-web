@@ -20,7 +20,8 @@
   },
   "support": {
     "title": "カスタマーサポート",
-    "contact": "1:1で問い合わせる"
+    "contact": "1:1で問い合わせる",
+    "improve": "サービス改善アンケート"
   },
   "buttons": {
     "cancel": "キャンセル",
