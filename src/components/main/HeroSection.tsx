@@ -23,7 +23,7 @@ export default function HeroSection() {
   return (
     <section className='relative w-full h-[360px] md:h-[480px] mb-10'>
       {/* 슬라이드 이미지 */}
-      <Carousel opts={{ loop: true }} plugins={[Autoplay({ delay: 3000 })]}>
+      <Carousel opts={{ loop: true }} plugins={[autoplay.current]}>
         <CarouselContent>
           {[1, 2, 3].map((item) => (
             <CarouselItem key={item}>
