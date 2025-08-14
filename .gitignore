@@ -46,5 +46,4 @@ next-env.d.ts
 /public/data/clinic_woojoo_cleared.json
 
 # 디버깅용
-src/app/api/_debug/
 src/utils/exposeAuthDebug.ts
