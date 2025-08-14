@@ -48,8 +48,14 @@
         "price": "¥700,000",
         "duration": "60分"
       }
-    },
+    }
+  },
+  "book": {
     "bookButton": "予約",
-    "shareButton": "共有"
+    "shareButton": "共有",
+    "reservePageLink": "内部予約ページへ",
+    "bookModalTitle": "予約する",
+    "openInNewTab": "新しいタブで開く",
+    "close": "閉じる"
   }
 }

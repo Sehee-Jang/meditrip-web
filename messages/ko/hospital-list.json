@@ -48,8 +48,14 @@
         "price": "700,000원",
         "duration": "60분"
       }
-    },
+    }
+  },
+  "book": {
     "bookButton": "예약",
-    "shareButton": "공유"
+    "shareButton": "공유",
+    "reservePageLink": "내부 예약 페이지로 이동",
+    "bookModalTitle": "예약하기",
+    "openInNewTab": "새 탭에서 예약하기",
+    "close": "닫기"
   }
 }
