@@ -6,7 +6,6 @@ import { useTranslations } from "next-intl";
 import SearchInput from "@/components/common/SearchInput";
 import CategorySection from "@/components/main/CategorySection";
 import GroupedVideoSection from "@/components/contents/GroupedVideoSection";
-import CommonButton from "../common/CommonButton";
 import type { CategoryKey } from "@/constants/categories";
 
 type Props = {
@@ -36,17 +35,14 @@ const SearchableContents = ({
   const nextQueryString = useMemo(() => {
     const params = new URLSearchParams(searchParams?.toString());
     // 키워드
-    if (keyword.trim()) {
-      params.set("q", keyword.trim());
-    } else {
-      params.delete("q");
-    }
+    if (keyword.trim()) params.set("q", keyword.trim());
+    else params.delete("q");
+
     // 카테고리(콤마 구분)
-    if (selectedCategories.length > 0) {
+    if (selectedCategories.length > 0)
       params.set("categories", selectedCategories.join(","));
-    } else {
-      params.delete("categories");
-    }
+    else params.delete("categories");
+
     const qs = params.toString();
     return qs ? `?${qs}` : "";
   }, [keyword, selectedCategories, searchParams]);
@@ -94,14 +90,8 @@ const SearchableContents = ({
       <GroupedVideoSection
         keyword={keyword}
         selectedCategories={selectedCategories}
+        pageSize={10}
       />
-
-      {/* 더보기 버튼 (추후 서버 연동 시 무한스크롤/페이지네이션으로 교체) */}
-      <div className='text-center'>
-        <CommonButton className='w-24 w-full md:w-[120px]'>
-          {t("viewMore")}
-        </CommonButton>
-      </div>
     </div>
   );
 };
