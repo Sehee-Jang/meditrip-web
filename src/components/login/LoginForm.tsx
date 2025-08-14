@@ -1,11 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "@/i18n/navigation";
+import { useRouter, Link } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import { loginWithEmail, loginWithGoogle } from "@/lib/auth";
 import { FcGoogle } from "react-icons/fc";
-import { Link } from "@/i18n/navigation";
 import { useSearchParams } from "next/navigation";
 
 const LoginForm = () => {
@@ -112,7 +111,12 @@ const LoginForm = () => {
         <Link href='/forgot-password' className='text-blue-600 hover:underline'>
           {t("forgotPassword")}
         </Link>
-        <Link href='/signup' className='text-blue-600 hover:underline'>
+        <Link
+          href={{ pathname: "/", hash: "signup-section" }}
+          aria-controls='signup-section'
+          className='text-blue-600 hover:underline'
+          prefetch
+        >
           {t("noAccount")}
         </Link>
       </div>

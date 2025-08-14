@@ -74,7 +74,7 @@ export default function SignupSection() {
   };
 
   return (
-    <section id='-section' className='w-full bg-white py-[60px]'>
+    <section id='signup-section' className='w-full bg-white py-[60px]'>
       <Container className='text-center'>
         <div className='w-full max-w-[1440px] px-[20px] md:px-[170px] text-center'>
           <h2 className='text-2xl md:text-4xl font-bold mb-4'>{t("title")}</h2>
