@@ -270,7 +270,7 @@ export default function SettingsClient() {
 
         {/* 1:1 문의 */}
         <div
-          className='flex items-center py-2 gap-2 cursor-pointer hover:underline'
+          className='flex items-center my-2 py-2 gap-2 cursor-pointer hover:underline'
           onClick={handleContactClick}
         >
           <HelpCircle className='w-5 h-5 text-gray-600' />
@@ -279,7 +279,7 @@ export default function SettingsClient() {
 
         {/* 서비스 개선 */}
         <div
-          className='flex items-center py-2 gap-2 cursor-pointer hover:underline'
+          className='flex items-center my-2 py-2 gap-2 cursor-pointer hover:underline'
           onClick={handleContactClick}
         >
           <a
