@@ -7,13 +7,18 @@ import {
   CarouselContent,
   CarouselItem,
 } from "@/components/ui/carousel";
-
 import Image from "next/image";
 import CommonButton from "../common/CommonButton";
 import Container from "../common/Container";
+import { useRef } from "react";
+import Link from "next/link";
 
 export default function HeroSection() {
   const t = useTranslations("hero-section");
+
+  const autoplay = useRef(
+    Autoplay({ delay: 3000, stopOnInteraction: true, stopOnMouseEnter: true })
+  );
 
   return (
     <section className='relative w-full h-[360px] md:h-[480px] mb-10'>
@@ -27,6 +32,7 @@ export default function HeroSection() {
                   src={`/images/hero${item}.webp`}
                   alt={`슬라이드 ${item}`}
                   fill
+                  sizes='(min-width: 768px) 100vw, 100vw'
                   className='object-cover object-center'
                   priority={item === 1}
                 />
@@ -45,14 +51,13 @@ export default function HeroSection() {
           <p className='mt-2 text-sm md:text-lg drop-shadow-md'>
             {t("subtitle")}
           </p>
-          <CommonButton
-            className='mt-4 w-32 md:w-40'
-            onClick={() => {
-              const el = document.getElementById("signup-section");
-              if (el) el.scrollIntoView({ behavior: "smooth" });
-            }}
-          >
-            {t("button")}
+          <CommonButton asChild className='mt-4 w-32 md:w-40'>
+            <Link
+              href={{ pathname: "/", hash: "signup-section" }}
+              aria-controls='signup-section'
+            >
+              {t("button")}
+            </Link>
           </CommonButton>
         </Container>
       </div>
