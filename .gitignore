@@ -47,3 +47,4 @@ next-env.d.ts
 
 # 디버깅용
 src/utils/exposeAuthDebug.ts
+src/debug

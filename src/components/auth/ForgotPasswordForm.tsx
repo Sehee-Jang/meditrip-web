@@ -2,62 +2,51 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import {
-  sendPasswordResetEmail,
-  fetchSignInMethodsForEmail,
-} from "firebase/auth";
+import { sendPasswordResetEmail } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import CommonButton from "@/components/common/CommonButton";
 import { CheckCircle2, Info, AlertCircle } from "lucide-react";
-
-function maskEmail(email: string): string {
-  const [name, domain] = email.split("@");
-  const domainParts = domain.split(".");
-  const maskedName =
-    name.length <= 2
-      ? `${name[0]}*`
-      : `${name[0]}${"*".repeat(Math.max(1, name.length - 2))}${name.at(-1)}`;
-  const maskedDomain = `${domainParts[0][0]}***.${domainParts
-    .slice(1)
-    .join(".")}`;
-  return `${maskedName}@${maskedDomain}`;
-}
+import { loginWithGoogle } from "@/lib/auth";
+import { FcGoogle } from "react-icons/fc";
 
 export default function ForgotPasswordForm() {
   const t = useTranslations("forgot-password");
 
   const [email, setEmail] = useState<string>("");
-  const [sending, setSending] = useState<boolean>(false);
+  const [sending, setSending] = useState(false);
   const [okMsg, setOkMsg] = useState<string | null>(null);
-  const [hintMsg, setHintMsg] = useState<string | null>(null);
+  const [infoMsg, setInfoMsg] = useState<string | null>(null);
   const [errMsg, setErrMsg] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setOkMsg(null);
-    setHintMsg(null);
+    setInfoMsg(null);
     setErrMsg(null);
     setSending(true);
 
+    const normalized = email.trim().toLowerCase();
+    if (normalized !== email) setEmail(normalized);
+
     try {
-      const methods = await fetchSignInMethodsForEmail(auth, email);
-      if (methods.includes("password")) {
-        await sendPasswordResetEmail(auth, email);
-        setOkMsg(t("sent", { email: maskEmail(email) }));
-      } else if (
-        methods.includes("google.com") &&
-        !methods.includes("password")
-      ) {
-        setHintMsg(t("googleOnlyHint"));
-      } else {
-        setErrMsg(t("notFound"));
-      }
+      await sendPasswordResetEmail(auth, normalized);
+      // 중립 문구 + Google 안내 함께 노출
+      setOkMsg(t("requestReceived"));
+      setInfoMsg(t("googleOnlyHint"));
     } catch {
       setErrMsg(t("sendFailed"));
     } finally {
       setSending(false);
+    }
+  };
+
+  const handleGoogle = async () => {
+    try {
+      await loginWithGoogle();
+    } catch {
+      // noop
     }
   };
 
@@ -88,7 +77,6 @@ export default function ForgotPasswordForm() {
         {sending ? t("loading") : t("submit")}
       </CommonButton>
 
-      {/* 메시지 영역: 토스처럼 심플한 안내배너 */}
       <div className='space-y-2' aria-live='polite'>
         {okMsg && (
           <div className='flex items-start gap-2 rounded-lg border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-800'>
@@ -96,10 +84,10 @@ export default function ForgotPasswordForm() {
             <p>{okMsg}</p>
           </div>
         )}
-        {hintMsg && (
+        {infoMsg && (
           <div className='flex items-start gap-2 rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-sm text-blue-800'>
             <Info className='mt-0.5 h-4 w-4 flex-none' />
-            <p>{hintMsg}</p>
+            <p>{infoMsg}</p>
           </div>
         )}
         {errMsg && (
@@ -109,6 +97,16 @@ export default function ForgotPasswordForm() {
           </div>
         )}
       </div>
+
+      <CommonButton
+        type='button'
+        onClick={handleGoogle}
+        variant='outline'
+        className='w-full h-11 text-base flex items-center justify-center gap-2'
+      >
+        <FcGoogle className='h-5 w-5' />
+        {t("ctaContinueWithGoogle")}
+      </CommonButton>
     </form>
   );
 }

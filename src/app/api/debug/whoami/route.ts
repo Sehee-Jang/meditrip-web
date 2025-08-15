@@ -1,4 +1,3 @@
-// src/app/api/_debug/whoami/route.ts
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
