@@ -1,5 +1,6 @@
 "use client";
 
+import UserNameById from "@/components/common/UserNameById";
 import { Badge } from "@/components/ui/badge";
 import {
   COMMUNITY_CATEGORY_ICONS,
@@ -9,10 +10,10 @@ import type { CommunityCategoryKey } from "@/types/category";
 import type { Question } from "@/types/question";
 
 export default function DetailHeader({ question }: { question: Question }) {
- const key = (question.category as CommunityCategoryKey) ?? "etc";
+  const key = (question.category as CommunityCategoryKey) ?? "etc";
   const Icon =
     COMMUNITY_CATEGORY_ICONS[question.category as CommunityCategoryKey];
- const label = COMMUNITY_CATEGORY_LABELS[key] ?? COMMUNITY_CATEGORY_LABELS.etc;
+  const label = COMMUNITY_CATEGORY_LABELS[key] ?? COMMUNITY_CATEGORY_LABELS.etc;
 
   return (
     <div>
@@ -26,6 +27,14 @@ export default function DetailHeader({ question }: { question: Question }) {
         </Badge>
       </div>
       <h2 className='mt-2 text-xl font-semibold'>{question.title}</h2>
+
+      {/* 작성자명 */}
+      {question.userId ? (
+        <span className='truncate'>
+          <span>작성자: </span>
+          <UserNameById userId={question.userId} fallbackName='익명' />
+        </span>
+      ) : null}
     </div>
   );
 }
