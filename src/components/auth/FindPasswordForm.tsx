@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useTranslations } from "next-intl";
+
 import { sendPasswordResetEmail } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import { Input } from "@/components/ui/input";
@@ -10,9 +11,16 @@ import CommonButton from "@/components/common/CommonButton";
 import { CheckCircle2, Info, AlertCircle } from "lucide-react";
 import { loginWithGoogle } from "@/lib/auth";
 import { FcGoogle } from "react-icons/fc";
+import {
+  Accordion,
+  AccordionItem,
+  AccordionTrigger,
+  AccordionContent,
+} from "@/components/ui/accordion";
 
-export default function ForgotPasswordForm() {
-  const t = useTranslations("forgot-password");
+export default function FindPasswordForm() {
+  const t = useTranslations("recovery");
+  const emailRef = useRef<HTMLInputElement | null>(null);
 
   const [email, setEmail] = useState<string>("");
   const [sending, setSending] = useState(false);
@@ -20,6 +28,7 @@ export default function ForgotPasswordForm() {
   const [infoMsg, setInfoMsg] = useState<string | null>(null);
   const [errMsg, setErrMsg] = useState<string | null>(null);
 
+  // 재설정 버튼 핸들러
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setOkMsg(null);
@@ -42,6 +51,7 @@ export default function ForgotPasswordForm() {
     }
   };
 
+  // 구글 로그인 버튼 핸들러
   const handleGoogle = async () => {
     try {
       await loginWithGoogle();
@@ -50,33 +60,42 @@ export default function ForgotPasswordForm() {
     }
   };
 
+  // 리셋 버튼 핸들러
+  const resetEmailInput = () => {
+    setEmail("");
+    emailRef.current?.focus();
+  };
+
   return (
     <form onSubmit={handleSubmit} className='space-y-4' noValidate>
       <div className='space-y-2'>
         <Label htmlFor='email' className='text-sm font-medium text-gray-700'>
-          {t("emailLabel")}
+          {t("common.emailLabel")}
         </Label>
         <Input
           id='email'
+          ref={emailRef}
           type='email'
           value={email}
           autoComplete='email'
           onChange={(e) => setEmail(e.target.value)}
           required
           disabled={sending}
-          placeholder={t("emailPlaceholder")}
+          placeholder={t("common.emailPlaceholder")}
           className='h-11'
         />
       </div>
 
+      {/* 재설정 링크 보내기 버튼 */}
       <CommonButton
         type='submit'
         className='w-full h-11 text-base'
         disabled={sending}
       >
-        {sending ? t("loading") : t("submit")}
+        {sending ? t("common.loading") : t("common.submit")}
       </CommonButton>
 
+      {/* 상태 메시지 영역 */}
       <div className='space-y-2' aria-live='polite'>
         {okMsg && (
           <div className='flex items-start gap-2 rounded-lg border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-800'>
@@ -98,6 +117,7 @@ export default function ForgotPasswordForm() {
         )}
       </div>
 
+      {/* 구글로 계속 버튼 */}
       <CommonButton
         type='button'
         onClick={handleGoogle}
@@ -105,8 +125,47 @@ export default function ForgotPasswordForm() {
         className='w-full h-11 text-base flex items-center justify-center gap-2'
       >
         <FcGoogle className='h-5 w-5' />
-        {t("ctaContinueWithGoogle")}
+        {t("common.ctaContinueWithGoogle")}
       </CommonButton>
+
+      {/* 도움말 아코디언 */}
+      <div className='pt-2'>
+        <Accordion type='single' collapsible>
+          <AccordionItem value='help'>
+            <AccordionTrigger className='text-sm font-medium'>
+              {t("help.title")}
+            </AccordionTrigger>
+            <AccordionContent className='text-sm text-gray-600 space-y-3'>
+              <div>• {t("help.spam")}</div>
+              <div>• {t("help.address")}</div>
+              <div className='flex flex-col gap-2'>
+                <span>• {t("help.google")}</span>
+                {/* 구글로 계속 버튼 */}
+                <CommonButton
+                  type='button'
+                  variant='outline'
+                  className='h-8 px-3'
+                  onClick={handleGoogle}
+                >
+                  {t("common.ctaContinueWithGoogle")}
+                </CommonButton>
+              </div>
+
+              <div className='flex items-center gap-2'>
+                <span>• {t("help.changeEmail")}</span>
+                <button
+                  type='button'
+                  onClick={resetEmailInput}
+                  className='underline text-blue-600 hover:opacity-80'
+                  aria-label={t("help.changeEmailActionAria")}
+                >
+                  {t("help.changeEmailAction")}
+                </button>
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
+      </div>
     </form>
   );
 }

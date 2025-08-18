@@ -108,8 +108,8 @@ const LoginForm = () => {
 
       {/* Links */}
       <div className='mt-6 flex justify-between text-sm'>
-        <Link href='/forgot-password' className='text-blue-600 hover:underline'>
-          {t("forgotPassword")}
+        <Link href='/find-password' className='text-blue-600 hover:underline'>
+          {t("findPassword")}
         </Link>
         <Link
           href={{ pathname: "/", hash: "signup-section" }}

@@ -51,8 +51,7 @@ export const NAMESPACES = [
   "settings-page",
   "signup-section",
   "terms-page",
-  "find-email",
-  "forgot-password",
+  "recovery",
 ] as const;
 
 type Namespace = (typeof NAMESPACES)[number];

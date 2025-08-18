@@ -7,6 +7,6 @@
   "errorGeneric": "로그인 중 오류가 발생했습니다.",
   "googleLogin": "구글 계정으로 로그인",
   "or": "또는",
-  "forgotPassword": "비밀번호를 잊으셨나요?",
+  "findPassword": "비밀번호를 잊으셨나요?",
   "noAccount": "계정이 없으신가요? 회원가입"
 }

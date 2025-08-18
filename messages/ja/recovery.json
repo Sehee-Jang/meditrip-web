@@ -1,0 +1,39 @@
+{
+  "common": {
+    "emailLabel": "メールアドレス",
+    "emailPlaceholder": "example@domain.com",
+    "submit": "送信する",
+    "loading": "送信中...",
+    "requestReceived": "リクエストを受け付けました。メール/パスワードで登録している場合は数分以内にメールが届きます。",
+    "googleOnlyHint": "Googleで登録している場合、メールは届きません。下の 'Googleで続行' ボタンからログインしてください。",
+    "ctaContinueWithGoogle": "Googleで続行",
+    "sendFailed": "処理に失敗しました。しばらくしてからお試しください。",
+    "notFoundStrict": "このメールアドレスで登録されたアカウントは見つかりませんでした。",
+    "forgotEmailLink": "メールアドレスを忘れましたか？",
+    "forgotPasswordLink": "パスワードをお忘れですか？",
+    "loginLink": "ログイン"
+  },
+  "forgotPassword": {
+    "title": "パスワード再設定",
+    "desc": "登録したメールアドレスにパスワード再設定用リンクを送信します。"
+  },
+  "findEmail": {
+    "title": "メールアドレスを確認",
+    "desc": "このブラウザのヒント・パスワード再設定・Googleでのログインでアカウントを復旧できます。",
+    "deviceHint": {
+      "title": "このブラウザで最近使用したメール",
+      "found": "{email}",
+      "empty": "このブラウザには最近のログイン履歴がありません。",
+      "use": "このメールを使用する"
+    }
+  },
+  "help": {
+    "title": "メールが届きませんか？",
+    "spam": "迷惑メール・プロモーション・すべてのメールをご確認ください。",
+    "address": "入力したアドレスを再確認してください。特にGmailはドット（.）や＋エイリアスが登録時と異なる場合があります。",
+    "google": "Googleで登録している場合、パスワード再設定メールは届きません。下の 'Googleで続行' ボタンからログインしてください。",
+    "changeEmail": "メールアドレスを間違えましたか？",
+    "changeEmailAction": "入力し直す",
+    "changeEmailActionAria": "メールアドレス入力をクリアして再入力"
+  }
+}
