@@ -11,6 +11,8 @@ import { deleteQuestion } from "@/services/questions/deleteQuestion";
 import { getFormattedDate } from "@/utils/date";
 import { listAnswers } from "@/services/community-admin/answers";
 import UserNameById from "@/components/common/UserNameById";
+import { auth } from "@/lib/firebase";
+import { onAuthStateChanged, type User as FirebaseUser } from "firebase/auth";
 
 export default function QuestionDetail({ question }: { question: Question }) {
   const router = useRouter();
@@ -19,6 +21,15 @@ export default function QuestionDetail({ question }: { question: Question }) {
 
   const [answers, setAnswers] = useState<AnswerItem[]>([]);
   const [loadingAnswers, setLoadingAnswers] = useState(false);
+  const [isOwner, setIsOwner] = useState<boolean>(false);
+
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, (user: FirebaseUser | null) => {
+      const owner = !!user && !!question.userId && user.uid === question.userId;
+      setIsOwner(owner);
+    });
+    return () => unsub();
+  }, [question.userId]);
 
   useEffect(() => {
     let mounted = true;
@@ -36,6 +47,7 @@ export default function QuestionDetail({ question }: { question: Question }) {
     };
   }, [question.id]);
 
+  // 삭제 버튼 핸들러
   const handleDelete = async () => {
     const confirmed = confirm(t("confirmDelete"));
     if (!confirmed) return;
@@ -59,14 +71,16 @@ export default function QuestionDetail({ question }: { question: Question }) {
           {question.title}
         </h1>
 
-        {/* 메타: 카테고리 · 작성자 · 날짜 */}
+        {/* 카테고리 · 작성자 · 작성일 */}
         <div className='flex flex-wrap items-center gap-2 text-xs text-gray-500'>
+          {/* 카테고리 */}
           <span className='inline-flex items-center rounded-full bg-gray-100 text-gray-700 px-2.5 py-1'>
-            {tCat(question.category)} {/* ⬅️ 로컬라이즈된 카테고리 */}
+            {tCat(question.category)}
           </span>
 
           {question.userId && <span className='text-gray-300'>•</span>}
 
+          {/* 작성자명 */}
           {question.userId ? (
             <span className='truncate'>
               <UserNameById
@@ -77,6 +91,8 @@ export default function QuestionDetail({ question }: { question: Question }) {
           ) : null}
 
           <span className='text-gray-300'>•</span>
+
+          {/* 작성일 */}
           <time dateTime={createdDate.toISOString()}>
             {getFormattedDate(createdDate)}
           </time>
@@ -153,29 +169,49 @@ export default function QuestionDetail({ question }: { question: Question }) {
         )}
       </section>
 
-      {/* 버튼 */}
-      <div className='pt-2 flex flex-col sm:flex-row gap-2 justify-end'>
-        <CommonButton
-          className='sm:w-auto w-full bg-white text-gray-900 border border-gray-200 hover:bg-gray-50'
-          onClick={() => router.push("/community")}
-        >
-          {t("back")}
-        </CommonButton>
-        <CommonButton
-          className='sm:w-auto w-full bg-white text-gray-900 border border-gray-200 hover:bg-gray-50'
-          onClick={() =>
-            router.push(`/community/questions/${question.id}/edit/`)
-          }
-        >
-          {t("edit")}
-        </CommonButton>
-        <CommonButton
-          className='sm:w-auto w-full bg-red-500 hover:bg-red-600'
-          onClick={handleDelete}
-        >
-          {t("delete")}
-        </CommonButton>
-      </div>
+      {/* 버튼: 본인에게만 노출 */}
+      {isOwner && (
+        <div className='pt-2 flex flex-col sm:flex-row gap-2 justify-end'>
+          {/* 목록 버튼 */}
+          <CommonButton
+            className='sm:w-auto w-full bg-white text-gray-900 border border-gray-200 hover:bg-gray-50'
+            onClick={() => router.push("/community")}
+          >
+            {t("back")}
+          </CommonButton>
+
+          {/* 수정 버튼 */}
+          <CommonButton
+            className='sm:w-auto w-full bg-white text-gray-900 border border-gray-200 hover:bg-gray-50'
+            onClick={() =>
+              router.push(`/community/questions/${question.id}/edit/`)
+            }
+          >
+            {t("edit")}
+          </CommonButton>
+
+          {/* 삭제 버튼 */}
+          <CommonButton
+            className='sm:w-auto w-full bg-red-500 hover:bg-red-600'
+            onClick={handleDelete}
+          >
+            {t("delete")}
+          </CommonButton>
+        </div>
+      )}
+
+      {/* 버튼: 본인이 아닌 경우 */}
+      {!isOwner && (
+        <div className='pt-2 flex justify-end'>
+          {/* 목록 버튼 */}
+          <CommonButton
+            className='sm:w-auto w-full bg-white text-gray-900 border border-gray-200 hover:bg-gray-50'
+            onClick={() => router.push("/community")}
+          >
+            {t("back")}
+          </CommonButton>
+        </div>
+      )}
     </article>
   );
 }
