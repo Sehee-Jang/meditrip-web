@@ -14,11 +14,11 @@ export default async function AdminLayout({
   children: React.ReactNode;
 }) {
   return (
-    
-      <QueryProvider>
+    <QueryProvider>
+      <AdminAuthGuard>
         <div className='flex h-dvh min-h-screen bg-gray-50'>
           {/* 1) 사이드바 */}
-          <Sidebar/>
+          <Sidebar />
 
           {/* 2) 메인 영역 */}
           <div className='flex-1 flex flex-col'>
@@ -26,12 +26,10 @@ export default async function AdminLayout({
             <Topbar />
 
             {/* 실제 페이지 컨텐츠 */}
-            <main className='flex-1 overflow-auto p-6'>
-              <AdminAuthGuard>{children}</AdminAuthGuard>
-            </main>
+            <main className='flex-1 overflow-auto p-6'>{children}</main>
           </div>
         </div>
-      </QueryProvider>
-
+      </AdminAuthGuard>
+    </QueryProvider>
   );
 }

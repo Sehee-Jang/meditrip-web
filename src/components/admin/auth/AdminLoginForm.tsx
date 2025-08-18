@@ -46,6 +46,7 @@ export default function AdminLoginForm() {
 
   const goAdmin = () => router.replace(`/admin`);
 
+  // 로그인 버튼 핸들러
   const handleSignIn = async () => {
     setError("");
     setSubmitting(true);
@@ -65,6 +66,7 @@ export default function AdminLoginForm() {
     }
   };
 
+  // 구글 로그인 버튼 핸들러
   const handleGoogleSignIn = async () => {
     setError("");
     setSubmitting(true);
@@ -93,6 +95,7 @@ export default function AdminLoginForm() {
       </CardHeader>
 
       <CardContent className='space-y-4'>
+        {/* 에러 상태 메세지 */}
         {error && (
           <Alert variant='destructive'>
             <AlertTitle>에러</AlertTitle>
@@ -100,6 +103,7 @@ export default function AdminLoginForm() {
           </Alert>
         )}
 
+        {/* 이메일 입력란 */}
         <div className='space-y-2'>
           <Label htmlFor='admin-email' className='flex items-center gap-2'>
             <Mail className='w-4 h-4' />
@@ -116,6 +120,7 @@ export default function AdminLoginForm() {
           placeholder='admin@example.com'
         />
 
+        {/* 비밀번호 입력란 */}
         <div className='space-y-2'>
           <Label htmlFor='admin-password' className='flex items-center gap-2'>
             <Lock className='w-4 h-4' />
@@ -132,8 +137,10 @@ export default function AdminLoginForm() {
           placeholder='••••••••'
         />
 
+        {/* 버튼 */}
         <Button
           onClick={handleSignIn}
+          variant='destructive'
           className='w-full'
           disabled={submitting || email.length === 0 || password.length === 0}
         >

@@ -1,7 +1,8 @@
+// src/components/admin/AdminAuthGuard.tsx
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { onAuthStateChanged, type User as FirebaseUser } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
@@ -13,46 +14,63 @@ export default function AdminAuthGuard({
   children: React.ReactNode;
 }) {
   const router = useRouter();
+  const pathname = usePathname();
   const [authorized, setAuthorized] = useState<boolean | null>(null);
 
+  // 로그인 페이지는 가드 우회 (조기 return 금지, 훅 호출 이후에 분기)
+  const isLoginRoute = pathname === "/admin/login";
+
   useEffect(() => {
+    // 로그인 페이지는 검증 스킵
+    if (isLoginRoute) {
+      setAuthorized(true);
+      return;
+    }
+
     let cancelled = false;
 
     const unsubscribe = onAuthStateChanged(
       auth,
       async (user: FirebaseUser | null) => {
-        // 비로그인 → 관리자 로그인 페이지로
+        const nextParam = `?next=${encodeURIComponent(pathname ?? "/admin")}`;
+
         if (!user) {
-          router.replace(`/admin/login`);
           if (!cancelled) setAuthorized(false);
+          router.replace(`/admin/login${nextParam}`);
           return;
         }
 
         try {
           const role: UserRole | null = await getUserRole(user.uid);
+          const isAdmin = role === "admin" || role === "super_admin";
 
-          // 관리자/슈퍼관리자만 통과
-          if (role === "admin" || role === "super_admin") {
-            if (!cancelled) setAuthorized(true);
-          } else {
-            router.replace(`/admin/login`);
-            if (!cancelled) setAuthorized(false);
+          if (!cancelled) {
+            if (isAdmin) {
+              setAuthorized(true);
+            } else {
+              setAuthorized(false);
+              router.replace(`/admin/login${nextParam}`);
+            }
           }
         } catch {
-          // 조회 실패 시에도 로그인 페이지로
-          router.replace(`/admin/login`);
           if (!cancelled) setAuthorized(false);
+          router.replace(`/admin/login${nextParam}`);
         }
       }
     );
+
     return () => {
       cancelled = true;
       unsubscribe();
     };
-  }, [router]);
+  }, [isLoginRoute, pathname, router]);
 
-  // 아직 확인 중일 땐 스피너
-  if (authorized === null) {
+  // 렌더 분기(훅 호출 이후)
+  if (isLoginRoute) {
+    return <>{children}</>;
+  }
+
+  if (authorized !== true) {
     return (
       <div className='flex items-center justify-center h-full'>
         <LoadingSpinner />
@@ -60,6 +78,5 @@ export default function AdminAuthGuard({
     );
   }
 
-  // 허가됐으면 자식 컴포넌트 렌더
   return <>{children}</>;
 }
