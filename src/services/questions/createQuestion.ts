@@ -60,6 +60,7 @@ export async function createQuestion({
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
     answersCount: 0,
+    hasAnswer: false,
     isHidden: false,
   });
 

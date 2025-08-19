@@ -17,7 +17,7 @@ import {
 import type { QueryDocumentSnapshot, DocumentData } from "firebase/firestore";
 import { useTranslations } from "next-intl";
 import { Question } from "@/types/question";
-import { getFormattedDate } from "@/utils/date";
+import { formatDateCompact } from "@/utils/date";
 import { MessageSquare, CheckCircle, Clock } from "lucide-react";
 import UserNameById from "@/components/common/UserNameById";
 
@@ -58,7 +58,7 @@ export default function PaginatedQuestionList({
       <ul className='mx-auto'>
         {questions.map((q) => {
           const date = q.createdAt
-            ? getFormattedDate(q.createdAt)
+            ? formatDateCompact(q.createdAt)
             : t("noDate");
 
           const answerCount = Number(q.answersCount ?? 0);

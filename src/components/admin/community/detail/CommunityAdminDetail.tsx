@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import DetailHeader from "./DetailHeader";
 import DetailActions from "./DetailActions";
 import AnswerSection from "./AnswerSection";
+
 export default function CommunityAdminDetail({
   questionId,
 }: {
@@ -15,7 +16,6 @@ export default function CommunityAdminDetail({
 }) {
   const router = useRouter();
 
-  // 질문 본문
   const { data: question, isLoading } = useQuery({
     queryKey: ["admin-question", questionId],
     queryFn: () => getAdminQuestionById(questionId),

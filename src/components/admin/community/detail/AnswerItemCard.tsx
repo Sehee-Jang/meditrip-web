@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/dialog";
 import type { AnswerItem } from "@/types/question";
 import { updateAnswer, deleteAnswer } from "@/services/community-admin/answers";
+import { formatDateTimeCompact } from "@/utils/date";
 
 export default function AnswerItemCard({
   questionId,
@@ -29,7 +30,7 @@ export default function AnswerItemCard({
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
-  const createdAt = new Date(answer.createdAt).toLocaleString();
+  const createdAt = formatDateTimeCompact(answer.createdAt);
 
   const handleSave = async (): Promise<void> => {
     if (!content.trim()) return;

@@ -4,17 +4,12 @@ import { useRouter } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { EyeOff, Eye, Trash2 } from "lucide-react";
-
 import CommunityAnswerDialog from "../CommunityAnswerDialog";
 import { setQuestionHidden } from "@/services/community-admin/hideQuestion";
 import { deleteQuestion } from "@/services/community-admin/deleteQuestion";
 import { createAnswer } from "@/services/community-admin/answers";
 
-export default function DetailActions({
-  questionId,
-}: {
-  questionId: string;
-}) {
+export default function DetailActions({ questionId }: { questionId: string }) {
   const qc = useQueryClient();
   const router = useRouter();
   return (
@@ -26,6 +21,9 @@ export default function DetailActions({
           await createAnswer(questionId, content);
           await qc.invalidateQueries({
             queryKey: ["admin-answers", questionId],
+          });
+          await qc.invalidateQueries({
+            queryKey: ["admin-question", questionId],
           });
         }}
       />

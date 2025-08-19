@@ -12,6 +12,8 @@ import {
 import type { Timestamp } from "firebase/firestore";
 import type { Question } from "@/types/question";
 import type { CommunityCategory } from "@/types/category";
+import { COMMUNITY_CATEGORY_KEYS } from "@/constants/communityCategories";
+import { toISO } from "@/utils/date";
 
 type FirestoreQuestionDoc = {
   title: string;
@@ -22,8 +24,16 @@ type FirestoreQuestionDoc = {
   imageUrl?: string;
   userId?: string;
   answersCount?: number;
+  hasAnswer?: boolean;
   isHidden?: boolean;
 };
+
+function normalizeCategory(input: unknown): CommunityCategory {
+  const v = typeof input === "string" ? input : String(input ?? "");
+  const ok = (COMMUNITY_CATEGORY_KEYS as readonly string[]).includes(v);
+  // 기본값: 첫 번째 키(프로젝트에서 가장 일반적인 카테고리)
+  return (ok ? v : COMMUNITY_CATEGORY_KEYS[0]) as CommunityCategory;
+}
 
 export function useQuestions(limitCount = 2) {
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -47,21 +57,27 @@ export function useQuestions(limitCount = 2) {
         const items: Question[] = snapshot.docs.map((docSnap) => {
           const raw = docSnap.data() as FirestoreQuestionDoc;
 
-          const createdAt = raw.createdAt?.toDate().toISOString() ?? "";
-          const updatedAt = raw.updatedAt?.toDate().toISOString() ?? undefined;
+          const createdAtISO = toISO(raw.createdAt);
+          const updatedAtISO = toISO(raw.updatedAt);
+          const answersCount =
+            typeof raw.answersCount === "number" ? raw.answersCount : 0;
+          const hasAnswer =
+            typeof raw.hasAnswer === "boolean"
+              ? raw.hasAnswer
+              : answersCount > 0;
 
           return {
             id: docSnap.id,
-            title: raw.title,
-            content: raw.content,
-            category: raw.category as Question["category"],
-            createdAt,
-            updatedAt,
-            imageUrl: raw.imageUrl,
-            userId: raw.userId ?? "", // 매우 오래된 문서 대비
-            answersCount:
-              typeof raw.answersCount === "number" ? raw.answersCount : 0,
-            isHidden: typeof raw.isHidden === "boolean" ? raw.isHidden : false,
+            title: String(raw.title ?? ""),
+            content: String(raw.content ?? ""),
+            category: normalizeCategory(raw.category),
+            createdAt: createdAtISO || updatedAtISO || new Date().toISOString(),
+            updatedAt: updatedAtISO || createdAtISO || new Date().toISOString(),
+            imageUrl: typeof raw.imageUrl === "string" ? raw.imageUrl : "",
+            userId: String(raw.userId ?? ""),
+            answersCount,
+            hasAnswer,
+            isHidden: Boolean(raw.isHidden ?? false),
           };
         });
 

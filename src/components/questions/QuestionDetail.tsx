@@ -8,7 +8,7 @@ import type { AnswerItem } from "@/types/question";
 import CommonButton from "@/components/common/CommonButton";
 import { useTranslations } from "next-intl";
 import { deleteQuestion } from "@/services/questions/deleteQuestion";
-import { getFormattedDate } from "@/utils/date";
+import { formatDateCompact } from "@/utils/date";
 import { listAnswers } from "@/services/community-admin/answers";
 import UserNameById from "@/components/common/UserNameById";
 import { auth } from "@/lib/firebase";
@@ -94,7 +94,7 @@ export default function QuestionDetail({ question }: { question: Question }) {
 
           {/* 작성일 */}
           <time dateTime={createdDate.toISOString()}>
-            {getFormattedDate(createdDate)}
+            {formatDateCompact(createdDate)}
           </time>
         </div>
       </header>
@@ -152,11 +152,11 @@ export default function QuestionDetail({ question }: { question: Question }) {
                 className='rounded-xl border border-gray-200 bg-white p-4'
               >
                 <div className='text-[12px] text-gray-500 mb-2'>
-                  {getFormattedDate(new Date(a.createdAt))}
+                  {formatDateCompact(new Date(a.createdAt))}
                   {a.updatedAt && (
                     <span className='ml-2'>
                       · {t("answers.updated")}{" "}
-                      {getFormattedDate(new Date(a.updatedAt))}
+                      {formatDateCompact(new Date(a.updatedAt))}
                     </span>
                   )}
                 </div>

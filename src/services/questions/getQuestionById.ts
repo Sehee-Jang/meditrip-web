@@ -1,9 +1,18 @@
 import { db } from "@/lib/firebase";
-import { doc, getDoc, Timestamp } from "firebase/firestore";
+import { doc, getDoc } from "firebase/firestore";
 import type { Question } from "@/types/question";
+import type { CommunityCategory } from "@/types/category";
+import { COMMUNITY_CATEGORY_KEYS } from "@/constants/communityCategories";
+import { toISO } from "@/utils/date";
 
-const toISO = (ts?: Timestamp) =>
-  ts ? ts.toDate().toISOString() : new Date().toISOString();
+const DEFAULT_CATEGORY = COMMUNITY_CATEGORY_KEYS[0] as CommunityCategory;
+
+function normalizeCategory(input: unknown): CommunityCategory {
+  const v = typeof input === "string" ? input : String(input ?? "");
+  return (COMMUNITY_CATEGORY_KEYS as readonly string[]).includes(v)
+    ? (v as CommunityCategory)
+    : DEFAULT_CATEGORY;
+}
 
 export async function getQuestionById(
   id: string,
@@ -13,23 +22,28 @@ export async function getQuestionById(
   const snap = await getDoc(ref);
   if (!snap.exists()) return null;
 
-  const x = snap.data();
+  const x = snap.data() as Record<string, unknown>;
+  const answersCount = typeof x.answersCount === "number" ? x.answersCount : 0;
+
+  const hasAnswer =
+    typeof x.hasAnswer === "boolean" ? x.hasAnswer : answersCount > 0;
 
   const q: Question = {
     id: snap.id,
-    title: x.title ?? "",
-    content: x.content ?? "",
-    category: x.category,
+    title: String(x.title ?? ""),
+    content: String(x.content ?? ""),
+    category: normalizeCategory(x.category),
     createdAt: toISO(x.createdAt),
-    updatedAt: toISO(x.updatedAt),
-    imageUrl: x.imageUrl ?? "",
-    userId: x.userId ?? "",
-    answersCount: Number(x.answersCount ?? 0),
+    updatedAt: toISO(x.updatedAt) || toISO(x.createdAt),
+    imageUrl: typeof x.imageUrl === "string" ? x.imageUrl : "",
+    userId: typeof x.userId === "string" ? x.userId : "",
+    answersCount,
+    hasAnswer,
     isHidden: Boolean(x.isHidden ?? false),
+    ...(x.lastAnsweredAt ? { lastAnsweredAt: toISO(x.lastAnsweredAt) } : {}),
   };
 
   // 공개용: 숨김 글이면 노출하지 않음
-  if (q.isHidden) return null;
   if (!opts?.includeHidden && q.isHidden) return null;
 
   return q;

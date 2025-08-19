@@ -5,16 +5,15 @@ export interface Question {
   title: string;
   content: string;
   category: CommunityCategory;
+  imageUrl?: string;
+  userId: string;
+  isHidden?: boolean; // 기본 false
   createdAt: string;
   updatedAt?: string;
 
-  imageUrl?: string;
-  userId: string;
-  // user?: Partial<User>; // 선택: 조회 시 작성자 정보 합쳐서 내려줄 때
-
   // 배열 집계 필드
   answersCount: number; // 기본 0
-  isHidden?: boolean; // 기본 false
+  hasAnswer: boolean; // 기본 false
 }
 
 /** 답변(answers 서브컬렉션의 뷰 모델) */

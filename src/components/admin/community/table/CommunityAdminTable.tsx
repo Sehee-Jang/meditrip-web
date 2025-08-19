@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
   type QueryDocumentSnapshot,
@@ -26,6 +26,11 @@ export default function CommunityAdminTable({
     queryKey: ["admin-questions", filter, cursor?.id ?? null],
     queryFn: async () => getAdminQuestions(20, filter, cursor ?? undefined),
   });
+
+  // 필터가 바뀌면 페이지네이션 커서 초기화
+  useEffect(() => {
+    setCursor(null);
+  }, [filter]);
 
   const items = data?.items ?? [];
 

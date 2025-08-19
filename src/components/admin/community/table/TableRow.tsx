@@ -2,11 +2,11 @@
 
 import { useRouter } from "next/navigation";
 import CommunityCategoryPill from "./CommunityCategoryPill";
-
 import RowActions from "./RowActions";
 import type { Question } from "@/types/question";
 import type { CommunityCategoryKey } from "@/types/category";
 import UserNameById from "@/components/common/UserNameById";
+import { formatDateTimeCompact } from "@/utils/date";
 
 export default function TableRow({ q }: { q: Question }) {
   const router = useRouter();
@@ -46,10 +46,10 @@ export default function TableRow({ q }: { q: Question }) {
       </td>
 
       {/* 답변 여부: 숫자만 표시 */}
-      <td className='px-4 py-3 text-center'>{q.answersCount}</td>
+      <td className='px-4 py-3 text-center'>{q.answersCount ?? 0}</td>
 
       {/* 작성일 */}
-      <td className='px-4 py-3'>{new Date(q.createdAt).toLocaleString()}</td>
+      <td className='px-4 py-3'>{formatDateTimeCompact(q.createdAt)}</td>
 
       {/* 액션 */}
       <td

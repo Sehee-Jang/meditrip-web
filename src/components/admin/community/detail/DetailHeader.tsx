@@ -1,40 +1,51 @@
 "use client";
 
-import UserNameById from "@/components/common/UserNameById";
-import { Badge } from "@/components/ui/badge";
-import {
-  COMMUNITY_CATEGORY_ICONS,
-  COMMUNITY_CATEGORY_LABELS,
-} from "@/constants/communityCategories";
-import type { CommunityCategoryKey } from "@/types/category";
 import type { Question } from "@/types/question";
+import { formatDateTimeCompact } from "@/utils/date";
 
 export default function DetailHeader({ question }: { question: Question }) {
-  const key = (question.category as CommunityCategoryKey) ?? "etc";
-  const Icon =
-    COMMUNITY_CATEGORY_ICONS[question.category as CommunityCategoryKey];
-  const label = COMMUNITY_CATEGORY_LABELS[key] ?? COMMUNITY_CATEGORY_LABELS.etc;
+  const createdAtText = formatDateTimeCompact(question.createdAt);
 
   return (
-    <div>
-      <div className='flex items-center gap-2'>
-        <span className='inline-flex items-center gap-1.5 rounded-full border bg-white px-2.5 py-1 text-xs'>
-          <Icon className='size-3.5' />
-          <span className='font-medium'>{label}</span>
-        </span>
-        <Badge variant='secondary'>
-          {new Date(question.createdAt).toLocaleString()}
-        </Badge>
-      </div>
-      <h2 className='mt-2 text-xl font-semibold'>{question.title}</h2>
+    <div className='flex flex-col gap-1 min-w-0'>
+      <div className='flex items-center gap-2 flex-wrap'>
+        {/* 카테고리 */}
+        {typeof question.category === "string" &&
+          question.category.length > 0 && (
+            <span className='inline-flex items-center rounded bg-slate-100 text-slate-700 h-6 px-2 text-xs'>
+              {question.category}
+            </span>
+          )}
 
-      {/* 작성자명 */}
-      {question.userId ? (
-        <span className='truncate'>
-          <span>작성자: </span>
-          <UserNameById userId={question.userId} fallbackName='익명' />
+        {/* 노출 상태 */}
+        <span
+          className={`inline-flex items-center rounded h-6 px-2 text-xs ${
+            question.isHidden
+              ? "bg-rose-50 text-rose-700"
+              : "bg-emerald-50 text-emerald-700"
+          }`}
+        >
+          {question.isHidden ? "숨김" : "노출"}
         </span>
-      ) : null}
+
+        {/* 답변 여부 */}
+        <span
+          className={`inline-flex items-center rounded h-6 px-2 text-xs ${
+            (question.answersCount ?? 0) > 0
+              ? "bg-emerald-50 text-emerald-700"
+              : "bg-slate-100 text-slate-700"
+          }`}
+        >
+          {(question.answersCount ?? 0) > 0 ? "답변완료" : "미답변"}
+        </span>
+
+        <span className='text-xs text-muted-foreground'>
+          ({question.answersCount ?? 0})
+        </span>
+      </div>
+
+      {/* 작성일 */}
+      <div className='text-xs text-muted-foreground'>{createdAtText}</div>
     </div>
   );
 }

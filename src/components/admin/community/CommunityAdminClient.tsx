@@ -7,7 +7,6 @@ import {
   COMMUNITY_CATEGORY_KEYS,
   COMMUNITY_CATEGORY_LABELS,
 } from "@/constants/communityCategories";
-// import type { CommunityCategory } from "@/types/category";
 
 type CategoryOption = "all" | CommunityCategoryKey; 
 

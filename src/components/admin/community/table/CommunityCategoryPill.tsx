@@ -3,8 +3,8 @@
 import {
   COMMUNITY_CATEGORY_ICONS,
   COMMUNITY_CATEGORY_LABELS,
+  type CommunityCategoryKey,
 } from "@/constants/communityCategories";
-import type { CommunityCategoryKey } from "@/types/category";
 
 export default function CommunityCategoryPill({
   category,
