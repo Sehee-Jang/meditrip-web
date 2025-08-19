@@ -12,7 +12,7 @@ import {
 import type { Timestamp } from "firebase/firestore";
 import type { Question } from "@/types/question";
 import type { CommunityCategory } from "@/types/category";
-import { COMMUNITY_CATEGORY_KEYS } from "@/constants/communityCategories";
+import { normalizeCommunityCategory } from "@/lib/communityCategory";
 import { toISO } from "@/utils/date";
 
 type FirestoreQuestionDoc = {
@@ -27,13 +27,6 @@ type FirestoreQuestionDoc = {
   hasAnswer?: boolean;
   isHidden?: boolean;
 };
-
-function normalizeCategory(input: unknown): CommunityCategory {
-  const v = typeof input === "string" ? input : String(input ?? "");
-  const ok = (COMMUNITY_CATEGORY_KEYS as readonly string[]).includes(v);
-  // 기본값: 첫 번째 키(프로젝트에서 가장 일반적인 카테고리)
-  return (ok ? v : COMMUNITY_CATEGORY_KEYS[0]) as CommunityCategory;
-}
 
 export function useQuestions(limitCount = 2) {
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -70,7 +63,7 @@ export function useQuestions(limitCount = 2) {
             id: docSnap.id,
             title: String(raw.title ?? ""),
             content: String(raw.content ?? ""),
-            category: normalizeCategory(raw.category),
+            category: normalizeCommunityCategory(raw.category),
             createdAt: createdAtISO || updatedAtISO || new Date().toISOString(),
             updatedAt: updatedAtISO || createdAtISO || new Date().toISOString(),
             imageUrl: typeof raw.imageUrl === "string" ? raw.imageUrl : "",

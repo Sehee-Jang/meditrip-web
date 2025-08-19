@@ -12,9 +12,9 @@ import {
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import type { Question } from "@/types/question";
-import type { CommunityCategory, CommunityCategoryKey } from "@/types/category";
-import { COMMUNITY_CATEGORY_KEYS } from "@/constants/communityCategories";
+import type { CommunityCategoryKey } from "@/types/category";
 import { toISO } from "@/utils/date";
+import { normalizeCommunityCategory } from "@/lib/communityCategory";
 
 export type AdminQuestionFilter = {
   category: "all" | CommunityCategoryKey;
@@ -25,14 +25,6 @@ export type AdminQuestionFilter = {
 export interface AdminQuestionListResult {
   items: Question[];
   cursor: QueryDocumentSnapshot<DocumentData> | null;
-}
-
-/** 🔒 string → CommunityCategory 안전 변환 */
-const CATEGORY_SET = new Set<string>(COMMUNITY_CATEGORY_KEYS);
-const DEFAULT_CATEGORY = COMMUNITY_CATEGORY_KEYS[0] as CommunityCategory;
-function normalizeCategory(input: unknown): CommunityCategory {
-  const s = typeof input === "string" ? input : String(input ?? "");
-  return CATEGORY_SET.has(s) ? (s as CommunityCategory) : DEFAULT_CATEGORY;
 }
 
 export async function getAdminQuestions(
@@ -78,7 +70,7 @@ export async function getAdminQuestions(
       id: d.id,
       title: String(raw.title ?? ""),
       content: String(raw.content ?? ""),
-      category: normalizeCategory(raw.category), // ✅ CommunityCategory로 안전 변환
+      category: normalizeCommunityCategory(raw.category),
       createdAt: toISO(raw.createdAt), // string
       updatedAt: toISO(raw.updatedAt), // string
       imageUrl: typeof raw.imageUrl === "string" ? raw.imageUrl : "",

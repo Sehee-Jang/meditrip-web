@@ -1,18 +1,8 @@
 import { db } from "@/lib/firebase";
 import { doc, getDoc } from "firebase/firestore";
 import type { Question } from "@/types/question";
-import type { CommunityCategory } from "@/types/category";
-import { COMMUNITY_CATEGORY_KEYS } from "@/constants/communityCategories";
+import { normalizeCommunityCategory } from "@/lib/communityCategory";
 import { toISO } from "@/utils/date";
-
-const DEFAULT_CATEGORY = COMMUNITY_CATEGORY_KEYS[0] as CommunityCategory;
-
-function normalizeCategory(input: unknown): CommunityCategory {
-  const v = typeof input === "string" ? input : String(input ?? "");
-  return (COMMUNITY_CATEGORY_KEYS as readonly string[]).includes(v)
-    ? (v as CommunityCategory)
-    : DEFAULT_CATEGORY;
-}
 
 export async function getQuestionById(
   id: string,
@@ -32,7 +22,7 @@ export async function getQuestionById(
     id: snap.id,
     title: String(x.title ?? ""),
     content: String(x.content ?? ""),
-    category: normalizeCategory(x.category),
+    category: normalizeCommunityCategory(x.category),
     createdAt: toISO(x.createdAt),
     updatedAt: toISO(x.updatedAt) || toISO(x.createdAt),
     imageUrl: typeof x.imageUrl === "string" ? x.imageUrl : "",
