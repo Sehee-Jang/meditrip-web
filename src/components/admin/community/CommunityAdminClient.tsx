@@ -40,6 +40,7 @@ export default function CommunityAdminClient({
 
   return (
     <div className='space-y-4'>
+      {/* 필터 선택 영역 */}
       <div className='flex flex-wrap gap-3 items-center'>
         <select
           className='border rounded px-3 py-2'

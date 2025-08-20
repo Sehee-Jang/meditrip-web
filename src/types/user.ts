@@ -1,3 +1,5 @@
+import type { DateInput } from "@/utils/date";
+
 export type UserRole = "admin" | "user";
 
 export type AppLocale = "ko" | "ja";
@@ -15,3 +17,8 @@ export interface User {
   isAnonymous?: boolean;
   preferredLocale?: AppLocale;
 }
+
+export type MemberRow = Pick<
+  User,
+  "id" | "nickname" | "email" | "agreeMarketing" | "points" | "role"
+> & { createdAt?: DateInput };
