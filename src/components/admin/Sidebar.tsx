@@ -10,7 +10,6 @@ import {
   ChevronLeft,
   ChevronRight,
   CalendarCheck,
-  Gift,
   Youtube,
   LogIn,
   LogOut,
@@ -34,12 +33,12 @@ type MenuItem = {
 
 const MENU: ReadonlyArray<MenuItem> = [
   { href: "", label: "대시보드", icon: HomeIcon, exact: true },
+  { href: "users", label: "회원 관리", icon: UserIcon },
   { href: "reservations", label: "예약 관리", icon: CalendarIcon },
   { href: "contents", label: "컨텐츠 관리", icon: Youtube },
   { href: "community", label: "1:1 상담 관리", icon: MessageCircleMore },
-  { href: "users", label: "회원 관리", icon: UserIcon },
+
   { href: "event", label: "이벤트 관리", icon: CalendarCheck },
-  { href: "points", label: "포인트 관리", icon: Gift },
 ];
 
 const itemPath = (href: string) => (href === "" ? "/admin" : `/admin/${href}`);
