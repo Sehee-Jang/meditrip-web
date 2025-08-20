@@ -1,4 +1,4 @@
-import UserTable from "@/components/admin/users/UserTable";
+import UserAdminClient from "@/components/admin/users/UserAdminClient";
 
 export default function AdminPointsPage() {
   return (
@@ -10,7 +10,7 @@ export default function AdminPointsPage() {
         </p>
       </div>
 
-      <UserTable />
+      <UserAdminClient />
     </div>
   );
 }
