@@ -1,18 +1,18 @@
 import React from "react";
 import CommunityAdminClient from "@/components/admin/community/CommunityAdminClient";
-
-type SearchParams = {
-  category?: string;
-  answered?: "all" | "yes" | "no";
-  visibility?: "all" | "visible" | "hidden";
-};
+import {
+  parseAdminFilterFromSearchParams,
+  type AdminFilter,
+  type AdminFilterSearchParams,
+} from "@/features/community/admin/filters";
 
 export default async function AdminCommunityPage({
   searchParams,
 }: {
-  searchParams: Promise<SearchParams>;
+  searchParams: Promise<AdminFilterSearchParams>;
 }) {
   const sp = await searchParams;
+  const initialFilter: AdminFilter = parseAdminFilterFromSearchParams(sp);
 
   return (
     <div className='max-w-5xl mx-auto px-4 py-10 space-y-10'>
@@ -24,7 +24,7 @@ export default async function AdminCommunityPage({
           </p>
         </div>
 
-        <CommunityAdminClient initialSearchParams={sp} />
+        <CommunityAdminClient initialFilter={initialFilter} />
       </div>
     </div>
   );

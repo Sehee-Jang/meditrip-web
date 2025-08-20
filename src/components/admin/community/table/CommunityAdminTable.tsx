@@ -7,17 +7,15 @@ import {
   type DocumentData,
 } from "firebase/firestore";
 import { Button } from "@/components/ui/button";
-import {
-  getAdminQuestions,
-  type AdminQuestionFilter,
-} from "@/services/community-admin/getAdminQuestions";
+import { getAdminQuestions } from "@/services/community-admin/getAdminQuestions";
 import TableHeader from "./TableHeader";
 import TableRow from "./TableRow";
+import type { AdminFilter } from "@/features/community/admin/filters";
 
 export default function CommunityAdminTable({
   filter,
 }: {
-  filter: AdminQuestionFilter;
+  filter: AdminFilter;
 }) {
   const [cursor, setCursor] =
     useState<QueryDocumentSnapshot<DocumentData> | null>(null);

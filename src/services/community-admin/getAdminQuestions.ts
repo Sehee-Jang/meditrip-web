@@ -15,6 +15,7 @@ import type { Question } from "@/types/question";
 import type { CommunityCategoryKey } from "@/types/category";
 import { toISO } from "@/utils/date";
 import { normalizeCommunityCategory } from "@/lib/communityCategory";
+import type { AdminFilter } from "@/features/community/admin/filters";
 
 export type AdminQuestionFilter = {
   category: "all" | CommunityCategoryKey;
@@ -29,7 +30,7 @@ export interface AdminQuestionListResult {
 
 export async function getAdminQuestions(
   pageSize: number,
-  filter: AdminQuestionFilter,
+  filter: AdminFilter,
   cursor?: QueryDocumentSnapshot<DocumentData>
 ): Promise<AdminQuestionListResult> {
   const base = collection(db, "questions");

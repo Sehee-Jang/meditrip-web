@@ -3,39 +3,27 @@
 import { useState } from "react";
 import CommunityAdminTable from "./table/CommunityAdminTable";
 import {
-  type CommunityCategoryKey,
+  type AdminFilter,
+  type CategoryFilter,
+} from "@/features/community/admin/filters";
+import {
   COMMUNITY_CATEGORY_KEYS,
   COMMUNITY_CATEGORY_LABELS,
 } from "@/constants/communityCategories";
 
-type CategoryOption = "all" | CommunityCategoryKey; 
-
-export interface AdminSearchParams {
-  category?: string; // URL에서 들어와서 string 그대로 둠
-  answered?: "all" | "yes" | "no";
-  visibility?: "all" | "visible" | "hidden";
-}
-
-function toCategoryOption(v?: string): CategoryOption {
-  if (!v || v === "all") return "all";
-  return (COMMUNITY_CATEGORY_KEYS as readonly string[]).includes(v)
-    ? (v as CommunityCategoryKey)
-    : "all";
-}
-
 export default function CommunityAdminClient({
-  initialSearchParams,
+  initialFilter,
 }: {
-  initialSearchParams: AdminSearchParams;
+  initialFilter: AdminFilter;
 }) {
-  const [category, setCategory] = useState<CategoryOption>(
-    toCategoryOption(initialSearchParams.category)
+  const [category, setCategory] = useState<CategoryFilter>(
+    initialFilter.category
   );
   const [answered, setAnswered] = useState<"all" | "yes" | "no">(
-    initialSearchParams.answered ?? "all"
+    initialFilter.answered ?? "all"
   );
   const [visibility, setVisibility] = useState<"all" | "visible" | "hidden">(
-    initialSearchParams.visibility ?? "all"
+    initialFilter.visibility ?? "all"
   );
 
   return (
@@ -45,7 +33,7 @@ export default function CommunityAdminClient({
         <select
           className='border rounded px-3 py-2'
           value={category}
-          onChange={(e) => setCategory(toCategoryOption(e.target.value))}
+          onChange={(e) => setCategory(e.target.value as CategoryFilter)}
         >
           <option value='all'>전체 카테고리</option>
           {COMMUNITY_CATEGORY_KEYS.map((k) => (
