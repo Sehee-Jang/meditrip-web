@@ -18,7 +18,7 @@ type Props = {
 export default function UserRowActions({ user, onShowLog, onDeduct }: Props) {
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger>
+      <DropdownMenuTrigger asChild>
         <Button
           variant='ghost'
           size='icon'
@@ -29,9 +29,9 @@ export default function UserRowActions({ user, onShowLog, onDeduct }: Props) {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align='end' className='w-36'>
-        {/* 포인트 사용내역   */}
+        {/* 포인트 내역   */}
         <DropdownMenuItem onClick={() => onShowLog(user)}>
-          사용 내역
+          포인트 내역
         </DropdownMenuItem>
 
         {/* 포인트 차감  */}

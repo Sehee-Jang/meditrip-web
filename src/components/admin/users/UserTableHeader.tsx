@@ -20,7 +20,7 @@ export default function UserTableHeader() {
           마케팅 동의
         </th>
         <th style={{ width: "14%" }} className='text-center'>
-          액션
+          더 보기
         </th>
       </tr>
     </thead>

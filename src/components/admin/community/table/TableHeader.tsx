@@ -20,7 +20,7 @@ export default function TableHeader() {
           작성일
         </th>
         <th style={{ width: "12%" }} className='text-center'>
-          액션
+          더 보기
         </th>
       </tr>
     </thead>

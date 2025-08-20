@@ -51,7 +51,7 @@ export default function TableRow({ q }: { q: Question }) {
       {/* 작성일 */}
       <td className='px-4 py-3'>{formatDateTimeCompact(q.createdAt)}</td>
 
-      {/* 액션 */}
+      {/* 더 보기 */}
       <td
         className='px-4 py-3 text-center'
         onClick={(e) => e.stopPropagation()}
