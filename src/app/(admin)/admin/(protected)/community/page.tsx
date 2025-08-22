@@ -21,6 +21,7 @@ export default async function AdminCommunityPage({
         title='1:1 상담 관리'
         description='커뮤니티 페이지에 등록된 문의 내용을 확인하고 관리하세요.'
       />
+
       <CommunityAdminClient initialFilter={initialFilter} />
     </>
   );

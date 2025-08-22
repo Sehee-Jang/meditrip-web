@@ -41,17 +41,21 @@ export default function LocalizedTabsField<T extends FieldValues>({
   const controlled = typeof activeLocale !== "undefined";
   const [tab, setTab] = React.useState<"ko" | "ja">("ko");
   const current = controlled ? activeLocale! : tab;
-  const setCurrent = (loc: "ko" | "ja") => {
-    if (controlled) onActiveLocaleChange?.(loc);
-    else setTab(loc);
-  };
+
+  const setCurrent = React.useCallback(
+    (loc: "ko" | "ja") => {
+      if (controlled) onActiveLocaleChange?.(loc);
+      else setTab(loc);
+    },
+    [controlled, onActiveLocaleChange]
+  );
 
   React.useEffect(() => {
     if (!autoSwitchOnError) return;
     if (errorJa && !errorKo && current !== "ja") setCurrent("ja");
-    if (errorKo && !errorJa && current !== "ko") setCurrent("ko");
-  }, [errorKo, errorJa]);
-  
+    else if (errorKo && !errorJa && current !== "ko") setCurrent("ko");
+  }, [autoSwitchOnError, errorKo, errorJa, current, setCurrent]);
+
   const commonNumberProps = {
     type: "number" as const,
     inputMode: "numeric" as const,

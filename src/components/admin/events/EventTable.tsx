@@ -13,7 +13,7 @@ interface Props {
   onRefresh: () => void;
 }
 
-export default function EventList({ events, onRefresh }: Props) {
+export default function EventTable({ events, onRefresh }: Props) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editedData, setEditedData] = useState<{
     description: string;

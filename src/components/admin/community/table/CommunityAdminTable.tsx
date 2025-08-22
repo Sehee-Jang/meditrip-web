@@ -8,8 +8,10 @@ import {
 } from "firebase/firestore";
 import { Button } from "@/components/ui/button";
 import { getAdminQuestions } from "@/services/community-admin/getAdminQuestions";
-import TableHeader from "./CommunityTableHeader";
-import TableRow from "./CommunityTableRow";
+import AdminDataTable, {
+  type DataTableColumn,
+} from "@/components/admin/common/AdminDataTable";
+import CommunityTableRow from "./CommunityTableRow";
 import type { AdminFilter } from "@/features/community/admin/filters";
 
 export default function CommunityAdminTable({
@@ -32,41 +34,31 @@ export default function CommunityAdminTable({
 
   const items = data?.items ?? [];
 
-  return (
-    <div className='rounded-2xl border bg-white shadow-sm'>
-      <div className='flex items-center justify-between px-4 py-3 border-b'>
-        <div className='font-medium'>문의 목록</div>
-        <div className='text-sm text-muted-foreground'>총 {items.length}건</div>
-      </div>
+  // 열 정의
 
-      <div className='overflow-x-auto'>
-        <table className='w-full text-sm'>
-          <TableHeader />
-          <tbody>
-            {isLoading ? (
-              <tr>
-                <td
-                  colSpan={6}
-                  className='p-8 text-center text-muted-foreground'
-                >
-                  로딩 중…
-                </td>
-              </tr>
-            ) : items.length === 0 ? (
-              <tr>
-                <td
-                  colSpan={6}
-                  className='p-8 text-center text-muted-foreground'
-                >
-                  결과가 없습니다.
-                </td>
-              </tr>
-            ) : (
-              items.map((q) => <TableRow key={q.id} q={q} />)
-            )}
-          </tbody>
-        </table>
-      </div>
+  const columns = [
+    { header: "제목" }, // 가변
+    { header: "카테고리", widthClass: "w-[18%]", align: "center" },
+    { header: "작성자명", widthClass: "w-[22%]" },
+    { header: "답변", widthClass: "w-[12%]", align: "right" },
+    { header: "작성일", widthClass: "w-[22%]", align: "center" },
+    { header: "더 보기", widthClass: "w-[14%]", align: "right" },
+  ] as const satisfies ReadonlyArray<DataTableColumn>;
+
+  return (
+    <>
+      <AdminDataTable
+        title='문의 목록'
+        items={items}
+        totalCount={items.length} // 전체 개수를 모르면 현재 페이지 개수로 표기
+        loading={isLoading}
+        columns={columns}
+        getRowKey={(q) => q.id}
+        renderRow={(q) => <CommunityTableRow q={q} />}
+        emptyMessage='결과가 없습니다.'
+        // 페이지 단위 카운트 라벨로 교체
+        countLabel={(n) => `총 ${n.toLocaleString()}건`}
+      />
 
       <div className='p-3 flex justify-end'>
         <Button
@@ -78,6 +70,6 @@ export default function CommunityAdminTable({
           더 보기
         </Button>
       </div>
-    </div>
+    </>
   );
 }

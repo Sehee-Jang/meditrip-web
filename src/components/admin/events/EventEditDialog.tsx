@@ -13,7 +13,7 @@ interface Event {
   active: boolean;
 }
 
-export default function EventList({
+export default function EventEditDialog({
   onEdit,
 }: {
   onEdit: (event: Event) => void;

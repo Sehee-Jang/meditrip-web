@@ -1,9 +1,8 @@
-
 "use client";
 
 import React, { useMemo, useState, useEffect } from "react";
 import SearchInput from "@/components/common/SearchInput";
-import UserTable from "./UserTable";
+import UserTable from "./table/UserTable";
 import { db } from "@/lib/firebase";
 import {
   collection,
