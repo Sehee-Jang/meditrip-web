@@ -8,8 +8,8 @@ import {
 } from "firebase/firestore";
 import { Button } from "@/components/ui/button";
 import { getAdminQuestions } from "@/services/community-admin/getAdminQuestions";
-import TableHeader from "./TableHeader";
-import TableRow from "./TableRow";
+import TableHeader from "./CommunityTableHeader";
+import TableRow from "./CommunityTableRow";
 import type { AdminFilter } from "@/features/community/admin/filters";
 
 export default function CommunityAdminTable({

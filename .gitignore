@@ -41,9 +41,7 @@ yarn-error.log*
 next-env.d.ts
 
 # 서비스 계정 키
-/scripts/serviceAccountKey.json
-/scripts/uploadClinic.ts
-/public/data/clinic_woojoo_cleared.json
+/scripts
 
 # 디버깅용
 src/utils/exposeAuthDebug.ts

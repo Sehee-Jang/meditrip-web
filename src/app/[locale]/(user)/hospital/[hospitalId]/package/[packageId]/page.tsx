@@ -2,10 +2,10 @@ import React from "react";
 import { notFound } from "next/navigation";
 import PageHeader from "@/components/common/PageHeader";
 import { getTranslations } from "next-intl/server";
-import { fetchClinics } from "@/services/hospitals/fetchClinics";
-import type { Clinic, Locale } from "@/types/clinic";
+import type { ClinicDetail, Locale } from "@/types/clinic";
 import Image from "next/image";
 import HospitalActions from "@/components/hospitals/HospitalActions";
+import { getClinicById } from "@/services/hospitals/getClinicById";
 
 interface Props {
   params: Promise<{
@@ -19,11 +19,11 @@ export default async function PackageDetailPage({ params }: Props) {
   const { locale, hospitalId, packageId } = await params;
   const t = await getTranslations("package-detail");
 
-  const clinics: Clinic[] = await fetchClinics();
-  const clinic = clinics.find((c) => c.id === hospitalId);
+  // 병원 상세(서브컬렉션 우선 + 레거시 fallback)
+  const clinic: ClinicDetail | null = await getClinicById(hospitalId);
   if (!clinic) return notFound();
 
-  const pkg = clinic.packages[packageId];
+  const pkg = clinic.packagesList.find((p) => p.id === packageId);
   if (!pkg) return notFound();
 
   const loc = locale as Locale;

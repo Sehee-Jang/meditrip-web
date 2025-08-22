@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import CommunityCategoryPill from "./CommunityCategoryPill";
-import RowActions from "./RowActions";
+import RowActions from "./CommunityRowActions";
 import type { Question } from "@/types/question";
 import type { CommunityCategoryKey } from "@/types/category";
 import UserNameById from "@/components/common/UserNameById";
