@@ -10,8 +10,8 @@ import {
 import { CATEGORY_KEYS, CATEGORY_LABELS_KO } from "@/constants/categories";
 import { listVideos } from "@/services/contents/videos.client";
 import type { Video } from "@/types/video";
-import VideoTable from "@/components/admin/contents/VideoTable";
-import VideoCreateDialog from "@/components/admin/contents/VideoCreateDialog";
+import VideoTable from "@/components/admin/shorts/VideoTable";
+import VideoCreateDialog from "@/components/admin/shorts/VideoCreateDialog";
 import { toast } from "sonner";
 import IconOnlyAddButton from "../common/IconOnlyAddButton";
 
