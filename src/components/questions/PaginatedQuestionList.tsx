@@ -31,7 +31,6 @@ export default function PaginatedQuestionList({
   const [cursors, setCursors] = useState<
     (QueryDocumentSnapshot<DocumentData> | undefined)[]
   >([undefined]);
-
   const [page, setPage] = useState(1);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [totalCount, setTotalCount] = useState(0);
