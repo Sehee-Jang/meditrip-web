@@ -473,9 +473,10 @@ export default async function ClinicDetailPage({
             </div>
           </details>
         </section>
+
         {/* 편의시설 */}
         {clinic.amenities && clinic.amenities.length > 0 && (
-          <section className='mt-4 px-4'>
+          <section className='space-y-2'>
             <div className='rounded-2xl border bg-card p-4'>
               <h2 className='text-base font-semibold mb-3'>
                 {t("amenitiesLabel") ?? "편의시설"}

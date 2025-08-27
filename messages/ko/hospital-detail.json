@@ -9,6 +9,7 @@
   "infoTab": "병원정보",
   "reviewsTab": "리뷰",
   "mapLabel": "지도",
+  "amenitiesLabel": "편의시설",
   "hours": {
     "open": "영업중",
     "closed": "영업종료",

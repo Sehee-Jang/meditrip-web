@@ -9,6 +9,7 @@
   "infoTab": "病院情報",
   "reviewsTab": "レビュー",
   "mapLabel": "地図",
+  "amenitiesLabel": "便益施設",
   "hours": {
     "open": "営業中",
     "closed": "営業時間外",
