@@ -19,6 +19,7 @@ import LocalizedTabsField from "@/components/admin/common/LocalizedTabsField";
 import ImagesUploader from "@/components/admin/common/ImagesUploader";
 import { Input } from "@/components/ui/input";
 import { LOCALES_TUPLE } from "@/constants/locales";
+import type { FieldErrors } from "react-hook-form";
 
 const DAY_KEYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"] as const;
 type DayKey = (typeof DAY_KEYS)[number];
@@ -91,6 +92,10 @@ export default function ClinicFormDialog({
   });
 
   const { register, setValue, handleSubmit, formState, reset, watch } = form;
+type SocialsInput = NonNullable<ClinicFormInput["socials"]>;
+const socialsErrors = formState.errors.socials as
+  | FieldErrors<SocialsInput>
+  | undefined;
 
   // 편집 모드 로드
   useEffect(() => {
@@ -357,11 +362,11 @@ export default function ClinicFormDialog({
 
           {/* 에러 표시(옵션) */}
           <div className='px-5 pb-4 text-sm text-destructive'>
-            {(formState.errors.phone?.message as string) ?? ""}
-            {(formState.errors.website?.message as string) ?? ""}
-            {(formState.errors.socials as any)?.instagram?.message ?? ""}
-            {(formState.errors.socials as any)?.line?.message ?? ""}
-            {(formState.errors.socials as any)?.whatsapp?.message ?? ""}
+            {formState.errors.phone?.message ?? ""}
+            {formState.errors.website?.message ?? ""}
+            {socialsErrors?.instagram?.message ?? ""}
+            {socialsErrors?.line?.message ?? ""}
+            {socialsErrors?.whatsapp?.message ?? ""}
           </div>
         </SectionCard>
 
