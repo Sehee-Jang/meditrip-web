@@ -478,10 +478,10 @@ export default async function ClinicDetailPage({
         {clinic.amenities && clinic.amenities.length > 0 && (
           <section className='space-y-2'>
             <div className='rounded-2xl border bg-card p-4'>
-              <h2 className='text-base font-semibold mb-3'>
+              <h2 className='text-xl font-semibold mb-5'>
                 {t("amenitiesLabel") ?? "편의시설"}
               </h2>
-              <div className='grid grid-cols-4 gap-4 text-center text-xs'>
+              <div className='flex justify-around gap-4 text-center text-[13px] py-4'>
                 {clinic.amenities.map((a) => (
                   <div key={a} className='flex flex-col items-center gap-1'>
                     {/* 심플 아이콘 대체: 필요시 매핑 테이블로 교체 */}
