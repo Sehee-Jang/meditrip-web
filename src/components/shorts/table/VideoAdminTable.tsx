@@ -12,7 +12,7 @@ import TableRow from "./TableRow";
 import {
   listVideosPage,
   type FireVideoAdminCursor,
-} from "@/services/contents/videos.client";
+} from "@/services/shorts/videos.client";
 
 export default function VideoAdminTable() {
   const [cursor, setCursor] =

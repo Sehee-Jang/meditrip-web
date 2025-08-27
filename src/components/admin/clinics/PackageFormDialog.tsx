@@ -17,6 +17,7 @@ import LocalizedTabsField from "@/components/admin/common/LocalizedTabsField";
 import ImagesUploader from "@/components/admin/common/ImagesUploader";
 import SingleImageUploader from "@/components/admin/common/SingleImageUploader";
 import { Button } from "@/components/ui/button";
+import { LOCALES_TUPLE } from "@/constants/locales";
 
 type PackageFormInput = z.input<typeof packageFormSchema>;
 type PackageFormOutput = z.output<typeof packageFormSchema>;
@@ -174,15 +175,10 @@ export default function PackageFormDialog({
             control={
               <LocalizedTabsField
                 register={register}
-                pathKo='title.ko'
-                pathJa='title.ja'
+                basePath='title'
+                locales={LOCALES_TUPLE}
                 placeholder='패키지 제목'
-                errorKo={
-                  formState.errors.title?.ko?.message as string | undefined
-                }
-                errorJa={
-                  formState.errors.title?.ja?.message as string | undefined
-                }
+                errors={formState.errors}
               />
             }
           />
@@ -191,15 +187,10 @@ export default function PackageFormDialog({
             control={
               <LocalizedTabsField
                 register={register}
-                pathKo='subtitle.ko'
-                pathJa='subtitle.ja'
+                basePath='subtitle'
+                locales={LOCALES_TUPLE}
                 placeholder='부제'
-                errorKo={
-                  formState.errors.subtitle?.ko?.message as string | undefined
-                }
-                errorJa={
-                  formState.errors.subtitle?.ja?.message as string | undefined
-                }
+                errors={formState.errors}
               />
             }
           />
@@ -319,17 +310,10 @@ export default function PackageFormDialog({
                       control={
                         <LocalizedTabsField
                           register={register}
-                          pathKo={`treatmentDetails.${i}.title.ko`}
-                          pathJa={`treatmentDetails.${i}.title.ja`}
+                          basePath={`treatmentDetails.${i}.title`}
+                          locales={LOCALES_TUPLE}
                           placeholder='단계 제목'
-                          errorKo={
-                            formState.errors.treatmentDetails?.[i]?.title?.ko
-                              ?.message as string | undefined
-                          }
-                          errorJa={
-                            formState.errors.treatmentDetails?.[i]?.title?.ja
-                              ?.message as string | undefined
-                          }
+                          errors={formState.errors}
                         />
                       }
                     />
@@ -339,19 +323,12 @@ export default function PackageFormDialog({
                       control={
                         <LocalizedTabsField
                           register={register}
-                          pathKo={`treatmentDetails.${i}.description.ko`}
-                          pathJa={`treatmentDetails.${i}.description.ja`}
+                          basePath={`treatmentDetails.${i}.description`}
+                          locales={LOCALES_TUPLE}
                           placeholder='상세 설명'
                           mode='textarea'
                           rows={3}
-                          errorKo={
-                            formState.errors.treatmentDetails?.[i]?.description
-                              ?.ko?.message as string | undefined
-                          }
-                          errorJa={
-                            formState.errors.treatmentDetails?.[i]?.description
-                              ?.ja?.message as string | undefined
-                          }
+                          errors={formState.errors}
                         />
                       }
                     />
@@ -393,21 +370,12 @@ export default function PackageFormDialog({
             control={
               <LocalizedTabsField
                 register={register}
-                pathKo='precautions.ko'
-                pathJa='precautions.ja'
+                basePath='precautions'
+                locales={LOCALES_TUPLE}
                 placeholder='시술 전/후 주의사항'
                 mode='textarea'
                 rows={3}
-                errorKo={
-                  formState.errors.precautions?.ko?.message as
-                    | string
-                    | undefined
-                }
-                errorJa={
-                  formState.errors.precautions?.ja?.message as
-                    | string
-                    | undefined
-                }
+                errors={formState.errors}
               />
             }
           />

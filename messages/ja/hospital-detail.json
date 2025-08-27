@@ -3,7 +3,15 @@
   "visionLabel": "ビジョン",
   "missionLabel": "ミッション",
   "eventsLabel": "予約特典",
-  "packagesLabel": "主要診療パッケージ",
+  "packagesLabel": "診療パッケージ",
   "bookButton": "予約する",
-  "shareButton": "共有する"
+  "shareButton": "共有する",
+  "infoTab": "病院情報",
+  "reviewsTab": "レビュー",
+  "mapLabel": "地図",
+  "hours": {
+    "open": "営業中",
+    "closed": "営業時間外",
+    "unknown": "営業時間不明"
+  }
 }

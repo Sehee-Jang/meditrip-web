@@ -5,7 +5,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import SearchInput from "@/components/common/SearchInput";
 import CategorySection from "@/components/main/CategorySection";
-import GroupedVideoSection from "@/components/contents/GroupedVideoSection";
+import GroupedVideoSection from "@/components/shorts/GroupedVideoSection";
 import type { CategoryKey } from "@/constants/categories";
 
 type Props = {
@@ -17,7 +17,7 @@ const SearchableContents = ({
   initialKeyword = "",
   initialSelectedCategories = [],
 }: Props) => {
-  const t = useTranslations("contents-page");
+  const t = useTranslations("shorts-page");
   const [keyword, setKeyword] = useState(initialKeyword);
   const [selectedCategories, setSelectedCategories] = useState<CategoryKey[]>(
     initialSelectedCategories

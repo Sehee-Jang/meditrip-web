@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { deleteVideo } from "@/services/contents/videos.client";
+import { deleteVideo } from "@/services/shorts/videos.client";
 
 export default function RowActions({
   videoId,

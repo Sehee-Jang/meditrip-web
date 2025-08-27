@@ -25,6 +25,27 @@ import type {
   ClinicStatus,
 } from "@/types/clinic";
 
+// ⬇️ undefined/빈 문자열 제거 유틸
+function compactSocials(
+  s: ClinicDoc["socials"] | undefined
+): ClinicDoc["socials"] | undefined {
+  if (!s) return undefined;
+  const out: Record<string, string> = {};
+  for (const [k, v] of Object.entries(s)) {
+    if (typeof v === "string") {
+      const trimmed = v.trim();
+      if (trimmed) out[k] = trimmed;
+    }
+  }
+  return Object.keys(out).length ? (out as ClinicDoc["socials"]) : undefined;
+}
+
+// ⬇️ 1단계(shallow)에서만 undefined 제거
+function stripUndefined<T extends Record<string, unknown>>(obj: T): T {
+  const entries = Object.entries(obj).filter(([, v]) => v !== undefined);
+  return Object.fromEntries(entries) as T;
+}
+
 /* ===============================
  * Converters
  * =============================== */
@@ -65,7 +86,7 @@ const packageConverter: FirestoreDataConverter<PackageDoc> = {
       title: d.title,
       subtitle: d.subtitle,
       price: d.price,
-      duration: d.duration, 
+      duration: d.duration,
       packageImages: Array.isArray(d.packageImages)
         ? (d.packageImages as string[])
         : [],
@@ -120,25 +141,66 @@ export async function getClinicByIdAdmin(
   return { id: snap.id, ...snap.data() };
 }
 
+// export async function createClinic(
+//   values: Omit<ClinicDoc, "createdAt" | "updatedAt">
+// ): Promise<string> {
+//   const now = serverTimestamp();
+//   const data: ClinicDoc = {
+//     ...values,
+//     createdAt: now as unknown as Timestamp,
+//     updatedAt: now as unknown as Timestamp,
+//   };
+//   const ref = await addDoc(clinicsCol.withConverter(clinicConverter), data);
+//   return ref.id;
+// }
 export async function createClinic(
   values: Omit<ClinicDoc, "createdAt" | "updatedAt">
 ): Promise<string> {
   const now = serverTimestamp();
-  const data: ClinicDoc = {
+
+  // socials 정리
+  const socialsClean = compactSocials(values.socials);
+
+  // 최종 payload (최상위 undefined 제거)
+  const base = stripUndefined({
     ...values,
+    socials: socialsClean,
+  });
+
+  const data: ClinicDoc = {
+    ...(base as Omit<ClinicDoc, "createdAt" | "updatedAt">),
     createdAt: now as unknown as Timestamp,
     updatedAt: now as unknown as Timestamp,
   };
+
   const ref = await addDoc(clinicsCol.withConverter(clinicConverter), data);
   return ref.id;
 }
 
+// export async function updateClinic(
+//   id: string,
+//   values: Partial<Omit<ClinicDoc, "createdAt" | "updatedAt">>
+// ): Promise<void> {
+//   const ref = doc(db, "clinics", id).withConverter(clinicConverter);
+//   await updateDoc(ref, { ...values, updatedAt: serverTimestamp() });
+// }
 export async function updateClinic(
   id: string,
   values: Partial<Omit<ClinicDoc, "createdAt" | "updatedAt">>
 ): Promise<void> {
   const ref = doc(db, "clinics", id).withConverter(clinicConverter);
-  await updateDoc(ref, { ...values, updatedAt: serverTimestamp() });
+
+  // socials 정리
+  const socialsClean = compactSocials(values.socials);
+
+  // 최상위 undefined 제거 + updatedAt 부여
+  const payload = stripUndefined({
+    ...values,
+    socials: socialsClean,
+    updatedAt: serverTimestamp(),
+  });
+
+  await updateDoc(ref, payload);
 }
 
 export async function deleteClinic(id: string): Promise<void> {

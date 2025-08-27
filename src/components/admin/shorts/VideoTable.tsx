@@ -5,7 +5,7 @@ import AdminDataTable, {
 } from "@/components/admin/common/AdminDataTable";
 import VideoTableRow from "./VideoTableRow";
 import type { Video } from "@/types/video";
-import { deleteVideo } from "@/services/contents/videos.client";
+import { deleteVideo } from "@/services/shorts/videos.client";
 import { toast } from "sonner";
 
 interface Props {

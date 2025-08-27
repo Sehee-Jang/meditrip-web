@@ -7,8 +7,8 @@ import FAQSection from "@/components/main/FAQSection";
 export default function HomeContent() {
   return (
     <SignupTrigger>
-      <FAQSection />
       <CommunitySection />
+      <FAQSection />
     </SignupTrigger>
   );
 }

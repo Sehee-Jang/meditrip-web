@@ -42,7 +42,7 @@ export default function Header() {
       {/* 데스크탑 메뉴 */}
       <nav className='hidden md:flex items-center gap-6 text-sm text-gray-800'>
         <Link href='/'>{t("main")}</Link>
-        <Link href='/contents'>{t("content")}</Link>
+        <Link href='/k-wellness'>{t("content")}</Link>
         <Link href='/community'>{t("community")}</Link>
         <Link href='/hospital'>{t("hospital")}</Link>
         {user ? (
@@ -59,7 +59,7 @@ export default function Header() {
 
       {/* 모바일 아이콘 메뉴 */}
       <nav className='flex md:hidden items-center gap-4 text-gray-700'>
-        <Link href='/contents' aria-label={t("content")}>
+        <Link href='/k-wellness' aria-label={t("content")}>
           <BookOpenIcon size={20} />
         </Link>
         <Link href='/community' aria-label={t("community")}>

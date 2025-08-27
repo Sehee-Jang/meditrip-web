@@ -1,5 +1,5 @@
 import { getTranslations } from "next-intl/server";
-import SearchableContents from "@/components/contents/SearchableContents";
+import SearchableContents from "@/components/shorts/SearchableContents";
 import Container from "@/components/common/Container";
 import PageHeader from "@/components/common/PageHeader";
 import SignupSection from "@/components/common/signup/SignupSection";
@@ -16,7 +16,7 @@ export default async function ContentsPage({
   params: Promise<{ locale: string }>;
   searchParams: Promise<SearchParams>;
 }) {
-  const t = await getTranslations("contents-page");
+  const t = await getTranslations("shorts-page");
   const sp = await searchParams;
 
   // categories 파싱: 단일/배열/콤마 모두 허용

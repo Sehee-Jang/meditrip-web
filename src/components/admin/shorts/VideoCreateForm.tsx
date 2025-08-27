@@ -18,7 +18,7 @@ import { toast } from "sonner";
 import {
   createVideo,
   type CreateVideoInput,
-} from "@/services/contents/videos.client";
+} from "@/services/shorts/videos.client";
 import {
   CATEGORY_VALUES_TUPLE,
   CATEGORY_KEYS,

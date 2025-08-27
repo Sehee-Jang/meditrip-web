@@ -1,37 +1,35 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import SearchInput from "@/components/common/SearchInput";
-import {
-  FilterRow,
-  SelectFilter,
-} from "@/components/admin/common/FilterControls";
+import React, { useEffect, useMemo, useState } from "react";
+import { FilterRow, SelectFilter } from "../common/FilterControls";
 import { CATEGORY_KEYS, CATEGORY_LABELS_KO } from "@/constants/categories";
-import { listVideos } from "@/services/shorts/videos.client";
-import type { Video } from "@/types/video";
-import VideoTable from "@/components/admin/shorts/VideoTable";
-import VideoCreateDialog from "@/components/admin/shorts/VideoCreateDialog";
-import { toast } from "sonner";
+import SearchInput from "@/components/common/SearchInput";
 import IconOnlyAddButton from "../common/IconOnlyAddButton";
+import WellnessTable from "./WellnessTable";
+import { Wellness } from "@/types/wellness";
+import { useQuery } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { listWellness } from "@/services/wellness/listWellness";
+import WellnessFormDialog from "./WellnessFormDialog";
 
 type CatFilter = "all" | (typeof CATEGORY_KEYS)[number];
 
-export default function ContentAdminClient() {
+export default function WellnessAdminClient() {
   const [open, setOpen] = useState(false);
   const [keyword, setKeyword] = useState("");
   const [cat, setCat] = useState<CatFilter>("all");
 
   const { data, isFetching, refetch, error } = useQuery({
-    queryKey: ["admin-videos"],
-    queryFn: () => listVideos({ limit: 100 }),
+    queryKey: ["admin-wellness", { cat, keyword }],
+    // 관리자: 숨김 포함
+    queryFn: () => listWellness({ includeHidden: true, limit: 100 }),
   });
 
   useEffect(() => {
-    if (error) toast.error("콘텐츠 목록을 불러오지 못했어요.");
+    if (error) toast.error("목록을 불러오지 못했어요.");
   }, [error]);
 
-  const items = useMemo<Video[]>(() => (data ?? []) as Video[], [data]);
+  const items = useMemo<Wellness[]>(() => data?.items ?? [], [data]);
 
   const filtered = useMemo(() => {
     const kw = keyword.trim().toLowerCase();
@@ -47,7 +45,6 @@ export default function ContentAdminClient() {
 
   return (
     <section className='space-y-4'>
-      {/* 상단 툴바: 좌(검색/카테고리) · 우(영상 추가) */}
       <div className='flex flex-col gap-3 md:flex-row md:items-center md:justify-between'>
         <FilterRow>
           <SearchInput
@@ -74,15 +71,14 @@ export default function ContentAdminClient() {
 
         <div className='flex shrink-0 items-center gap-2'>
           <IconOnlyAddButton
-            label='영상 추가'
-            ariaLabel='영상 추가'
+            label='콘텐츠 추가'
+            ariaLabel='콘텐츠 추가'
             onClick={() => setOpen(true)}
           />
         </div>
       </div>
 
-      {/* 목록 테이블 */}
-      <VideoTable
+      <WellnessTable
         items={filtered}
         totalCount={items.length}
         loading={isFetching}
@@ -90,14 +86,14 @@ export default function ContentAdminClient() {
       />
 
       {/* 생성 다이얼로그 */}
-      <VideoCreateDialog
-        open={open}
-        onOpenChange={setOpen}
-        onCreated={() => {
-          setOpen(false);
-          void refetch();
-        }}
-      />
+      {open && (
+        <WellnessFormDialog
+          id='' // 빈 문자열이면 create 모드
+          open
+          onOpenChange={setOpen}
+          onCreated={() => void refetch()}
+        />
+      )}
     </section>
   );
 }

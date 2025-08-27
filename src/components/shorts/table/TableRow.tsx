@@ -18,7 +18,7 @@ export default function TableRow({
   return (
     <tr
       className='border-b hover:bg-slate-50 cursor-pointer'
-      onClick={() => router.push(`/admin/contents/${v.id}`)}
+      onClick={() => router.push(`/admin/shorts/${v.id}`)}
     >
       {/* 제목 + (옵션) 상태 뱃지 자리 */}
       <td className='px-4 py-3'>

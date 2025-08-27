@@ -2,10 +2,13 @@ import React from "react";
 import { notFound } from "next/navigation";
 import PageHeader from "@/components/common/PageHeader";
 import { getTranslations } from "next-intl/server";
-import type { ClinicDetail, Locale } from "@/types/clinic";
+import type { ClinicDetail } from "@/types/clinic";
+import type { Locale } from "@/i18n/routing";
 import Image from "next/image";
 import HospitalActions from "@/components/hospitals/HospitalActions";
 import { getClinicById } from "@/services/hospitals/getClinicById";
+import { toSupportedLocale } from "@/utils/i18n";
+import { pickText } from "@/utils/i18n";
 
 interface Props {
   params: Promise<{
@@ -26,13 +29,15 @@ export default async function PackageDetailPage({ params }: Props) {
   const pkg = clinic.packagesList.find((p) => p.id === packageId);
   if (!pkg) return notFound();
 
-  const loc = locale as Locale;
+  const loc: Locale = toSupportedLocale(locale);
+  const title = pickText(pkg.title, loc);
+  const precautions = pickText(pkg.precautions ?? null, loc);
 
   return (
     <main className='md:px-4 md:py-8'>
       <PageHeader
-        desktopTitle={pkg.title[loc]}
-        mobileTitle={pkg.title[loc]}
+        desktopTitle={title}
+        mobileTitle={title}
         showBackIcon
         center
       />
@@ -47,12 +52,7 @@ export default async function PackageDetailPage({ params }: Props) {
                 key={i}
                 className='relative w-full h-60 sm:h-80 md:h-[360px]'
               >
-                <Image
-                  src={img}
-                  alt={pkg.title[loc]}
-                  fill
-                  className='object-cover'
-                />
+                <Image src={img} alt={title} fill className='object-cover' />
               </div>
             ))}
           </div>
@@ -144,7 +144,7 @@ export default async function PackageDetailPage({ params }: Props) {
               {t("noteTitle")}
             </h2>
             <div className='bg-gray-50 border rounded-md p-4 text-sm text-gray-600'>
-              {pkg.precautions[loc]}
+              {precautions}
             </div>
           </>
         )}

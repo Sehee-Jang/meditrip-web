@@ -5,13 +5,13 @@ import { auth } from "@/lib/firebase";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
 import Container from "../common/Container";
-import VideoCard from "../contents/VideoCard";
+import VideoCard from "../shorts/VideoCard";
 import { ChevronRight } from "lucide-react";
 import type { Video } from "@/types/video";
-import { listVideos } from "@/services/contents/videos.client";
+import { listVideos } from "@/services/shorts/videos.client";
 
-export default function ContentSection() {
-  const t = useTranslations("content-section");
+export default function ShortsSection() {
+  const t = useTranslations("shorts-section");
   const [isAnonymous, setIsAnonymous] = useState(true);
   const [showPrompt, setShowPrompt] = useState(false);
   const [viewCount, setViewCount] = useState(0);
@@ -124,7 +124,7 @@ export default function ContentSection() {
 
           {/* 더 보기 버튼 (데스크탑만) */}
           <Link
-            href='/contents/'
+            href='/shorts/'
             className='hidden md:inline-flex items-center gap-1 bg-white text-black border text-sm font-medium px-4 py-2 rounded-md hover:bg-gray-100 hover:border-gray-300 transition'
           >
             {t("seeMore")}
@@ -190,7 +190,7 @@ export default function ContentSection() {
         {/* 더 보기 버튼 (모바일만) */}
         <div className='mt-8 flex justify-center md:hidden'>
           <Link
-            href='/contents'
+            href='/shorts'
             className='inline-flex items-center gap-1 bg-white text-black border text-sm font-medium px-4 py-2 rounded-md hover:bg-gray-100 hover:border-gray-300 transition'
           >
             {t("seeMore")}

@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import VideoListSection from "./VideoListSection";
 import { CategoryKey } from "@/constants/categories";
 import { Video } from "@/types/video";
-import { listVideos } from "@/services/contents/videos.client";
+import { listVideos } from "@/services/shorts/videos.client";
 import CommonButton from "../common/CommonButton";
 
 type Props = {
@@ -21,7 +21,7 @@ export default function GroupedVideoSection({
   pageSize = 10,
 }: Props) {
   const tCat = useTranslations("categories");
-  const tCont = useTranslations("contents-page");
+  const tCont = useTranslations("shorts-page");
   const [items, setItems] = useState<Video[]>([]);
   const [page, setPage] = useState(1);
 
@@ -114,55 +114,3 @@ export default function GroupedVideoSection({
     </>
   );
 }
-
-  // const byKeyword = items.filter((v) => {
-  //   const kw = keyword.trim();
-  //   if (!kw) return true;
-  //   return (
-  //     v.title.toLowerCase().includes(kw.toLowerCase()) ||
-  //     v.category.toLowerCase().includes(kw.toLowerCase())
-  //   );
-  // });
-
-  // 카테고리 선택 O → 선택 카테고리만, 카테고리 선택 X → 그대로(byKeyword)
-  // const byCategory =
-  //   selectedCategories.length === 0
-  //     ? byKeyword
-  //     : byKeyword.filter((v) => selectedCategories.includes(v.category));
-
-  // 카테고리 미선택이면 "모아보기"로 단일 리스트 렌더
-  // if (selectedCategories.length === 0) {
-  //   return byKeyword.length === 0 ? (
-  //     <p className='text-center text-sm text-gray-500 py-8'>
-  //       {tCont("noContentMessage")}
-  //     </p>
-  //   ) : (
-  //     <VideoListSection title={tCont("allContents")} videos={byKeyword} />
-  //   );
-  // }
-
-  // 카테고리 선택된 경우에만 기존처럼 그룹 섹션 렌더
-  // const grouped = byCategory.reduce((acc, video) => {
-  //   if (!acc[video.category]) acc[video.category] = [];
-  //   acc[video.category].push(video);
-  //   return acc;
-  // }, {} as Record<CategoryKey, Video[]>);
-
-  // const entries = Object.entries(grouped);
-
-//   return entries.length === 0 ? (
-//     <p className='text-center text-sm text-gray-500 py-8'>
-//       {tCont("noContentMessage")}
-//     </p>
-//   ) : (
-//     <>
-//       {entries.map(([categoryKey, videos]) => (
-//         <VideoListSection
-//           key={categoryKey}
-//           title={tCat(categoryKey as CategoryKey)}
-//           videos={videos}
-//         />
-//       ))}
-//     </>
-//   );
-// }

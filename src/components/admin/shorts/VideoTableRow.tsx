@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import ContentCategoryPill from "@/components/contents/table/ContentCategoryPill";
+import ContentCategoryPill from "@/components/shorts/table/ContentCategoryPill";
 import type { Video } from "@/types/video";
 import { formatDateTimeCompact } from "@/utils/date";
 import { useState } from "react";

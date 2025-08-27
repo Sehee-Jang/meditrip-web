@@ -1,14 +1,17 @@
 import type { Timestamp } from "firebase/firestore";
+import type { LocaleKey } from "@/constants/locales";
 
 /** ===== 공통 ===== */
-export type Locale = "ko" | "ja";
+// export type Locale = "ko" | "ja";
 export type ClinicCategory = "traditional" | "cosmetic" | "wellness";
 export type ClinicStatus = "visible" | "hidden";
+// 다국어 문서 형태
+export type LocalizedTextDoc = Record<LocaleKey, string>;
 
-export interface LocalizedField {
-  ko: string;
-  ja: string;
-}
+// export interface LocalizedField {
+//   ko: string;
+//   ja: string;
+// }
 
 export interface LocalizedNumber {
   ko: number; // KRW 금액 또는 분
@@ -22,42 +25,66 @@ export interface Geo {
   formattedAddress?: string; // 지오코딩 표준 주소(원문)
 }
 
+/** ===== 영업시간/편의시설/SNS ===== */
+export type DayOfWeek = "mon" | "tue" | "wed" | "thu" | "fri" | "sat" | "sun";
+export type TimeHHmm = `${number}${number}:${number}${number}`; // "09:00"
+export type DailyRange = { open: TimeHHmm; close: TimeHHmm };
+export type WeeklyHours = Partial<Record<DayOfWeek, DailyRange[]>>;
+
+export type AmenityKey =
+  | "parking"
+  | "freeWifi"
+  | "infoDesk"
+  | "privateCare"
+  | "airportPickup";
+
+export type SocialPlatform = "instagram" | "line" | "whatsapp";
+
+
 /** ===== Firestore 저장용: 진료 상세설명 ===== */
 export interface TreatmentStep {
-  title: LocalizedField; // 예: "검사 및 검진"
-  description: LocalizedField; // 예: 상세 설명
+  title: LocalizedTextDoc; // 예: "검사 및 검진"
+  description: LocalizedTextDoc; // 예: 상세 설명
   imageUrl?: string; // Firestore에 저장된 이미지 URL
 }
 
 /** Firestore 저장용 : 패키지 (서브컬렉션) */
 export interface PackageInfo {
-  title: LocalizedField;
-  subtitle: LocalizedField;
+  title: LocalizedTextDoc;
+  subtitle: LocalizedTextDoc;
   price: LocalizedNumber;
   duration: LocalizedNumber;
   packageImages?: string[];
   treatmentDetails?: TreatmentStep[]; // 진료 상세 설명 (텍스트 + 이미지 포함)
-  precautions?: LocalizedField; // 주의사항 텍스트
+  precautions?: LocalizedTextDoc; // 주의사항 텍스트
 }
 
 /** Firestore 저장용: 병원 (패키지는 서브컬렉션) */
 export interface Clinic {
   id: string;
-  name: LocalizedField;
-  address: LocalizedField;
+  name: LocalizedTextDoc;
+  address: LocalizedTextDoc;
   geo?: Geo; // 지도는 여기 기반으로
   intro: {
-    title: LocalizedField;
-    subtitle: LocalizedField;
+    title: LocalizedTextDoc;
+    subtitle: LocalizedTextDoc;
   };
   category?: ClinicCategory;
-  vision: LocalizedField;
-  mission: LocalizedField;
-  description: LocalizedField;
-  events: {
+  vision?: LocalizedTextDoc;
+  mission?: LocalizedTextDoc;
+  description?: LocalizedTextDoc;
+  events?: {
     ko: string[];
     ja: string[];
   };
+  tagKeys?: string[]; // 상단 칩(필터용 키)
+  phone?: string; // "02-745-7511" 등
+  website?: string; // 클리닉 웹사이트
+  socials?: Partial<Record<SocialPlatform, string>>; // instagram/line/youtube URL
+  weeklyHours?: WeeklyHours; // 요일별 영업시간
+  weeklyClosedDays?: DayOfWeek[]; // 정기 휴무 요일
+  hoursNote?: LocalizedTextDoc; // "매주 일요일 휴무" 등 안내문
+  amenities?: AmenityKey[]; // 편의시설 아이콘 키
   isFavorite: boolean; // 기본 false
   rating: number; // 기본 0
   reviewCount: number; // 기본 0

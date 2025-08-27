@@ -3,7 +3,15 @@
   "visionLabel": "Vision",
   "missionLabel": "Mission",
   "eventsLabel": "예약 이벤트",
-  "packagesLabel": "주요 진료 패키지",
+  "packagesLabel": "진료 패키지",
   "bookButton": "예약하기",
-  "shareButton": "공유하기"
+  "shareButton": "공유하기",
+  "infoTab": "병원정보",
+  "reviewsTab": "리뷰",
+  "mapLabel": "지도",
+  "hours": {
+    "open": "영업중",
+    "closed": "영업종료",
+    "unknown": "영업시간 정보 없음"
+  }
 }
