@@ -25,6 +25,7 @@
 // "fs" 사용 금지! Edge 호환 버전
 
 export const NAMESPACES = [
+  "amenities",
   "categories",
   "common",
   "community-page",

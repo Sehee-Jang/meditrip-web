@@ -21,7 +21,7 @@ export default function FormRow({
   return (
     <div className={cn("px-5 py-4 flex items-start gap-4", className)}>
       <div className='w-36 shrink-0 pt-2'>
-        <label className='text-[12px] font-medium text-muted-foreground'>
+        <label className='text-[13px] font-medium text-muted-foreground'>
           {label}
         </label>
       </div>

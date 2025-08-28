@@ -11,7 +11,20 @@ import FavoriteButton from "@/components/hospitals/FavoriteButton";
 import GoogleMapEmbed from "@/components/common/GoogleMapEmbed";
 import { formatPrice, formatDuration } from "@/lib/format";
 import { toSupportedLocale, pickText, pickLocalized } from "@/utils/i18n";
-import { Clock, Earth, MapPin, Phone, Star, ChevronDown } from "lucide-react";
+import {
+  Clock,
+  Earth,
+  MapPin,
+  Phone,
+  Star,
+  ChevronDown,
+  Car,
+  Wifi,
+  Info,
+  Shield,
+  Plane,
+} from "lucide-react";
+import type { AmenityKey, Doctor } from "@/types/clinic";
 
 type PageParams = Promise<{ locale: string; hospitalId: string }>;
 type SearchParams = Promise<{ tab?: string }>;
@@ -90,6 +103,7 @@ export default async function ClinicDetailPage({
   const activeTab: "info" | "reviews" = tab === "reviews" ? "reviews" : "info";
 
   const t = await getTranslations("hospital-detail");
+  const tAmenity = await getTranslations("amenities");
 
   // 단일 문서만 읽기
   const clinic: ClinicDetail | null = await getClinicById(hospitalId);
@@ -125,6 +139,20 @@ export default async function ClinicDetailPage({
   const ratingAvg = typeof rating?.avg === "number" ? rating?.avg : undefined;
   const ratingCount =
     typeof rating?.count === "number" ? rating?.count : undefined;
+
+  const reservationNotices =
+    pickLocalized<string[]>(clinic.reservationNotices ?? null, loc) ?? [];
+
+  const doctors: Doctor[] = clinic.doctors ?? [];
+
+  // 편의시설 아이콘/라벨 매핑
+  const AMENITY_ICONS: Record<AmenityKey, React.ReactNode> = {
+    parking: <Car size={24} />,
+    freeWifi: <Wifi size={24} />,
+    infoDesk: <Info size={24} />,
+    privateCare: <Shield size={24} />,
+    airportPickup: <Plane size={24} />,
+  };
 
   return (
     <main className='md:px-4 md:py-8'>
@@ -186,6 +214,7 @@ export default async function ClinicDetailPage({
             </div>
           )}
         </div>
+
         {/* 탭 네비게이션 (비JS, 앵커/링크) */}
         <div className='mt-2'>
           <div className='border-b'>
@@ -224,33 +253,170 @@ export default async function ClinicDetailPage({
                 </InfoRow>
 
                 {/* 영업시간: 좌측 상태, 우측 안내 + ▾ */}
-                <InfoRow
-                  icon={<Clock size={18} />}
-                  right={
-                    hoursNote ? (
-                      <span className='inline-flex items-center gap-1 text-sm text-muted-foreground'>
-                        {hoursNote}
-                        <ChevronDown size={16} />
-                      </span>
-                    ) : null
-                  }
-                >
-                  <span
-                    className={
-                      open === null
-                        ? ""
-                        : open
-                        ? "text-emerald-600 font-medium"
-                        : "text-rose-600 font-medium"
-                    }
-                  >
-                    {open === null
-                      ? t("hours.unknown")
+                {(() => {
+                  const dayOrder: DayOfWeek[] = [
+                    "mon",
+                    "tue",
+                    "wed",
+                    "thu",
+                    "fri",
+                    "sat",
+                    "sun",
+                  ];
+                  const pairs: Array<[DayOfWeek, DayOfWeek | null]> = [
+                    ["mon", "tue"],
+                    ["wed", "thu"],
+                    ["fri", "sat"],
+                    ["sun", null],
+                  ];
+
+                  const DAY_LABELS: Record<
+                    Locale,
+                    Record<DayOfWeek, string>
+                  > = {
+                    ko: {
+                      mon: "월",
+                      tue: "화",
+                      wed: "수",
+                      thu: "목",
+                      fri: "금",
+                      sat: "토",
+                      sun: "일",
+                    },
+                    ja: {
+                      mon: "月",
+                      tue: "火",
+                      wed: "水",
+                      thu: "木",
+                      fri: "金",
+                      sat: "土",
+                      sun: "日",
+                    },
+                    zh: {
+                      mon: "周一",
+                      tue: "周二",
+                      wed: "周三",
+                      thu: "周四",
+                      fri: "周五",
+                      sat: "周六",
+                      sun: "周日",
+                    },
+                    en: {
+                      mon: "Mon",
+                      tue: "Tue",
+                      wed: "Wed",
+                      thu: "Thu",
+                      fri: "Fri",
+                      sat: "Sat",
+                      sun: "Sun",
+                    },
+                  };
+                  const CLOSED: Record<Locale, string> = {
+                    ko: "휴무",
+                    ja: "休み",
+                    zh: "休息",
+                    en: "Closed",
+                  };
+                  const NOINFO: Record<Locale, string> = {
+                    ko: "영업시간 정보가 없습니다.",
+                    ja: "営業時間情報がありません。",
+                    zh: "暂无营业时间信息。",
+                    en: "No hours information.",
+                  };
+
+                  const hours = clinic.weeklyHours ?? {};
+                  const closedDays = clinic.weeklyClosedDays ?? [];
+                  const hasAny = dayOrder.some(
+                    (d) => (hours[d]?.length ?? 0) > 0
+                  );
+
+                  const labelColor =
+                    open === null
+                      ? ""
                       : open
-                      ? t("hours.open")
-                      : t("hours.closed")}
-                  </span>
-                </InfoRow>
+                      ? "text-emerald-600 font-medium"
+                      : "text-rose-600 font-medium";
+
+                  const todayKey: DayOfWeek = (
+                    ["sun", "mon", "tue", "wed", "thu", "fri", "sat"] as const
+                  )[new Date().getDay()];
+
+                  const isClosed = (d: DayOfWeek) =>
+                    closedDays.includes(d) || (hours[d]?.length ?? 0) === 0;
+
+                  const textFor = (d: DayOfWeek) =>
+                    (hours[d]?.length ?? 0) > 0
+                      ? hours[d]!.map((r) => `${r.open} – ${r.close}`).join(
+                          ", "
+                        )
+                      : CLOSED[loc];
+
+                  const Cell = ({ d }: { d: DayOfWeek }) => (
+                    <div className='grid grid-cols-[28px_1fr] items-baseline gap-3'>
+                      <span
+                        className={[
+                          "w-7 text-muted-foreground",
+                          todayKey === d ? "text-foreground font-medium" : "",
+                        ].join(" ")}
+                      >
+                        {(DAY_LABELS[loc] ?? DAY_LABELS.en)[d]}
+                      </span>
+                      <span
+                        className={[
+                          "font-mono tabular-nums",
+                          isClosed(d) ? "text-muted-foreground" : "font-medium",
+                        ].join(" ")}
+                      >
+                        {textFor(d)}
+                      </span>
+                    </div>
+                  );
+
+                  return (
+                    <details className='group border-b rounded-lg'>
+                      <summary className='list-none cursor-pointer'>
+                        <div className='flex items-center gap-3 px-4 py-4 text-[15px]'>
+                          <span className='mt-0.5 shrink-0 text-muted-foreground'>
+                            <Clock size={18} />
+                          </span>
+                          <div className='flex-1'>
+                            <span className={labelColor}>
+                              {open === null
+                                ? t("hours.unknown")
+                                : open
+                                ? t("hours.open")
+                                : t("hours.closed")}
+                            </span>
+                          </div>
+                          <span className='ml-3 shrink-0 inline-flex items-center gap-2 text-sm text-muted-foreground'>
+                            {hoursNote}
+                            <ChevronDown
+                              size={16}
+                              className='transition-transform group-open:rotate-180'
+                            />
+                          </span>
+                        </div>
+                      </summary>
+
+                      <div className='pl-12 pr-4 pb-4'>
+                        {hasAny ? (
+                          <div className='grid grid-cols-2 gap-x-10 gap-y-2'>
+                            {pairs.map(([a, b]) => (
+                              <React.Fragment key={a + (b ?? "")}>
+                                <Cell d={a} />
+                                {b ? <Cell d={b} /> : <div />}
+                              </React.Fragment>
+                            ))}
+                          </div>
+                        ) : (
+                          <p className='text-sm text-muted-foreground'>
+                            {NOINFO[loc]}
+                          </p>
+                        )}
+                      </div>
+                    </details>
+                  );
+                })()}
 
                 {/* 전화 */}
                 {clinic.phone && (
@@ -341,20 +507,13 @@ export default async function ClinicDetailPage({
               <span className='text-xl font-semibold'>
                 {t("aboutLabel") ?? "병원소개"}
               </span>
-              <span className='i-chevron group-open:rotate-180 transition-transform'>
-                {/* 간단한 ▾ 아이콘 */}
-                <svg width='18' height='18' viewBox='0 0 24 24'>
-                  <path
-                    d='M6 9l6 6 6-6'
-                    stroke='currentColor'
-                    strokeWidth='2'
-                    fill='none'
-                  />
-                </svg>
-              </span>
+              <ChevronDown
+                size={18}
+                className='text-muted-foreground transition-transform group-open:rotate-180'
+              />
             </summary>
 
-            <div className='flex flex-col gap-4 px-4 pb-4 text-sm leading-7 text-foreground/90'>
+            <div className='flex flex-col gap-4 px-4 py-4 text-sm leading-7 text-foreground/90'>
               {/* 설명 */}
               <p>{description}</p>
 
@@ -381,37 +540,89 @@ export default async function ClinicDetailPage({
           </details>
         </section>
 
-        {/* 편의시설 */}
-        {clinic.amenities && clinic.amenities.length > 0 && (
+        {/* 의료진 소개 */}
+        {doctors.length > 0 && (
           <section className='space-y-2'>
-            <div className='rounded-2xl border bg-card p-4'>
-              <h2 className='text-xl font-semibold mb-5'>
-                {t("amenitiesLabel") ?? "편의시설"}
-              </h2>
-              <div className='flex justify-around gap-4 text-center text-[13px] py-4'>
-                {clinic.amenities.map((a) => (
-                  <div key={a} className='flex flex-col items-center gap-1'>
-                    {/* 심플 아이콘 대체: 필요시 매핑 테이블로 교체 */}
-                    <div className='w-9 h-9 rounded-full border grid place-items-center'>
-                      {/* 기본 아이콘 */}
-                      <svg width='18' height='18' viewBox='0 0 24 24'>
-                        <circle
-                          cx='12'
-                          cy='12'
-                          r='9'
-                          stroke='currentColor'
-                          fill='none'
-                          strokeWidth='2'
-                        />
-                      </svg>
-                    </div>
-                    <span className='truncate'>{a}</span>
-                  </div>
-                ))}
+            <details className='group rounded-2xl border bg-card'>
+              <summary className='list-none cursor-pointer px-4 py-3 flex items-center justify-between'>
+                <span className='text-xl font-semibold'>
+                  {t("doctorsLabel") ?? "의료진 소개"}
+                </span>
+                <ChevronDown
+                  size={18}
+                  className='text-muted-foreground transition-transform group-open:rotate-180'
+                />
+              </summary>
+
+              <div className='flex flex-col gap-4 px-4 py-4 text-sm leading-7 text-foreground/90'>
+                {doctors.map((d, idx) => {
+                  const doctorName = pickText(d.name, loc);
+                  const lines = pickLocalized<string[]>(d.lines, loc) ?? [];
+                  return (
+                    <li key={idx} className='grid grid-cols-[88px_1fr] gap-4'>
+                      {/* 사진 */}
+                      <div className='relative w-[88px] h-[88px] rounded-lg overflow-hidden border bg-muted'>
+                        {d.photoUrl ? (
+                          <Image
+                            src={d.photoUrl}
+                            alt={doctorName || "doctor photo"}
+                            fill
+                            className='object-cover'
+                          />
+                        ) : null}
+                      </div>
+
+                      {/* 이름 + 경력 */}
+                      <div>
+                        <div className='text-base font-medium'>
+                          {doctorName}
+                        </div>
+                        {lines.length > 0 && (
+                          <ul className='mt-2 list-disc list-inside text-sm text-foreground/80 space-y-1'>
+                            {lines.map((l, i) => (
+                              <li key={i}>{l}</li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
+                    </li>
+                  );
+                })}
               </div>
-            </div>
+            </details>
           </section>
         )}
+
+        {/* 편의시설 */}
+        <section className='space-y-2'>
+          {clinic.amenities && clinic.amenities.length > 0 && (
+            <details className='group rounded-2xl border bg-card'>
+              <summary className='list-none cursor-pointer px-4 py-3 flex items-center justify-between'>
+                <span className='text-xl font-semibold'>
+                  {t("amenitiesLabel") ?? "편의시설"}
+                </span>
+                <ChevronDown
+                  size={18}
+                  className='text-muted-foreground transition-transform group-open:rotate-180'
+                />
+              </summary>
+
+              <div className='flex flex-col gap-4 px-4 py-4 text-sm leading-7 text-foreground/90'>
+                <ul className='grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-y-4'>
+                  {clinic.amenities.map((a) => (
+                    <li key={a} className='flex flex-col items-center gap-1'>
+                      <span className='inline-flex items-center justify-center'>
+                        {AMENITY_ICONS[a]}
+                      </span>
+                      <span className='text-sm '>{tAmenity(a)}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </details>
+          )}
+        </section>
+
         {/* 지도 */}
         <section className='space-y-2'>
           <div className='rounded-2xl border bg-card p-4'>
@@ -426,6 +637,7 @@ export default async function ClinicDetailPage({
             />
           </div>
         </section>
+
         {/* 패키지 리스트 */}
         <section className='space-y-2'>
           <h2 className='text-xl font-semibold'>{t("packagesLabel")}</h2>
@@ -481,6 +693,20 @@ export default async function ClinicDetailPage({
             })}
           </div>
         </section>
+
+        {/* 예약 시 주의사항 */}
+        {reservationNotices.length > 0 && (
+          <section className='space-y-2'>
+            <div className='rounded-2xl border bg-card p-4'>
+              <h2 className='text-xl font-semibold mb-3'>예약 시 주의사항</h2>
+              <ul className='list-disc list-inside text-sm text-foreground/80 space-y-1'>
+                {reservationNotices.map((n, i) => (
+                  <li key={i}>{n}</li>
+                ))}
+              </ul>
+            </div>
+          </section>
+        )}
       </section>
     </main>
   );

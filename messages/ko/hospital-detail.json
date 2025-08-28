@@ -2,6 +2,7 @@
   "aboutLabel": "병원 소개",
   "visionLabel": "Vision",
   "missionLabel": "Mission",
+  "doctorsLabel": "의료진 소개",
   "eventsLabel": "예약 이벤트",
   "packagesLabel": "진료 패키지",
   "bookButton": "예약하기",
@@ -14,5 +15,6 @@
     "open": "영업중",
     "closed": "영업종료",
     "unknown": "영업시간 정보 없음"
-  }
+  },
+  "reservationNoticesLabel": "예약 시 주의사항"
 }

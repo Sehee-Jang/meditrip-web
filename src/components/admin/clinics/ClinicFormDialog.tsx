@@ -38,6 +38,7 @@ import {
   asClinicCategory,
   asAmenityKeys,
 } from "./form-utils";
+import CleanFormLayout from "@/components/admin/common/CleanFormLayout";
 
 /* ====== 타입 별칭 ====== */
 type ClinicFormInputZod = z.input<typeof clinicFormSchema>;
@@ -79,13 +80,8 @@ export default function ClinicFormDialog({
       vision: { ko: "", ja: "", zh: "", en: "" },
       mission: { ko: "", ja: "", zh: "", en: "" },
       description: { ko: "", ja: "", zh: "", en: "" },
-      events: { ko: [], ja: [], zh: [], en: [] },
-      reservationNotices: {
-        ko: ["", "", ""],
-        ja: ["", "", ""],
-        zh: ["", "", ""],
-        en: ["", "", ""],
-      },
+      events: { ko: [""], ja: [""], zh: [""], en: [""] },
+      reservationNotices: { ko: [""], ja: [""], zh: [""], en: [""] },
       images: [],
       tagKeys: [],
       phone: "",
@@ -270,6 +266,19 @@ export default function ClinicFormDialog({
 
   const images = watch("images") ?? [];
 
+  const sections = [
+    { id: "sec-basic", label: "기본 정보" },
+    { id: "sec-contacts", label: "연락처·웹/SNS" },
+    { id: "sec-hours", label: "영업시간·휴무" },
+    { id: "sec-about", label: "소개" },
+    { id: "sec-amenities", label: "편의시설" },
+    { id: "sec-notices", label: "주의사항" },
+    { id: "sec-events", label: "이벤트" },
+    { id: "sec-doctors", label: "의료진 소개" },
+    { id: "sec-media", label: "이미지" },
+    { id: "sec-geo", label: "좌표/주소" },
+  ] as const;
+
   return (
     <FormSheet
       open={open}
@@ -277,247 +286,316 @@ export default function ClinicFormDialog({
       title={mode === "create" ? "병원 등록" : "병원 수정"}
       description='필수 정보를 입력하세요.'
       formId={formId}
+      // 제출 버튼은 CleanFormLayout 하단 고정바에서 노출하므로 여기선 라벨은 사용 안 함
       submitLabel={mode === "create" ? "등록" : "수정"}
-      widthClassName='sm:max-w-[860px]'
+      widthClassName='sm:max-w-[980px]' // 살짝 넓게
     >
       <RHFProvider {...form}>
         <form
           id={formId}
           ref={formElRef}
-          className='space-y-6'
           onSubmit={handleSubmit(onSubmit, onInvalid)}
         >
-          {/* ===== 기본 정보 ===== */}
-          <SectionCard title='기본 정보'>
-            <FormRow
-              label='병원명'
-              control={
-                <LocalizedTabsField
-                  register={register}
-                  basePath='name'
-                  locales={LOCALES_TUPLE}
-                  errors={formState.errors}
-                  placeholder='병원명을 입력하세요.'
-                  mode='input'
-                />
-              }
-            />
-            <FormRow
-              label='주소'
-              control={
-                <LocalizedTabsField
-                  register={register}
-                  basePath='address'
-                  locales={LOCALES_TUPLE}
-                  errors={formState.errors}
-                  placeholder='주소를 입력하세요.'
-                  mode='input'
-                />
-              }
-            />
-            <FormRow
-              label='소개 제목(선택)'
-              control={
-                <LocalizedTabsField
-                  register={register}
-                  basePath='intro.title'
-                  locales={LOCALES_TUPLE}
-                  errors={formState.errors}
-                  placeholder='소개 제목을 입력하세요.'
-                  mode='input'
-                />
-              }
-            />
-            <FormRow
-              label='소개 부제(선택)'
-              control={
-                <LocalizedTabsField
-                  register={register}
-                  basePath='intro.subtitle'
-                  locales={LOCALES_TUPLE}
-                  errors={formState.errors}
-                  placeholder='소개 부제를 입력하세요.'
-                  mode='input'
-                />
-              }
-            />
-            <FormRow
-              label='카테고리(선택)'
-              control={
-                <select
-                  {...register("category")}
-                  className='h-9 rounded border px-2 text-sm'
-                  aria-invalid={!!formState.errors.category}
-                >
-                  <option value=''>선택 안 함</option>
-                  <option value='traditional'>한방/통합의학</option>
-                  <option value='cosmetic'>미용/성형</option>
-                  <option value='wellness'>웰니스</option>
-                </select>
-              }
-            />
-          </SectionCard>
-
-          {/* ===== 연락처 & 웹·SNS ===== */}
-          <SectionCard title='연락처 & 웹·SNS'>
-            <ContactsAndSocials />
-          </SectionCard>
-
-          {/* ===== 영업시간 & 휴무/안내문 ===== */}
-          <SectionCard title='영업시간 & 휴무'>
-            <WeeklyHoursGrid />
-            <FormRow label='정기 휴무 요일' control={<ClosedDaysChecklist />} />
-            <FormRow
-              label='휴무/영업 안내문(선택)'
-              control={
-                <LocalizedTabsField
-                  register={register}
-                  basePath='hoursNote'
-                  locales={LOCALES_TUPLE}
-                  errors={formState.errors}
-                  placeholder='예) 매주 일요일 휴무'
-                  mode='input'
-                />
-              }
-            />
-          </SectionCard>
-
-          {/* ===== 편의시설 ===== */}
-          <SectionCard title='편의시설'>
-            <AmenitiesChecklist />
-          </SectionCard>
-
-          {/* ===== 소개(비전/미션/설명) ===== */}
-          <SectionCard title='소개'>
-            <FormRow
-              label='비전(Vision)'
-              control={
-                <LocalizedTabsField
-                  register={register}
-                  basePath='vision'
-                  locales={LOCALES_TUPLE}
-                  errors={formState.errors}
-                  placeholder='병원의 비전을 입력하세요.'
-                  mode='input'
-                />
-              }
-            />
-            <FormRow
-              label='미션(Mission)'
-              control={
-                <LocalizedTabsField
-                  register={register}
-                  basePath='mission'
-                  locales={LOCALES_TUPLE}
-                  errors={formState.errors}
-                  placeholder='병원의 미션을 입력하세요.'
-                  mode='input'
-                />
-              }
-            />
-            <FormRow
-              label='설명(Description)'
-              control={
-                <LocalizedTabsField
-                  register={register}
-                  basePath='description'
-                  locales={LOCALES_TUPLE}
-                  errors={formState.errors}
-                  placeholder='병원 소개/설명을 입력하세요.'
-                  mode='textarea'
-                />
-              }
-            />
-          </SectionCard>
-
-          {/* ===== 예약 시 주의사항/이벤트 ===== */}
-          <SectionCard title='예약 시 주의사항'>
-            <LocalizedRepeaterFieldMulti
-              basePath='reservationNotices'
-              locales={LOCALES_TUPLE}
-              addLabel='추가'
-              removeLabel='삭제'
-              placeholders={{
-                ko: "주의사항(한국어)",
-                ja: "注意事項(日本語)",
-                zh: "注意事项(中文)",
-                en: "Notice (EN)",
-              }}
-            />
-          </SectionCard>
-          <SectionCard title='예약 이벤트'>
-            <LocalizedRepeaterFieldMulti
-              basePath='events'
-              locales={LOCALES_TUPLE}
-              addLabel='이벤트 추가'
-              removeLabel='삭제'
-              placeholders={{
-                ko: "예) 9월 신규 10% 할인",
-                ja: "例) 9月新規10%OFF",
-                zh: "例) 9月新顾客9折",
-                en: "e.g., Sep New 10% OFF",
-              }}
-            />
-          </SectionCard>
-
-          {/* ===== 의료진 소개 ===== */}
-          <SectionCard title='의료진 소개'>
-            <DoctorsField />
-          </SectionCard>
-
-          {/* ===== 이미지 ===== */}
-          <SectionCard
-            title='이미지'
-            description='대표 이미지 등을 업로드하세요.'
-          >
-            <FormRow
-              label='이미지'
-              control={
-                <ImagesUploader
-                  value={images}
-                  onChange={(urls: string[]) =>
-                    setValue("images", urls, { shouldDirty: true })
+          <CleanFormLayout sections={sections}>
+            {/* ===== 기본 정보 ===== */}
+            <section
+              id='sec-basic'
+              data-section='sec-basic'
+              className='scroll-mt-24'
+            >
+              {" "}
+              <SectionCard title='기본 정보'>
+                <FormRow
+                  label='병원명'
+                  control={
+                    <LocalizedTabsField
+                      register={register}
+                      basePath='name'
+                      locales={LOCALES_TUPLE}
+                      errors={formState.errors}
+                      placeholder='병원명을 입력하세요.'
+                      mode='input'
+                    />
                   }
-                  preset='clinics'
                 />
-              }
-            />
-          </SectionCard>
+                <FormRow
+                  label='주소'
+                  control={
+                    <LocalizedTabsField
+                      register={register}
+                      basePath='address'
+                      locales={LOCALES_TUPLE}
+                      errors={formState.errors}
+                      placeholder='주소를 입력하세요.'
+                      mode='input'
+                    />
+                  }
+                />
+                <FormRow
+                  label='소개 제목(선택)'
+                  control={
+                    <LocalizedTabsField
+                      register={register}
+                      basePath='intro.title'
+                      locales={LOCALES_TUPLE}
+                      errors={formState.errors}
+                      placeholder='소개 제목을 입력하세요.'
+                      mode='input'
+                    />
+                  }
+                />
+                <FormRow
+                  label='소개 부제(선택)'
+                  control={
+                    <LocalizedTabsField
+                      register={register}
+                      basePath='intro.subtitle'
+                      locales={LOCALES_TUPLE}
+                      errors={formState.errors}
+                      placeholder='소개 부제를 입력하세요.'
+                      mode='input'
+                    />
+                  }
+                />
+                <FormRow
+                  label='카테고리(선택)'
+                  control={
+                    <select
+                      {...register("category")}
+                      className='h-9 rounded border px-2 text-sm'
+                      aria-invalid={!!formState.errors.category}
+                    >
+                      <option value=''>선택 안 함</option>
+                      <option value='traditional'>한방/통합의학</option>
+                      <option value='cosmetic'>미용/성형</option>
+                      <option value='wellness'>웰니스</option>
+                    </select>
+                  }
+                />
+              </SectionCard>
+            </section>
 
-          {/* ===== 좌표/주소(선택) ===== */}
-          <SectionCard
-            title='좌표/주소(선택)'
-            description='위도와 경도를 추가하면 지도에 정확한 위치를 표시할 수 있습니다.'
-          >
-            <div className='grid grid-cols-2 gap-3 px-5 py-4'>
-              <div>
-                <label className='mb-1 block text-xs text-muted-foreground'>
-                  위도
-                </label>
-                <Input
-                  type='number'
-                  step='any'
-                  {...register("geo.lat", {
-                    setValueAs: (v) => (v === "" ? undefined : Number(v)),
-                  })}
-                  placeholder='예) 37.5665'
+            {/* ===== 연락처 & 웹·SNS ===== */}
+            <section
+              id='sec-contacts'
+              data-section='sec-contacts'
+              className='scroll-mt-24'
+            >
+              {" "}
+              <SectionCard title='연락처 & 웹·SNS'>
+                <ContactsAndSocials />
+              </SectionCard>
+            </section>
+
+            {/* ===== 영업시간 & 휴무/안내문 ===== */}
+            <section
+              id='sec-hours'
+              data-section='sec-hours'
+              className='scroll-mt-24'
+            >
+              <SectionCard title='영업시간 & 휴무'>
+                <WeeklyHoursGrid />
+                <FormRow
+                  label='정기 휴무 요일'
+                  control={<ClosedDaysChecklist />}
                 />
-              </div>
-              <div>
-                <label className='mb-1 block text-xs text-muted-foreground'>
-                  경도
-                </label>
-                <Input
-                  type='number'
-                  step='any'
-                  {...register("geo.lng", {
-                    setValueAs: (v) => (v === "" ? undefined : Number(v)),
-                  })}
-                  placeholder='예) 126.9780'
+                <FormRow
+                  label='휴무/영업 안내문(선택)'
+                  control={
+                    <LocalizedTabsField
+                      register={register}
+                      basePath='hoursNote'
+                      locales={LOCALES_TUPLE}
+                      errors={formState.errors}
+                      placeholder='예) 매주 일요일 휴무'
+                      mode='input'
+                    />
+                  }
                 />
-              </div>
-            </div>
-          </SectionCard>
+              </SectionCard>
+            </section>
+
+            {/* ===== 병원 소개(비전/미션/설명) ===== */}
+            <section
+              id='sec-about'
+              data-section='sec-about'
+              className='scroll-mt-24'
+            >
+              <SectionCard title='소개'>
+                <FormRow
+                  label='설명(Description)'
+                  control={
+                    <LocalizedTabsField
+                      register={register}
+                      basePath='description'
+                      locales={LOCALES_TUPLE}
+                      errors={formState.errors}
+                      placeholder='병원 소개/설명을 입력하세요.'
+                      mode='textarea'
+                    />
+                  }
+                />
+                <FormRow
+                  label='비전(Vision)'
+                  control={
+                    <LocalizedTabsField
+                      register={register}
+                      basePath='vision'
+                      locales={LOCALES_TUPLE}
+                      errors={formState.errors}
+                      placeholder='병원의 비전을 입력하세요.'
+                      mode='input'
+                    />
+                  }
+                />
+                <FormRow
+                  label='미션(Mission)'
+                  control={
+                    <LocalizedTabsField
+                      register={register}
+                      basePath='mission'
+                      locales={LOCALES_TUPLE}
+                      errors={formState.errors}
+                      placeholder='병원의 미션을 입력하세요.'
+                      mode='input'
+                    />
+                  }
+                />
+              </SectionCard>
+            </section>
+
+            {/* ===== 편의시설 ===== */}
+            <section
+              id='sec-amenities'
+              data-section='sec-amenities'
+              className='scroll-mt-24'
+            >
+              <SectionCard title='편의시설'>
+                <AmenitiesChecklist />
+              </SectionCard>
+            </section>
+
+            {/* ===== 예약 시 주의사항===== */}
+            <section
+              id='sec-notices'
+              data-section='sec-notices'
+              className='scroll-mt-24'
+            >
+              <SectionCard title='예약 시 주의사항'>
+                <LocalizedRepeaterFieldMulti
+                  basePath='reservationNotices'
+                  locales={LOCALES_TUPLE}
+                  addLabel='추가'
+                  removeLabel='삭제'
+                  placeholders={{
+                    ko: "주의사항(한국어)",
+                    ja: "注意事項(日本語)",
+                    zh: "注意事项(中文)",
+                    en: "Notice (EN)",
+                  }}
+                />
+              </SectionCard>
+            </section>
+
+            {/* ===== 예약 이벤트 ===== */}
+            <section
+              id='sec-events'
+              data-section='sec-events'
+              className='scroll-mt-24'
+            >
+              <SectionCard title='예약 이벤트'>
+                <LocalizedRepeaterFieldMulti
+                  basePath='events'
+                  locales={LOCALES_TUPLE}
+                  addLabel='이벤트 추가'
+                  removeLabel='삭제'
+                  placeholders={{
+                    ko: "예) 9월 신규 10% 할인",
+                    ja: "例) 9月新規10%OFF",
+                    zh: "例) 9月新顾客9折",
+                    en: "e.g., Sep New 10% OFF",
+                  }}
+                />
+              </SectionCard>
+            </section>
+
+            {/* ===== 의료진 소개 ===== */}
+            <section
+              id='sec-doctors'
+              data-section='sec-doctors'
+              className='scroll-mt-24'
+            >
+              <SectionCard title='의료진 소개'>
+                <DoctorsField />
+              </SectionCard>
+            </section>
+
+            {/* ===== 이미지 ===== */}
+            <section
+              id='sec-media'
+              data-section='sec-media'
+              className='scroll-mt-24'
+            >
+              <SectionCard
+                title='이미지'
+                description='대표 이미지 등을 업로드하세요.'
+              >
+                <FormRow
+                  label='이미지'
+                  control={
+                    <ImagesUploader
+                      value={images}
+                      onChange={(urls: string[]) =>
+                        setValue("images", urls, { shouldDirty: true })
+                      }
+                      preset='clinics'
+                    />
+                  }
+                />
+              </SectionCard>
+            </section>
+
+            {/* ===== 좌표/주소(선택) ===== */}
+            <section
+              id='sec-geo'
+              data-section='sec-geo'
+              className='scroll-mt-24'
+            >
+              <SectionCard
+                title='좌표/주소(선택)'
+                description='위도와 경도를 추가하면 지도에 정확한 위치를 표시할 수 있습니다.'
+              >
+                <div className='grid grid-cols-2 gap-3 px-5 py-4'>
+                  <div>
+                    <label className='mb-1 block text-xs text-muted-foreground'>
+                      위도
+                    </label>
+                    <Input
+                      type='number'
+                      step='any'
+                      {...register("geo.lat", {
+                        setValueAs: (v) => (v === "" ? undefined : Number(v)),
+                      })}
+                      placeholder='예) 37.5665'
+                    />
+                  </div>
+                  <div>
+                    <label className='mb-1 block text-xs text-muted-foreground'>
+                      경도
+                    </label>
+                    <Input
+                      type='number'
+                      step='any'
+                      {...register("geo.lng", {
+                        setValueAs: (v) => (v === "" ? undefined : Number(v)),
+                      })}
+                      placeholder='예) 126.9780'
+                    />
+                  </div>
+                </div>
+              </SectionCard>
+            </section>
+          </CleanFormLayout>
         </form>
       </RHFProvider>
     </FormSheet>

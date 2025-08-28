@@ -2,6 +2,7 @@
   "aboutLabel": "病院紹介",
   "visionLabel": "ビジョン",
   "missionLabel": "ミッション",
+  "doctorsLabel": "医療陣の紹介",
   "eventsLabel": "予約特典",
   "packagesLabel": "診療パッケージ",
   "bookButton": "予約する",
@@ -14,5 +15,6 @@
     "open": "営業中",
     "closed": "営業時間外",
     "unknown": "営業時間不明"
-  }
+  },
+  "reservationNoticesLabel": "予約時の注意事項"
 }
