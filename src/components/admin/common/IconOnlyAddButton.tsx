@@ -1,5 +1,5 @@
 "use client";
-
+import { usePortalContainer } from "@/components/a11y/PortalContainerContext";
 import * as React from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -46,6 +46,8 @@ export default function IconOnlyAddButton({
   className,
   disabled = false,
 }: Props) {
+  const portalContainer = usePortalContainer();
+
   return (
     <TooltipProvider>
       <Tooltip>
@@ -72,7 +74,12 @@ export default function IconOnlyAddButton({
             />
           </Button>
         </TooltipTrigger>
-        <TooltipContent side='left' sideOffset={8} className='z-[9999]'>
+        <TooltipContent
+          side='left'
+          sideOffset={8}
+          className='z-[9999]'
+          container={portalContainer}
+        >
           {label}
         </TooltipContent>
       </Tooltip>
