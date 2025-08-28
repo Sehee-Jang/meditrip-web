@@ -55,6 +55,20 @@ const clinicConverter: FirestoreDataConverter<ClinicDoc> = {
   toFirestore: (data): DocumentData => data,
   fromFirestore: (snap): ClinicDoc => {
     const d = snap.data() as DocumentData;
+
+    // socials 정리(문자열만 유지)
+    const socials = (() => {
+      if (!d.socials || typeof d.socials !== "object") return undefined;
+      const out: Record<string, string> = {};
+      for (const [k, v] of Object.entries(
+        d.socials as Record<string, unknown>
+      )) {
+        if (typeof v === "string" && v.trim()) out[k] = v;
+      }
+      return Object.keys(out).length ? out : undefined;
+    })();
+
+
     return {
       name: d.name,
       address: d.address,
@@ -64,11 +78,37 @@ const clinicConverter: FirestoreDataConverter<ClinicDoc> = {
       vision: d.vision,
       mission: d.mission,
       description: d.description,
-      events: d.events ?? { ko: [], ja: [] },
+      events: d.events ?? { ko: [], ja: [], zh: [], en: [] },
+      reservationNotices: d.reservationNotices ?? {
+        ko: [],
+        ja: [],
+        zh: [],
+        en: [],
+      },
+      // 연락처 & 웹·SNS
+      phone: typeof d.phone === "string" ? d.phone : undefined,
+      website: typeof d.website === "string" ? d.website : undefined,
+      socials,
+
+      // 영업시간/휴무/안내문
+      weeklyHours: d.weeklyHours, // { mon: [{open,close}], ... } 형태 그대로 전달
+      weeklyClosedDays: Array.isArray(d.weeklyClosedDays)
+        ? d.weeklyClosedDays
+        : [],
+      hoursNote: d.hoursNote,
+
+      // 편의시설/태그/이미지
+      amenities: Array.isArray(d.amenities) ? d.amenities : [],
+      tagKeys: Array.isArray(d.tagKeys) ? d.tagKeys : [],
+      images: Array.isArray(d.images) ? (d.images as string[]) : [],
+
+      // 의료진 소개
+      doctors: Array.isArray(d.doctors) ? d.doctors : [],
+
+      // 기타
       isFavorite: Boolean(d.isFavorite),
       rating: typeof d.rating === "number" ? d.rating : 0,
       reviewCount: typeof d.reviewCount === "number" ? d.reviewCount : 0,
-      images: Array.isArray(d.images) ? (d.images as string[]) : [],
       status: (d.status as "visible" | "hidden") ?? "visible",
       createdAt: d.createdAt as Timestamp,
       updatedAt: d.updatedAt as Timestamp,

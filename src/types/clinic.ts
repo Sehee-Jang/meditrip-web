@@ -7,6 +7,7 @@ export type ClinicCategory = "traditional" | "cosmetic" | "wellness";
 export type ClinicStatus = "visible" | "hidden";
 // 다국어 문서 형태
 export type LocalizedTextDoc = Record<LocaleKey, string>;
+export type LocalizedStringArray = Record<LocaleKey, string[]>;
 
 // export interface LocalizedField {
 //   ko: string;
@@ -40,6 +41,15 @@ export type AmenityKey =
 
 export type SocialPlatform = "instagram" | "line" | "whatsapp";
 
+/** ===== 의료진 ===== */
+export interface Doctor {
+  /** 다국어 이름 */
+  name: LocalizedTextDoc;
+  /** 프로필 사진 URL */
+  photoUrl?: string;
+  /** 다국어 소개/경력 라인 배열 */
+  lines: LocalizedStringArray;
+}
 
 /** ===== Firestore 저장용: 진료 상세설명 ===== */
 export interface TreatmentStep {
@@ -61,34 +71,44 @@ export interface PackageInfo {
 
 /** Firestore 저장용: 병원 (패키지는 서브컬렉션) */
 export interface Clinic {
+  // 기본정보
   id: string;
   name: LocalizedTextDoc;
+  images: string[];
+  category?: ClinicCategory;
   address: LocalizedTextDoc;
-  geo?: Geo; // 지도는 여기 기반으로
+  tagKeys?: string[]; // 상단 칩(필터용 키)
   intro: {
     title: LocalizedTextDoc;
     subtitle: LocalizedTextDoc;
   };
-  category?: ClinicCategory;
-  vision?: LocalizedTextDoc;
-  mission?: LocalizedTextDoc;
-  description?: LocalizedTextDoc;
-  events?: {
-    ko: string[];
-    ja: string[];
-  };
-  tagKeys?: string[]; // 상단 칩(필터용 키)
-  phone?: string; // "02-745-7511" 등
-  website?: string; // 클리닉 웹사이트
-  socials?: Partial<Record<SocialPlatform, string>>; // instagram/line/youtube URL
+  //의료진
+  doctors?: Doctor[];
+  // 영업시간
   weeklyHours?: WeeklyHours; // 요일별 영업시간
   weeklyClosedDays?: DayOfWeek[]; // 정기 휴무 요일
   hoursNote?: LocalizedTextDoc; // "매주 일요일 휴무" 등 안내문
+  // 연락처
+  phone?: string; // "02-745-7511" 등
+  website?: string; // 클리닉 웹사이트
+  socials?: Partial<Record<SocialPlatform, string>>;
+
+  // 병원소개: 소개글, 비전, 미션, 이벤트
+  description?: LocalizedTextDoc;
+  vision?: LocalizedTextDoc;
+  mission?: LocalizedTextDoc;
+  events?: LocalizedStringArray;
+  reservationNotices?: LocalizedStringArray;
+
+  // 지도
+  geo?: Geo;
+
+  // 편의시설
   amenities?: AmenityKey[]; // 편의시설 아이콘 키
+
   isFavorite: boolean; // 기본 false
   rating: number; // 기본 0
   reviewCount: number; // 기본 0
-  images: string[];
   status: ClinicStatus; // 노출 제어
   createdAt: Timestamp;
   updatedAt: Timestamp;

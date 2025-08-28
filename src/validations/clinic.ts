@@ -1,175 +1,157 @@
 import { z } from "zod";
 import {
   localizedRequiredDynamicSchema,
-  localizedOptionalDynamicSchema,
   localizedNumberSchema,
 } from "./common";
+import { LOCALES_TUPLE, type LocaleKey } from "@/constants/locales";
 
-import type {
-  DayOfWeek,
-  TimeHHmm,
-} from "@/types/clinic";
+// 요일 키 (UI와 동일)
+export const DAY_KEYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"] as const;
+export type DayKey = (typeof DAY_KEYS)[number];
 
-/** ===== 공통 ===== */
-export const geoSchema = z
-  .object({
-    lat: z.number().min(-90).max(90).optional(),
-    lng: z.number().min(-180).max(180).optional(),
-    placeId: z.string().optional(),
-    formattedAddress: z.string().optional(),
-  })
-  .refine(
-    (g) =>
-      (g.lat == null && g.lng == null) ||
-      (typeof g.lat === "number" && typeof g.lng === "number"),
-    { message: "위도/경도는 함께 입력하세요.", path: ["lat"] }
-  )
-  .optional();
-
-/** ===== 영업시간/편의시설/SNS 스키마 ===== */
-/** 공통 유틸: 빈 문자열이면 undefined로 */
-const toOptional = <S extends z.ZodTypeAny>(schema: S) =>
-  z.preprocess(
-    (v) => (typeof v === "string" && v.trim() === "" ? undefined : v),
-    schema.optional()
-  );
-
-/** ===== Day enum ===== */
-export const dayEnum = z.enum(
-  ["mon","tue","wed","thu","fri","sat","sun"] as [DayOfWeek, ...DayOfWeek[]]
-);
-
-/** ===== HH:mm (00:00~23:59) ===== */
-const hhmm = z.string()
-  .regex(/^\d{2}:\d{2}$/, "HH:mm 형식이어야 합니다.")
-  .transform((v, ctx) => {
-    const [hStr, mStr] = v.split(":");
-    const h = Number(hStr), m = Number(mStr);
-    const ok = Number.isInteger(h) && Number.isInteger(m) && h >= 0 && h <= 23 && m >= 0 && m <= 59;
-    if (ok) return v as TimeHHmm;
-    ctx.addIssue({ code: z.ZodIssueCode.custom, message: "유효한 시간이어야 합니다(HH:mm)." });
-    return z.NEVER;
+// 공통: 로케일 문자열 동적 스키마 (누락 키는 ""로 채움)
+const localizedStringDynamicSchema: z.ZodType<Record<LocaleKey, string>> = z
+  .record(z.enum(LOCALES_TUPLE), z.string())
+  .transform((m) => {
+    const out = {} as Record<LocaleKey, string>;
+    LOCALES_TUPLE.forEach((k) => {
+      out[k] = typeof m[k] === "string" ? m[k] : "";
+    });
+    return out;
   });
 
-const hhmmOptional = toOptional(hhmm);
+// 공통: 로케일 문자열 배열 동적 스키마 (누락 키는 []로 채움)
+const localizedStringArrayDynamicSchema: z.ZodType<Record<LocaleKey, string[]>> =
+  z
+    .record(z.enum(LOCALES_TUPLE), z.array(z.string().trim()))
+    .transform((m) => {
+      const out = {} as Record<LocaleKey, string[]>;
+      LOCALES_TUPLE.forEach((k) => {
+        out[k] = Array.isArray(m[k]) ? m[k] : [];
+      });
+      return out;
+    });
 
-/** 하루 구간: 둘 다 입력 or 둘 다 비움 */
-const dailyRangeLoose = z.object({
-  open: hhmmOptional,
-  close: hhmmOptional,
-}).refine(
-  (v) => (!!v.open && !!v.close) || (!v.open && !v.close),
-  { message: "시작·종료시간은 짝으로 입력하거나 비워두세요.", path: ["open"] }
-);
-
-/** 주간 영업시간(요일별 optional 배열) → 유효 구간만 남기기 */
-const weeklyHoursLoose = z.object({
-  mon: z.array(dailyRangeLoose).optional(),
-  tue: z.array(dailyRangeLoose).optional(),
-  wed: z.array(dailyRangeLoose).optional(),
-  thu: z.array(dailyRangeLoose).optional(),
-  fri: z.array(dailyRangeLoose).optional(),
-  sat: z.array(dailyRangeLoose).optional(),
-  sun: z.array(dailyRangeLoose).optional(),
-});
-const weeklyHoursSchema = weeklyHoursLoose.transform((obj) => {
-  const out: Partial<Record<DayOfWeek, { open: TimeHHmm; close: TimeHHmm }[]>> = {};
-  (["mon","tue","wed","thu","fri","sat","sun"] as DayOfWeek[]).forEach((d) => {
-    const src = obj[d] ?? [];
-    const valid = src.filter(
-      (r): r is { open: TimeHHmm; close: TimeHHmm } => !!r.open && !!r.close
-    );
-    if (valid.length) out[d] = valid;
+    // 기본값 헬퍼들(Record<LocaleKey, ...>를 정확히 생성)
+const makeLocalizedArray = (length = 0): Record<LocaleKey, string[]> => {
+  const out = {} as Record<LocaleKey, string[]>;
+  LOCALES_TUPLE.forEach((k) => {
+    out[k] = Array.from({ length }, () => "");
   });
   return out;
+};
+
+// 시간 형태(HH:mm). 빈 문자열/undefined도 허용
+const timeHHmm = z.string().regex(/^\d{2}:\d{2}$/);
+const timeMaybe = z.union([timeHHmm, z.literal(""), z.undefined()]);
+
+// 요일별 시간 범위
+const timeRangeSchema = z.object({
+  open: timeMaybe,
+  close: timeMaybe,
 });
 
-/** ===== 소셜 “아이디” 스키마 (URL 아님) ===== */
-const INSTAGRAM_ID = /^[a-z0-9._]{1,30}$/;          // 소문자/숫자/._, 1~30
-const GENERIC_ID   = /^[A-Za-z0-9._-]{1,50}$/;      // 라인/왓츠앱 공통
+// 주간 영업시간 (요일별 시간대 배열, 일부 요일만 존재해도 허용)
+const weeklyHoursSchema: z.ZodType<
+  Partial<Record<DayKey, Array<{ open?: string; close?: string }>>>
+> = z.object({
+  mon: z.array(timeRangeSchema).optional(),
+  tue: z.array(timeRangeSchema).optional(),
+  wed: z.array(timeRangeSchema).optional(),
+  thu: z.array(timeRangeSchema).optional(),
+  fri: z.array(timeRangeSchema).optional(),
+  sat: z.array(timeRangeSchema).optional(),
+  sun: z.array(timeRangeSchema).optional(),
+});
 
-const instagramIdSchema = toOptional(
-  z.string()
-    .transform((s) => s.trim().toLowerCase())
-    .refine((s) => INSTAGRAM_ID.test(s), "인스타 아이디 형식이 아닙니다.")
-);
 
-const lineIdSchema = toOptional(
-  z.string()
-    .transform((s) => s.trim())
-    .transform((s) => (s.startsWith("@") ? s.slice(1) : s))
-    .refine((s) => GENERIC_ID.test(s), "LINE 아이디 형식이 아닙니다.")
-);
+// 연락처/SNS
+const socialsSchema = z
+  .object({
+    instagram: z.string().optional(),
+    line: z.string().optional(),
+    whatsapp: z.string().optional(),
+    youtube: z.string().optional(),
+  })
+  .partial();
 
-// ✅ WhatsApp “ID” (전화번호 아님)
-const whatsappIdSchema = toOptional(
-  z.string()
-    .transform((s) => s.trim())
-    .refine((s) => GENERIC_ID.test(s), "WhatsApp ID 형식이 아닙니다.")
-);
+// 좌표
+const geoSchema = z
+  .object({
+    lat: z.number().optional(),
+    lng: z.number().optional(),
+  })
+  .optional();
 
-const socialsSchema = z.object({
-  instagram: instagramIdSchema,
-  line: lineIdSchema,
-  whatsapp: whatsappIdSchema,
-}).partial();
+// 의료진
+const doctorSchema = z.object({
+  name: localizedStringDynamicSchema,                   // ko/ja/zh/en
+  photoUrl: z.string().url().optional().or(z.literal("")), // 빈 문자열 허용
+  lines: localizedStringArrayDynamicSchema,             // ko/ja/zh/en 배열
+});
 
-/** ===== 전화번호/웹사이트 ===== */
-// 전화번호: +, 숫자, (), -, ., 공백 허용 (하이픈 필수 아님)
-const phoneSchema = toOptional(
-  z.string().refine(
-    (s) => /^[+0-9()\-.\s]{3,20}$/.test(s),
-    "전화번호 형식이 아닙니다."
-  )
-);
-
-// 웹사이트: 빈 값 허용, 있으면 URL 형식
-const websiteSchema = toOptional(z.string().url());
-
-const amenitiesEnum = z.enum([
-  "parking",
-  "freeWifi",
-  "infoDesk",
-  "privateCare",
-  "airportPickup",
-]);
-
-/** ===== 병원 폼 ===== */
+// 메인 스키마
 export const clinicFormSchema = z.object({
-  name: localizedRequiredDynamicSchema,
-  address: localizedRequiredDynamicSchema,
-  geo: geoSchema.optional(),
+  // 기본/로케일 필드
+  name: localizedStringDynamicSchema,
+  address: localizedStringDynamicSchema,
   intro: z.object({
-    title: localizedOptionalDynamicSchema, // 입력 안받음(유지용)
-    subtitle: localizedOptionalDynamicSchema, // 선택 입력
+    title: localizedStringDynamicSchema,
+    subtitle: localizedStringDynamicSchema,
   }),
-  category: z.enum(["traditional", "cosmetic", "wellness"]).optional(),
-  vision: localizedOptionalDynamicSchema,
-  mission: localizedOptionalDynamicSchema,
-  description: localizedOptionalDynamicSchema,
-  events: z
-    .object({ ko: z.array(z.string()), ja: z.array(z.string()) })
-    .default({ ko: [], ja: [] })
-    .optional(),
-  images: z.array(z.string()).default([]),
+  vision: localizedStringDynamicSchema,
+  mission: localizedStringDynamicSchema,
+  description: localizedStringDynamicSchema,
+  hoursNote: localizedStringDynamicSchema, // 영업/휴무 안내문
 
-  tagKeys: z.array(z.string()).optional(),
-  phone: phoneSchema,
-  website: websiteSchema,
-  socials: socialsSchema.optional(),
-  weeklyHours: weeklyHoursSchema.optional(),
-  weeklyClosedDays: z.array(dayEnum).optional(),
-  hoursNote: localizedOptionalDynamicSchema.optional(),
-  amenities: z.array(amenitiesEnum).optional(),
+  // 선택/부가
+  category: z.string().optional(), // "traditional" | "cosmetic" | "wellness" 등을 문자열로 관리
+  geo: geoSchema,
 
-  // 폼에서 숨기지만 값은 유지
+  // 이벤트/주의사항: 전 로케일(ko/ja/zh/en)
+  events: localizedStringArrayDynamicSchema.default(makeLocalizedArray(0)),
+  reservationNotices: localizedStringArrayDynamicSchema
+    .transform((obj) => {
+      const pad3 = (arr: string[]) =>
+        arr.length >= 3 ? arr : [...arr, "", "", ""].slice(0, 3);
+      const out = {} as Record<LocaleKey, string[]>;
+      LOCALES_TUPLE.forEach((k) => {
+        out[k] = pad3(obj[k]);
+      });
+      return out;
+    })
+    .default(makeLocalizedArray(3)),
+
+  // 이미지/태그
+  images: z.array(z.string().url().or(z.string().min(1))).default([]),
+  tagKeys: z.array(z.string()).default([]),
+
+  // 연락처/웹/SNS
+  phone: z.string().optional().or(z.literal("")),
+  website: z.string().url().optional().or(z.literal("")),
+  socials: socialsSchema.default({}),
+
+  // 영업 정보
+  weeklyHours: weeklyHoursSchema.default({}),
+  weeklyClosedDays: z
+    .array(z.enum(["sun", "mon", "tue", "wed", "thu", "fri", "sat"] as const))
+    .default([]),
+
+  // 편의시설(문자열 키 배열)
+  amenities: z.array(z.string()).default([]),
+
+  // 기타
   isFavorite: z.boolean().default(false),
-  rating: z.number().min(0).default(0),
-  reviewCount: z.number().min(0).default(0),
+  rating: z.number().default(0),
+  reviewCount: z.number().default(0),
   status: z.enum(["visible", "hidden"]).default("visible"),
+
+  // 의료진
+  doctors: z.array(doctorSchema).default([]),
 });
 
 export type ClinicFormValues = z.infer<typeof clinicFormSchema>;
+
 
 /** ===== 패키지 폼 ===== */
 const imageUrlOptional = z.preprocess(
