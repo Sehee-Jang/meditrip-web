@@ -15,22 +15,53 @@ export interface ClinicRowActionsProps {
   onDelete: () => void;
 }
 
+function clearBodyPointerSoon(): void {
+  if (typeof document === "undefined") return;
+  document.body.style.pointerEvents = "";
+  queueMicrotask(() => {
+    document.body.style.pointerEvents = "";
+  });
+  requestAnimationFrame(() => {
+    document.body.style.pointerEvents = "";
+  });
+}
+
 export default function ClinicRowActions({
   onEdit,
   onDelete,
 }: ClinicRowActionsProps) {
   return (
-    <DropdownMenu>
+    <DropdownMenu
+      // 열림/닫힘 어떤 전환이든 한 번씩 복구
+      onOpenChange={() => clearBodyPointerSoon()}
+    >
       <DropdownMenuTrigger asChild>
         <Button variant='ghost' size='icon' aria-label='더 보기'>
           <MoreHorizontal />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align='end' className='w-36'>
-        <DropdownMenuItem onClick={onEdit}>수정</DropdownMenuItem>
+      <DropdownMenuContent
+        align='end'
+        className='w-36'
+        onInteractOutside={() => clearBodyPointerSoon()}
+        onCloseAutoFocus={() => clearBodyPointerSoon()}
+      >
+        <DropdownMenuItem
+          onSelect={(e) => {
+            e.preventDefault(); // 메뉴 기본 닫힘 타이밍과 레이스 방지
+            clearBodyPointerSoon();
+            onEdit(); // 시트 열기
+          }}
+        >
+          수정
+        </DropdownMenuItem>
         <DropdownMenuItem
           className='text-red-600 focus:text-red-600'
-          onClick={onDelete}
+          onSelect={(e) => {
+            e.preventDefault();
+            clearBodyPointerSoon();
+            onDelete();
+          }}
         >
           삭제
         </DropdownMenuItem>
