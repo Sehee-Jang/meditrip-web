@@ -42,8 +42,8 @@ export const CATEGORY_ICONS: Record<CategoryKey, LucideIcon> = {
 };
 
 export const CATEGORY_LABELS_KO: Record<CategoryKey, string> = {
-  stress: "스트레스",
-  diet: "다이어트",
+  stress: "멘탈케어",
+  diet: "다이어트&디톡스",
   immunity: "면역관리",
   women: "여성질환",
   antiaging: "안티에이징",

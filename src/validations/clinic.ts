@@ -4,9 +4,18 @@ import {
   localizedNumberSchema,
 } from "./common";
 import { LOCALES_TUPLE, type LocaleKey } from "@/constants/locales";
+import { CATEGORY_KEYS, type CategoryKey } from "@/constants/categories";
 
 // 요일 키 (UI와 동일)
-export const DAY_KEYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"] as const;
+export const DAY_KEYS = [
+  "mon",
+  "tue",
+  "wed",
+  "thu",
+  "fri",
+  "sat",
+  "sun",
+] as const;
 export type DayKey = (typeof DAY_KEYS)[number];
 
 // 공통: 로케일 문자열 동적 스키마 (누락 키는 ""로 채움)
@@ -21,18 +30,19 @@ const localizedStringDynamicSchema: z.ZodType<Record<LocaleKey, string>> = z
   });
 
 // 공통: 로케일 문자열 배열 동적 스키마 (누락 키는 []로 채움)
-const localizedStringArrayDynamicSchema: z.ZodType<Record<LocaleKey, string[]>> =
-  z
-    .record(z.enum(LOCALES_TUPLE), z.array(z.string().trim()))
-    .transform((m) => {
-      const out = {} as Record<LocaleKey, string[]>;
-      LOCALES_TUPLE.forEach((k) => {
-        out[k] = Array.isArray(m[k]) ? m[k] : [];
-      });
-      return out;
+const localizedStringArrayDynamicSchema: z.ZodType<
+  Record<LocaleKey, string[]>
+> = z
+  .record(z.enum(LOCALES_TUPLE), z.array(z.string().trim()))
+  .transform((m) => {
+    const out = {} as Record<LocaleKey, string[]>;
+    LOCALES_TUPLE.forEach((k) => {
+      out[k] = Array.isArray(m[k]) ? m[k] : [];
     });
+    return out;
+  });
 
-    // 기본값 헬퍼들(Record<LocaleKey, ...>를 정확히 생성)
+// 기본값 헬퍼들(Record<LocaleKey, ...>를 정확히 생성)
 const makeLocalizedArray = (length = 0): Record<LocaleKey, string[]> => {
   const out = {} as Record<LocaleKey, string[]>;
   LOCALES_TUPLE.forEach((k) => {
@@ -64,7 +74,6 @@ const weeklyHoursSchema: z.ZodType<
   sun: z.array(timeRangeSchema).optional(),
 });
 
-
 // 연락처/SNS
 const socialsSchema = z
   .object({
@@ -85,10 +94,21 @@ const geoSchema = z
 
 // 의료진
 const doctorSchema = z.object({
-  name: localizedStringDynamicSchema,                   // ko/ja/zh/en
+  name: localizedStringDynamicSchema, // ko/ja/zh/en
   photoUrl: z.string().url().optional().or(z.literal("")), // 빈 문자열 허용
-  lines: localizedStringArrayDynamicSchema,             // ko/ja/zh/en 배열
+  lines: localizedStringArrayDynamicSchema, // ko/ja/zh/en 배열
 });
+
+// 카테고리 키 유효성 (기존 카테고리 키만 허용)
+const categoryKeysSchema = z
+  .array(
+    z.custom<CategoryKey>(
+      (val) =>
+        typeof val === "string" && CATEGORY_KEYS.includes(val as CategoryKey),
+      "유효하지 않은 카테고리입니다."
+    )
+  )
+  .default([]);
 
 // 메인 스키마
 export const clinicFormSchema = z.object({
@@ -103,9 +123,9 @@ export const clinicFormSchema = z.object({
   mission: localizedStringDynamicSchema,
   description: localizedStringDynamicSchema,
   hoursNote: localizedStringDynamicSchema, // 영업/휴무 안내문
-
+  categoryKeys: categoryKeysSchema,
   // 선택/부가
-  category: z.string().optional(), // "traditional" | "cosmetic" | "wellness" 등을 문자열로 관리
+  // category: z.string().optional(), // "traditional" | "cosmetic" | "wellness" 등을 문자열로 관리
   geo: geoSchema,
 
   // 이벤트/주의사항: 전 로케일(ko/ja/zh/en)
@@ -151,7 +171,6 @@ export const clinicFormSchema = z.object({
 });
 
 export type ClinicFormValues = z.infer<typeof clinicFormSchema>;
-
 
 /** ===== 패키지 폼 ===== */
 const imageUrlOptional = z.preprocess(

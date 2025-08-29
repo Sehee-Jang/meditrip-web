@@ -1,11 +1,6 @@
 import type { LocaleKey } from "@/constants/locales";
 import { LOCALES_TUPLE } from "@/constants/locales";
-import type {
-  AmenityKey,
-  ClinicCategory,
-  DailyRange,
-  DayOfWeek,
-} from "@/types/clinic";
+import type { AmenityKey, DailyRange, DayOfWeek } from "@/types/clinic";
 
 /** 요일 키 (UI 루프에 사용) */
 export const DAY_KEYS = [
@@ -34,17 +29,6 @@ export const CLOSED_DAYS_ORDER = [
 export type HHmm = `${number}${number}:${number}${number}`;
 export const isHHmm = (v: unknown): v is HHmm =>
   typeof v === "string" && /^\d{2}:\d{2}$/.test(v);
-
-/** 카테고리 안전 변환 */
-const CATEGORY_VALUES: readonly ClinicCategory[] = [
-  "traditional",
-  "cosmetic",
-  "wellness",
-] as const;
-export const asClinicCategory = (val: unknown): ClinicCategory | undefined =>
-  CATEGORY_VALUES.includes(val as ClinicCategory)
-    ? (val as ClinicCategory)
-    : undefined;
 
 /** 편의시설 키 집합 */
 export const AMENITY_VALUES: readonly AmenityKey[] = [

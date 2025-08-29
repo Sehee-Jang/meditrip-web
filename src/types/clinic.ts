@@ -1,10 +1,11 @@
 import type { Timestamp } from "firebase/firestore";
 import type { LocaleKey } from "@/constants/locales";
 import { TagSlug } from "./tag";
+import type { CategoryKey } from "@/types/category";
 
 /** ===== 공통 ===== */
 // export type Locale = "ko" | "ja";
-export type ClinicCategory = "traditional" | "cosmetic" | "wellness";
+// export type ClinicCategory = "traditional" | "cosmetic" | "wellness";
 export type ClinicStatus = "visible" | "hidden";
 // 다국어 문서 형태
 export type LocalizedTextDoc = Record<LocaleKey, string>;
@@ -76,7 +77,7 @@ export interface Clinic {
   id: string;
   name: LocalizedTextDoc;
   images: string[];
-  category?: ClinicCategory;
+  categoryKeys?: CategoryKey[];
   address: LocalizedTextDoc;
   tagSlugs?: TagSlug[]; // 필터용 키, 배열
   intro: {
@@ -162,7 +163,7 @@ export type ClinicListItem = Pick<
   | "rating"
   | "reviewCount"
   | "status"
-  | "category"
+  | "categoryKeys"
 >;
 
 /**

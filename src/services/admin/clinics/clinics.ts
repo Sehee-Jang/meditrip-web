@@ -24,6 +24,7 @@ import type {
   PackageWithId,
   ClinicStatus,
 } from "@/types/clinic";
+import { CATEGORY_KEYS, type CategoryKey } from "@/constants/categories";
 
 // undefined/빈 문자열 제거 유틸
 function compactSocials(
@@ -50,6 +51,13 @@ function stripUndefined<T extends Record<string, unknown>>(obj: T): T {
  * Converters
  * =============================== */
 const clinicsCol = collection(db, "clinics");
+// 허용 키만 통과
+const asCategoryKeys = (val: unknown): CategoryKey[] => {
+  if (!Array.isArray(val)) return [];
+  return (val as unknown[]).filter((k): k is CategoryKey =>
+    typeof k === "string" && CATEGORY_KEYS.includes(k as CategoryKey)
+  );
+};
 
 const clinicConverter: FirestoreDataConverter<ClinicDoc> = {
   toFirestore: (data): DocumentData => data,
@@ -73,7 +81,9 @@ const clinicConverter: FirestoreDataConverter<ClinicDoc> = {
       address: d.address,
       geo: d.geo,
       intro: d.intro,
-      category: d.category,
+      categoryKeys: asCategoryKeys(
+        (d as { categoryKeys?: unknown }).categoryKeys
+      ),
       vision: d.vision,
       mission: d.mission,
       description: d.description,

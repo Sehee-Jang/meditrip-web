@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/select";
 import ClinicRowActions from "./ClinicRowActions";
 import { ClinicWithId } from "@/types/clinic";
+import { CATEGORY_LABELS_KO, type CategoryKey } from "@/constants/categories";
 
 type ClinicStatus = "visible" | "hidden";
 
@@ -24,6 +25,7 @@ type Props = {
   onOpenPackages: (clinicId: string) => void;
   onEdit: (clinicId: string) => void;
 };
+
 export default function ClinicTableRow({
   clinic,
   onUpdated,
@@ -50,10 +52,31 @@ export default function ClinicTableRow({
     onUpdated();
   };
 
+  // categoryKeys를 한국어 라벨로 변환
+  const categoryKeys = (clinic.categoryKeys ?? []) as CategoryKey[];
+  const categoryLabels = categoryKeys.map((k) => CATEGORY_LABELS_KO[k] ?? k);
+
   return (
     <tr className='border-t hover:bg-muted/20'>
       <td className='px-4 py-3'>{clinic.name?.ko ?? "-"}</td>
-      <td className='px-4 py-3'>{clinic.category ?? "-"}</td>
+
+      <td className='px-4 py-3'>
+        {categoryLabels.length > 0 ? (
+          <div className='flex flex-wrap gap-1'>
+            {categoryLabels.map((label, i) => (
+              <span
+                key={`${label}-${i}`}
+                className='rounded border px-2 py-0.5 text-xs'
+              >
+                {label}
+              </span>
+            ))}
+          </div>
+        ) : (
+          "-"
+        )}
+      </td>
+
       <td className='px-4 py-3 text-center'>
         <Select
           value={clinic.status}

@@ -14,8 +14,8 @@
       "label": "카테고리 선택",
       "placeholder": "질문에 적합한 카테고리를 선택해 주세요.",
       "options": {
-        "stress": "스트레스",
-        "diet": "다이어트",
+        "stress": "멘탈케어",
+        "diet": "다이어트&디톡스",
         "immunity": "면역관리",
         "women": "여성질환",
         "antiaging": "안티에이징",

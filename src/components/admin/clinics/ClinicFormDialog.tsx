@@ -6,6 +6,7 @@ import {
   FormProvider as RHFProvider,
   useForm,
   type SubmitHandler,
+  Controller,
 } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { z } from "zod";
@@ -22,7 +23,7 @@ import FormRow from "@/components/admin/common/FormRow";
 import LocalizedTabsField from "@/components/admin/common/LocalizedTabsField";
 import ImagesUploader from "@/components/admin/common/ImagesUploader";
 import { Input } from "@/components/ui/input";
-import { LOCALES_TUPLE } from "@/constants/locales";
+import { LOCALES_TUPLE, type LocaleKey } from "@/constants/locales";
 import ContactsAndSocials from "./fields/ContactsAndSocials";
 import WeeklyHoursGrid from "./fields/WeeklyHoursGrid";
 import ClosedDaysChecklist from "./fields/ClosedDaysChecklist";
@@ -35,14 +36,60 @@ import {
   ensureLocalizedStringArrays,
   normalizeAmenities,
   toDocWeeklyHours,
-  asClinicCategory,
   asAmenityKeys,
 } from "./form-utils";
 import CleanFormLayout from "@/components/admin/common/CleanFormLayout";
 import TagPicker from "@/components/admin/clinics/fields/TagPicker";
-
-import type { LocaleKey } from "@/constants/locales";
 import { useTagsCatalog } from "@/services/tags/tags";
+import {
+  CATEGORY_KEYS,
+  CATEGORY_LABELS_KO,
+  CATEGORY_ICONS,
+  type CategoryKey,
+} from "@/constants/categories";
+
+/* ====== 카테고리 다중선택 UI (체크리스트) ====== */
+function CategoriesChecklist({
+  value,
+  onChange,
+  disabled,
+}: {
+  value: CategoryKey[];
+  onChange: (next: CategoryKey[]) => void;
+  disabled?: boolean;
+}) {
+  const toggle = (k: CategoryKey) => {
+    const has = value.includes(k);
+    onChange(has ? value.filter((x) => x !== k) : [...value, k]);
+  };
+
+  return (
+    <div className='flex flex-wrap gap-2'>
+      {CATEGORY_KEYS.map((k) => {
+        const checked = value.includes(k);
+        const Icon = CATEGORY_ICONS[k];
+        const label = CATEGORY_LABELS_KO[k] ?? k;
+        return (
+          <button
+            key={k}
+            type='button'
+            onClick={() => toggle(k)}
+            disabled={disabled}
+            className={[
+              "inline-flex items-center gap-2 h-8 rounded-md border px-3 text-sm",
+              checked ? "border-primary ring-1 ring-primary" : "opacity-80",
+            ].join(" ")}
+            aria-pressed={checked}
+          >
+            <Icon size={16} aria-hidden />
+            <span>{label}</span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 
 /* ====== 타입 별칭 ====== */
 type ClinicFormInputZod = z.input<typeof clinicFormSchema>;
@@ -80,7 +127,8 @@ export default function ClinicFormDialog({
         title: { ko: "", ja: "", zh: "", en: "" },
         subtitle: { ko: "", ja: "", zh: "", en: "" },
       },
-      category: undefined,
+      // category 제거됨
+      categoryKeys: [],
       vision: { ko: "", ja: "", zh: "", en: "" },
       mission: { ko: "", ja: "", zh: "", en: "" },
       description: { ko: "", ja: "", zh: "", en: "" },
@@ -105,10 +153,11 @@ export default function ClinicFormDialog({
     shouldFocusError: true,
   });
 
-  const { register, setValue, handleSubmit, formState, reset, watch } = form;
+  const { register, setValue, handleSubmit, formState, reset, watch, control } =
+    form;
 
   const { data: tagCatalog, loading: tagsLoading } = useTagsCatalog();
-  const currentLocale = LOCALES_TUPLE[0]; // 관리자 UI 기본 표시언어(필요 시 state로 제어)
+  const currentLocale = LOCALES_TUPLE[0]; // 관리자 UI 기본 표시언어
 
   // 데이터 로딩
   useEffect(() => {
@@ -148,7 +197,12 @@ export default function ClinicFormDialog({
             en: "",
           },
         },
-        category: data.category,
+        // category 제거됨
+        categoryKeys: Array.isArray(
+          (data as { categoryKeys?: unknown }).categoryKeys
+        )
+          ? (data as { categoryKeys: CategoryKey[] }).categoryKeys
+          : [],
         vision: (data.vision as Record<string, string>) ?? {
           ko: "",
           ja: "",
@@ -228,7 +282,7 @@ export default function ClinicFormDialog({
     if (submittingRef.current) return;
     submittingRef.current = true;
     try {
-      const { geo, category, weeklyHours, amenities, ...rest } = values;
+      const { geo, weeklyHours, amenities, ...rest } = values;
 
       const geoClean: Geo | undefined =
         geo && typeof geo.lat === "number" && typeof geo.lng === "number"
@@ -236,15 +290,13 @@ export default function ClinicFormDialog({
           : undefined;
 
       const weeklyHoursClean = toDocWeeklyHours(weeklyHours);
-      const categoryClean = asClinicCategory(category);
       const amenitiesClean = asAmenityKeys(amenities);
 
       const finalPayload: Omit<ClinicDoc, "createdAt" | "updatedAt"> = {
-        ...rest,
+        ...rest, // categoryKeys 포함
         weeklyHours: weeklyHoursClean,
         amenities: amenitiesClean,
         ...(geoClean ? { geo: geoClean } : {}),
-        ...(categoryClean ? { category: categoryClean } : {}),
       };
 
       if (mode === "create") {
@@ -293,9 +345,8 @@ export default function ClinicFormDialog({
       title={mode === "create" ? "병원 등록" : "병원 수정"}
       description='필수 정보를 입력하세요.'
       formId={formId}
-      // 제출 버튼은 CleanFormLayout 하단 고정바에서 노출하므로 여기선 라벨은 사용 안 함
       submitLabel={mode === "create" ? "등록" : "수정"}
-      widthClassName='sm:max-w-[980px]' // 살짝 넓게
+      widthClassName='sm:max-w-[980px]'
     >
       <RHFProvider {...form}>
         <form
@@ -310,7 +361,6 @@ export default function ClinicFormDialog({
               data-section='sec-basic'
               className='scroll-mt-24'
             >
-              {" "}
               <SectionCard title='기본 정보'>
                 <FormRow
                   label='병원명'
@@ -364,19 +414,20 @@ export default function ClinicFormDialog({
                     />
                   }
                 />
+                {/* 기존 단일 category는 제거, 다중 categoryKeys로 전환 */}
                 <FormRow
-                  label='카테고리(선택)'
+                  label='카테고리(다중 선택)'
                   control={
-                    <select
-                      {...register("category")}
-                      className='h-9 rounded border px-2 text-sm'
-                      aria-invalid={!!formState.errors.category}
-                    >
-                      <option value=''>선택 안 함</option>
-                      <option value='traditional'>한방/통합의학</option>
-                      <option value='cosmetic'>미용/성형</option>
-                      <option value='wellness'>웰니스</option>
-                    </select>
+                    <Controller
+                      name='categoryKeys'
+                      control={control}
+                      render={({ field }) => (
+                        <CategoriesChecklist
+                          value={field.value ?? []}
+                          onChange={field.onChange}
+                        />
+                      )}
+                    />
                   }
                 />
                 <FormRow
@@ -403,7 +454,6 @@ export default function ClinicFormDialog({
               data-section='sec-contacts'
               className='scroll-mt-24'
             >
-              {" "}
               <SectionCard title='연락처 & 웹·SNS'>
                 <ContactsAndSocials />
               </SectionCard>
