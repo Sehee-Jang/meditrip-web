@@ -177,6 +177,7 @@ export default async function ClinicDetailPage({
             src={clinic.images[0] || "/images/placeholder.png"}
             alt={name || "clinic image"}
             fill
+            sizes='(max-width: 768px) 100vw, 896px'
             className='object-cover'
           />
 
@@ -574,6 +575,7 @@ export default async function ClinicDetailPage({
                             src={d.photoUrl}
                             alt={doctorName || "doctor photo"}
                             fill
+                            sizes='88px'
                             className='object-cover'
                           />
                         ) : null}
@@ -679,6 +681,7 @@ export default async function ClinicDetailPage({
                         src={img}
                         alt={title || "package image"}
                         fill
+                        sizes='(max-width: 640px) 100vw, 50vw'
                         className='object-cover'
                       />
                     </div>
