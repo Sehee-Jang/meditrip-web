@@ -1,4 +1,4 @@
-// src/services/hospitals/getClinicById.ts
+
 import { db } from "@/lib/firebase";
 import {
   collection,

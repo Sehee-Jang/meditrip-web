@@ -1,5 +1,7 @@
 import * as admin from "firebase-admin";
-import { NextRequest } from "next/server";
+import { Firestore, getFirestore } from "firebase-admin/firestore";
+import { getAuth, type Auth, type DecodedIdToken } from "firebase-admin/auth";
+import type { NextRequest } from "next/server";
 
 type ServiceAccountLike = {
   project_id: string;
@@ -24,6 +26,7 @@ function stripWrappingQuotes(s: string): string {
   return t;
 }
 
+/** 개행/캐리지 리턴 정규화 및 흔한 오타 방어 */
 function cleanPrivateKey(k: string): string {
   let key = stripWrappingQuotes(k);
   key = key.replace(/\\n/g, "\n").replace(/\\r/g, "\n").replace(/\r\n/g, "\n");
@@ -31,6 +34,13 @@ function cleanPrivateKey(k: string): string {
   return key;
 }
 
+/**
+ * Admin 자격증명 로딩
+ * 우선순위:
+ * 1) FIREBASE_ADMIN_CREDENTIALS_BASE64 (base64의 service account JSON)
+ * 2) FIREBASE_ADMIN_CREDENTIALS (JSON 문자열)
+ * 3) FIREBASE_ADMIN_PROJECT_ID / CLIENT_EMAIL / PRIVATE_KEY (개별 항목)
+ */
 function readAdminCreds(): ServiceAccountLike {
   const b64 = process.env.FIREBASE_ADMIN_CREDENTIALS_BASE64;
   if (b64) {
@@ -68,15 +78,15 @@ function readAdminCreds(): ServiceAccountLike {
   };
 }
 
+/** 실제 Admin 앱 초기화 (중복 초기화/레이스 방지) */
 function initAdminApp(): admin.app.App {
-  const sa = readAdminCreds();
-
-  // 이름 없는 default 앱을 우선 사용(이미 있으면 재사용)
+  // 이미 초기화되어 있으면 기존 인스턴스 사용
   if (admin.apps.length > 0) {
     return admin.app();
   }
 
-  // race(동시 초기화) 대비: duplicate-app 캐치
+  const sa = readAdminCreds();
+
   try {
     return admin.initializeApp({
       credential: admin.credential.cert({
@@ -86,6 +96,7 @@ function initAdminApp(): admin.app.App {
       }),
     });
   } catch (e) {
+    // HMR 중 동시에 초기화될 수 있어 already exists 허용
     if (e instanceof Error && e.message.includes("already exists")) {
       return admin.app();
     }
@@ -93,7 +104,7 @@ function initAdminApp(): admin.app.App {
   }
 }
 
-/** 요청 시점에만 초기화 (전역 캐시) */
+/** 요청 시점에 lazy 초기화 + 전역 캐시 */
 export function getAdminApp(): admin.app.App {
   if (!globalThis.__FIREBASE_ADMIN_APP__) {
     globalThis.__FIREBASE_ADMIN_APP__ = initAdminApp();
@@ -101,9 +112,24 @@ export function getAdminApp(): admin.app.App {
   return globalThis.__FIREBASE_ADMIN_APP__;
 }
 
+/** Firestore 핸들 */
+export function adminDb(): Firestore {
+  return getFirestore(getAdminApp());
+}
+
+/** Auth 핸들 */
+export function adminAuth(): Auth {
+  return getAuth(getAdminApp());
+}
+
+/**
+ * Authorization: Bearer <idToken> 헤더에서 Firebase 사용자 확인
+ * - 유효하지 않은 토큰/만료 → null
+ * - 환경변수 누락 → 라우트 상위에서 500 처리할 수 있게 throw 유지
+ */
 export async function getFirebaseUserFromRequest(
   req: NextRequest
-): Promise<admin.auth.DecodedIdToken | null> {
+): Promise<DecodedIdToken | null> {
   const authHeader = req.headers.get("authorization") ?? "";
   const token = authHeader.startsWith("Bearer ")
     ? authHeader.slice(7)
@@ -111,14 +137,13 @@ export async function getFirebaseUserFromRequest(
   if (!token) return null;
 
   try {
-    const a = getAdminApp();
-    const decoded = await admin.auth(a).verifyIdToken(token);
+    const decoded = await adminAuth().verifyIdToken(token);
     return decoded;
   } catch (e) {
     if (e instanceof Error && e.message === "FIREBASE_ADMIN_ENV_MISSING") {
-      throw e; // 라우트에서 500 처리
+      throw e; // 상위 라우트에서 500 처리
     }
-    // 그 외(만료/형식 오류 등)는 인증 실패로 처리
+    // 만료/위조 등 일반 실패는 null
     return null;
   }
 }

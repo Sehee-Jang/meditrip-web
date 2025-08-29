@@ -1,5 +1,6 @@
 import type { Timestamp } from "firebase/firestore";
 import type { LocaleKey } from "@/constants/locales";
+import { TagSlug } from "./tag";
 
 /** ===== 공통 ===== */
 // export type Locale = "ko" | "ja";
@@ -77,7 +78,7 @@ export interface Clinic {
   images: string[];
   category?: ClinicCategory;
   address: LocalizedTextDoc;
-  tagKeys?: string[]; // 상단 칩(필터용 키)
+  tagSlugs?: TagSlug[]; // 필터용 키, 배열
   intro: {
     title: LocalizedTextDoc;
     subtitle: LocalizedTextDoc;

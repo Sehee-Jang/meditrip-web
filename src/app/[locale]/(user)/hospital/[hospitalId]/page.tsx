@@ -25,6 +25,7 @@ import {
   Plane,
 } from "lucide-react";
 import type { AmenityKey, Doctor } from "@/types/clinic";
+import { getTagsCatalogServer } from "@/services/hospitals/getTagsCatalog";
 
 type PageParams = Promise<{ locale: string; hospitalId: string }>;
 type SearchParams = Promise<{ tab?: string }>;
@@ -126,12 +127,18 @@ export default async function ClinicDetailPage({
     Record<"instagram" | "line" | "youtube" | "whatsapp", string>
   >;
 
-  // 선택적 속성들(존재할 때만 노출)
-  const tags: string[] =
-    "tags" in clinic && Array.isArray((clinic as { tags?: string[] }).tags)
-      ? ((clinic as { tags?: string[] }).tags as string[])
-      : [];
+  // 태그
+  const tagCatalog = await getTagsCatalogServer();
 
+  // 기존 tags 배열을 slug 리스트로 유지하고 있다면:
+  const tagLabels = (clinic.tagSlugs ?? [])
+    .map((slug) => {
+      const hit = tagCatalog.find((t) => t.slug === slug);
+      return hit ? hit.labels[loc] || hit.slug : slug;
+    })
+    .filter((s) => s);
+
+  // 별점
   const rating =
     "rating" in clinic
       ? (clinic as { rating?: { avg?: number; count?: number } }).rating
@@ -183,12 +190,13 @@ export default async function ClinicDetailPage({
         </div>
         {/* 타이틀 + 위치 + 별점 + 태그칩 */}
         <div className='px-4 pt-4'>
+          {/* 병원명 */}
           <h1 className='text-2xl font-semibold'>{name}</h1>
+          {/* 주소 */}
           <div className='mt-1 flex items-center gap-2 text-sm text-muted-foreground'>
             <MapPin size={16} />
             <span className='truncate'>{address}</span>
           </div>
-
           {/* 별점 */}
           {typeof ratingAvg === "number" && (
             <div className='mt-1 flex items-center gap-1 text-sm'>
@@ -199,16 +207,15 @@ export default async function ClinicDetailPage({
               )}
             </div>
           )}
-
-          {/* 태그 칩 */}
-          {tags.length > 0 && (
+          {/* 태그 */}
+          {tagLabels.length > 0 && (
             <div className='mt-2 flex flex-wrap gap-2'>
-              {tags.map((tag) => (
+              {tagLabels.map((label, i) => (
                 <span
-                  key={tag}
+                  key={`${label}-${i}`}
                   className='inline-flex rounded-md border px-2.5 py-1 text-xs bg-background'
                 >
-                  {tag}
+                  {label}
                 </span>
               ))}
             </div>

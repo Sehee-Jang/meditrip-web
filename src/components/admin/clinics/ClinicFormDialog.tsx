@@ -39,6 +39,10 @@ import {
   asAmenityKeys,
 } from "./form-utils";
 import CleanFormLayout from "@/components/admin/common/CleanFormLayout";
+import TagPicker from "@/components/admin/clinics/fields/TagPicker";
+
+import type { LocaleKey } from "@/constants/locales";
+import { useTagsCatalog } from "@/services/tags/tags";
 
 /* ====== 타입 별칭 ====== */
 type ClinicFormInputZod = z.input<typeof clinicFormSchema>;
@@ -83,7 +87,7 @@ export default function ClinicFormDialog({
       events: { ko: [""], ja: [""], zh: [""], en: [""] },
       reservationNotices: { ko: [""], ja: [""], zh: [""], en: [""] },
       images: [],
-      tagKeys: [],
+      tagSlugs: [],
       phone: "",
       website: "",
       socials: {},
@@ -102,6 +106,9 @@ export default function ClinicFormDialog({
   });
 
   const { register, setValue, handleSubmit, formState, reset, watch } = form;
+
+  const { data: tagCatalog, loading: tagsLoading } = useTagsCatalog();
+  const currentLocale = LOCALES_TUPLE[0]; // 관리자 UI 기본 표시언어(필요 시 state로 제어)
 
   // 데이터 로딩
   useEffect(() => {
@@ -168,7 +175,7 @@ export default function ClinicFormDialog({
           3
         ),
         images: data.images ?? [],
-        tagKeys: data.tagKeys ?? [],
+        tagSlugs: data.tagSlugs ?? [],
         phone: data.phone ?? "",
         website: data.website ?? "",
         socials: data.socials ?? {},
@@ -370,6 +377,21 @@ export default function ClinicFormDialog({
                       <option value='cosmetic'>미용/성형</option>
                       <option value='wellness'>웰니스</option>
                     </select>
+                  }
+                />
+                <FormRow
+                  label='태그(선택)'
+                  control={
+                    <TagPicker
+                      value={watch("tagSlugs") ?? []}
+                      onChange={(next) =>
+                        setValue("tagSlugs", next, { shouldDirty: true })
+                      }
+                      catalog={tagCatalog}
+                      locale={currentLocale as LocaleKey}
+                      placeholder='태그 검색 또는 클릭하여 선택'
+                      disabled={tagsLoading}
+                    />
                   }
                 />
               </SectionCard>

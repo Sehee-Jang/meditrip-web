@@ -25,7 +25,7 @@ import type {
   ClinicStatus,
 } from "@/types/clinic";
 
-// ⬇️ undefined/빈 문자열 제거 유틸
+// undefined/빈 문자열 제거 유틸
 function compactSocials(
   s: ClinicDoc["socials"] | undefined
 ): ClinicDoc["socials"] | undefined {
@@ -40,7 +40,7 @@ function compactSocials(
   return Object.keys(out).length ? (out as ClinicDoc["socials"]) : undefined;
 }
 
-// ⬇️ 1단계(shallow)에서만 undefined 제거
+// 1단계(shallow)에서만 undefined 제거
 function stripUndefined<T extends Record<string, unknown>>(obj: T): T {
   const entries = Object.entries(obj).filter(([, v]) => v !== undefined);
   return Object.fromEntries(entries) as T;
@@ -67,7 +67,6 @@ const clinicConverter: FirestoreDataConverter<ClinicDoc> = {
       }
       return Object.keys(out).length ? out : undefined;
     })();
-
 
     return {
       name: d.name,
@@ -99,7 +98,7 @@ const clinicConverter: FirestoreDataConverter<ClinicDoc> = {
 
       // 편의시설/태그/이미지
       amenities: Array.isArray(d.amenities) ? d.amenities : [],
-      tagKeys: Array.isArray(d.tagKeys) ? d.tagKeys : [],
+      tagSlugs: Array.isArray(d.tagSlugs) ? d.tagSlugs : [],
       images: Array.isArray(d.images) ? (d.images as string[]) : [],
 
       // 의료진 소개

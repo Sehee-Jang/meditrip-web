@@ -27,6 +27,7 @@
 export const NAMESPACES = [
   "amenities",
   "categories",
+  "coming-soon",
   "common",
   "community-page",
   "community-section",

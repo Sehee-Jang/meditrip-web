@@ -1,3 +1,4 @@
+// src/middleware.ts
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import createMiddleware from "next-intl/middleware";
@@ -41,27 +42,37 @@ function detectFromAcceptLanguage(
 export default function middleware(req: NextRequest) {
   const { pathname, search } = req.nextUrl;
 
-  // 제외: 정적/파일/관리자/API
+  // 0) 비-GET/HEAD 요청은 로케일 리다이렉트/처리를 하지 않음 (API/폼 제출 보호)
+  if (req.method !== "GET" && req.method !== "HEAD") {
+    return NextResponse.next();
+  }
+
+  // 1) 국제화 대상 제외 경로: API/정적/관리자 등
   if (
     pathname.startsWith("/api") ||
     pathname.startsWith("/_next") ||
-    pathname.startsWith(ADMIN_PREFIX) ||
     pathname.startsWith("/_vercel") ||
-    /\.[\w]+$/.test(pathname)
+    pathname.startsWith(ADMIN_PREFIX) ||
+    pathname.startsWith("/favicon") ||
+    pathname.startsWith("/images") ||
+    pathname.startsWith("/assets") ||
+    /\.[\w]+$/.test(pathname) // 파일 확장자
   ) {
     return NextResponse.next();
   }
 
-  // 이미 /ko 또는 /ja면 next-intl에 위임
+  // 2) 이미 /ko 또는 /ja면 next-intl에 위임
   if (hasLocalePrefix(pathname)) {
     return nextIntlMiddleware(req);
   }
 
-  // 우선순위: IP → 쿠키 → 브라우저 → default
+  // 3) 우선순위: IP → 쿠키 → 브라우저 → default
   const ipLocale = detectFromCountry(req);
   const cookieVal = req.cookies.get(LOCALE_COOKIE)?.value;
   const cookieLocale: AppLocale | undefined =
-    cookieVal === "ko" || cookieVal === "ja" ? cookieVal : undefined;
+    cookieVal === "ko" || cookieVal === "ja"
+      ? (cookieVal as AppLocale)
+      : undefined;
   const acceptLocale = detectFromAcceptLanguage(
     req.headers.get("accept-language")
   );
@@ -85,5 +96,8 @@ export default function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: "/((?!api|_next|_vercel|.*\\..*|admin).*)",
+  // 미들웨어 자체가 실행될 경로를 제한 (여기서도 /api, 정적, /admin 제외)
+  matcher: [
+    "/((?!api|_next|_vercel|.*\\..*|favicon.ico|images|assets|admin).*)",
+  ],
 };

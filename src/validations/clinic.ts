@@ -124,7 +124,7 @@ export const clinicFormSchema = z.object({
 
   // 이미지/태그
   images: z.array(z.string().url().or(z.string().min(1))).default([]),
-  tagKeys: z.array(z.string()).default([]),
+  tagSlugs: z.array(z.string()).default([]),
 
   // 연락처/웹/SNS
   phone: z.string().optional().or(z.literal("")),
