@@ -20,6 +20,15 @@ interface Props {
   disabled?: boolean; // 업로드버튼 비활성화
 }
 
+// 파일명 안전화: 공백→하이픈, 허용문자만 유지, 소문자
+function toSafeFileName(name: string): string {
+  return name
+    .normalize("NFKD")
+    .replace(/\s+/g, "-")
+    .replace(/[^a-zA-Z0-9._-]/g, "")
+    .toLowerCase();
+}
+
 export default function ImagesUploader({
   value,
   onChange,
@@ -58,9 +67,8 @@ export default function ImagesUploader({
 
       for (const file of Array.from(files)) {
         // 폴더/랜덤 파일명 + 원본명(특수문자 안전)
-        const path = `${finalDir}/${crypto.randomUUID()}-${encodeURIComponent(
-          file.name
-        )}`;
+        const safeName = toSafeFileName(file.name);
+        const path = `${finalDir}/${crypto.randomUUID()}-${safeName}`;
 
         // 업로드 (RLS/버킷/정책에 따라 실패 가능)
         const { error } = await supabase.storage

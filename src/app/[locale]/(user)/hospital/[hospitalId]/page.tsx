@@ -26,6 +26,7 @@ import {
 } from "lucide-react";
 import type { AmenityKey, Doctor } from "@/types/clinic";
 import { getTagsCatalogServer } from "@/services/hospitals/getTagsCatalog";
+import HospitalCarousel from "@/components/hospitals/HospitalCarousel";
 
 type PageParams = Promise<{ locale: string; hospitalId: string }>;
 type SearchParams = Promise<{ tab?: string }>;
@@ -172,7 +173,17 @@ export default async function ClinicDetailPage({
 
       <section className='max-w-4xl mx-auto px-4 py-6 flex flex-col gap-8'>
         {/* 대표 이미지 슬라이더 */}
-        <div className='relative w-full h-72 rounded-xl overflow-hidden '>
+        <div className='relative '>
+          <HospitalCarousel photos={clinic.images} />
+          <div className='absolute top-3 right-3 hidden md:block'>
+            <FavoriteButton
+              hospitalId={clinic.id}
+              className='p-2 rounded-full bg-white/90 hover:bg-white shadow'
+            />
+          </div>
+        </div>
+
+        {/* <div className='relative w-full h-72 rounded-xl overflow-hidden '>
           <Image
             src={clinic.images[0] || "/images/placeholder.png"}
             alt={name || "clinic image"}
@@ -181,15 +192,15 @@ export default async function ClinicDetailPage({
             className='object-cover'
           />
 
-          {/* 데스크탑 전용 하트(이미지 우상단 오버레이) */}
           <div className='absolute top-3 right-3 hidden md:block'>
             <FavoriteButton
               hospitalId={clinic.id}
               className='p-2 rounded-full bg-white/90 hover:bg-white shadow'
             />
           </div>
-        </div>
-        {/* 타이틀 + 위치 + 별점 + 태그칩 */}
+        </div> */}
+
+        {/* 타이틀 + 위치 + 별점 + 태그 */}
         <div className='px-4 pt-4'>
           {/* 병원명 */}
           <h1 className='text-2xl font-semibold'>{name}</h1>
@@ -251,6 +262,7 @@ export default async function ClinicDetailPage({
               </Link>
             </nav>
           </div>
+
           {/* 탭 컨텐츠: info / reviews */}
           <div>
             {activeTab === "info" ? (
@@ -439,60 +451,56 @@ export default async function ClinicDetailPage({
                 {(clinic.website || Object.keys(socials).length > 0) && (
                   <InfoRow icon={<Earth size={18} />}>
                     <div className='space-y-1'>
+                      {/* Website */}
                       <div className='flex items-center gap-2'>
-                        <span>Website</span>
+                        <span className=''>Website: </span>
                         {clinic.website && (
-                          <a
-                            href={clinic.website}
-                            target='_blank'
-                            rel='noopener noreferrer'
-                            className='text-primary no-underline'
-                          >
-                            {websiteHost}
-                          </a>
+                          <span className='font-semibold'>
+                            <a
+                              href={clinic.website}
+                              target='_blank'
+                              rel='noopener noreferrer'
+                              className='text-primary no-underline'
+                            >
+                              {websiteHost}
+                            </a>
+                          </span>
                         )}
                       </div>
+
+                      {/* instagram */}
                       <div className='flex flex-wrap gap-4 text-primary text-sm'>
                         {socials.instagram && (
-                          <a
-                            href={socials.instagram}
-                            target='_blank'
-                            rel='noopener noreferrer'
-                            className='no-underline'
-                          >
-                            Instagram
-                          </a>
+                          <div>
+                            <span>Instagram: </span>
+                            <span className='font-semibold'>
+                              <a
+                                href={`https://www.instagram.com/${socials.instagram}`}
+                                target='_blank'
+                                rel='noopener noreferrer'
+                                className='no-underline'
+                              >
+                                {socials.instagram}
+                              </a>
+                            </span>
+                          </div>
                         )}
                         {socials.line && (
-                          <a
-                            href={socials.line}
-                            target='_blank'
-                            rel='noopener noreferrer'
-                            className='no-underline'
-                          >
-                            Line
-                          </a>
+                          <div>
+                            <span>Line: </span>
+                            <span className='font-semibold'>
+                              {socials.line}
+                            </span>
+                          </div>
                         )}
-                        {/* whatsapp은 유지하되, 유튜브도 지원 */}
-                        {socials.youtube && (
-                          <a
-                            href={socials.youtube}
-                            target='_blank'
-                            rel='noopener noreferrer'
-                            className='no-underline'
-                          >
-                            Youtube
-                          </a>
-                        )}
+                        {/* whatsapp */}
                         {socials.whatsapp && (
-                          <a
-                            href={socials.whatsapp}
-                            target='_blank'
-                            rel='noopener noreferrer'
-                            className='no-underline'
-                          >
-                            WhatsApp
-                          </a>
+                          <div>
+                            <span>WhatsApp: </span>
+                            <span className='font-semibold'>
+                              {socials.whatsapp}
+                            </span>
+                          </div>
                         )}
                       </div>
                     </div>
@@ -521,7 +529,7 @@ export default async function ClinicDetailPage({
               />
             </summary>
 
-            <div className='flex flex-col gap-4 px-4 py-4 text-sm leading-7 text-foreground/90'>
+            <div className='flex flex-col gap-4 px-8  py-4 text-sm leading-7 text-foreground/90'>
               {/* 설명 */}
               <p>{description}</p>
 
@@ -532,25 +540,13 @@ export default async function ClinicDetailPage({
               {/* 미션 */}
               <h3 className='text-xl font-semibold'>{t("missionLabel")}</h3>
               <p>{mission}</p>
-
-              {/* 이벤트 안내 */}
-              {events.length > 0 && (
-                <section className='space-y-2'>
-                  <h3 className='text-xl font-semibold'>{t("eventsLabel")}</h3>
-                  <ul className='list-disc list-inside text-gray-700'>
-                    {events.map((e, i) => (
-                      <li key={i}>{e}</li>
-                    ))}
-                  </ul>
-                </section>
-              )}
             </div>
           </details>
         </section>
 
         {/* 의료진 소개 */}
-        {doctors.length > 0 && (
-          <section className='space-y-2'>
+        <section className='space-y-2'>
+          {doctors.length > 0 && (
             <details className='group rounded-2xl border bg-card'>
               <summary className='list-none cursor-pointer px-4 py-3 flex items-center justify-between'>
                 <span className='text-xl font-semibold'>
@@ -562,7 +558,7 @@ export default async function ClinicDetailPage({
                 />
               </summary>
 
-              <div className='flex flex-col gap-4 px-4 py-4 text-sm leading-7 text-foreground/90'>
+              <div className='flex flex-col gap-4 px-8  py-4 text-sm leading-7 text-foreground/90'>
                 {doctors.map((d, idx) => {
                   const doctorName = pickText(d.name, loc);
                   const lines = pickLocalized<string[]>(d.lines, loc) ?? [];
@@ -599,8 +595,8 @@ export default async function ClinicDetailPage({
                 })}
               </div>
             </details>
-          </section>
-        )}
+          )}
+        </section>
 
         {/* 편의시설 */}
         <section className='space-y-2'>
@@ -625,6 +621,31 @@ export default async function ClinicDetailPage({
                       </span>
                       <span className='text-sm '>{tAmenity(a)}</span>
                     </li>
+                  ))}
+                </ul>
+              </div>
+            </details>
+          )}
+        </section>
+
+        {/* 이벤트 안내 */}
+        <section className='space-y-2'>
+          {events.length > 0 && (
+            <details className='group rounded-2xl border bg-card'>
+              <summary className='list-none cursor-pointer px-4 py-3 flex items-center justify-between'>
+                <span className='text-xl font-semibold'>
+                  {t("eventsLabel") ?? "예약 이벤트"}
+                </span>
+                <ChevronDown
+                  size={18}
+                  className='text-muted-foreground transition-transform group-open:rotate-180'
+                />
+              </summary>
+
+              <div className='flex flex-col px-8 pb-4 text-sm leading-7 text-foreground/90'>
+                <ul className='mt-2 list-disc list-inside text-sm text-foreground/80 space-y-1'>
+                  {events.map((ev, idx) => (
+                    <li key={`${ev}-${idx}`}>{ev}</li>
                   ))}
                 </ul>
               </div>
@@ -707,9 +728,11 @@ export default async function ClinicDetailPage({
         {/* 예약 시 주의사항 */}
         {reservationNotices.length > 0 && (
           <section className='space-y-2'>
-            <div className='rounded-2xl border bg-card p-4'>
-              <h2 className='text-xl font-semibold mb-3'>예약 시 주의사항</h2>
-              <ul className='list-disc list-inside text-sm text-foreground/80 space-y-1'>
+            <div className='rounded-2xl border bg-card'>
+              <h2 className='text-xl font-semibold px-4 py-3'>
+                {t("reservationNoticesLabel")}
+              </h2>
+              <ul className='list-disc list-inside text-sm text-foreground/80 space-y-1 px-8 pb-4 '>
                 {reservationNotices.map((n, i) => (
                   <li key={i}>{n}</li>
                 ))}
