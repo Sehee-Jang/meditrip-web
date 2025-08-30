@@ -558,13 +558,56 @@ export default async function ClinicDetailPage({
                 />
               </summary>
 
-              <div className='flex flex-col gap-4 px-8  py-4 text-sm leading-7 text-foreground/90'>
+              <div className='px-8 py-4 text-foreground/90'>
+                {/* 목록 시맨틱 보강 */}
+                <ul className='space-y-6'>
+                  {doctors.map((d, idx) => {
+                    const doctorName = pickText(d.name, loc);
+                    const lines = pickLocalized<string[]>(d.lines, loc) ?? [];
+                    return (
+                      <li
+                        key={idx} // 가능하면 고유 id/사진 URL 등 안정 키로 교체 권장
+                        className='grid grid-cols-[112px_1fr] md:grid-cols-[160px_1fr] gap-6 items-start'
+                      >
+                        {/* 사진: 모바일 112, 데스크톱 160 */}
+                        <div className='relative w-[112px] h-[112px] md:w-[160px] md:h-[160px] rounded-xl overflow-hidden border bg-muted'>
+                          {d.photoUrl ? (
+                            <Image
+                              src={d.photoUrl}
+                              alt={doctorName || "doctor photo"}
+                              fill
+                              sizes='(min-width: 768px) 160px, 112px'
+                              className='object-cover'
+                            />
+                          ) : null}
+                        </div>
+
+                        {/* 이름 + 경력 */}
+                        <div className='text-sm leading-7'>
+                          <div className='text-base md:text-lg font-medium'>
+                            {doctorName}
+                          </div>
+                          {lines.length > 0 && (
+                            <ul className='mt-2 list-disc list-inside text-foreground/80 space-y-1'>
+                              {lines.map((l, i) => (
+                                <li key={i}>{l}</li>
+                              ))}
+                            </ul>
+                          )}
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+
+              {/* <div className='flex flex-col gap-4 px-8  py-4 text-sm leading-7 text-foreground/90'>
                 {doctors.map((d, idx) => {
                   const doctorName = pickText(d.name, loc);
                   const lines = pickLocalized<string[]>(d.lines, loc) ?? [];
                   return (
                     <li key={idx} className='grid grid-cols-[88px_1fr] gap-4'>
-                      {/* 사진 */}
+                    
                       <div className='relative w-[88px] h-[88px] rounded-lg overflow-hidden border bg-muted'>
                         {d.photoUrl ? (
                           <Image
@@ -577,7 +620,7 @@ export default async function ClinicDetailPage({
                         ) : null}
                       </div>
 
-                      {/* 이름 + 경력 */}
+          
                       <div>
                         <div className='text-base font-medium'>
                           {doctorName}
@@ -593,7 +636,7 @@ export default async function ClinicDetailPage({
                     </li>
                   );
                 })}
-              </div>
+              </div> */}
             </details>
           )}
         </section>
