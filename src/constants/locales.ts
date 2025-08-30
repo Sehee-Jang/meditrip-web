@@ -10,4 +10,5 @@ export const LOCALE_LABELS_KO: Record<LocaleKey, string> = {
 
 // 필수 언어(운영 정책에 맞춰 변경 가능)
 // 필수 언어: 한국어 + 일본어 → 추후 ["ko", "ja","zh"]로 바꾸면 스키마가 자동 반영됨.
-export const REQUIRED_LOCALES = ["ko", "ja"] as const;
+// export const REQUIRED_LOCALES = ["ko", "ja"] as const;
+export const REQUIRED_LOCALES: readonly LocaleKey[] = ["ko", "ja"];

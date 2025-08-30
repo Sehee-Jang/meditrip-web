@@ -102,7 +102,7 @@ export default async function PackageDetailPage({ params }: Props) {
                               src={step.imageUrl!}
                               alt={step.title[loc]}
                               fill
-                              className='object-cover transition-transform duration-300 group-hover:scale-[1.02]'
+                              className='object-fit transition-transform duration-300 group-hover:scale-[1.02]'
                               sizes='(min-width: 768px) 160px, 100vw'
                             />
                           </div>

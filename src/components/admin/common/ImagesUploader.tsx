@@ -123,11 +123,6 @@ export default function ImagesUploader({
         >
           {uploading ? "업로드 중..." : "이미지 선택"}
         </Button>
-
-        {/* 개발중 확인용: 현재 업로드 타겟 경로 */}
-        <span className='text-xs text-gray-500'>
-          {finalBucket}/{finalDir}
-        </span>
       </div>
 
       {/* 썸네일 그리드 */}

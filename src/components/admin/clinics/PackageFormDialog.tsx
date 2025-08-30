@@ -2,14 +2,17 @@
 
 import * as React from "react";
 import { useEffect, useRef } from "react";
-import { useForm, useFieldArray, type SubmitHandler } from "react-hook-form";
+import {
+  useForm,
+  useFieldArray,
+  type SubmitHandler,
+  Controller,
+} from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { z } from "zod";
-
 import { createPackage, updatePackage } from "@/services/admin/clinics/clinics";
 import type { PackageDoc, PackageWithId } from "@/types/clinic";
 import { packageFormSchema } from "@/validations/clinic";
-
 import FormSheet from "@/components/admin/common/FormSheet";
 import SectionCard from "@/components/admin/common/SectionCard";
 import FormRow from "@/components/admin/common/FormRow";
@@ -66,11 +69,19 @@ export default function PackageFormDialog({
           precautions: undefined,
         },
     mode: "onChange",
-    shouldFocusError: true,
+    shouldFocusError: false,
   });
 
-  const { control, register, watch, setValue, handleSubmit, formState, reset } =
-    form;
+  const {
+    control,
+    register,
+    watch,
+    setValue,
+    handleSubmit,
+    formState,
+    reset,
+    clearErrors,
+  } = form;
 
   const { fields, append, remove, move } = useFieldArray({
     control,
@@ -101,8 +112,6 @@ export default function PackageFormDialog({
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, pkg?.id]);
-
-  const images = watch("packageImages") ?? [];
 
   const focusFirstInvalid = (): void => {
     const formEl = formElRef.current;
@@ -139,8 +148,13 @@ export default function PackageFormDialog({
   };
 
   // 에러 발생 시: ja에 오류가 있으면 탭 전환 + 첫 오류로 스크롤/포커스
-  const onInvalid = (): void => {
-    // 다음 프레임에 DOM 갱신 후 포커스
+  const onInvalid: Parameters<typeof handleSubmit>[1] = (errs) => {
+    if (errs?.packageImages) {
+      document
+        .getElementById("pkg-images")
+        ?.scrollIntoView({ behavior: "smooth", block: "center" });
+      return;
+    }
     requestAnimationFrame(focusFirstInvalid);
   };
 
@@ -177,8 +191,8 @@ export default function PackageFormDialog({
                 register={register}
                 basePath='title'
                 locales={LOCALES_TUPLE}
-                placeholder='패키지 제목'
                 errors={formState.errors}
+                placeholder='패키지 제목'
               />
             }
           />
@@ -200,16 +214,11 @@ export default function PackageFormDialog({
             control={
               <LocalizedTabsField
                 register={register}
-                pathKo='price.ko'
-                pathJa='price.ja'
+                basePath='price'
+                locales={LOCALES_TUPLE}
+                errors={formState.errors}
                 placeholder='예) 10000'
                 mode='number'
-                errorKo={
-                  formState.errors.price?.ko?.message as string | undefined
-                }
-                errorJa={
-                  formState.errors.price?.ja?.message as string | undefined
-                }
               />
             }
           />
@@ -219,16 +228,11 @@ export default function PackageFormDialog({
             control={
               <LocalizedTabsField
                 register={register}
-                pathKo='duration.ko'
-                pathJa='duration.ja'
+                basePath='duration'
+                locales={LOCALES_TUPLE}
+                errors={formState.errors}
                 placeholder='예) 60'
                 mode='number'
-                errorKo={
-                  formState.errors.duration?.ko?.message as string | undefined
-                }
-                errorJa={
-                  formState.errors.duration?.ja?.message as string | undefined
-                }
               />
             }
           />
@@ -239,13 +243,29 @@ export default function PackageFormDialog({
           <FormRow
             label='패키지 이미지'
             control={
-              <ImagesUploader
-                value={images}
-                onChange={(urls: string[]) =>
-                  setValue("packageImages", urls, { shouldDirty: true })
-                }
-                dir={`clinics/${clinicId}/packages`}
-              />
+              <div id='pkg-images' className='space-y-2'>
+                <Controller
+                  name='packageImages'
+                  control={control}
+                  render={({ field, fieldState }) => (
+                    <>
+                      <ImagesUploader
+                        value={field.value ?? []}
+                        onChange={(urls: string[]) => {
+                          field.onChange(urls); // RHF에 값 반영
+                          if (urls.length > 0) clearErrors("packageImages"); // 에러 즉시 해제
+                        }}
+                        preset='packages'
+                      />
+                      {fieldState.error && (
+                        <p className='text-xs text-red-600'>
+                          {fieldState.error.message}
+                        </p>
+                      )}
+                    </>
+                  )}
+                />
+              </div>
             }
           />
         </SectionCard>
@@ -347,7 +367,7 @@ export default function PackageFormDialog({
                               shouldDirty: true,
                             })
                           }
-                          dir={`clinics/${clinicId}/packages/steps`}
+                          preset='packages'
                         />
                       }
                     />

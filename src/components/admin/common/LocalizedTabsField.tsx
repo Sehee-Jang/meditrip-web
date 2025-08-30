@@ -109,7 +109,6 @@ export default function LocalizedTabsField<T extends FieldValues>(
     ...(isDynamic ? props.labels : undefined),
   };
 
-  // 활성 탭(제어/비제어)
   const controlled = typeof activeLocale !== "undefined";
   const [tab, setTab] = React.useState<LocaleKey>(locales[0]);
   const current = controlled ? (activeLocale as LocaleKey) : tab;
@@ -141,15 +140,30 @@ export default function LocalizedTabsField<T extends FieldValues>(
     return map;
   }, [errors, isDynamic, locales, props]);
 
-  // 에러가 있는 탭으로 자동 이동
+  // basePath 루트 에러 추출 (예: "필수 언어(ko, ja)를 입력하세요.")
+  const baseError: string | undefined = isDynamic
+    ? getErrorMessage(errors, String(props.basePath))
+    : undefined;
+
+  // 에러가 있으면 자동으로 해당 탭으로 이동 (루트 에러는 ko로 고정)
   React.useEffect(() => {
     if (!autoSwitchOnError) return;
-    if (!errorMap[current]) {
+    const hasCurrent =
+      Boolean(errorMap[current]) ||
+      Boolean(baseError && REQUIRED_LOCALES.includes(current));
+    if (!hasCurrent) {
       const hit = locales.find((loc) => Boolean(errorMap[loc]));
-      if (hit && hit !== current) setCurrent(hit);
+      if (hit && hit !== current) {
+        setCurrent(hit);
+        return;
+      }
+      if (baseError) {
+        setCurrent(REQUIRED_LOCALES[0]);
+        return;
+      } // ko
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [JSON.stringify(errorMap), autoSwitchOnError]);
+  }, [JSON.stringify(errorMap), baseError, autoSwitchOnError]);
 
   const numberProps = {
     type: "number" as const,
@@ -166,12 +180,15 @@ export default function LocalizedTabsField<T extends FieldValues>(
           const isRequired = (
             REQUIRED_LOCALES as readonly LocaleKey[]
           ).includes(loc);
-          const hasError = Boolean(errorMap[loc]);
+          const hasLocaleErr = Boolean(errorMap[loc]);
+          const hasBaseErrOnThis = Boolean(
+            baseError && loc === REQUIRED_LOCALES[0]
+          ); // 루트 에러는 ko 탭에 표시
           return (
             <TabsTrigger key={loc} value={loc}>
               {labels[loc] ?? loc.toUpperCase()}
               {isRequired && <span className='ml-0.5 text-red-500'>*</span>}
-              {hasError && (
+              {(hasLocaleErr || hasBaseErrOnThis) && (
                 <span
                   aria-label='오류 있음'
                   className='ml-1 inline-block h-1.5 w-1.5 rounded-full bg-red-600'
@@ -187,7 +204,9 @@ export default function LocalizedTabsField<T extends FieldValues>(
           ? (joinPath(props.basePath as string, loc) as Path<T>)
           : ((loc === "ko" ? props.pathKo : props.pathJa) as Path<T>);
 
-        const err = errorMap[loc];
+        const localeErr = errorMap[loc];
+        // ✅ 현재 탭에는 루트 에러도 함께 보여준다 (없으면 로케일 에러)
+        const displayErr = loc === current && baseError ? baseError : localeErr;
 
         const Control =
           mode === "textarea" ? (
@@ -195,27 +214,37 @@ export default function LocalizedTabsField<T extends FieldValues>(
               rows={rows}
               {...register(name)}
               placeholder={placeholder}
-              aria-invalid={Boolean(err) || undefined}
+              aria-invalid={Boolean(displayErr) || undefined}
             />
           ) : mode === "number" ? (
             <Input
               {...numberProps}
-              {...register(name, { valueAsNumber: true })}
+              {...register(name, {
+                setValueAs: (v) =>
+                  v === "" || v === null ? undefined : Number(v),
+              })}
               placeholder={placeholder}
-              aria-invalid={Boolean(err) || undefined}
+              aria-invalid={Boolean(displayErr) || undefined}
             />
           ) : (
             <Input
               {...register(name)}
               placeholder={placeholder}
-              aria-invalid={Boolean(err) || undefined}
+              aria-invalid={Boolean(displayErr) || undefined}
             />
           );
 
         return (
-          <TabsContent key={loc} value={loc} className='mt-0'>
+          <TabsContent
+            key={loc}
+            value={loc}
+            className='mt-0 hidden data-[state=active]:block' //  비활성 숨김
+            forceMount //  등록 유지
+          >
             {Control}
-            {err && <p className='mt-1 text-[11px] text-red-600'>{err}</p>}
+            {displayErr && (
+              <p className='mt-1 text-[11px] text-red-600'>{displayErr}</p>
+            )}
           </TabsContent>
         );
       })}

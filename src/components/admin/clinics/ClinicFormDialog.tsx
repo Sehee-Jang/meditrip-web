@@ -90,7 +90,6 @@ function CategoriesChecklist({
   );
 }
 
-
 /* ====== 타입 별칭 ====== */
 type ClinicFormInputZod = z.input<typeof clinicFormSchema>;
 type ClinicFormOutputZod = z.output<typeof clinicFormSchema>;
@@ -132,8 +131,8 @@ export default function ClinicFormDialog({
       vision: { ko: "", ja: "", zh: "", en: "" },
       mission: { ko: "", ja: "", zh: "", en: "" },
       description: { ko: "", ja: "", zh: "", en: "" },
-      events: { ko: [""], ja: [""], zh: [""], en: [""] },
-      reservationNotices: { ko: [""], ja: [""], zh: [""], en: [""] },
+      events: { ko: [], ja: [], zh: [], en: [] },
+      reservationNotices: { ko: [], ja: [], zh: [], en: [] },
       images: [],
       tagSlugs: [],
       phone: "",

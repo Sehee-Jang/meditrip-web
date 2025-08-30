@@ -1,7 +1,10 @@
 import { z } from "zod";
 import {
   localizedRequiredDynamicSchema,
-  localizedNumberSchema,
+  localizedNumberKoJaRequiredSchema,
+  localizedStringDynamicSchema,
+  localizedStringArrayDynamicSchema,
+  treatmentStepSchema,
 } from "./common";
 import { LOCALES_TUPLE, type LocaleKey } from "@/constants/locales";
 import { CATEGORY_KEYS, type CategoryKey } from "@/constants/categories";
@@ -18,38 +21,14 @@ export const DAY_KEYS = [
 ] as const;
 export type DayKey = (typeof DAY_KEYS)[number];
 
-// 공통: 로케일 문자열 동적 스키마 (누락 키는 ""로 채움)
-const localizedStringDynamicSchema: z.ZodType<Record<LocaleKey, string>> = z
-  .record(z.enum(LOCALES_TUPLE), z.string())
-  .transform((m) => {
-    const out = {} as Record<LocaleKey, string>;
-    LOCALES_TUPLE.forEach((k) => {
-      out[k] = typeof m[k] === "string" ? m[k] : "";
-    });
-    return out;
-  });
-
-// 공통: 로케일 문자열 배열 동적 스키마 (누락 키는 []로 채움)
-const localizedStringArrayDynamicSchema: z.ZodType<
-  Record<LocaleKey, string[]>
-> = z
-  .record(z.enum(LOCALES_TUPLE), z.array(z.string().trim()))
-  .transform((m) => {
-    const out = {} as Record<LocaleKey, string[]>;
-    LOCALES_TUPLE.forEach((k) => {
-      out[k] = Array.isArray(m[k]) ? m[k] : [];
-    });
-    return out;
-  });
-
 // 기본값 헬퍼들(Record<LocaleKey, ...>를 정확히 생성)
-const makeLocalizedArray = (length = 0): Record<LocaleKey, string[]> => {
-  const out = {} as Record<LocaleKey, string[]>;
-  LOCALES_TUPLE.forEach((k) => {
-    out[k] = Array.from({ length }, () => "");
-  });
-  return out;
-};
+// const makeLocalizedArray = (length = 0): Record<LocaleKey, string[]> => {
+//   const out = {} as Record<LocaleKey, string[]>;
+//   LOCALES_TUPLE.forEach((k) => {
+//     out[k] = Array.from({ length }, () => "");
+//   });
+//   return out;
+// };
 
 // 시간 형태(HH:mm). 빈 문자열/undefined도 허용
 const timeHHmm = z.string().regex(/^\d{2}:\d{2}$/);
@@ -112,9 +91,11 @@ const categoryKeysSchema = z
 
 // 메인 스키마
 export const clinicFormSchema = z.object({
-  // 기본/로케일 필드
-  name: localizedStringDynamicSchema,
-  address: localizedStringDynamicSchema,
+  // ko/ja 필수, zh/en 선택
+  name: localizedRequiredDynamicSchema,
+  address: localizedRequiredDynamicSchema,
+
+  // 모두 선택
   intro: z.object({
     title: localizedStringDynamicSchema,
     subtitle: localizedStringDynamicSchema,
@@ -122,25 +103,20 @@ export const clinicFormSchema = z.object({
   vision: localizedStringDynamicSchema,
   mission: localizedStringDynamicSchema,
   description: localizedStringDynamicSchema,
-  hoursNote: localizedStringDynamicSchema, // 영업/휴무 안내문
-  categoryKeys: categoryKeysSchema,
-  // 선택/부가
-  // category: z.string().optional(), // "traditional" | "cosmetic" | "wellness" 등을 문자열로 관리
-  geo: geoSchema,
+  hoursNote: localizedStringDynamicSchema,
 
-  // 이벤트/주의사항: 전 로케일(ko/ja/zh/en)
-  events: localizedStringArrayDynamicSchema.default(makeLocalizedArray(0)),
-  reservationNotices: localizedStringArrayDynamicSchema
-    .transform((obj) => {
-      const pad3 = (arr: string[]) =>
-        arr.length >= 3 ? arr : [...arr, "", "", ""].slice(0, 3);
-      const out = {} as Record<LocaleKey, string[]>;
-      LOCALES_TUPLE.forEach((k) => {
-        out[k] = pad3(obj[k]);
-      });
-      return out;
-    })
-    .default(makeLocalizedArray(3)),
+  categoryKeys: categoryKeysSchema,
+  geo: geoSchema,
+  events: localizedStringArrayDynamicSchema,
+  reservationNotices: localizedStringArrayDynamicSchema.transform((obj) => {
+    const pad3 = (arr: string[]) =>
+      arr.length >= 3 ? arr : [...arr, "", "", ""].slice(0, 3);
+    const out = {} as Record<LocaleKey, string[]>;
+    LOCALES_TUPLE.forEach((k) => {
+      out[k] = pad3(obj[k]);
+    });
+    return out;
+  }),
 
   // 이미지/태그
   images: z.array(z.string().url().or(z.string().min(1))).default([]),
@@ -173,24 +149,19 @@ export const clinicFormSchema = z.object({
 export type ClinicFormValues = z.infer<typeof clinicFormSchema>;
 
 /** ===== 패키지 폼 ===== */
-const imageUrlOptional = z.preprocess(
-  (v) => (typeof v === "string" && v.trim() === "" ? undefined : v),
-  z.string().url().optional()
-);
-
-export const treatmentStepSchema = z.object({
-  title: localizedRequiredDynamicSchema,
-  description: localizedRequiredDynamicSchema,
-  imageUrl: imageUrlOptional,
-});
-
 export const packageFormSchema = z.object({
+  // ko/ja만 필수
   title: localizedRequiredDynamicSchema,
-  subtitle: localizedRequiredDynamicSchema.optional(), // 선택 입력
-  price: localizedNumberSchema, // 숫자 필수(ko/ja)
-  duration: localizedNumberSchema, // 숫자 필수(ko/ja, 분)
-  packageImages: z.array(z.string()).optional(),
-  treatmentDetails: z.array(treatmentStepSchema).optional(),
-  precautions: localizedRequiredDynamicSchema.optional(),
+
+  // 부제/주의사항 등은 선택
+  subtitle: localizedStringDynamicSchema,
+  precautions: localizedStringDynamicSchema,
+
+  // 가격/소요시간은 ko/ja 필수 숫자, zh/en 선택 숫자
+  price: localizedNumberKoJaRequiredSchema,
+  duration: localizedNumberKoJaRequiredSchema,
+
+  packageImages: z.array(z.string().url()).min(1, "이미지 1장 이상"),
+  treatmentDetails: z.array(treatmentStepSchema).default([]),
 });
 export type PackageFormValues = z.infer<typeof packageFormSchema>;

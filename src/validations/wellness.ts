@@ -2,7 +2,7 @@ import { z } from "zod";
 import { CATEGORY_VALUES_TUPLE } from "@/constants/categories";
 import {
   localizedRequiredDynamicSchema,
-  localizedOptionalDynamicSchema,
+  localizedStringDynamicSchema,
   tagsOptionalSchema,
 } from "./common";
 
@@ -19,7 +19,7 @@ export const wellnessFormSchema = z.object({
   category: z.enum(CATEGORY_VALUES_TUPLE),
 
   // 선택
-  excerpt: localizedOptionalDynamicSchema,
+  excerpt: localizedStringDynamicSchema,
   tags: tagsOptionalSchema,
   thumbnailUrl: z.array(z.string().trim().min(1)).optional().default([]),
 

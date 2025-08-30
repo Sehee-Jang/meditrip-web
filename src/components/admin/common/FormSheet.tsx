@@ -26,6 +26,9 @@ interface FormSheetProps {
 
   /** 닫혀있을 때도 컴포넌트를 유지하고 싶다면 true (기본: false → 닫히면 완전 언마운트) */
   mountWhenClosed?: boolean;
+
+  /** 폼 유효성/제출 상태에 따라 상위에서 제출 비활성화 제어 */
+  submitDisabled?: boolean;
 }
 
 export default function FormSheet({
@@ -41,12 +44,14 @@ export default function FormSheet({
   widthClassName = "sm:max-w-[840px]",
   footer,
   mountWhenClosed = false,
+  submitDisabled,
 }: FormSheetProps) {
   // 닫힐 때 완전 언마운트 → 포털/오버레이/포커스트랩 잔존 이슈 방지
   if (!open && !mountWhenClosed) return null;
 
   // open 상태가 바뀔 때마다 Sheet를 강제 재마운트 → 내부 포커스/포털 초기화
   const sheetKey = open ? "open" : "closed";
+  const isSubmitDisabled = Boolean(loading || submitDisabled);
 
   return (
     <Sheet key={sheetKey} open={open} onOpenChange={onOpenChange}>
@@ -98,7 +103,8 @@ export default function FormSheet({
                   <Button
                     type='submit'
                     form={formId}
-                    disabled={loading}
+                    disabled={isSubmitDisabled}
+                    aria-disabled={isSubmitDisabled}
                     className='bg-indigo-700 hover:bg-indigo-800'
                   >
                     {submitLabel}

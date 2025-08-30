@@ -40,11 +40,35 @@ function compactSocials(
   }
   return Object.keys(out).length ? (out as ClinicDoc["socials"]) : undefined;
 }
+/** 객체가 "순수 객체(Plain Object)"인지 확인 */
+function isPlainObject(v: unknown): v is Record<string, unknown> {
+  if (typeof v !== "object" || v === null) return false;
+  const proto = Object.getPrototypeOf(v);
+  return proto === Object.prototype || proto === null;
+}
 
-// 1단계(shallow)에서만 undefined 제거
-function stripUndefined<T extends Record<string, unknown>>(obj: T): T {
-  const entries = Object.entries(obj).filter(([, v]) => v !== undefined);
-  return Object.fromEntries(entries) as T;
+/** 중첩된 모든 depth에서 undefined 값을 제거
+ *  - 배열: 요소를 재귀 처리하고 undefined 요소는 제거
+ *  - 순수 객체: 키를 재귀 처리하고 값이 undefined면 키를 제거
+ *  - Firestore 특수 타입(Timestamp/FieldValue/GeoPoint 등)은 그대로 유지
+ */
+function stripUndefinedDeep<T>(input: T): T {
+  if (Array.isArray(input)) {
+    const arr = input
+      .map((v) => stripUndefinedDeep(v))
+      .filter((v) => v !== undefined);
+    return arr as unknown as T;
+  }
+  if (isPlainObject(input)) {
+    const out: Record<string, unknown> = {};
+    for (const [k, v] of Object.entries(input)) {
+      if (v === undefined) continue;
+      const cleaned = stripUndefinedDeep(v);
+      if (cleaned !== undefined) out[k] = cleaned;
+    }
+    return out as T;
+  }
+  return input;
 }
 
 /* ===============================
@@ -54,8 +78,9 @@ const clinicsCol = collection(db, "clinics");
 // 허용 키만 통과
 const asCategoryKeys = (val: unknown): CategoryKey[] => {
   if (!Array.isArray(val)) return [];
-  return (val as unknown[]).filter((k): k is CategoryKey =>
-    typeof k === "string" && CATEGORY_KEYS.includes(k as CategoryKey)
+  return (val as unknown[]).filter(
+    (k): k is CategoryKey =>
+      typeof k === "string" && CATEGORY_KEYS.includes(k as CategoryKey)
   );
 };
 
@@ -210,8 +235,8 @@ export async function createClinic(
   // socials 정리
   const socialsClean = compactSocials(values.socials);
 
-  // 최종 payload (최상위 undefined 제거)
-  const base = stripUndefined({
+  // 깊은 단계까지 undefined 제거
+  const base = stripUndefinedDeep({
     ...values,
     socials: socialsClean,
   });
@@ -242,8 +267,8 @@ export async function updateClinic(
   // socials 정리
   const socialsClean = compactSocials(values.socials);
 
-  // 최상위 undefined 제거 + updatedAt 부여
-  const payload = stripUndefined({
+  // 깊은 단계까지 undefined 제거 + updatedAt 부여
+  const payload = stripUndefinedDeep({
     ...values,
     socials: socialsClean,
     updatedAt: serverTimestamp(),
@@ -287,11 +312,16 @@ export async function createPackage(
   values: Omit<PackageDoc, "createdAt" | "updatedAt">
 ): Promise<string> {
   const now = serverTimestamp();
+
+  // zh/en 숫자 필드가 비어있으면 undefined일 수 있으니, 저장 전 제거
+  const cleaned = stripUndefinedDeep(values);
+
   const data: PackageDoc = {
-    ...values,
+    ...(cleaned as Omit<PackageDoc, "createdAt" | "updatedAt">),
     createdAt: now as unknown as Timestamp,
     updatedAt: now as unknown as Timestamp,
   };
+
   const ref = await addDoc(
     packagesCol(clinicId).withConverter(packageConverter),
     data
@@ -308,7 +338,13 @@ export async function updatePackage(
   const ref = doc(db, "clinics", clinicId, "packages", packageId).withConverter(
     packageConverter
   );
-  await updateDoc(ref, { ...values, updatedAt: serverTimestamp() });
+
+  const payload = stripUndefinedDeep({
+    ...values,
+    updatedAt: serverTimestamp(),
+  });
+
+  await updateDoc(ref, payload);
   await syncPackageCount(clinicId);
 }
 
