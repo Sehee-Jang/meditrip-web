@@ -9,10 +9,10 @@ export interface Wellness {
   title: LocalizedTextDoc;
   excerpt: LocalizedTextDoc; // 목록/메타 설명용 요약문
   body: LocalizedTextDoc; // 실제 콘텐츠 본문
-  categoryKeys?: CategoryKey;
-
+  category: CategoryKey;
+  // categories?: CategoryKey[]; // 다중 카테고리
   tags: string[]; // 주제/속성 기반 필터 & 추천
-  thumbnailUrl: string;
+  images: string[];
 
   viewCount: number;
   likeCount: number;
@@ -24,12 +24,13 @@ export interface Wellness {
 
 /** Firestore 실제 저장 형태(읽기 원본) */
 export type WellnessDoc = {
-  title?: LocalizedTextDoc | string;
-  excerpt?: LocalizedTextDoc | string;
-  body?: LocalizedTextDoc | string;
-  categoryKeys?: CategoryKey;
+  title?: LocalizedTextDoc;
+  excerpt?: LocalizedTextDoc;
+  body?: LocalizedTextDoc;
+  category: CategoryKey;
+  // categories?: CategoryKey[]; // 다중 카테고리
   tags?: string[];
-  thumbnailUrl?: string | null;
+  images?: string[];
 
   viewCount?: number;
   likeCount?: number;
@@ -41,13 +42,17 @@ export type WellnessDoc = {
 
 /** 생성 입력 */
 export type CreateWellnessInput = {
-  title: string | LocalizedTextDoc;
-  excerpt: string | LocalizedTextDoc;
-  body: string | LocalizedTextDoc;
+  title: LocalizedTextDoc;
+  excerpt: LocalizedTextDoc;
+  body: LocalizedTextDoc;
   category: CategoryKey;
+  // categories: CategoryKey[]; // 다중 카테고리
   tags: string[];
-  thumbnailUrl: string;
+  images: string[];
   isHidden?: boolean;
 };
 
 export type UpdateWellnessInput = Partial<CreateWellnessInput>;
+
+/** 병원 문서 + id (조회용) */
+export type WellnessWithId = WellnessDoc & { id: string };

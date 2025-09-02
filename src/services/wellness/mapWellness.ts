@@ -2,7 +2,6 @@ import type { QueryDocumentSnapshot, DocumentData } from "firebase/firestore";
 import { serverTimestamp } from "firebase/firestore";
 import type {
   CreateWellnessInput,
-  LocalizedTextDoc,
   UpdateWellnessInput,
   Wellness,
   WellnessDoc,
@@ -10,6 +9,7 @@ import type {
 import { CATEGORY_KEYS, type CategoryKey } from "@/constants/categories";
 import { toISO } from "@/utils/date";
 import { LocaleKey, LOCALES_TUPLE } from "@/constants/locales";
+import { LocalizedTextDoc } from "@/types/common";
 
 /** 카테고리 정규화 */
 function normalizeCategory(v: unknown): CategoryKey {
@@ -38,11 +38,15 @@ function normalizeI18n(v: unknown): LocalizedTextDoc {
   return out as LocalizedTextDoc;
 }
 
-/** 다국어 문서에서 ko 문자열만 뽑아 UI 모델에 넣기 */
-function pickKo(v: LocalizedTextDoc | string | undefined): string {
-  if (!v) return "";
-  if (typeof v === "string") return v;
-  return v.ko ?? "";
+/** images 정규화: string|string[]|null|undefined → string[] */
+function normalizeImages(v: unknown): string[] {
+  if (Array.isArray(v)) {
+    return (v.filter((x) => typeof x === "string" && x) as string[]) ?? [];
+  }
+  if (typeof v === "string") {
+    return v ? [v] : [];
+  }
+  return [];
 }
 
 /** Firestore → 앱 표준(ko 문자열 뽑아서, ISO/기본값 보장) */
@@ -50,18 +54,19 @@ export function mapSnapToWellness(
   snap: QueryDocumentSnapshot<DocumentData>
 ): Wellness {
   const raw = snap.data() as WellnessDoc;
+  const rawAny = raw as unknown as { images?: unknown };
 
   const createdAtISO = toISO(raw.createdAt);
   const updatedAtISO = toISO(raw.updatedAt);
 
   return {
     id: snap.id,
-    title: pickKo(raw.title),
-    excerpt: pickKo(raw.excerpt),
-    body: pickKo(raw.body),
+    title: normalizeI18n(raw.title),
+    excerpt: normalizeI18n(raw.excerpt),
+    body: normalizeI18n(raw.body),
     category: normalizeCategory(raw.category),
     tags: Array.isArray(raw.tags) ? (raw.tags.filter(Boolean) as string[]) : [],
-    thumbnailUrl: typeof raw.thumbnailUrl === "string" ? raw.thumbnailUrl : "",
+    images: normalizeImages(rawAny.images),
 
     viewCount: typeof raw.viewCount === "number" ? raw.viewCount : 0,
     likeCount: typeof raw.likeCount === "number" ? raw.likeCount : 0,
@@ -74,17 +79,21 @@ export function mapSnapToWellness(
 
 /** (옵션) 원본 객체 → 앱 표준 수동 변환이 필요할 때 */
 export function mapDocToWellness(id: string, raw: WellnessDoc): Wellness {
+  const rawAny = raw as unknown as {
+    images?: unknown;
+    thumbnailUrl?: unknown;
+  };
   const createdAtISO = toISO(raw.createdAt);
   const updatedAtISO = toISO(raw.updatedAt);
 
   return {
     id,
-    title: String(raw.title ?? ""),
-    excerpt: String(raw.excerpt ?? ""),
-    body: String(raw.body ?? ""),
+    title: normalizeI18n(raw.title),
+    excerpt: normalizeI18n(raw.excerpt),
+    body: normalizeI18n(raw.body),
     category: normalizeCategory(raw.category),
     tags: Array.isArray(raw.tags) ? (raw.tags.filter(Boolean) as string[]) : [],
-    thumbnailUrl: typeof raw.thumbnailUrl === "string" ? raw.thumbnailUrl : "",
+    images: normalizeImages(rawAny.images),
 
     viewCount: typeof raw.viewCount === "number" ? raw.viewCount : 0,
     likeCount: typeof raw.likeCount === "number" ? raw.likeCount : 0,
@@ -105,7 +114,7 @@ export function mapCreateInputToDoc(input: CreateWellnessInput): WellnessDoc {
     tags: Array.isArray(input.tags)
       ? (input.tags.filter(Boolean) as string[])
       : [],
-    thumbnailUrl: input.thumbnailUrl,
+    images: normalizeImages(input.images),
     isHidden: Boolean(input.isHidden ?? false),
 
     viewCount: 0,
@@ -128,8 +137,7 @@ export function mapUpdateInputToDoc(
   if (typeof patch.body !== "undefined") data.body = normalizeI18n(patch.body);
   if (typeof patch.category === "string") data.category = patch.category;
   if (Array.isArray(patch.tags)) data.tags = patch.tags;
-  if (typeof patch.thumbnailUrl === "string")
-    data.thumbnailUrl = patch.thumbnailUrl;
+  if (Array.isArray(patch.images)) data.images = normalizeImages(patch.images);
   if (typeof patch.isHidden === "boolean") data.isHidden = patch.isHidden;
 
   return data;

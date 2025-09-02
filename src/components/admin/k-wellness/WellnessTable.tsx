@@ -5,6 +5,8 @@ import AdminDataTable, { DataTableColumn } from "../common/AdminDataTable";
 import { Wellness } from "@/types/wellness";
 import WellnessTableRow from "./WellnessTableRow";
 import WellnessFormDialog from "./WellnessFormDialog";
+import { deleteWellness } from "@/services/wellness/deleteWellness";
+import { toast } from "sonner";
 
 interface Props {
   items: Wellness[];
@@ -30,6 +32,18 @@ export default function WellnessTable({
     { header: "작업", widthClass: "w-[20%]", align: "right" },
   ] as const satisfies ReadonlyArray<DataTableColumn>;
 
+  const handleDelete = async (id: string) => {
+    const ok = confirm("정말 삭제할까요?");
+    if (!ok) return;
+    try {
+      await deleteWellness(id);
+      toast.success("삭제되었습니다.");
+      onChanged?.(); // 👈 목록 갱신
+    } catch {
+      toast.error("삭제에 실패했어요.");
+    }
+  };
+
   return (
     <>
       <AdminDataTable<Wellness>
@@ -38,12 +52,12 @@ export default function WellnessTable({
         totalCount={totalCount}
         loading={loading}
         columns={columns}
-        getRowKey={(v) => v.id}
-        renderRow={(v) => (
+        getRowKey={(w) => w.id}
+        renderRow={(w) => (
           <WellnessTableRow
-            v={v}
-            onEdit={() => setEditId(v.id)}
-            onChanged={onChanged}
+            wellness={w}
+            onEdit={(id) => setEditId(id)}
+            onDelete={(id) => void handleDelete(id)}
           />
         )}
         emptyMessage='데이터가 없습니다.'

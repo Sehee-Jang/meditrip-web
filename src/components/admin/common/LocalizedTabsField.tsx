@@ -99,18 +99,26 @@ export default function LocalizedTabsField<T extends FieldValues>(
     errors,
   } = props;
 
+  // 동적/정적 모드 판별
   const isDynamic = "basePath" in props && typeof props.basePath === "string";
-  const locales: readonly LocaleKey[] = isDynamic
-    ? props.locales ?? LOCALES_TUPLE
-    : (["ko", "ja"] as const);
 
-  const labels: Record<LocaleKey, string> = {
-    ...LOCALE_LABELS_KO,
-    ...(isDynamic ? props.labels : undefined),
-  };
+  // locales 계산을 별도 useMemo로 고정
+  const resolvedLocales = React.useMemo<readonly LocaleKey[]>(() => {
+    return isDynamic
+      ? props.locales && props.locales.length > 0
+        ? props.locales
+        : LOCALES_TUPLE
+      : (["ko", "ja"] as const);
+  }, [isDynamic, props.locales]);
 
+  // 라벨 병합
+  const labels: Record<LocaleKey, string> = React.useMemo(() => {
+    return { ...LOCALE_LABELS_KO, ...(isDynamic ? props.labels : undefined) };
+  }, [isDynamic, props.labels]);
+
+  // 제어/비제어 탭 상태
   const controlled = typeof activeLocale !== "undefined";
-  const [tab, setTab] = React.useState<LocaleKey>(locales[0]);
+  const [tab, setTab] = React.useState<LocaleKey>(resolvedLocales[0]);
   const current = controlled ? (activeLocale as LocaleKey) : tab;
 
   const setCurrent = React.useCallback(
@@ -121,24 +129,29 @@ export default function LocalizedTabsField<T extends FieldValues>(
     [controlled, onActiveLocaleChange]
   );
 
-  // 로케일별 에러 맵
+  // locales가 바뀌었을 때(동적) 현재 탭이 유효하지 않으면 첫 로케일로 보정
   const errorMap = React.useMemo<Partial<Record<LocaleKey, string>>>(() => {
     const map: Partial<Record<LocaleKey, string>> = {};
-    for (const loc of locales) {
+    for (const loc of resolvedLocales) {
       if (isDynamic) {
         const path = joinPath(props.basePath as string, loc);
         map[loc] = getErrorMessage(errors, path);
       } else {
         if (loc === "ko")
           map[loc] =
-            props.errorKo ?? getErrorMessage(errors, String(props.pathKo));
+            (props as KoJaVariant<T>).errorKo ??
+            getErrorMessage(errors, String((props as KoJaVariant<T>).pathKo));
         else if (loc === "ja")
           map[loc] =
-            props.errorJa ?? getErrorMessage(errors, String(props.pathJa));
+            (props as KoJaVariant<T>).errorJa ??
+            getErrorMessage(errors, String((props as KoJaVariant<T>).pathJa));
       }
     }
     return map;
-  }, [errors, isDynamic, locales, props]);
+  }, [errors, isDynamic, resolvedLocales, props]);
+
+  // 문자열 키로 의존성 안정화
+  const errorMapKey = React.useMemo(() => JSON.stringify(errorMap), [errorMap]);
 
   // basePath 루트 에러 추출 (예: "필수 언어(ko, ja)를 입력하세요.")
   const baseError: string | undefined = isDynamic
@@ -152,7 +165,7 @@ export default function LocalizedTabsField<T extends FieldValues>(
       Boolean(errorMap[current]) ||
       Boolean(baseError && REQUIRED_LOCALES.includes(current));
     if (!hasCurrent) {
-      const hit = locales.find((loc) => Boolean(errorMap[loc]));
+      const hit = resolvedLocales.find((loc) => Boolean(errorMap[loc]));
       if (hit && hit !== current) {
         setCurrent(hit);
         return;
@@ -163,7 +176,14 @@ export default function LocalizedTabsField<T extends FieldValues>(
       } // ko
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [JSON.stringify(errorMap), baseError, autoSwitchOnError]);
+  }, [
+    autoSwitchOnError,
+    baseError,
+    current,
+    errorMapKey,
+    resolvedLocales,
+    setCurrent,
+  ]);
 
   const numberProps = {
     type: "number" as const,
@@ -176,7 +196,7 @@ export default function LocalizedTabsField<T extends FieldValues>(
   return (
     <Tabs value={current} onValueChange={(v) => setCurrent(v as LocaleKey)}>
       <TabsList className='mb-2'>
-        {locales.map((loc) => {
+        {resolvedLocales.map((loc) => {
           const isRequired = (
             REQUIRED_LOCALES as readonly LocaleKey[]
           ).includes(loc);
@@ -199,13 +219,17 @@ export default function LocalizedTabsField<T extends FieldValues>(
         })}
       </TabsList>
 
-      {locales.map((loc) => {
+      {resolvedLocales.map((loc) => {
         const name: Path<T> = isDynamic
-          ? (joinPath(props.basePath as string, loc) as Path<T>)
-          : ((loc === "ko" ? props.pathKo : props.pathJa) as Path<T>);
+          ? (joinPath(
+              (props as DynamicVariant<T>).basePath as string,
+              loc
+            ) as Path<T>)
+          : ((loc === "ko"
+              ? (props as KoJaVariant<T>).pathKo
+              : (props as KoJaVariant<T>).pathJa) as Path<T>);
 
         const localeErr = errorMap[loc];
-        // ✅ 현재 탭에는 루트 에러도 함께 보여준다 (없으면 로케일 에러)
         const displayErr = loc === current && baseError ? baseError : localeErr;
 
         const Control =
@@ -238,8 +262,8 @@ export default function LocalizedTabsField<T extends FieldValues>(
           <TabsContent
             key={loc}
             value={loc}
-            className='mt-0 hidden data-[state=active]:block' //  비활성 숨김
-            forceMount //  등록 유지
+            className='mt-0 hidden data-[state=active]:block' // 비활성 숨김
+            forceMount // 등록 유지
           >
             {Control}
             {displayErr && (

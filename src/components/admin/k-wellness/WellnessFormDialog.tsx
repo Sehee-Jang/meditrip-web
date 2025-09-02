@@ -62,7 +62,7 @@ export default function WellnessFormDialog({
       body: { ko: "", ja: "", zh: "", en: "" },
       // category: "stress" as CategoryKey,
       tags: [],
-      thumbnailUrl: [],
+      images: [],
       isHidden: false, // 생성 폼에서는 노출하지 않음
     },
     mode: "onChange",
@@ -93,7 +93,7 @@ export default function WellnessFormDialog({
         body: values.body,
         category: values.category,
         tags: values.tags,
-        thumbnailUrl: values.thumbnailUrl?.[0] ?? "",
+        images: values.images ?? [],
         isHidden: values.isHidden,
       };
 
@@ -117,7 +117,7 @@ export default function WellnessFormDialog({
     requestAnimationFrame(focusFirstInvalid);
   };
 
-  const images = watch("thumbnailUrl") ?? [];
+  const images = watch("images") ?? [];
 
   return (
     <FormSheet
@@ -234,7 +234,7 @@ export default function WellnessFormDialog({
               <ImagesUploader
                 value={images}
                 onChange={(urls: string[]) =>
-                  setValue("thumbnailUrl", urls, { shouldDirty: true })
+                  setValue("images", urls, { shouldDirty: true })
                 }
                 dir='wellness'
               />

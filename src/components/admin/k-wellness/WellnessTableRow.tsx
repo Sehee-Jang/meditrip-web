@@ -4,52 +4,48 @@ import React from "react";
 import { CATEGORY_LABELS_KO } from "@/constants/categories";
 import { formatDateCompact } from "@/utils/date";
 import type { Wellness } from "@/types/wellness";
-
-import { toast } from "sonner";
-import { deleteWellness } from "@/services/wellness/deleteWellness";
+import WellnessRowActions from "./WellnessRowActions";
 
 type Props = {
-  v: Wellness;
-  onEdit?: () => void;
-  onChanged?: () => void;
+  wellness: Wellness;
+  onEdit?: (wellnessId: string) => void;
+  onDelete: (wellnessId: string) => void;
 };
 
-export default function WellnessTableRow({ v, onEdit, onChanged }: Props) {
-  const handleDelete = async () => {
-    const ok = confirm("정말 삭제할까요?");
-    if (!ok) return;
-    try {
-      await deleteWellness(v.id);
-      toast.success("삭제되었습니다.");
-      onChanged?.();
-    } catch {
-      toast.error("삭제에 실패했어요.");
-    }
-  };
-
+// 빈 값일 때 다른 로케일로 대체
+function titleFallback(w: Wellness): string {
+  return w.title.ko || w.title.ja || w.title.en || w.title.zh || "-";
+}
+export default function WellnessTableRow({
+  wellness,
+  onEdit,
+  onDelete,
+}: Props) {
   return (
     <tr>
       <td className='py-2'>
-        <div className='truncate font-medium'>{v.title}</div>
+        <div className='truncate font-medium'>{titleFallback(wellness)}</div>
       </td>
-      <td className='py-2 text-center'>{CATEGORY_LABELS_KO[v.category]}</td>
-      <td className='py-2 text-center'>{formatDateCompact(v.createdAt)}</td>
-      <td className='py-2 text-right'>
-        <div className='inline-flex gap-2'>
-          <button
-            type='button'
-            className='rounded border px-2 py-1 text-sm hover:bg-gray-50'
-            onClick={onEdit}
-          >
-            수정
-          </button>
-          <button
-            type='button'
-            className='rounded border px-2 py-1 text-sm text-red-600 hover:bg-red-50'
-            onClick={() => void handleDelete()}
-          >
-            삭제
-          </button>
+
+      <td className='py-2 text-center'>
+        {CATEGORY_LABELS_KO[wellness.category]}
+      </td>
+
+      <td className='py-2 text-center'>
+        {formatDateCompact(wellness.createdAt)}
+      </td>
+
+      {/* 액션 */}
+      <td
+        className='px-4 py-3 pr-4 text-right'
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className='inline-flex items-center justify-end gap-2'>
+          <WellnessRowActions
+            wellness={wellness}
+            onEdit={() => onEdit?.(wellness.id)}
+            onDelete={() => onDelete(wellness.id)}
+          />
         </div>
       </td>
     </tr>
