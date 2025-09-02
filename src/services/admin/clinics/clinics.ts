@@ -40,6 +40,7 @@ function compactSocials(
   }
   return Object.keys(out).length ? (out as ClinicDoc["socials"]) : undefined;
 }
+
 /** 객체가 "순수 객체(Plain Object)"인지 확인 */
 function isPlainObject(v: unknown): v is Record<string, unknown> {
   if (typeof v !== "object" || v === null) return false;
@@ -75,6 +76,7 @@ function stripUndefinedDeep<T>(input: T): T {
  * Converters
  * =============================== */
 const clinicsCol = collection(db, "clinics");
+
 // 허용 키만 통과
 const asCategoryKeys = (val: unknown): CategoryKey[] => {
   if (!Array.isArray(val)) return [];
@@ -213,18 +215,6 @@ export async function getClinicByIdAdmin(
   return { id: snap.id, ...snap.data() };
 }
 
-// export async function createClinic(
-//   values: Omit<ClinicDoc, "createdAt" | "updatedAt">
-// ): Promise<string> {
-//   const now = serverTimestamp();
-//   const data: ClinicDoc = {
-//     ...values,
-//     createdAt: now as unknown as Timestamp,
-//     updatedAt: now as unknown as Timestamp,
-//   };
-//   const ref = await addDoc(clinicsCol.withConverter(clinicConverter), data);
-//   return ref.id;
-// }
 export async function createClinic(
   values: Omit<ClinicDoc, "createdAt" | "updatedAt">
 ): Promise<string> {
@@ -249,13 +239,6 @@ export async function createClinic(
   return ref.id;
 }
 
-// export async function updateClinic(
-//   id: string,
-//   values: Partial<Omit<ClinicDoc, "createdAt" | "updatedAt">>
-// ): Promise<void> {
-//   const ref = doc(db, "clinics", id).withConverter(clinicConverter);
-//   await updateDoc(ref, { ...values, updatedAt: serverTimestamp() });
-// }
 export async function updateClinic(
   id: string,
   values: Partial<Omit<ClinicDoc, "createdAt" | "updatedAt">>
@@ -324,7 +307,9 @@ export async function createPackage(
     packagesCol(clinicId).withConverter(packageConverter),
     data
   );
-  await syncPackageCount(clinicId);
+  await updateDoc(doc(db, "clinics", clinicId), {
+    updatedAt: serverTimestamp(),
+  });
   return ref.id;
 }
 
@@ -343,7 +328,9 @@ export async function updatePackage(
   });
 
   await updateDoc(ref, payload);
-  await syncPackageCount(clinicId);
+  await updateDoc(doc(db, "clinics", clinicId), {
+    updatedAt: serverTimestamp(),
+  });
 }
 
 export async function deletePackage(
@@ -351,14 +338,7 @@ export async function deletePackage(
   packageId: string
 ): Promise<void> {
   await deleteDoc(doc(db, "clinics", clinicId, "packages", packageId));
-  await syncPackageCount(clinicId);
-}
-
-export async function syncPackageCount(clinicId: string): Promise<void> {
-  const q = query(packagesCol(clinicId));
-  const snap = await getDocs(q);
-  const ref = doc(db, "clinics", clinicId);
-  await updateDoc(ref, {
+  await updateDoc(doc(db, "clinics", clinicId), {
     updatedAt: serverTimestamp(),
   });
 }
