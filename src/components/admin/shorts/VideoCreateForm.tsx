@@ -102,7 +102,7 @@ export default function VideoCreateForm({
     defaultValues: {
       title: "",
       youtubeUrl: "",
-      category: CATEGORY_VALUES_TUPLE[0],
+      // category: CATEGORY_VALUES_TUPLE[0],
       thumbnailUrl: "",
     },
   });
@@ -169,7 +169,7 @@ export default function VideoCreateForm({
       <div className='space-y-2'>
         <Label>카테고리</Label>
         <Select
-          defaultValue={CATEGORY_VALUES_TUPLE[0]}
+         
           onValueChange={(v) =>
             setValue("category", v as FormValues["category"], {
               shouldValidate: true,

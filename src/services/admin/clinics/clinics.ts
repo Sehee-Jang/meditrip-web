@@ -146,8 +146,6 @@ const clinicConverter: FirestoreDataConverter<ClinicDoc> = {
       status: (d.status as "visible" | "hidden") ?? "visible",
       createdAt: d.createdAt as Timestamp,
       updatedAt: d.updatedAt as Timestamp,
-      packages_migrated: d.packages_migrated,
-      packageCount: d.packageCount,
     };
   },
 };
@@ -361,8 +359,6 @@ export async function syncPackageCount(clinicId: string): Promise<void> {
   const snap = await getDocs(q);
   const ref = doc(db, "clinics", clinicId);
   await updateDoc(ref, {
-    packageCount: snap.size,
     updatedAt: serverTimestamp(),
-    packages_migrated: true,
   });
 }

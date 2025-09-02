@@ -8,7 +8,7 @@ import ImagesUploader from "@/components/admin/common/ImagesUploader";
 import LocalizedTabsField from "@/components/admin/common/LocalizedTabsField";
 import { wellnessFormSchema } from "@/validations/wellness";
 import { z } from "zod";
-import { SubmitHandler, useForm } from "react-hook-form";
+import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createWellness } from "@/services/wellness/createWellness";
 import { updateWellness } from "@/services/wellness/updateWellness";
@@ -17,11 +17,19 @@ import type {
   UpdateWellnessInput,
 } from "@/types/wellness";
 import {
-  CATEGORY_VALUES_TUPLE,
   CATEGORY_LABELS_KO,
   type CategoryKey,
+  Category,
+  CATEGORIES,
 } from "@/constants/categories";
 import { LOCALES_TUPLE } from "@/constants/locales";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface WellnessFormDialogProps {
   id: string; // 빈 문자열이면 create
@@ -45,7 +53,6 @@ export default function WellnessFormDialog({
   const formId = "wellness-form";
   const submittingRef = useRef<boolean>(false);
   const formElRef = useRef<HTMLFormElement | null>(null);
-
   const form = useForm<FormIn, unknown, FormOut>({
     resolver: zodResolver<FormIn, unknown, FormOut>(wellnessFormSchema),
     defaultValues: {
@@ -53,7 +60,7 @@ export default function WellnessFormDialog({
       title: { ko: "", ja: "", zh: "", en: "" },
       excerpt: { ko: "", ja: "", zh: "", en: "" },
       body: { ko: "", ja: "", zh: "", en: "" },
-      category: "stress" as CategoryKey,
+      // category: "stress" as CategoryKey,
       tags: [],
       thumbnailUrl: [],
       isHidden: false, // 생성 폼에서는 노출하지 않음
@@ -161,25 +168,43 @@ export default function WellnessFormDialog({
           <FormRow
             label='카테고리'
             control={
-              <div>
-                <select
-                  {...register("category", { required: true })}
-                  className='h-9 rounded border px-2 text-sm'
-                  aria-invalid={!!formState.errors.category}
-                >
-                  {CATEGORY_VALUES_TUPLE.map((k) => (
-                    <option key={k} value={k}>
-                      {CATEGORY_LABELS_KO[k]}
-                    </option>
-                  ))}
-                </select>
+              <Controller
+                name='category'
+                control={form.control}
+                // RHF defaultValues.category가 초기값의 단일 출처가 됨
+                render={({ field, fieldState }) => (
+                  <div>
+                    <Select
+                      value={(field.value as string | undefined) ?? undefined}
+                      onValueChange={(v) => field.onChange(v as Category)}
+                    >
+                      <SelectTrigger
+                        aria-invalid={!!fieldState.error}
+                        aria-describedby='category-error'
+                        className='h-9'
+                      >
+                        <SelectValue placeholder='카테고리를 선택하세요' />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {Object.entries(CATEGORIES).map(([key, value]) => (
+                          <SelectItem key={value} value={value}>
+                            {CATEGORY_LABELS_KO[key as CategoryKey]}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
 
-                {typeof formState.errors.category?.message === "string" && (
-                  <p className='mt-1 text-[11px] text-red-600'>
-                    {formState.errors.category.message}
-                  </p>
+                    {typeof fieldState.error?.message === "string" && (
+                      <p
+                        id='category-error'
+                        className='mt-1 text-[11px] text-red-600'
+                      >
+                        {fieldState.error.message}
+                      </p>
+                    )}
+                  </div>
                 )}
-              </div>
+              />
             }
           />
         </SectionCard>

@@ -1,17 +1,16 @@
 import type { CategoryKey } from "@/constants/categories";
 import type { DateInput } from "@/utils/date";
 import type { FieldValue } from "firebase/firestore";
-import type { LocaleKey } from "@/constants/locales";
+import { LocalizedTextDoc } from "./common";
 
-// 다국어 문서 형태
-export type LocalizedTextDoc = Record<LocaleKey, string>;
-
+/** Firestore 저장용 */
 export interface Wellness {
   id: string;
-  title: string;
-  excerpt: string; // 목록/메타 설명용 요약문
-  body: string; // 실제 콘텐츠 본문
-  category: CategoryKey;
+  title: LocalizedTextDoc;
+  excerpt: LocalizedTextDoc; // 목록/메타 설명용 요약문
+  body: LocalizedTextDoc; // 실제 콘텐츠 본문
+  categoryKeys?: CategoryKey;
+
   tags: string[]; // 주제/속성 기반 필터 & 추천
   thumbnailUrl: string;
 
@@ -28,7 +27,7 @@ export type WellnessDoc = {
   title?: LocalizedTextDoc | string;
   excerpt?: LocalizedTextDoc | string;
   body?: LocalizedTextDoc | string;
-  category?: string;
+  categoryKeys?: CategoryKey;
   tags?: string[];
   thumbnailUrl?: string | null;
 

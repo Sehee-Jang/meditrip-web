@@ -126,7 +126,6 @@ export default function ClinicFormDialog({
         title: { ko: "", ja: "", zh: "", en: "" },
         subtitle: { ko: "", ja: "", zh: "", en: "" },
       },
-      // category 제거됨
       categoryKeys: [],
       vision: { ko: "", ja: "", zh: "", en: "" },
       mission: { ko: "", ja: "", zh: "", en: "" },
