@@ -2,7 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { fetchClinics } from "@/services/hospitals/fetchClinics";
-import type { Clinic } from "@/types/clinic";
+import type { ClinicListItem } from "@/types/clinic";
+import type { LocaleKey } from "@/constants/locales";
 import FavoriteButton from "../hospitals/FavoriteButton";
 import { Link } from "@/i18n/navigation";
 import Image from "next/image";
@@ -13,9 +14,9 @@ import { useFavoritesStore } from "@/stores/useFavoritesStore";
 export default function MyFavoriteClinics() {
   const t = useTranslations("my-favorite");
 
-  const [clinics, setClinics] = useState<Clinic[]>([]);
+  const [clinics, setClinics] = useState<ClinicListItem[]>([]);
   const favoriteIds = useFavoritesStore((s) => s.ids);
-  const locale = useLocale() as keyof Clinic["name"];
+  const locale = useLocale() as LocaleKey;
 
   useEffect(() => {
     fetchClinics().then(setClinics);

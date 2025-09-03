@@ -1,6 +1,6 @@
 "use client";
 import { useLocale, useTranslations } from "next-intl";
-import type { Clinic } from "@/types/clinic";
+import type { ClinicListItem } from "@/types/clinic";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Link } from "@/i18n/navigation";
 import Image from "next/image";
@@ -8,7 +8,7 @@ import FavoriteButton from "./FavoriteButton";
 import { ChevronRight, Star } from "lucide-react";
 
 interface ClinicListProps {
-  clinics: Clinic[];
+  clinics: ClinicListItem[];
 }
 
 export default function ClinicList({ clinics }: ClinicListProps) {

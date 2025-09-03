@@ -53,52 +53,52 @@ export interface PackageInfo {
 }
 
 /** Firestore 저장용: 병원 (패키지는 서브컬렉션) */
-export interface Clinic {
-  // 기본정보
-  id: string;
-  name: LocalizedTextDoc;
-  images: string[];
-  categoryKeys?: CategoryKey[];
-  address: LocalizedTextDoc;
-  tagSlugs?: TagSlug[]; // 필터용 키, 배열
-  intro: {
-    title: LocalizedTextDoc;
-    subtitle: LocalizedTextDoc;
-  };
-  //의료진
-  doctors?: Doctor[];
-  // 영업시간
-  weeklyHours?: WeeklyHours; // 요일별 영업시간
-  weeklyClosedDays?: DayOfWeek[]; // 정기 휴무 요일
-  hoursNote?: LocalizedTextDoc; // "매주 일요일 휴무" 등 안내문
-  // 연락처
-  phone?: string; // "02-745-7511" 등
-  website?: string; // 클리닉 웹사이트
-  socials?: Partial<Record<SocialPlatform, string>>;
+// export interface Clinic {
+//   // 기본정보
+//   id: string;
+//   name: LocalizedTextDoc;
+//   images: string[];
+//   categoryKeys?: CategoryKey[];
+//   address: LocalizedTextDoc;
+//   tagSlugs?: TagSlug[]; // 필터용 키, 배열
+//   intro: {
+//     title: LocalizedTextDoc;
+//     subtitle: LocalizedTextDoc;
+//   };
+//   //의료진
+//   doctors?: Doctor[];
+//   // 영업시간
+//   weeklyHours?: WeeklyHours; // 요일별 영업시간
+//   weeklyClosedDays?: DayOfWeek[]; // 정기 휴무 요일
+//   hoursNote?: LocalizedTextDoc; // "매주 일요일 휴무" 등 안내문
+//   // 연락처
+//   phone?: string; // "02-745-7511" 등
+//   website?: string; // 클리닉 웹사이트
+//   socials?: Partial<Record<SocialPlatform, string>>;
 
-  // 병원소개: 소개글, 비전, 미션, 이벤트
-  description?: LocalizedTextDoc;
-  vision?: LocalizedTextDoc;
-  mission?: LocalizedTextDoc;
-  events?: LocalizedStringArray;
-  reservationNotices?: LocalizedStringArray;
+//   // 병원소개: 소개글, 비전, 미션, 이벤트
+//   description?: LocalizedTextDoc;
+//   vision?: LocalizedTextDoc;
+//   mission?: LocalizedTextDoc;
+//   events?: LocalizedStringArray;
+//   reservationNotices?: LocalizedStringArray;
 
-  // 지도
-  geo?: Geo;
+//   // 지도
+//   geo?: Geo;
 
-  // 편의시설
-  amenities?: AmenityKey[]; // 편의시설 아이콘 키
+//   // 편의시설
+//   amenities?: AmenityKey[]; // 편의시설 아이콘 키
 
-  isFavorite: boolean; // 기본 false
-  rating: number; // 기본 0
-  reviewCount: number; // 기본 0
-  status: ClinicStatus; // 노출 제어
-  createdAt: Timestamp;
-  updatedAt: Timestamp;
+//   isFavorite: boolean; // 기본 false
+//   rating: number; // 기본 0
+//   reviewCount: number; // 기본 0
+//   status: ClinicStatus; // 노출 제어
+//   createdAt: Timestamp;
+//   updatedAt: Timestamp;
 
-  // ⚠️ 과거 임베드 구조 호환을 위해 유지 (리스트/기존 화면에서만 사용)
-  packages: Record<string, PackageInfo>;
-}
+//   // ⚠️ 과거 임베드 구조 호환을 위해 유지 (리스트/기존 화면에서만 사용)
+//   packages: Record<string, PackageInfo>;
+// }
 
 /** ===== 저장/조회 타입 ===== */
 // Firestore "clinics/{id}" 문서 형태(저장용) — 레거시 packages

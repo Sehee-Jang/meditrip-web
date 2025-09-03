@@ -5,7 +5,7 @@ import { useLocale, useTranslations } from "next-intl";
 import SearchInput from "@/components/common/SearchInput";
 import LoadingSpinner from "../common/LoadingSpinner";
 import ClinicList from "./ClinicList";
-import type { Clinic } from "@/types/clinic";
+import type { ClinicListItem } from "@/types/clinic";
 import { fetchClinics } from "@/services/hospitals/fetchClinics";
 import Container from "../common/Container";
 
@@ -15,7 +15,7 @@ export default function HospitalListClient() {
   const loc: "ko" | "ja" = locale === "ja" ? "ja" : "ko";
 
   const [query, setQuery] = useState("");
-  const [clinics, setClinics] = useState<Clinic[]>([]);
+  const [clinics, setClinics] = useState<ClinicListItem[]>([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
