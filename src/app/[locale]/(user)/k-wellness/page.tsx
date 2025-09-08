@@ -1,4 +1,4 @@
-// src/app/[locale]/(user)/k-wellness/page.tsx
+
 import { getTranslations } from "next-intl/server";
 import { CATEGORY_KEYS, type CategoryKey } from "@/constants/categories";
 import Container from "@/components/common/Container";
