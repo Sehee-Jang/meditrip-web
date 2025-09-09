@@ -2,8 +2,8 @@
   "clinicList": {
     "emptyMessage": "登録されたクリニックがありません。",
     "viewDetails": "詳細を見る",
-    "searchPlaceholder": "病院検索",
-    "searchHelper": "お探しの病院を簡単に見つけましょう。",
+    "searchPlaceholder": "ウェルネスプログラムを検索",
+    "searchHelper": "興味のあるウェルネスプログラムを探してみましょう。",
     "loading": "Loading..."
   },
   "clinicDetail": {

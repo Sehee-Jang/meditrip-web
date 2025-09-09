@@ -2,8 +2,8 @@
   "clinicList": {
     "emptyMessage": "등록된 병원이 없습니다.",
     "viewDetails": "상세보기",
-    "searchPlaceholder": "병원 검색",
-    "searchHelper": "찾고 싶은 병원을 쉽게 검색해보세요.",
+    "searchPlaceholder": "웰니스 프로그램 검색",
+    "searchHelper": "관심 있는 웰니스 프로그램을 검색해보세요.",
     "loading": "로딩중"
   },
   "clinicDetail": {
