@@ -1,0 +1,116 @@
+import React from "react";
+import fetchWellness from "@/services/kto/fetchWellness";
+import PageHeader from "@/components/common/PageHeader";
+import { getTranslations } from "next-intl/server";
+import TourGridClient from "./TourGridClient";
+
+type PageParams = { locale: string };
+type SearchParams = {
+  sido?: string; // lDongRegnCd
+  sigungu?: string; // lDongSignguCd
+  theme?: string; // EX050300 등
+  rows?: string;
+  page?: string;
+  q?: string; // search keyword
+  mode?: "area" | "search" | "location";
+  mapX?: string;
+  mapY?: string;
+  radius?: string;
+};
+
+export default async function TourPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<PageParams>;
+  searchParams: Promise<SearchParams>;
+}) {
+  const { locale } = await params;
+  const sp = await searchParams;
+  const t = await getTranslations("tour-page");
+
+  const lang = locale === "ko" ? "ko" : "ja";
+  const numOfRows = Number(sp.rows ?? "12");
+  const pageNo = Number(sp.page ?? "1");
+  const lDongRegnCd = sp.sido;
+  const lDongSignguCd = sp.sigungu;
+  const wellnessThemaCd = sp.theme;
+  const mode = sp.mode ?? (sp.q ? "search" : "area");
+
+  const keyword = sp.q?.trim();
+  const mapX = sp.mapX ? Number(sp.mapX) : undefined;
+  const mapY = sp.mapY ? Number(sp.mapY) : undefined;
+  const radius = sp.radius ? Number(sp.radius) : undefined;
+
+  const { items, totalCount } = await fetchWellness({
+    lang,
+    pageNo,
+    numOfRows,
+    lDongRegnCd,
+    lDongSignguCd,
+    wellnessThemaCd,
+    arrange: mode === "location" ? "C" : "C",
+    mode,
+    keyword,
+    withDetail: true,
+    mapX,
+    mapY,
+    radius,
+  });
+
+  return (
+    <main className='mx-auto max-w-5xl px-4 py-8'>
+      <PageHeader
+        desktopTitle={t("title")}
+        mobileTitle={t("title")}
+        showBackIcon
+        center
+      />
+
+      <p className='mb-6 text-sm text-muted-foreground'>
+        {[
+          mode ? `mode ${mode}` : null,
+          lDongRegnCd ? `시도 ${lDongRegnCd}` : null,
+          lDongSignguCd ? `시군구 ${lDongSignguCd}` : null,
+          wellnessThemaCd ? `테마 ${wellnessThemaCd}` : null,
+          keyword ? `키워드 "${keyword}"` : null,
+        ]
+          .filter(Boolean)
+          .join(" · ") || (lang === "ko" ? "전체" : "All")}
+      </p>
+
+      {items.length === 0 ? (
+        <div className='rounded-xl border p-6 text-center text-sm text-muted-foreground'>
+          {lang === "ko" ? "조회 결과가 없습니다." : "No results."}
+        </div>
+      ) : (
+           <TourGridClient
+          lang={lang}
+          initialItems={items}
+          initialTotal={totalCount ?? items.length}
+          initialPage={pageNo}
+          pageSize={numOfRows}
+          filters={{
+            mode,
+            lDongRegnCd,
+            lDongSignguCd,
+            wellnessThemaCd,
+            keyword,
+            mapX,
+            mapY,
+            radius,
+          }}
+        />
+        // <ul className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
+        //   {items.map((w: WellnessListItem) => {
+        //     return (
+        //       <li key={w.id} className='rounded-xl border overflow-hidden'>
+        //         <TourCard lang={lang} item={w} />
+        //       </li>
+        //     );
+        //   })}
+        // </ul>
+      )}
+    </main>
+  );
+}

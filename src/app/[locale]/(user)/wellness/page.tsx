@@ -27,7 +27,7 @@ export default async function WellnessPage({
   const { locale } = await params;
   const sp = await searchParams;
 
-  const lang = locale === "en" ? "en" : "ko";
+  const lang = locale === "ko" ? "ko" : "ja";
   const numOfRows = Number(sp.rows ?? "12");
   const pageNo = Number(sp.page ?? "1");
   const lDongRegnCd = sp.sido;

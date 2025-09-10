@@ -45,6 +45,7 @@ export default function Header() {
         <Link href='/k-wellness'>{t("content")}</Link>
         <Link href='/community'>{t("community")}</Link>
         <Link href='/hospital'>{t("hospital")}</Link>
+        <Link href='/tour'>{t("tour")}</Link>
         {user ? (
           <>
             <Link href='/mypage'>{t("mypage")}</Link>

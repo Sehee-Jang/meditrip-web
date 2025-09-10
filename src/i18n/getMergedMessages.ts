@@ -53,6 +53,7 @@ export const NAMESPACES = [
   "settings-page",
   "signup-section",
   "terms-page",
+  "tour-page",
   "recovery",
 ] as const;
 

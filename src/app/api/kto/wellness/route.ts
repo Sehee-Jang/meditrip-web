@@ -87,7 +87,10 @@ function mapToListItem<T extends KtoAreaBasedItem>(it: T): WellnessListItem {
     phone: (it.tel ?? "").trim(),
     coord,
     themeCode: (it.wellnessThemaCd ?? "").trim(),
-    image: { thumb: it.thumbImage, original: it.orgImage },
+    image: {
+      original: it.orgImage || it.thumbImage, // 원본 우선 폴백
+      thumb: it.thumbImage,
+    },
     region: { sido: it.lDongRegnCd, sigungu: it.lDongSignguCd },
   };
 }
