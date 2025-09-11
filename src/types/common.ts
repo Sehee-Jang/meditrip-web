@@ -1,3 +1,4 @@
+import type { JSONContent } from "@tiptap/core";
 import { LocaleKey } from "@/constants/locales";
 import type { Locale } from "@/i18n/routing";
 
@@ -10,7 +11,7 @@ export type LocalizedText = Localized<string>;
 // 다국어 문서 형태
 export type LocalizedTextDoc = Record<LocaleKey, string>;
 export type LocalizedStringArray = Record<LocaleKey, string[]>;
-
+export type LocalizedRichTextDoc = Record<LocaleKey, JSONContent>;
 
 export interface LocalizedNumber {
   ko: number; // KRW 금액 또는 분

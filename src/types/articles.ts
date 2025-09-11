@@ -1,14 +1,14 @@
 import type { CategoryKey } from "@/constants/categories";
 import type { DateInput } from "@/utils/date";
 import type { FieldValue } from "firebase/firestore";
-import { LocalizedTextDoc } from "./common";
+import { LocalizedRichTextDoc, LocalizedTextDoc } from "./common";
 
 /** Firestore 저장용 */
 export interface Article {
   id: string;
   title: LocalizedTextDoc;
   excerpt: LocalizedTextDoc; // 목록/메타 설명용 요약문
-  body: LocalizedTextDoc; // 실제 콘텐츠 본문
+  body: LocalizedRichTextDoc; // 실제 콘텐츠 본문
   category: CategoryKey;
   // categories?: CategoryKey[]; // 다중 카테고리
   tags: string[]; // 주제/속성 기반 필터 & 추천
@@ -26,7 +26,7 @@ export interface Article {
 export type ArticleDoc = {
   title?: LocalizedTextDoc;
   excerpt?: LocalizedTextDoc;
-  body?: LocalizedTextDoc;
+  body?: LocalizedRichTextDoc;
   category: CategoryKey;
   // categories?: CategoryKey[]; // 다중 카테고리
   tags?: string[];
@@ -44,7 +44,7 @@ export type ArticleDoc = {
 export type CreateArticleInput = {
   title: LocalizedTextDoc;
   excerpt: LocalizedTextDoc;
-  body: LocalizedTextDoc;
+  body: LocalizedRichTextDoc;
   category: CategoryKey;
   // categories: CategoryKey[]; // 다중 카테고리
   tags: string[];
