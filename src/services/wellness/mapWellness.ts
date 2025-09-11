@@ -1,11 +1,11 @@
 import type { QueryDocumentSnapshot, DocumentData } from "firebase/firestore";
 import { serverTimestamp } from "firebase/firestore";
 import type {
-  CreateWellnessInput,
-  UpdateWellnessInput,
-  Wellness,
-  WellnessDoc,
-} from "@/types/wellness";
+  CreateArticleInput,
+  UpdateArticleInput,
+  Article,
+  ArticleDoc,
+} from "@/types/articles";
 import { CATEGORY_KEYS, type CategoryKey } from "@/constants/categories";
 import { toISO } from "@/utils/date";
 import { LocaleKey, LOCALES_TUPLE } from "@/constants/locales";
@@ -52,8 +52,8 @@ function normalizeImages(v: unknown): string[] {
 /** Firestore → 앱 표준(ko 문자열 뽑아서, ISO/기본값 보장) */
 export function mapSnapToWellness(
   snap: QueryDocumentSnapshot<DocumentData>
-): Wellness {
-  const raw = snap.data() as WellnessDoc;
+): Article {
+  const raw = snap.data() as ArticleDoc;
   const rawAny = raw as unknown as { images?: unknown };
 
   const createdAtISO = toISO(raw.createdAt);
@@ -78,7 +78,7 @@ export function mapSnapToWellness(
 }
 
 /** (옵션) 원본 객체 → 앱 표준 수동 변환이 필요할 때 */
-export function mapDocToWellness(id: string, raw: WellnessDoc): Wellness {
+export function mapDocToWellness(id: string, raw: ArticleDoc): Article {
   const rawAny = raw as unknown as {
     images?: unknown;
     thumbnailUrl?: unknown;
@@ -105,7 +105,7 @@ export function mapDocToWellness(id: string, raw: WellnessDoc): Wellness {
 }
 
 /** 생성 입력 → Firestore 문서 형태(다국어 객체로 저장) */
-export function mapCreateInputToDoc(input: CreateWellnessInput): WellnessDoc {
+export function mapCreateInputToDoc(input: CreateArticleInput): ArticleDoc {
   return {
     title: normalizeI18n(input.title),
     excerpt: normalizeI18n(input.excerpt),
@@ -125,10 +125,8 @@ export function mapCreateInputToDoc(input: CreateWellnessInput): WellnessDoc {
 }
 
 /** 수정 입력(부분) → Firestore 업데이트 payload(다국어 객체 유지) */
-export function mapUpdateInputToDoc(
-  patch: UpdateWellnessInput
-): Partial<WellnessDoc> {
-  const data: Partial<WellnessDoc> = { updatedAt: serverTimestamp() };
+export function mapUpdateInputToDoc(patch: UpdateArticleInput): Partial<ArticleDoc> {
+  const data: Partial<ArticleDoc> = { updatedAt: serverTimestamp() };
 
   if (typeof patch.title !== "undefined")
     data.title = normalizeI18n(patch.title);

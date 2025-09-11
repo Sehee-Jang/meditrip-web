@@ -30,7 +30,7 @@ type Props = {
   onChange?: (nextSelected: CategoryKey[]) => void;
 
   /** mode==="link"일 때 이동할 기본 경로 */
-  linkHref?: string; // 기본 "/k-wellness"
+  linkHref?: string; // 기본 "/articles"
 
   className?: string;
 };
@@ -41,7 +41,7 @@ export default function CategorySection({
   multiple = false,
   selected = [],
   onChange,
-  linkHref = "/k-wellness",
+  linkHref = "/articles",
   className,
 }: Props) {
   const t = useTranslations("categories");

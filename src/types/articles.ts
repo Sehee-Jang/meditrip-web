@@ -4,7 +4,7 @@ import type { FieldValue } from "firebase/firestore";
 import { LocalizedTextDoc } from "./common";
 
 /** Firestore 저장용 */
-export interface Wellness {
+export interface Article {
   id: string;
   title: LocalizedTextDoc;
   excerpt: LocalizedTextDoc; // 목록/메타 설명용 요약문
@@ -23,7 +23,7 @@ export interface Wellness {
 }
 
 /** Firestore 실제 저장 형태(읽기 원본) */
-export type WellnessDoc = {
+export type ArticleDoc = {
   title?: LocalizedTextDoc;
   excerpt?: LocalizedTextDoc;
   body?: LocalizedTextDoc;
@@ -41,7 +41,7 @@ export type WellnessDoc = {
 };
 
 /** 생성 입력 */
-export type CreateWellnessInput = {
+export type CreateArticleInput = {
   title: LocalizedTextDoc;
   excerpt: LocalizedTextDoc;
   body: LocalizedTextDoc;
@@ -52,7 +52,7 @@ export type CreateWellnessInput = {
   isHidden?: boolean;
 };
 
-export type UpdateWellnessInput = Partial<CreateWellnessInput>;
+export type UpdateArticleInput = Partial<CreateArticleInput>;
 
 /** 병원 문서 + id (조회용) */
-export type WellnessWithId = WellnessDoc & { id: string };
+export type ArticleWithId = ArticleDoc & { id: string };

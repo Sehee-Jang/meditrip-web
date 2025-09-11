@@ -2,25 +2,25 @@
 
 import React, { useState } from "react";
 import AdminDataTable, { DataTableColumn } from "../common/AdminDataTable";
-import { Wellness } from "@/types/wellness";
-import WellnessTableRow from "./WellnessTableRow";
-import WellnessFormDialog from "./WellnessFormDialog";
+import { Article } from "@/types/articles";
+import ArticlesTableRow from "./ArticlesTableRow";
+import ArticlesFormDialog from "./ArticlesFormDialog";
 import { deleteWellness } from "@/services/wellness/deleteWellness";
 import { toast } from "sonner";
 
 interface Props {
-  items: Wellness[];
+  items: Article[];
   totalCount: number;
   loading?: boolean;
   title?: string;
   onChanged?: () => void;
 }
 
-export default function WellnessTable({
+export default function ArticlesTable({
   items,
   totalCount,
   loading = false,
-  title = "K-웰니스 콘텐츠 목록",
+  title = "K-웰니스 아티클 목록",
   onChanged,
 }: Props) {
   const [editId, setEditId] = useState<string | null>(null);
@@ -46,7 +46,7 @@ export default function WellnessTable({
 
   return (
     <>
-      <AdminDataTable<Wellness>
+      <AdminDataTable<Article>
         title={title}
         items={items}
         totalCount={totalCount}
@@ -54,8 +54,8 @@ export default function WellnessTable({
         columns={columns}
         getRowKey={(w) => w.id}
         renderRow={(w) => (
-          <WellnessTableRow
-            wellness={w}
+          <ArticlesTableRow
+            article={w}
             onEdit={(id) => setEditId(id)}
             onDelete={(id) => void handleDelete(id)}
           />
@@ -64,7 +64,7 @@ export default function WellnessTable({
       />
 
       {editId && (
-        <WellnessFormDialog
+        <ArticlesFormDialog
           id={editId}
           open
           onOpenChange={(v) => !v && setEditId(null)}

@@ -37,7 +37,7 @@ const MENU: ReadonlyArray<MenuItem> = [
   { href: "", label: "대시보드", icon: HomeIcon, exact: true },
   { href: "users", label: "회원 관리", icon: UserIcon },
   { href: "reservations", label: "예약 관리", icon: CalendarIcon },
-  { href: "k-wellness", label: "K-웰니스 관리", icon: Newspaper },
+  { href: "articles", label: "아티클 관리", icon: Newspaper },
   { href: "shorts", label: "쇼츠 관리", icon: Youtube },
   { href: "community", label: "1:1 상담 관리", icon: MessageCircleMore },
   { href: "clinics", label: "병원 관리", icon: Hospital },

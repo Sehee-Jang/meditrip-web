@@ -1,4 +1,3 @@
-
 import { getTranslations } from "next-intl/server";
 import { CATEGORY_KEYS, type CategoryKey } from "@/constants/categories";
 import Container from "@/components/common/Container";
@@ -15,7 +14,7 @@ function isCategoryKey(v: unknown): v is CategoryKey {
   );
 }
 
-export default async function KWellsPage({
+export default async function ArticlesPage({
   searchParams,
 }: {
   searchParams: Promise<SearchParams>;

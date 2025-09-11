@@ -12,10 +12,7 @@ import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createWellness } from "@/services/wellness/createWellness";
 import { updateWellness } from "@/services/wellness/updateWellness";
-import type {
-  CreateWellnessInput,
-  UpdateWellnessInput,
-} from "@/types/wellness";
+import type { CreateArticleInput, UpdateArticleInput } from "@/types/articles";
 import {
   CATEGORY_LABELS_KO,
   type CategoryKey,
@@ -31,7 +28,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-interface WellnessFormDialogProps {
+interface ArticlesFormDialogProps {
   id: string; // 빈 문자열이면 create
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -42,13 +39,13 @@ interface WellnessFormDialogProps {
 type FormIn = z.input<typeof wellnessFormSchema>;
 type FormOut = z.output<typeof wellnessFormSchema>;
 
-export default function WellnessFormDialog({
+export default function ArticlesFormDialog({
   id,
   open,
   onOpenChange,
   onCreated,
   onUpdated,
-}: WellnessFormDialogProps) {
+}: ArticlesFormDialogProps) {
   const mode: "create" | "edit" = id ? "edit" : "create";
   const formId = "wellness-form";
   const submittingRef = useRef<boolean>(false);
@@ -98,12 +95,12 @@ export default function WellnessFormDialog({
       };
 
       if (mode === "create") {
-        const input: CreateWellnessInput = payloadBase;
+        const input: CreateArticleInput = payloadBase;
         await createWellness(input);
         onCreated?.();
         reset();
       } else {
-        const patch: UpdateWellnessInput = payloadBase;
+        const patch: UpdateArticleInput = payloadBase;
         await updateWellness(id, patch);
         onUpdated?.();
       }

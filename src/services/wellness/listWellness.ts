@@ -11,7 +11,7 @@ import {
   type QueryDocumentSnapshot,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import type { Wellness } from "@/types/wellness";
+import type { Article } from "@/types/articles";
 import type { CategoryKey } from "@/constants/categories";
 import { mapSnapToWellness } from "./mapWellness";
 
@@ -24,7 +24,7 @@ export type ListOptions = {
 };
 
 export type ListResult = {
-  items: Wellness[];
+  items: Article[];
   cursor: QueryDocumentSnapshot<DocumentData> | null;
   hasMore: boolean;
 };

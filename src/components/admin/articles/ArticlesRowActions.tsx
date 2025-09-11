@@ -9,15 +9,15 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { MoreHorizontal, Trash2 } from "lucide-react";
-import type { Wellness } from "@/types/wellness";
+import type { Article } from "@/types/articles";
 
 type Props = {
-  wellness: Wellness;
+  article: Article;
   onEdit: () => void;
   onDelete: () => void;
 };
 
-export default function WellnessRowActions({ onEdit, onDelete }: Props) {
+export default function ArticlesRowActions({ onEdit, onDelete }: Props) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
