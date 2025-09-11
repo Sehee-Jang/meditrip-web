@@ -26,6 +26,7 @@
 
 export const NAMESPACES = [
   "amenities",
+  "button",
   "categories",
   "coming-soon",
   "common",

@@ -1,6 +1,8 @@
 "use client";
 
 import * as React from "react";
+import { Phone, Clock, Car, Ticket } from "lucide-react";
+import type { LucideProps } from "lucide-react";
 
 type Props = {
   contentId: string;
@@ -13,6 +15,28 @@ type DetailResp = {
   introFields: Array<{ label: string; value: string }>;
   info: { extras: Array<{ name: string; text: string }> };
 };
+
+type IconComponent = React.ComponentType<LucideProps>;
+
+function RowIcon({
+  Icon,
+  srLabel,
+  children,
+}: {
+  Icon: IconComponent;
+  srLabel: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className='grid grid-cols-[24px,1fr] items-start gap-2 text-sm'>
+      <div className='flex items-center justify-center text-muted-foreground'>
+        <Icon className='h-4 w-4' aria-hidden />
+        <span className='sr-only'>{srLabel}</span>
+      </div>
+      <div>{children}</div>
+    </div>
+  );
+}
 
 /* HTML → 텍스트(개행 유지, 엔티티 일부 디코드) */
 function htmlToText(s = "") {
@@ -149,22 +173,6 @@ function Expandable({
   );
 }
 
-/* 라벨/값 2열 레이아웃 */
-function Row({
-  label,
-  children,
-}: {
-  label: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className='grid grid-cols-[80px,1fr] items-start gap-2 text-sm'>
-      <div className='shrink-0 text-muted-foreground'>{label}</div>
-      <div>{children}</div>
-    </div>
-  );
-}
-
 export default function TourCardExtra({
   contentId,
   lang,
@@ -238,42 +246,42 @@ export default function TourCardExtra({
   return (
     <div ref={ref} className='mt-3 space-y-1.5 border-t pt-3'>
       {phone && (
-        <Row label={t("연락처", "Contact")}>
+        <RowIcon Icon={Phone} srLabel={t("연락처", "Contact")}>
           <span>{phone}</span>
-        </Row>
+        </RowIcon>
       )}
 
       {toLines(hours).length > 0 && (
-        <Row label={t("운영시간", "Hours")}>
+        <RowIcon Icon={Clock} srLabel={t("운영시간", "Hours")}>
           <Expandable
             text={hours}
-            lines={1} /* 1줄까진 접기 없이, 2줄 이상일 때만 '더보기' 표시 */
+            lines={1} // 1줄까지는 더보기 없음
             more={t("더보기", "More")}
             less={t("접기", "Less")}
           />
-        </Row>
+        </RowIcon>
       )}
 
       {(parking || parkingFee) && (
-        <Row label={t("주차", "Parking")}>
+        <RowIcon Icon={Car} srLabel={t("주차", "Parking")}>
           <span>{parking || t("정보 없음", "N/A")}</span>
           {parkingFee && (
             <span className='ml-2 text-muted-foreground'>
-              · {t("주차요금", "Fee")} {parkingFee}
+              ({t("주차요금", "Fee")} {parkingFee})
             </span>
           )}
-        </Row>
+        </RowIcon>
       )}
 
       {toLines(admission).length > 0 && (
-        <Row label={t("입장료", "Admission")}>
+        <RowIcon Icon={Ticket} srLabel={t("입장료", "Admission")}>
           <Expandable
             text={admission}
-            lines={2} /* 2줄까진 접기 없이, 3줄 이상일 때만 '더보기' 표시 */
+            lines={2} // 2줄까지는 더보기 없음
             more={t("더보기", "More")}
             less={t("접기", "Less")}
           />
-        </Row>
+        </RowIcon>
       )}
     </div>
   );

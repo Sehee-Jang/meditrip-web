@@ -1,5 +1,3 @@
-
-
 import type {
   KtoListResponse,
   KtoAreaBasedItem,
@@ -135,6 +133,46 @@ function parseXml<T>(xml: string): T {
   return response as T;
 }
 
+// ===================== 법정동 코드 API =====================
+/** /ldongCode 아이템 타입 (KTO 스펙 최소 필드) */
+export type KtoLdongCodeItem = {
+  rnum?: string;
+  name?: string;
+  code?: string;
+  lDongRegnCd?: string;
+  lDongRegnNm?: string;
+  lDongSignguCd?: string;
+  lDongSignguNm?: string;
+};
+
+/**
+ * 시도/시군구 코드 목록 조회
+ * - scope는 라우트에서 결정(여기선 lDongRegnCd 유무로 시군구 필터만 지원)
+ * - lDongRegnCd 없으면: 전체(시도/시군구 혼재 응답) → 라우트에서 집계/유일화 처리 권장
+ * - lDongRegnCd 있으면: 해당 시도의 시군구 목록
+ */
+export async function getLdongCode(params: {
+  locale?: string; // "ko" | "ja" | "en" ... (langDivCd로 변환)
+  lDongRegnCd?: string; // 시도 코드(예: "11")
+  pageNo?: number;
+  numOfRows?: number; // 페이징: 기본 크게 요청
+}): Promise<KtoListResponse<KtoLdongCodeItem>> {
+  const lang = langFromLocale(params.locale);
+  const qs = qsCommon(lang);
+
+  if (params.lDongRegnCd) {
+    qs.set("lDongRegnCd", params.lDongRegnCd); // 특정 시도의 시군구 목록
+  } else {
+    qs.set("lDongListYn", "Y"); // 시도 전체 목록
+  }
+  if (params.pageNo) qs.set("pageNo", String(params.pageNo));
+  if (params.numOfRows) qs.set("numOfRows", String(params.numOfRows));
+
+  // _type=json, serviceKey 등은 qsCommon에 이미 포함
+  const url = `${BASE}/ldongCode?${qs.toString()}`;
+  return await getJSONorXML<KtoListResponse<KtoLdongCodeItem>>(url);
+}
+
 // --- JSON/XML 자동 판별 ---
 async function getJSONorXML<T>(url: string): Promise<T> {
   const res = await fetch(url, { cache: "no-store" });
@@ -175,12 +213,23 @@ function itemsOfLoose<T>(resp: unknown): T[] {
     (getNested(resp, ["response", "body"]) as unknown) ??
     (getNested(resp, ["body"]) as unknown);
   if (typeof body !== "object" || body === null) return [];
+
   const itemsNode = (getNested(body, ["items"]) as unknown) ?? body;
   const raw =
     (typeof itemsNode === "object" && itemsNode !== null
       ? (itemsNode as Record<string, unknown>)["item"]
       : undefined) ?? itemsNode;
+
   if (raw == null) return [];
+
+  //  빈 객체 단일 응답이면 결과 없음으로 간주
+  if (
+    typeof raw === "object" &&
+    !Array.isArray(raw) &&
+    Object.keys(raw as Record<string, unknown>).length === 0
+  ) {
+    return [];
+  }
   return Array.isArray(raw) ? (raw as T[]) : [raw as T];
 }
 

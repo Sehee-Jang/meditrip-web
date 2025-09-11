@@ -2,7 +2,8 @@ import React from "react";
 import fetchWellness from "@/services/kto/fetchWellness";
 import PageHeader from "@/components/common/PageHeader";
 import { getTranslations } from "next-intl/server";
-import TourGridClient from "./TourGridClient";
+import TourGridClient from "../../../../components/tour/TourGridClient";
+import TourFiltersClient from "@/services/tour/TourFiltersClient";
 
 type PageParams = { locale: string };
 type SearchParams = {
@@ -58,6 +59,18 @@ export default async function TourPage({
     radius,
   });
 
+  const gridKey = JSON.stringify({
+    mode,
+    lDongRegnCd,
+    lDongSignguCd,
+    wellnessThemaCd,
+    keyword,
+    mapX,
+    mapY,
+    radius,
+    numOfRows,
+  });
+
   return (
     <main className='mx-auto max-w-5xl px-4 py-8'>
       <PageHeader
@@ -66,6 +79,8 @@ export default async function TourPage({
         showBackIcon
         center
       />
+
+      <TourFiltersClient lang={lang} />
 
       <p className='mb-6 text-sm text-muted-foreground'>
         {[
@@ -84,8 +99,9 @@ export default async function TourPage({
           {lang === "ko" ? "조회 결과가 없습니다." : "No results."}
         </div>
       ) : (
-           <TourGridClient
+        <TourGridClient
           lang={lang}
+          key={gridKey}
           initialItems={items}
           initialTotal={totalCount ?? items.length}
           initialPage={pageNo}
@@ -101,15 +117,6 @@ export default async function TourPage({
             radius,
           }}
         />
-        // <ul className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
-        //   {items.map((w: WellnessListItem) => {
-        //     return (
-        //       <li key={w.id} className='rounded-xl border overflow-hidden'>
-        //         <TourCard lang={lang} item={w} />
-        //       </li>
-        //     );
-        //   })}
-        // </ul>
       )}
     </main>
   );

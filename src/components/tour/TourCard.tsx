@@ -181,8 +181,11 @@ export default function TourCard({ lang, item }: Props) {
           {/* 홈페이지(있는 경우만) */}
           {homepage ? (
             <div className='flex items-start gap-2'>
-              <span className='shrink-0 text-muted-foreground'>
-                <Globe size={12} />
+              <span className='mt-[2px] shrink-0 text-muted-foreground'>
+                <Globe className='h-4 w-4' aria-hidden />
+                <span className='sr-only'>
+                  {lang === "ko" ? "홈페이지" : "Website"}
+                </span>
               </span>
               <a
                 href={homepage}

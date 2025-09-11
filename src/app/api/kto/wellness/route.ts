@@ -33,12 +33,22 @@ function itemsOfLoose<T>(resp: unknown): T[] {
     (getNested(resp, ["response", "body"]) as unknown) ??
     (getNested(resp, ["body"]) as unknown);
   if (typeof body !== "object" || body === null) return [];
+
   const itemsNode = (getNested(body, ["items"]) as unknown) ?? body;
   const raw =
     (typeof itemsNode === "object" && itemsNode !== null
       ? (itemsNode as Record<string, unknown>)["item"]
       : undefined) ?? itemsNode;
   if (raw == null) return [];
+
+  // 빈 객체 단일 응답이면 결과 없음으로 간주
+  if (
+    typeof raw === "object" &&
+    !Array.isArray(raw) &&
+    Object.keys(raw as Record<string, unknown>).length === 0
+  ) {
+    return [];
+  }
   return Array.isArray(raw) ? (raw as T[]) : [raw as T];
 }
 
@@ -176,10 +186,23 @@ export async function GET(req: Request) {
     const arrangeRaw = sp.get("arrange");
 
     // 지역 코드
-    const lDongRegnCd = sp.get("lDongRegnCd") ?? undefined;
-    const lDongSignguCd = sp.get("lDongSignguCd") ?? undefined;
+    let lDongRegnCd = sp.get("lDongRegnCd") ?? undefined;
+    let lDongSignguCd = sp.get("lDongSignguCd") ?? undefined;
     const wellnessThemaCd = sp.get("wellnessThemaCd") ?? undefined;
 
+    //  정규화: 5자리(예: 50130) 들어오면 2+3으로 쪼개서 API 규격에 맞춤
+    if (lDongSignguCd) {
+      lDongSignguCd = lDongSignguCd.trim();
+      if (lDongSignguCd.length === 5) {
+        lDongRegnCd = lDongRegnCd ?? lDongSignguCd.slice(0, 2); // 시도 자동 채움
+        lDongSignguCd = lDongSignguCd.slice(2); // "130"
+      } else if (lDongSignguCd.length > 3) {
+        // 혹시 모를 변형값: 뒤 3자리만 사용
+        lDongSignguCd = lDongSignguCd.slice(-3);
+      }
+    }
+
+    // search
     if (mode === "search") {
       const keyword = sp.get("keyword");
       if (!keyword || !keyword.trim()) {
@@ -204,7 +227,11 @@ export async function GET(req: Request) {
         contentTypeId,
       });
 
-      let items = itemsOfLoose<KtoSearchKeywordItem>(data).map(mapToListItem);
+      let items = itemsOfLoose<KtoSearchKeywordItem>(data)
+        .filter(
+          (it) => typeof it?.contentId === "string" && it.contentId.trim()
+        )
+        .map(mapToListItem);
       if (withDetail) items = await enrichHomepages(items, langParam);
 
       const totalCount =
@@ -214,6 +241,7 @@ export async function GET(req: Request) {
       return NextResponse.json({ mode, pageNo, numOfRows, totalCount, items });
     }
 
+    // location
     if (mode === "location") {
       const mapX = toNumberSafe(sp.get("mapX"));
       const mapY = toNumberSafe(sp.get("mapY"));
@@ -242,7 +270,12 @@ export async function GET(req: Request) {
         contentTypeId,
       });
 
-      let items = itemsOfLoose<KtoLocationBasedItem>(data).map(mapToListItem);
+      let items = itemsOfLoose<KtoLocationBasedItem>(data)
+        .filter(
+          (it) => typeof it?.contentId === "string" && it.contentId.trim()
+        )
+        .map(mapToListItem);
+
       if (withDetail) items = await enrichHomepages(items, langParam);
 
       const totalCount =
@@ -268,7 +301,9 @@ export async function GET(req: Request) {
       contentTypeId,
     });
 
-    let items = itemsOfLoose<KtoAreaBasedItem>(data).map(mapToListItem);
+    let items = itemsOfLoose<KtoAreaBasedItem>(data)
+      .filter((it) => typeof it?.contentId === "string" && it.contentId.trim())
+      .map(mapToListItem);
     if (withDetail) {
       items = await enrichHomepages(items, langParam);
       // (선택) 빈 homepage 속성 제거

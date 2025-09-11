@@ -3,7 +3,9 @@
 import * as React from "react";
 import type { WellnessListItem } from "@/types/kto-wellness";
 import TourCard from "@/components/tour/TourCard";
-
+import { useState, useEffect } from "react";
+import { Button } from "../ui/button";
+import { useTranslations } from "next-intl";
 type Mode = "area" | "search" | "location";
 
 type Filters = {
@@ -76,10 +78,18 @@ export default function TourGridClient({
   pageSize,
   filters,
 }: Props) {
-  const [items, setItems] = React.useState<WellnessListItem[]>(initialItems);
-  const [page, setPage] = React.useState<number>(initialPage);
-  const [total, setTotal] = React.useState<number>(initialTotal);
-  const [loading, setLoading] = React.useState(false);
+  const t = useTranslations("button");
+  const [items, setItems] = useState<WellnessListItem[]>(initialItems);
+  const [page, setPage] = useState<number>(initialPage);
+  const [total, setTotal] = useState<number>(initialTotal);
+  const [loading, setLoading] = useState(false);
+
+  // URL(검색파라미터) 변경으로 props가 바뀌면, 내부 상태를 갱신
+  useEffect(() => {
+    setItems(initialItems);
+    setPage(initialPage);
+    setTotal(initialTotal);
+  }, [initialItems, initialPage, initialTotal]);
 
   const hasMore = page * pageSize < total;
 
@@ -122,14 +132,17 @@ export default function TourGridClient({
 
       {hasMore && (
         <div className='mt-6 flex justify-center'>
-          <button
+          <Button
             type='button'
+            variant='brand'
             onClick={loadMore}
             disabled={loading}
-            className='rounded-lg border px-4 py-2 text-sm hover:bg-accent disabled:opacity-60'
+            className='disabled:opacity-60 rounded-lg'
+            // className='rounded-lg border px-4 py-2 text-sm hover:bg-accent disabled:opacity-60'
+            // className='inline-flex items-center gap-1 bg-white text-black border text-sm font-medium px-4 py-2 rounded-md hover:bg-gray-100 hover:border-gray-300 transition'
           >
-            {loading ? "불러오는 중..." : "더보기"}
-          </button>
+            {loading ? t("loading") : t("seeMore")}
+          </Button>
         </div>
       )}
     </div>
