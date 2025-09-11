@@ -21,8 +21,8 @@ export function subscribeFavoriteHospitalIds(
 
   const colRef = collection(db, "users", uid, "favorites");
 
-  // ✅ 프리플라이트: 권한 거절이면 여기서 바로 오류 원인이 보입니다.
-  //    성공하면 실제 구독(onSnapshot) 시작
+  // 프리플라이트: 권한 거절이면 여기서 바로 오류 원인이 보입니다.
+  // 성공하면 실제 구독(onSnapshot) 시작
   void getDocs(colRef)
     .then(() => {
       // 프리플라이트 성공 → 구독 시작

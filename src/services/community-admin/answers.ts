@@ -53,7 +53,7 @@ export async function createAnswer(
     const prev = Number(qSnap.data()?.answersCount ?? 0);
     tx.update(qRef, {
       answersCount: prev + 1,
-      hasAnswer: true, // ✅ 항상 true
+      hasAnswer: true, // 항상 true
       updatedAt: serverTimestamp(),
       lastAnsweredAt: serverTimestamp(),
     });
@@ -88,7 +88,7 @@ export async function deleteAnswer(
     const next = Math.max(prev - 1, 0);
     tx.update(qRef, {
       answersCount: next,
-      hasAnswer: next > 0, // ✅ 0이면 false
+      hasAnswer: next > 0, // 0이면 false
       updatedAt: serverTimestamp(),
     });
   });

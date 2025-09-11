@@ -22,7 +22,7 @@ export default function FavoritesInitializer() {
       }
 
       if (u?.uid) {
-        // ✅ 로그인된 뒤에만 구독 시작
+        // 로그인된 뒤에만 구독 시작
         unsubFav = subscribeFavoriteHospitalIds(u.uid, setIds);
       } else {
         reset();

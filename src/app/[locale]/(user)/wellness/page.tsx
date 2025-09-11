@@ -50,7 +50,7 @@ export default async function WellnessPage({
     arrange: mode === "location" ? "C" : "C",
     mode,
     keyword,
-    withDetail: true, // ✅ 목록에서도 homepage 보강
+    withDetail: true, // 목록에서도 homepage 보강
     mapX,
     mapY,
     radius,
