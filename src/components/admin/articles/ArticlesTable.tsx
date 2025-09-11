@@ -5,7 +5,7 @@ import AdminDataTable, { DataTableColumn } from "../common/AdminDataTable";
 import { Article } from "@/types/articles";
 import ArticlesTableRow from "./ArticlesTableRow";
 import ArticlesFormDialog from "./ArticlesFormDialog";
-import { deleteWellness } from "@/services/wellness/deleteWellness";
+import { deleteArticle } from "@/services/articles/deleteArticle";
 import { toast } from "sonner";
 
 interface Props {
@@ -36,7 +36,7 @@ export default function ArticlesTable({
     const ok = confirm("정말 삭제할까요?");
     if (!ok) return;
     try {
-      await deleteWellness(id);
+      await deleteArticle(id);
       toast.success("삭제되었습니다.");
       onChanged?.(); // 👈 목록 갱신
     } catch {

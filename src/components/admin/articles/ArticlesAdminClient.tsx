@@ -9,7 +9,7 @@ import ArticlesTable from "./ArticlesTable";
 import { Article } from "@/types/articles";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { listWellness } from "@/services/wellness/listWellness";
+import { listArticles } from "@/services/articles/listArticles";
 import ArticlesFormDialog from "./ArticlesFormDialog";
 
 type CatFilter = "all" | (typeof CATEGORY_KEYS)[number];
@@ -22,7 +22,7 @@ export default function ArticlesAdminClient() {
   const { data, isFetching, refetch, error } = useQuery({
     queryKey: ["admin-articles", { cat, keyword }],
     // 관리자: 숨김 포함
-    queryFn: () => listWellness({ includeHidden: true, limit: 100 }),
+    queryFn: () => listArticles({ includeHidden: true, limit: 100 }),
   });
 
   useEffect(() => {
@@ -49,8 +49,7 @@ export default function ArticlesAdminClient() {
         w.title.ja.toLowerCase().includes(kw) ||
         w.excerpt.ko.toLowerCase().includes(kw) ||
         w.excerpt.ja.toLowerCase().includes(kw) ||
-        w.body.ko.toLowerCase().includes(kw) ||
-        w.body.ja.toLowerCase().includes(kw) ||
+        // 본문은 JSON이므로 목록검색엔 excerpt/제목/태그만 사용 권장
         CATEGORY_LABELS_KO[w.category].toLowerCase().includes(kw) ||
         w.category.toLowerCase().includes(kw) ||
         w.tags.some((t) => t.toLowerCase().includes(kw));

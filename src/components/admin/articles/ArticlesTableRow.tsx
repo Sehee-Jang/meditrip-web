@@ -19,7 +19,7 @@ function titleFallback(w: Article): string {
 export default function ArticlesTable({ article, onEdit, onDelete }: Props) {
   return (
     <tr>
-      <td className='py-2'>
+      <td className='px-4 py-2'>
         <div className='truncate font-medium'>{titleFallback(article)}</div>
       </td>
 
