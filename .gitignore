@@ -48,3 +48,4 @@ src/utils/exposeAuthDebug.ts
 src/debug
 src/app/api/dev
 src/app/api/debug
+!src/app/api/debug/kto-wellness-ping
