@@ -1,4 +1,3 @@
-
 // 위치기반(내 주변) 웰니스 목록 프록시 — KTO locationBasedList 호출
 
 import { NextResponse } from "next/server";
@@ -12,13 +11,13 @@ import type {
   KtoLocationBasedItem,
   KtoAreaBasedItem,
   WellnessListItem,
+  ArrangeLocation,
 } from "@/types/kto-wellness";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-// ---- 유틸 ----
-type ArrangeLocation = "A" | "C" | "D" | "E" | "O" | "Q" | "R" | "S";
+// ---- 타입 가드 ----
 function isArrangeLocation(x: string | null): x is ArrangeLocation {
   return (
     x === "A" ||

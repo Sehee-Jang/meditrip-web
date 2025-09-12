@@ -14,6 +14,9 @@ import type {
   KtoLocationBasedItem,
   KtoDetailCommonItem,
   WellnessListItem,
+  Mode,
+  ArrangeArea,
+  ArrangeLocation,
 } from "@/types/kto-wellness";
 
 export const runtime = "nodejs";
@@ -53,11 +56,7 @@ function itemsOfLoose<T>(resp: unknown): T[] {
   return Array.isArray(raw) ? (raw as T[]) : [raw as T];
 }
 
-// ---------- 기타 유틸 ----------
-type Mode = "area" | "search" | "location";
-type ArrangeArea = "A" | "C" | "D" | "O" | "Q" | "R";
-type ArrangeLocation = "A" | "C" | "D" | "E" | "O" | "Q" | "R" | "S";
-
+// ---------- 타입 가드 ----------
 function isArrangeArea(x: string | null): x is ArrangeArea {
   return (
     x === "A" || x === "C" || x === "D" || x === "O" || x === "Q" || x === "R"
@@ -76,6 +75,7 @@ function isArrangeLocation(x: string | null): x is ArrangeLocation {
   );
 }
 
+// ---------- 기타 유틸 ----------
 function toNumberSafe(val?: string | number | null): number | undefined {
   if (val == null) return undefined;
   const n = typeof val === "number" ? val : Number(String(val));

@@ -1,4 +1,4 @@
-import type { WellnessListItem } from "@/types/kto-wellness";
+import type { WellnessListItem, Arrange, Mode } from "@/types/kto-wellness";
 import { resolveBaseUrl } from "@/utils/baseUrl";
 
 export interface FetchWellnessOptions {
@@ -8,8 +8,8 @@ export interface FetchWellnessOptions {
   lDongRegnCd?: string;
   lDongSignguCd?: string;
   wellnessThemaCd?: string;
-  arrange?: "A" | "C" | "D" | "O" | "Q" | "R";
-  mode?: "area" | "search" | "location";
+  arrange?: Arrange;
+  mode?: Mode;
   keyword?: string;
   withDetail?: boolean;
   mapX?: number;

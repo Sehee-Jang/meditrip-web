@@ -16,6 +16,14 @@ export interface KtoListResponse<TItem> {
   };
 }
 
+// ---------- 공용 도메인 타입 ----------
+export type Mode = "area" | "search" | "location";
+
+// KTO 정렬 코드
+export type ArrangeArea = "A" | "C" | "D" | "O" | "Q" | "R";
+export type ArrangeLocation = "A" | "C" | "D" | "E" | "O" | "Q" | "R" | "S";
+export type Arrange = ArrangeArea | ArrangeLocation;
+
 // ---------- 목록 계열 ----------
 export interface KtoAreaBasedItem {
   wellnessThemaCd?: string;
@@ -102,6 +110,15 @@ export interface WellnessListItem {
   image: { thumb?: string; original?: string };
   region: { sido?: string; sigungu?: string };
   homepage?: string; // withDetail=1일 때 목록 보강
+}
+
+// 내부 프록시(/api/kto/wellness, /api/kto/wellness/nearby) 공통 응답 스키마
+export interface WellnessListApiResponse {
+  mode: Mode;
+  pageNo: number;
+  numOfRows: number;
+  totalCount: number;
+  items: WellnessListItem[];
 }
 
 export interface WellnessDetail {
