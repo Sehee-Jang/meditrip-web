@@ -16,6 +16,7 @@ import type {
   WellnessListItem,
 } from "@/types/kto-wellness";
 
+export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 

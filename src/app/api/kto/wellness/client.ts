@@ -1,3 +1,4 @@
+// src/app/api/kto/wellness/client.ts
 import type {
   KtoListResponse,
   KtoAreaBasedItem,
@@ -8,28 +9,16 @@ import type {
   KtoDetailInfoItem,
   KtoDetailImageItem,
 } from "@/types/kto-wellness";
+import { ktoEncodedKey, KTO_COMMON_HEADERS } from "@/utils/kto";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
+// KTO 웰니스 전용 베이스 (공식 문서의 WellnessTursmService 계열 사용)
 const BASE = "https://apis.data.go.kr/B551011/WellnessTursmService";
 
-// --- 환경변수 ---
-const RAW_KEY =
-  process.env.KTO_SERVICE_KEY ??
-  process.env.TOURAPI_SERVICE_KEY ??
-  process.env.NEXT_PUBLIC_KTO_SERVICE_KEY ??
-  "";
-
-if (!RAW_KEY) {
-  console.warn("[KTO] KTO_SERVICE_KEY 미설정 — 개발 테스트만 가능할 수 있음");
-}
-
-const SERVICE_KEY = RAW_KEY.includes("%")
-  ? decodeURIComponent(RAW_KEY)
-  : RAW_KEY;
-
-const APP_NAME = process.env.KTO_APP_NAME ?? "ONYU";
+// --- 앱 이름(없으면 기본) ---
+const APP_NAME = (process.env.KTO_APP_NAME ?? "ONYU").trim();
 
 // --- 언어/타입 ---
 export function langFromLocale(loc?: string): string {
@@ -50,14 +39,15 @@ export function contentTypeFor(langDivCd: string): string {
   return langDivCd.toUpperCase() === "KOR" ? "12" : "76";
 }
 
-// --- 공통 쿼리: 항상 JSON---
+// --- 공통 쿼리: 항상 JSON & 인코딩된 키 ---
 function qsCommon(lang: string): URLSearchParams {
   const qs = new URLSearchParams();
-  qs.set("serviceKey", SERVICE_KEY);
-  qs.set("MobileOS", "WIN");
+  // ★ Decoding 키를 1회 인코딩한 값 사용(이미 인코딩 키면 그대로)
+  qs.set("serviceKey", ktoEncodedKey());
+  qs.set("_type", "json");
+  qs.set("MobileOS", "ETC"); // WIN 대신 ETC 권장
   qs.set("MobileApp", APP_NAME);
   qs.set("langDivCd", lang.toUpperCase());
-  qs.set("_type", "json");
   return qs;
 }
 
@@ -133,69 +123,56 @@ function parseXml<T>(xml: string): T {
   return response as T;
 }
 
-// ===================== 법정동 코드 API =====================
-/** /ldongCode 아이템 타입 (KTO 스펙 최소 필드) */
-export type KtoLdongCodeItem = {
-  rnum?: string;
-  name?: string;
-  code?: string;
-  lDongRegnCd?: string;
-  lDongRegnNm?: string;
-  lDongSignguCd?: string;
-  lDongSignguNm?: string;
-};
-
-/**
- * 시도/시군구 코드 목록 조회
- * - scope는 라우트에서 결정(여기선 lDongRegnCd 유무로 시군구 필터만 지원)
- * - lDongRegnCd 없으면: 전체(시도/시군구 혼재 응답) → 라우트에서 집계/유일화 처리 권장
- * - lDongRegnCd 있으면: 해당 시도의 시군구 목록
- */
-export async function getLdongCode(params: {
-  locale?: string; // "ko" | "ja" | "en" ... (langDivCd로 변환)
-  lDongRegnCd?: string; // 시도 코드(예: "11")
-  pageNo?: number;
-  numOfRows?: number; // 페이징: 기본 크게 요청
-}): Promise<KtoListResponse<KtoLdongCodeItem>> {
-  const lang = langFromLocale(params.locale);
-  const qs = qsCommon(lang);
-
-  if (params.lDongRegnCd) {
-    qs.set("lDongRegnCd", params.lDongRegnCd); // 특정 시도의 시군구 목록
-  } else {
-    qs.set("lDongListYn", "Y"); // 시도 전체 목록
-  }
-  if (params.pageNo) qs.set("pageNo", String(params.pageNo));
-  if (params.numOfRows) qs.set("numOfRows", String(params.numOfRows));
-
-  // _type=json, serviceKey 등은 qsCommon에 이미 포함
-  const url = `${BASE}/ldongCode?${qs.toString()}`;
-  return await getJSONorXML<KtoListResponse<KtoLdongCodeItem>>(url);
-}
-
-// --- JSON/XML 자동 판별 ---
+// --- 공통 fetch: 헤더/타임아웃/HTML 가드/에러 메시지 ---
 async function getJSONorXML<T>(url: string): Promise<T> {
-  const res = await fetch(url, { cache: "no-store" });
-  if (!res.ok) {
-    throw new Error(`[KTO] 요청 실패 ${res.status} @ ${maskServiceKey(url)}`);
-  }
-  const ct = (res.headers.get("content-type") ?? "").toLowerCase();
-  const text = await res.text();
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 12_000);
 
-  if (ct.includes("json") || /^[\s\r\n]*[{[]/.test(text)) {
-    try {
-      return JSON.parse(text) as T;
-    } catch {}
-  }
-  if (/^[\s\r\n]*</.test(text)) {
-    return parseXml<T>(text);
-  }
   try {
-    return JSON.parse(text) as T;
-  } catch {
+    const res = await fetch(url, {
+      cache: "no-store",
+      signal: ctrl.signal,
+      headers: KTO_COMMON_HEADERS,
+    });
+
+    const ct = (res.headers.get("content-type") ?? "").toLowerCase();
+    const text = await res.text();
+
+    if (!res.ok) {
+      // HTML 인증 페이지가 섞여 들어오는 경우를 위해 본문 앞 200자만 노출
+      throw new Error(
+        `[KTO] 요청 실패 ${res.status} @ ${maskServiceKey(url)} :: ${text.slice(
+          0,
+          200
+        )}`
+      );
+    }
+
+    // JSON 응답
+    if (ct.includes("json") || /^[\s\r\n]*[{[]/.test(text)) {
+      try {
+        return JSON.parse(text) as T;
+      } catch (e) {
+        throw new Error(
+          `[KTO] JSON 파싱 실패 @ ${maskServiceKey(url)} :: ${String(e).slice(
+            0,
+            120
+          )}`
+        );
+      }
+    }
+
+    // XML 응답
+    if (/^[\s\r\n]*</.test(text)) {
+      return parseXml<T>(text);
+    }
+
+    // 알 수 없는 응답(대개 HTML)
     throw new Error(
       `[KTO] 알 수 없는 응답 @ ${maskServiceKey(url)} :: ${text.slice(0, 200)}`
     );
+  } finally {
+    clearTimeout(timer);
   }
 }
 
@@ -208,6 +185,7 @@ function getNested(obj: unknown, path: string[]): unknown {
   }
   return cur;
 }
+
 function itemsOfLoose<T>(resp: unknown): T[] {
   const body =
     (getNested(resp, ["response", "body"]) as unknown) ??
@@ -222,7 +200,6 @@ function itemsOfLoose<T>(resp: unknown): T[] {
 
   if (raw == null) return [];
 
-  //  빈 객체 단일 응답이면 결과 없음으로 간주
   if (
     typeof raw === "object" &&
     !Array.isArray(raw) &&
@@ -231,6 +208,38 @@ function itemsOfLoose<T>(resp: unknown): T[] {
     return [];
   }
   return Array.isArray(raw) ? (raw as T[]) : [raw as T];
+}
+
+// ===================== 법정동 코드 API =====================
+export type KtoLdongCodeItem = {
+  rnum?: string;
+  name?: string;
+  code?: string;
+  lDongRegnCd?: string;
+  lDongRegnNm?: string;
+  lDongSignguCd?: string;
+  lDongSignguNm?: string;
+};
+
+export async function getLdongCode(params: {
+  locale?: string;
+  lDongRegnCd?: string;
+  pageNo?: number;
+  numOfRows?: number;
+}): Promise<KtoListResponse<KtoLdongCodeItem>> {
+  const lang = langFromLocale(params.locale);
+  const qs = qsCommon(lang);
+
+  if (params.lDongRegnCd) {
+    qs.set("lDongRegnCd", params.lDongRegnCd);
+  } else {
+    qs.set("lDongListYn", "Y");
+  }
+  if (params.pageNo) qs.set("pageNo", String(params.pageNo));
+  if (params.numOfRows) qs.set("numOfRows", String(params.numOfRows));
+
+  const url = `${BASE}/ldongCode?${qs.toString()}`;
+  return await getJSONorXML<KtoListResponse<KtoLdongCodeItem>>(url);
 }
 
 // ===================== 목록 API =====================
