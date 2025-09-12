@@ -1,6 +1,6 @@
 "use client";
 
-import * as React from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -103,7 +103,7 @@ export default function LocalizedTabsField<T extends FieldValues>(
   const isDynamic = "basePath" in props && typeof props.basePath === "string";
 
   // locales 계산을 별도 useMemo로 고정
-  const resolvedLocales = React.useMemo<readonly LocaleKey[]>(() => {
+  const resolvedLocales = useMemo<readonly LocaleKey[]>(() => {
     return isDynamic
       ? props.locales && props.locales.length > 0
         ? props.locales
@@ -112,16 +112,16 @@ export default function LocalizedTabsField<T extends FieldValues>(
   }, [isDynamic, props.locales]);
 
   // 라벨 병합
-  const labels: Record<LocaleKey, string> = React.useMemo(() => {
+  const labels: Record<LocaleKey, string> = useMemo(() => {
     return { ...LOCALE_LABELS_KO, ...(isDynamic ? props.labels : undefined) };
   }, [isDynamic, props.labels]);
 
   // 제어/비제어 탭 상태
   const controlled = typeof activeLocale !== "undefined";
-  const [tab, setTab] = React.useState<LocaleKey>(resolvedLocales[0]);
+  const [tab, setTab] = useState<LocaleKey>(resolvedLocales[0]);
   const current = controlled ? (activeLocale as LocaleKey) : tab;
 
-  const setCurrent = React.useCallback(
+  const setCurrent = useCallback(
     (loc: LocaleKey) => {
       if (controlled) onActiveLocaleChange?.(loc);
       else setTab(loc);
@@ -130,7 +130,7 @@ export default function LocalizedTabsField<T extends FieldValues>(
   );
 
   // locales가 바뀌었을 때(동적) 현재 탭이 유효하지 않으면 첫 로케일로 보정
-  const errorMap = React.useMemo<Partial<Record<LocaleKey, string>>>(() => {
+  const errorMap = useMemo<Partial<Record<LocaleKey, string>>>(() => {
     const map: Partial<Record<LocaleKey, string>> = {};
     for (const loc of resolvedLocales) {
       if (isDynamic) {
@@ -151,7 +151,7 @@ export default function LocalizedTabsField<T extends FieldValues>(
   }, [errors, isDynamic, resolvedLocales, props]);
 
   // 문자열 키로 의존성 안정화
-  const errorMapKey = React.useMemo(() => JSON.stringify(errorMap), [errorMap]);
+  const errorMapKey = useMemo(() => JSON.stringify(errorMap), [errorMap]);
 
   // basePath 루트 에러 추출 (예: "필수 언어(ko, ja)를 입력하세요.")
   const baseError: string | undefined = isDynamic
@@ -159,7 +159,7 @@ export default function LocalizedTabsField<T extends FieldValues>(
     : undefined;
 
   // 에러가 있으면 자동으로 해당 탭으로 이동 (루트 에러는 ko로 고정)
-  React.useEffect(() => {
+  useEffect(() => {
     if (!autoSwitchOnError) return;
     const hasCurrent =
       Boolean(errorMap[current]) ||

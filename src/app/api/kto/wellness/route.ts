@@ -41,7 +41,6 @@ function itemsOfLoose<T>(resp: unknown): T[] {
       : undefined) ?? itemsNode;
   if (raw == null) return [];
 
-  // 빈 객체 단일 응답이면 결과 없음으로 간주
   if (
     typeof raw === "object" &&
     !Array.isArray(raw) &&
@@ -98,7 +97,7 @@ function mapToListItem<T extends KtoAreaBasedItem>(it: T): WellnessListItem {
     coord,
     themeCode: (it.wellnessThemaCd ?? "").trim(),
     image: {
-      original: it.orgImage || it.thumbImage, // 원본 우선 폴백
+      original: it.orgImage || it.thumbImage,
       thumb: it.thumbImage,
     },
     region: { sido: it.lDongRegnCd, sigungu: it.lDongSignguCd },
@@ -115,20 +114,39 @@ function decodeEntities(s: string): string {
     .replace(/&quot;/g, '"')
     .replace(/&#39;|&apos;/g, "'");
 }
+
+/** 스킴 없는 도메인(www.example.com, example.jp/path)도 https:// 보정 */
 function extractHomepage(raw?: string): string | undefined {
   if (!raw) return undefined;
   const decoded = decodeEntities(raw).replace(/\s+/g, " ").trim();
-  const mHref =
-    decoded.match(/href\s*=\s*["'](https?:\/\/[^\s"'<>]+)["']/i) ||
-    decoded.match(/href\s*=\s*(https?:\/\/[^\s"'<>]+)/i);
-  const candidate = (mHref?.[1] ?? mHref?.[0]) || decoded;
-  const mUrl = String(candidate).match(/https?:\/\/[^\s"'<>]+/i);
-  if (!mUrl) return undefined;
-  const cleaned = mUrl[0].replace(/&amp;/g, "&").trim();
+
+  // 1) href 우선 추출
+  const hrefMatch =
+    decoded.match(/href\s*=\s*["']([^"'<>]+)["']/i) ||
+    decoded.match(/href\s*=\s*([^"'<>]+)/i);
+  const candidate = (hrefMatch?.[1] ?? hrefMatch?.[0] ?? decoded).trim();
+
+  // 2) 완전한 URL 우선
+  const urlMatch = candidate.match(/https?:\/\/[^\s"'<>]+/i);
+  let url = urlMatch ? urlMatch[0] : "";
+
+  // 3) 스킴 없는 도메인 텍스트 보정
+  if (!url) {
+    const text = decoded.replace(/<[^>]*>/g, "").trim();
+    const domainLike = /^[\w.-]+\.[a-z]{2,}(\/[^\s]*)?$/i;
+    if (domainLike.test(candidate)) url = candidate;
+    else if (domainLike.test(text)) url = text;
+  }
+  if (!url) return undefined;
+
+  // 4) 스킴 부여 + 정리
+  if (!/^https?:\/\//i.test(url)) url = `https://${url}`;
+  url = url.replace(/&amp;/g, "&").trim();
+
   try {
-    return new URL(cleaned).toString();
+    return new URL(url).toString();
   } catch {
-    return cleaned;
+    return url;
   }
 }
 
@@ -173,8 +191,8 @@ export async function GET(req: Request) {
       sp.get("withDetail")?.toLowerCase() === "true";
 
     // 언어/타입 힌트
-    const langParam = sp.get("lang") ?? sp.get("locale") ?? "ko"; // 원문
-    const langDiv = langFromLocale(langParam); // KOR/ENG...
+    const langParam = sp.get("lang") ?? sp.get("locale") ?? "ko";
+    const langDiv = langFromLocale(langParam);
     const contentTypeId = sp.get("contentTypeId") ?? contentTypeFor(langDiv);
 
     // 공통 페이지
@@ -190,14 +208,13 @@ export async function GET(req: Request) {
     let lDongSignguCd = sp.get("lDongSignguCd") ?? undefined;
     const wellnessThemaCd = sp.get("wellnessThemaCd") ?? undefined;
 
-    //  정규화: 5자리(예: 50130) 들어오면 2+3으로 쪼개서 API 규격에 맞춤
+    // 정규화: 5자리 → 2+3
     if (lDongSignguCd) {
       lDongSignguCd = lDongSignguCd.trim();
       if (lDongSignguCd.length === 5) {
-        lDongRegnCd = lDongRegnCd ?? lDongSignguCd.slice(0, 2); // 시도 자동 채움
-        lDongSignguCd = lDongSignguCd.slice(2); // "130"
+        lDongRegnCd = lDongRegnCd ?? lDongSignguCd.slice(0, 2);
+        lDongSignguCd = lDongSignguCd.slice(2);
       } else if (lDongSignguCd.length > 3) {
-        // 혹시 모를 변형값: 뒤 3자리만 사용
         lDongSignguCd = lDongSignguCd.slice(-3);
       }
     }
@@ -306,10 +323,8 @@ export async function GET(req: Request) {
       .map(mapToListItem);
     if (withDetail) {
       items = await enrichHomepages(items, langParam);
-      // (선택) 빈 homepage 속성 제거
       items = items.map((it) => {
         if (it.homepage?.trim()) return it;
-        // homepage 키만 제외한 새 객체 생성
         return Object.fromEntries(
           Object.entries(it).filter(([k]) => k !== "homepage")
         ) as WellnessListItem;

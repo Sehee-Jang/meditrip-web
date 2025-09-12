@@ -1,6 +1,6 @@
 "use client";
 
-import * as React from "react";
+import { useState, useEffect } from "react";
 import type { WellnessListItem } from "@/types/kto-wellness";
 import TourCardExtra from "./TourCardExtra";
 import { Globe } from "lucide-react";
@@ -18,7 +18,6 @@ type DetailMini = {
   contact?: string;
 };
 
-/** 상세 API 응답의 최소 스키마(쓰는 필드만 정의) */
 type IntroField = { label: string; value: string };
 type NamedText = { name?: unknown; text?: unknown };
 type DetailResponse = {
@@ -66,6 +65,30 @@ function pickIntro(intros: IntroField[] | undefined, labels: string[]) {
   return undefined;
 }
 
+/** 엔티티 디코드 */
+function decodeEntities(s = "") {
+  return s
+    .replace(/&amp;/g, "&")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;|&apos;/g, "'")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">");
+}
+
+/** 홈페이지 정규화(클라이언트 방어용) */
+function normalizeHomepage(raw?: string): string | undefined {
+  if (!raw) return undefined;
+  const dec = decodeEntities(String(raw).trim());
+  const mHref = dec.match(/href\s*=\s*["']([^"']+)["']/i);
+  let url = (mHref?.[1] ?? "").trim();
+  if (!url) {
+    const mText = dec.match(/>(https?:\/\/[^<]+)</i);
+    if (mText) url = mText[1].trim();
+  }
+  if (!url && /^https?:\/\//i.test(dec)) url = dec;
+  return /^https?:\/\//i.test(url) ? url : undefined;
+}
+
 /** extras 배열에서 '입장' 또는 '요금'이 들어간 name을 찾아 text 반환 */
 function feeFromExtras(extras: unknown): string | undefined {
   if (!Array.isArray(extras)) return undefined;
@@ -83,11 +106,11 @@ function feeFromExtras(extras: unknown): string | undefined {
 }
 
 export default function TourCard({ lang, item }: Props) {
-  const [detail, setDetail] = React.useState<DetailMini | null>(null);
-  const [openMap, setOpenMap] = React.useState(false);
+  const [detail, setDetail] = useState<DetailMini | null>(null);
+  const [openMap, setOpenMap] = useState(false);
 
   // 상세 비동기 보강: 운영시간/주차/이용요금/홈페이지
-  React.useEffect(() => {
+  useEffect(() => {
     let cancelled = false;
     const run = async () => {
       try {
@@ -103,19 +126,16 @@ export default function TourCard({ lang, item }: Props) {
         const res = await fetch(url, { cache: "no-store" });
         if (!res.ok) throw new Error(`detail ${res.status}`);
 
-        // json() 결과를 우리가 쓰는 필드만 갖는 타입으로 단언
         const d = (await res.json()) as DetailResponse;
         if (cancelled) return;
 
         const hours = pickIntro(d.introFields, ["이용시간"]);
         const parking = pickIntro(d.introFields, ["주차"]);
 
-        // 비용: introFields "이용요금" 우선, 없으면 info.extras에서 name에 '입장' 또는 '요금'
         const fee =
           pickIntro(d.introFields, ["이용요금"]) ??
           feeFromExtras(d.info?.extras);
 
-        // 연락처 폴백: 목록 phone → 상세 phone → introFields "문의"
         const contact =
           item.phone || d.phone || pickIntro(d.introFields, ["문의"]);
 
@@ -138,7 +158,10 @@ export default function TourCard({ lang, item }: Props) {
 
   const imgSrc = item.image.original || item.image.thumb || "";
   const addr = item.address || "-";
-  const homepage = detail?.homepage;
+
+  // 상세값이 비정상일 때 목록값으로 폴백 + 정규화
+  const homepage =
+    normalizeHomepage(detail?.homepage) ?? normalizeHomepage(item.homepage);
 
   const mapHref = googleMapsHref(item.address, item.coord);
   const embedSrc = googleMapsEmbed(item.address, item.coord);

@@ -7,6 +7,8 @@ import type {
   KtoDetailIntroItem,
   KtoDetailInfoItem,
   KtoDetailImageItem,
+  KtoLdongCodeItem,
+  KtoLdongCodeItemResponse,
 } from "@/types/kto-wellness";
 
 export const dynamic = "force-dynamic";
@@ -134,16 +136,6 @@ function parseXml<T>(xml: string): T {
 }
 
 // ===================== 법정동 코드 API =====================
-/** /ldongCode 아이템 타입 (KTO 스펙 최소 필드) */
-export type KtoLdongCodeItem = {
-  rnum?: string;
-  name?: string;
-  code?: string;
-  lDongRegnCd?: string;
-  lDongRegnNm?: string;
-  lDongSignguCd?: string;
-  lDongSignguNm?: string;
-};
 
 /**
  * 시도/시군구 코드 목록 조회
@@ -156,7 +148,7 @@ export async function getLdongCode(params: {
   lDongRegnCd?: string; // 시도 코드(예: "11")
   pageNo?: number;
   numOfRows?: number; // 페이징: 기본 크게 요청
-}): Promise<KtoListResponse<KtoLdongCodeItem>> {
+}): Promise<KtoLdongCodeItemResponse<KtoLdongCodeItem>> {
   const lang = langFromLocale(params.locale);
   const qs = qsCommon(lang);
 
@@ -170,7 +162,7 @@ export async function getLdongCode(params: {
 
   // _type=json, serviceKey 등은 qsCommon에 이미 포함
   const url = `${BASE}/ldongCode?${qs.toString()}`;
-  return await getJSONorXML<KtoListResponse<KtoLdongCodeItem>>(url);
+  return await getJSONorXML<KtoLdongCodeItemResponse<KtoLdongCodeItem>>(url);
 }
 
 // --- JSON/XML 자동 판별 ---

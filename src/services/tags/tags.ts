@@ -1,7 +1,7 @@
 "use client";
 
-import * as React from "react";
-import type { TagWithId} from "@/types/tag";
+import { useState, useEffect } from "react";
+import type { TagWithId } from "@/types/tag";
 
 /** /api/tags 에서 받아오는 응답 타입 */
 type TagsApiResponse = {
@@ -20,11 +20,11 @@ export async function fetchTagsCatalog(): Promise<TagWithId[]> {
 
 /** React 훅: 태그 카탈로그 */
 export function useTagsCatalog() {
-  const [data, setData] = React.useState<TagWithId[]>([]);
-  const [loading, setLoading] = React.useState<boolean>(false);
-  const [error, setError] = React.useState<string | null>(null);
+  const [data, setData] = useState<TagWithId[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
 
-  React.useEffect(() => {
+  useEffect(() => {
     let mounted = true;
     setLoading(true);
     fetchTagsCatalog()

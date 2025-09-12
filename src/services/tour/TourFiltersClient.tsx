@@ -1,7 +1,8 @@
 "use client";
 
-import * as React from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
+import { TOUR_THEME_LABELS } from "@/types/kto-wellness";
 
 type Props = {
   lang: "ko" | "ja"; // 페이지에서 넘겨줌
@@ -9,15 +10,21 @@ type Props = {
 
 type Option = { label: string; value: string };
 
-const THEMA_OPTIONS: Option[] = [
-  { label: "전체", value: "" },
-  { label: "온천/사우나/스파", value: "EX050100" },
-  { label: "찜질방", value: "EX050200" },
-  { label: "한방 체험", value: "EX050300" },
-  { label: "힐링 명상", value: "EX050400" },
-  { label: "뷰티 스파", value: "EX050500" },
-  { label: "기타 웰니스", value: "EX050600" },
-  { label: "자연 치유", value: "EX050700" },
+function allLabel(lang: "ko" | "ja") {
+  return lang === "ja" ? "すべて" : "전체";
+}
+function langKeyOf(lang: "ko" | "ja"): "KOR" | "JPN" | "ENG" {
+  return lang === "ko" ? "KOR" : "JPN";
+}
+// 테마 표시 순서를 고정하고 싶으면 아래 배열을 사용
+const THEME_ORDER = [
+  "EX050100",
+  "EX050200",
+  "EX050300",
+  "EX050400",
+  "EX050500",
+  "EX050600",
+  "EX050700",
 ];
 
 export default function TourFiltersClient({ lang }: Props) {
@@ -25,74 +32,103 @@ export default function TourFiltersClient({ lang }: Props) {
   const pathname = usePathname();
   const sp = useSearchParams();
 
-  const [sido, setSido] = React.useState<string>(sp.get("sido") ?? "");
-  const [sigungu, setSigungu] = React.useState<string>(sp.get("sigungu") ?? "");
-  const [theme, setTheme] = React.useState<string>(sp.get("theme") ?? "");
+  const [sido, setSido] = useState<string>(sp.get("sido") ?? "");
+  const [sigungu, setSigungu] = useState<string>(sp.get("sigungu") ?? "");
+  const [theme, setTheme] = useState<string>(sp.get("theme") ?? "");
 
-  const [sidoOptions, setSidoOptions] = React.useState<Option[]>([
+  const [sidoOptions, setSidoOptions] = useState<Option[]>([
     { label: "전체", value: "" },
   ]);
-  const [sigunguOptions, setSigunguOptions] = React.useState<Option[]>([
+  const [sigunguOptions, setSigunguOptions] = useState<Option[]>([
     { label: "전체", value: "" },
   ]);
-  const [loadingSido, setLoadingSido] = React.useState(false);
-  const [loadingSigungu, setLoadingSigungu] = React.useState(false);
+  const [loadingSido, setLoadingSido] = useState(false);
+  const [loadingSigungu, setLoadingSigungu] = useState(false);
+
+  // 테마 옵션을 라벨 맵에서 생성
+  const themeOptions = useMemo<Option[]>(() => {
+    const key = langKeyOf(lang);
+    const list = THEME_ORDER.filter(
+      (code) => TOUR_THEME_LABELS[code]?.[key]
+    ).map((code) => ({
+      value: code,
+      label: TOUR_THEME_LABELS[code]![key]!,
+    }));
+    return [{ label: allLabel(lang), value: "" }, ...list];
+  }, [lang]);
 
   // 시도 옵션 로드
-  React.useEffect(() => {
-    let aborted = false;
+  useEffect(() => {
     const ac = new AbortController();
-    const run = async () => {
+
+    (async () => {
       setLoadingSido(true);
+
       try {
-        const res = await fetch(`/api/kto/ldong?scope=sido&lang=ko`, {
+        const res = await fetch(`/api/kto/ldong?scope=sido&lang=${lang}`, {
           signal: ac.signal,
           cache: "no-store",
         });
+        if (!res.ok) throw new Error("Failed to load sido options");
         const json = (await res.json()) as { options?: Option[] };
-        if (!aborted && Array.isArray(json.options))
-          setSidoOptions(json.options);
+        if (ac.signal.aborted) return;
+        setSidoOptions(
+          Array.isArray(json.options)
+            ? json.options
+            : [{ label: "전체", value: "" }]
+        );
+      } catch (err) {
+        if (ac.signal.aborted) return;
+        console.error(err);
       } finally {
-        setLoadingSido(false);
+        if (!ac.signal.aborted) setLoadingSido(false);
       }
-    };
-    run();
+    })();
+
     return () => {
-      aborted = true;
-      ac.abort();
+      ac.abort("component-unmounted");
     };
   }, [lang]);
 
   // 시군구 옵션 로드(시도 변경 시)
-  React.useEffect(() => {
-    let aborted = false;
+  useEffect(() => {
     const ac = new AbortController();
-    const run = async () => {
+
+    (async () => {
+      // 시도 변경 시 선택 초기화
       setSigungu("");
+
       if (!sido) {
         setSigunguOptions([{ label: "전체", value: "" }]);
         return;
       }
+
       setLoadingSigungu(true);
       try {
         const res = await fetch(
-          `/api/kto/ldong?scope=sigungu&sido=${sido}&lang=ko`,
-          {
-            signal: ac.signal,
-            cache: "no-store",
-          }
+          `/api/kto/ldong?scope=sigungu&sido=${encodeURIComponent(
+            sido
+          )}&lang=${lang}`,
+          { signal: ac.signal, cache: "no-store" }
         );
+        if (!res.ok) throw new Error("Failed to load sigungu options");
         const json = (await res.json()) as { options?: Option[] };
-        if (!aborted && Array.isArray(json.options))
-          setSigunguOptions(json.options);
+        if (ac.signal.aborted) return;
+        setSigunguOptions(
+          Array.isArray(json.options)
+            ? json.options
+            : [{ label: "전체", value: "" }]
+        );
+      } catch (err) {
+        if (ac.signal.aborted) return;
+        console.error(err);
       } finally {
-        setLoadingSigungu(false);
+        if (!ac.signal.aborted) setLoadingSigungu(false);
       }
-    };
-    run();
+    })();
+
     return () => {
-      aborted = true;
-      ac.abort();
+      ac.abort("component-unmounted");
     };
   }, [sido, lang]);
 
@@ -104,12 +140,7 @@ export default function TourFiltersClient({ lang }: Props) {
     const q = new URLSearchParams(sp.toString());
     q.set("mode", "area");
     q.set("page", "1");
-
-    const setParam = (key: string, value?: string) => {
-      if (typeof value !== "string") return;
-      if (value) q.set(key, value);
-      else q.delete(key);
-    };
+    const setParam = (k: string, v?: string) => (v ? q.set(k, v) : q.delete(k));
     setParam("sido", next.sido);
     setParam("sigungu", next.sigungu);
     setParam("theme", next.theme);
@@ -129,7 +160,7 @@ export default function TourFiltersClient({ lang }: Props) {
       {/* 시도 */}
       <label className='flex-1 min-w-0 flex items-center gap-2'>
         <span className='w-14 shrink-0 text-sm text-muted-foreground'>
-          {lang === "ko" ? "시도" : "Sido"}
+          {lang === "ko" ? "시도" : "Province"}
         </span>
         <select
           className='w-full min-w-0 rounded-md border bg-background px-2 py-1 text-sm'
@@ -152,7 +183,7 @@ export default function TourFiltersClient({ lang }: Props) {
       {/* 시군구 */}
       <label className='flex-1 min-w-0 flex items-center gap-2'>
         <span className='w-14 shrink-0 text-sm text-muted-foreground'>
-          {lang === "ko" ? "시군구" : "Sigungu"}
+          {lang === "ko" ? "시/군/구" : "City"}
         </span>
         <select
           className='w-full min-w-0 rounded-md border bg-background px-2 py-1 text-sm'
@@ -178,7 +209,7 @@ export default function TourFiltersClient({ lang }: Props) {
           value={theme}
           onChange={(e) => setTheme(e.target.value)}
         >
-          {THEMA_OPTIONS.map((op) => (
+          {themeOptions.map((op) => (
             <option key={op.value} value={op.value}>
               {op.label}
             </option>

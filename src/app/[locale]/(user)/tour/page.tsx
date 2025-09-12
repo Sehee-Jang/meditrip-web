@@ -2,7 +2,7 @@ import React from "react";
 import fetchWellness from "@/services/kto/fetchWellness";
 import PageHeader from "@/components/common/PageHeader";
 import { getTranslations } from "next-intl/server";
-import TourGridClient from "../../../../components/tour/TourGridClient";
+import TourGridClient from "@/components/tour/TourGridClient";
 import TourFiltersClient from "@/services/tour/TourFiltersClient";
 
 type PageParams = { locale: string };

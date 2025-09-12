@@ -1,6 +1,6 @@
 "use client";
 
-import * as React from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { Phone, Clock, Car, Ticket } from "lucide-react";
 import type { LucideProps } from "lucide-react";
 
@@ -103,7 +103,7 @@ function findExtra(
   return out;
 }
 
-/* 2줄 → 더보기/접기: 줄 수로 판단, 필요 없으면 버튼/그라데이션 미노출 */
+/* 2줄 → 더보기/접기 */
 function Expandable({
   text,
   lines = 2,
@@ -115,8 +115,8 @@ function Expandable({
   more?: string;
   less?: string;
 }) {
-  const [open, setOpen] = React.useState(false);
-  const normalizedLines = React.useMemo(() => toLines(text), [text]);
+  const [open, setOpen] = useState(false);
+  const normalizedLines = useMemo(() => toLines(text), [text]);
   const hasContent = normalizedLines.length > 0;
   const needToggle = normalizedLines.length > lines;
 
@@ -143,7 +143,6 @@ function Expandable({
         {visibleText}
       </span>
 
-      {/* 접힘 상태에서만 페이드 */}
       {!open && needToggle && (
         <div
           aria-hidden
@@ -155,7 +154,6 @@ function Expandable({
         />
       )}
 
-      {/* 줄 수가 충분할 때만 토글 버튼 */}
       {needToggle && (
         <button
           type='button'
@@ -178,11 +176,12 @@ export default function TourCardExtra({
   lang,
   fallbackPhone,
 }: Props) {
-  const [detail, setDetail] = React.useState<DetailResp | null>(null);
-  const ref = React.useRef<HTMLDivElement>(null);
+  const [detail, setDetail] = useState<DetailResp | null>(null);
+  const [limited, setLimited] = useState(false); // 쿼터/네트워크 실패 플래그
+  const ref = useRef<HTMLDivElement>(null);
 
   /* 화면에 들어올 때만 상세 호출 */
-  React.useEffect(() => {
+  useEffect(() => {
     const el = ref.current;
     if (!el) return;
 
@@ -198,9 +197,20 @@ export default function TourCardExtra({
             cache: "no-store",
             signal: ac.signal,
           })
-            .then((r) => r.json())
-            .then((json: DetailResp) => setDetail(json))
-            .catch(() => {});
+            .then(async (r) => {
+              if (!r.ok) throw new Error(String(r.status));
+              return (await r.json()) as DetailResp;
+            })
+            .then((json) => setDetail(json))
+            .catch(() => {
+              // 실패 시에도 최소 폴백: 연락처만이라도 노출
+              setLimited(true);
+              setDetail({
+                phone: fallbackPhone,
+                introFields: [],
+                info: { extras: [] },
+              });
+            });
         }
       },
       { rootMargin: "200px" }
@@ -211,7 +221,7 @@ export default function TourCardExtra({
       io.disconnect();
       ac.abort();
     };
-  }, [contentId, lang]);
+  }, [contentId, lang, fallbackPhone]);
 
   const t = (ko: string, en: string) => (lang === "ko" ? ko : en);
 
@@ -221,6 +231,7 @@ export default function TourCardExtra({
     fallbackPhone ||
     "";
 
+  // 필요하면 라벨 확장: "営業時間", "Contact", "お問い合わせ" 등
   const hours = detail
     ? pickIntro(detail.introFields, ["이용시간", "운영시간", "Operating hours"])
     : "";
@@ -229,9 +240,12 @@ export default function TourCardExtra({
     ? pickIntro(detail.introFields, ["주차", "Parking"])
     : "";
 
-  const { parkingFee, admission } = detail
-    ? findExtra(detail.info.extras, ["parkingFee", "admission"])
-    : { parkingFee: "", admission: "" };
+  // 안전 접근: extras 없을 수 있음
+  const extrasArr = detail?.info?.extras ?? [];
+  const { parkingFee, admission } = findExtra(extrasArr, [
+    "parkingFee",
+    "admission",
+  ]);
 
   const hasAny =
     Boolean(phone) ||
@@ -239,49 +253,57 @@ export default function TourCardExtra({
     Boolean(parking || parkingFee) ||
     toLines(admission).length > 0;
 
-  if (!hasAny) {
-    return <div ref={ref} className='mt-3 border-t pt-3 text-sm' />;
-  }
-
   return (
-    <div ref={ref} className='mt-3 space-y-1.5 border-t pt-3'>
-      {phone && (
-        <RowIcon Icon={Phone} srLabel={t("연락처", "Contact")}>
-          <span>{phone}</span>
-        </RowIcon>
+    <div ref={ref} className='mt-3 space-y-1.5 border-t pt-3 text-sm'>
+      {limited && (
+        <div className='mb-1 text-xs text-muted-foreground'>
+          {lang === "ko"
+            ? "API 제한으로 상세정보를 일부 표시하지 못했습니다."
+            : "Some details are unavailable due to API limits."}
+        </div>
       )}
 
-      {toLines(hours).length > 0 && (
-        <RowIcon Icon={Clock} srLabel={t("운영시간", "Hours")}>
-          <Expandable
-            text={hours}
-            lines={1} // 1줄까지는 더보기 없음
-            more={t("더보기", "More")}
-            less={t("접기", "Less")}
-          />
-        </RowIcon>
-      )}
-
-      {(parking || parkingFee) && (
-        <RowIcon Icon={Car} srLabel={t("주차", "Parking")}>
-          <span>{parking || t("정보 없음", "N/A")}</span>
-          {parkingFee && (
-            <span className='ml-2 text-muted-foreground'>
-              ({t("주차요금", "Fee")} {parkingFee})
-            </span>
+      {!hasAny ? null : (
+        <>
+          {phone && (
+            <RowIcon Icon={Phone} srLabel={t("연락처", "Contact")}>
+              <span>{phone}</span>
+            </RowIcon>
           )}
-        </RowIcon>
-      )}
 
-      {toLines(admission).length > 0 && (
-        <RowIcon Icon={Ticket} srLabel={t("입장료", "Admission")}>
-          <Expandable
-            text={admission}
-            lines={2} // 2줄까지는 더보기 없음
-            more={t("더보기", "More")}
-            less={t("접기", "Less")}
-          />
-        </RowIcon>
+          {toLines(hours).length > 0 && (
+            <RowIcon Icon={Clock} srLabel={t("운영시간", "Hours")}>
+              <Expandable
+                text={hours}
+                lines={1}
+                more={t("더보기", "More")}
+                less={t("접기", "Less")}
+              />
+            </RowIcon>
+          )}
+
+          {(parking || parkingFee) && (
+            <RowIcon Icon={Car} srLabel={t("주차", "Parking")}>
+              <span>{parking || t("정보 없음", "N/A")}</span>
+              {parkingFee && (
+                <span className='ml-2 text-muted-foreground'>
+                  ({t("주차요금", "Fee")} {parkingFee})
+                </span>
+              )}
+            </RowIcon>
+          )}
+
+          {toLines(admission).length > 0 && (
+            <RowIcon Icon={Ticket} srLabel={t("입장료", "Admission")}>
+              <Expandable
+                text={admission}
+                lines={2}
+                more={t("더보기", "More")}
+                less={t("접기", "Less")}
+              />
+            </RowIcon>
+          )}
+        </>
       )}
     </div>
   );
