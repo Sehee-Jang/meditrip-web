@@ -64,7 +64,20 @@ export default async function fetchWellness(
       url.searchParams.set("radius", String(radius));
   }
 
-  const res = await fetch(url.toString(), { cache: "no-store" });
+  const init: RequestInit = { cache: "no-store" };
+
+  // 서버에서 자기 도메인 호출할 때만 Vercel 보호 우회
+  if (typeof window === "undefined") {
+    const bypass = process.env.VERCEL_AUTOMATION_BYPASS_SECRET; 
+    if (bypass) {
+      init.headers = {
+        ...(init.headers as Record<string, string> | undefined),
+        "x-vercel-protection-bypass": bypass,
+      };
+    }
+  }
+
+   const res = await fetch(url.toString(), init);
   if (!res.ok) {
     const text = await res.text().catch(() => "");
     throw new Error(
