@@ -55,7 +55,7 @@ export default function Header() {
             {t("login")}
           </Link>
         )}
-        <Link href='/business'>{t("business")}</Link>
+        <Link href='/community'>{t("business")}</Link>
         <LanguageSwitcher /> {/* 드롭다운만 표시 */}
       </nav>
 
@@ -91,7 +91,7 @@ export default function Header() {
         )}
 
         {/* 비지니스 문의 */}
-        <Link href='/business' aria-label='business'>
+        <Link href='/community' aria-label='business'>
           <BriefcaseBusiness size={20} />
         </Link>
 
