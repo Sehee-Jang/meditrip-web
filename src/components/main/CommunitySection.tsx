@@ -3,7 +3,7 @@
 import { useTranslations } from "next-intl";
 import { ChevronRight } from "lucide-react";
 import Container from "../common/Container";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import CommunityList from "./CommunityList";
 
 export default function CommunitySection() {

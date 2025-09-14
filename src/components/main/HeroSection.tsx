@@ -11,7 +11,7 @@ import Image from "next/image";
 import CommonButton from "../common/CommonButton";
 import Container from "../common/Container";
 import { useRef } from "react";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 
 export default function HeroSection() {
   const t = useTranslations("hero-section");
