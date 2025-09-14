@@ -1,0 +1,26 @@
+{
+  "section": {
+    "title": "웰니스 프로그램",
+    "desc": "다양한 웰니스 프로그램을 만나보세요.",
+    "button": "더보기"
+  },
+  "page": {
+    "title": "웰니스 프로그램"
+  },
+  "clinicList": {
+    "emptyMessage": "등록된 병원이 없습니다.",
+    "viewDetails": "상세보기",
+    "searchPlaceholder": "웰니스 프로그램 검색",
+    "searchHelper": "관심 있는 웰니스 프로그램을 검색해보세요.",
+    "loading": "로딩중"
+  },
+
+  "book": {
+    "bookButton": "예약",
+    "shareButton": "공유",
+    "reservePageLink": "내부 예약 페이지로 이동",
+    "bookModalTitle": "예약하기",
+    "openInNewTab": "새 탭에서 예약하기",
+    "close": "닫기"
+  }
+}

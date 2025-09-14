@@ -10,7 +10,7 @@ import { fetchClinics } from "@/services/hospitals/fetchClinics";
 import Container from "../common/Container";
 
 export default function HospitalListClient() {
-  const t = useTranslations("hospital-list");
+  const t = useTranslations("clinic");
   const locale = useLocale();
   const loc: "ko" | "ja" = locale === "ja" ? "ja" : "ko";
 

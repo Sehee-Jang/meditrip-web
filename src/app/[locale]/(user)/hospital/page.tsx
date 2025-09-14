@@ -4,13 +4,13 @@ import { getTranslations } from "next-intl/server";
 import HospitalListClient from "@/components/hospitals/HospitalListClient";
 
 export default async function HospitalPage() {
-  const t = await getTranslations("hospital-page");
+  const t = await getTranslations("clinic");
 
   return (
     <main className='md:px-4 md:py-8'>
       <PageHeader
-        desktopTitle={t("title")}
-        mobileTitle={t("title")}
+        desktopTitle={t("page.title")}
+        mobileTitle={t("page.title")}
         showBackIcon
         center
       />

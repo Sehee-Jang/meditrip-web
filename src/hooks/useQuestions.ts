@@ -12,14 +12,14 @@ import {
   where,
 } from "firebase/firestore";
 import type { Question } from "@/types/question";
-import type { CommunityCategory } from "@/types/category";
+import type { Category } from "@/types/category";
 import { normalizeCommunityCategory } from "@/lib/communityCategory";
 import { toISO } from "@/utils/date";
 
 type FirestoreQuestionDoc = {
   title: string;
   content: string;
-  category: CommunityCategory | string;
+  category: Category | string;
   createdAt?: Timestamp;
   updatedAt?: Timestamp;
   imageUrl?: string | null;

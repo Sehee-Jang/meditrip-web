@@ -1,9 +1,8 @@
-import { COMMUNITY_CATEGORY_KEYS } from "@/constants/communityCategories";
-import type { CommunityCategoryKey } from "@/constants/communityCategories";
+import { CATEGORY_KEYS, CategoryKey } from "@/constants/categories";
 
 export type AnswerFilter = "all" | "yes" | "no";
 export type VisibilityFilter = "all" | "visible" | "hidden";
-export type CategoryFilter = "all" | CommunityCategoryKey;
+export type CategoryFilter = "all" | CategoryKey;
 
 export type AdminFilter = {
   category: CategoryFilter;
@@ -28,8 +27,8 @@ function pickFirst(v?: string | string[]): string | undefined {
 
 function toCategoryFilter(v?: string): CategoryFilter {
   if (!v || v === "all") return "all";
-  return (COMMUNITY_CATEGORY_KEYS as readonly string[]).includes(v)
-    ? (v as CommunityCategoryKey)
+  return (CATEGORY_KEYS as readonly string[]).includes(v)
+    ? (v as CategoryKey)
     : "all";
 }
 

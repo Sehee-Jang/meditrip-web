@@ -25,10 +25,11 @@ export default function EditQuestionForm({ question }: { question: Question }) {
     title: z.string().min(2),
     category: z.enum([
       "stress",
-      "diet",
+      // "diet",
       "immunity",
-      "women",
+      // "women",
       "antiaging",
+      "therapy",
       "etc",
     ]),
     content: z.string().min(1),

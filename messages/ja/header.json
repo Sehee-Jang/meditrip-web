@@ -1,11 +1,12 @@
 {
   "articles": "ウェルネス記事",
   "main": "ホーム",
-  "content": "コンテンツ",
+  "contents": "コンテンツ",
   "community": "コミュニティ",
   "hospital": "ウェルネスプログラム",
   "tour": "ウェルネスツアー",
   "mypage": "マイページ",
+  "business": "ビジネスお問い合わせ",
   "login": "ログイン",
   "logout": "ログアウト"
 }

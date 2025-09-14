@@ -32,10 +32,11 @@ export const COMMUNITY_CATEGORY_ICONS: Record<
 };
 
 export const COMMUNITY_CATEGORY_LABELS: Record<CommunityCategoryKey, string> = {
-  stress: "멘탈케어",
-  diet: "다이어트&디톡스",
-  immunity: "면역관리",
-  women: "여성질환",
-  antiaging: "안티에이징",
+  stress: "멘탈·스트레스 관리",
+  // diet: "다이어트&디톡스",
+  immunity: "체력·면역 관리",
+  // women: "여성질환",
+  antiaging: "안티에이징·뷰티",
+  therapy: "종합 테라피",
   etc: "기타",
 };

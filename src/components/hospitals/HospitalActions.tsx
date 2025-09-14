@@ -16,7 +16,7 @@ interface HospitalActionsProps {
 export default function HospitalActions(props: HospitalActionsProps) {
   const { bookingUrl = "https://ko.surveymonkey.com/r/YXDPQ5Q" } = props;
 
-  const t = useTranslations("hospital-list");
+  const t = useTranslations("clinic");
   const router = useRouter();
   const { isLoggedIn, loading } = useAuthCheck();
   const [open, setOpen] = useState(false);

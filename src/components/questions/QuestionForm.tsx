@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Image from "next/image";
-
 import { useRouter } from "@/i18n/navigation";
 import { useDropzone } from "react-dropzone";
 import { useForm } from "react-hook-form";
@@ -13,10 +12,11 @@ import { useTranslations } from "next-intl";
 import { auth } from "@/lib/firebase";
 import { createQuestion } from "@/services/questions/createQuestion";
 import {
-  COMMUNITY_CATEGORY_VALUES,
-  COMMUNITY_CATEGORY_KEYS,
-} from "@/constants/communityCategories";
-import type { CommunityCategory, CommunityCategoryKey } from "@/types/category";
+  CATEGORY_KEYS,
+  CATEGORY_VALUES,
+  type Category,
+  type CategoryKey,
+} from "@/types/category";
 import { awardViaApi } from "@/services/points/awardViaApi";
 
 export default function QuestionForm() {
@@ -26,9 +26,7 @@ export default function QuestionForm() {
 
   const formSchema = z.object({
     title: z.string().min(2, { message: t("form.content.errors.titleMin") }),
-    category: z.enum(
-      COMMUNITY_CATEGORY_VALUES as [CommunityCategory, ...CommunityCategory[]]
-    ),
+    category: z.enum(CATEGORY_VALUES as [Category, ...Category[]]),
     content: z
       .string()
       .min(1, { message: t("form.content.errors.contentRequired") }),
@@ -139,7 +137,7 @@ export default function QuestionForm() {
             {t("form.category.label")}
           </label>
           <div className='flex flex-wrap gap-2'>
-            {COMMUNITY_CATEGORY_KEYS.map((key: CommunityCategoryKey) => (
+            {CATEGORY_KEYS.map((key: CategoryKey) => (
               <label
                 key={key}
                 className='border px-3 py-1 rounded-full text-sm cursor-pointer hover:bg-gray-100'

@@ -104,7 +104,7 @@ export default async function ClinicDetailPage({
   const { tab } = await searchParams;
   const activeTab: "info" | "reviews" = tab === "reviews" ? "reviews" : "info";
 
-  const t = await getTranslations("hospital-detail");
+  const t = await getTranslations("clinic-detail");
   const tAmenity = await getTranslations("amenities");
 
   // 단일 문서만 읽기

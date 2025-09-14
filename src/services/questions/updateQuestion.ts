@@ -1,12 +1,12 @@
 import { db } from "@/lib/firebase";
 import { doc, updateDoc, serverTimestamp } from "firebase/firestore";
 import { uploadImageToSupabase } from "./createQuestion";
-import type { CommunityCategory } from "@/types/category";
+import type { Category } from "@/types/category";
 
 export interface UpdateQuestionInput {
   id: string;
   title: string;
-  category: CommunityCategory;
+  category: Category;
   content: string;
   file?: File;
 }

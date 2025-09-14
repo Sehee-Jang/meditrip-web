@@ -14,11 +14,12 @@
       "label": "カテゴリを選択",
       "placeholder": "質問に適したカテゴリを選んでください。",
       "options": {
-        "stress": "メンタルケア",
+        "stress": "心とストレスケア",
         "diet": "ダイエット & デトックス",
-        "immunity": "免疫ケア",
+        "immunity": "体力・免疫ケア",
         "women": "女性特有の不調",
-        "antiaging": "アンチエイジング",
+        "antiaging": "アンチエイジング・美容",
+        "therapy": "トータルセラピー",
         "etc": "その他"
       }
     },

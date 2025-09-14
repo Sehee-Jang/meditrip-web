@@ -26,8 +26,11 @@
 
 export const NAMESPACES = [
   "amenities",
+  "article",
   "button",
   "categories",
+  "clinic",
+  "clinic-detail",
   "coming-soon",
   "common",
   "community-page",
@@ -39,9 +42,7 @@ export const NAMESPACES = [
   "footer",
   "header",
   "hero-section",
-  "hospital-detail",
-  "hospital-list",
-  "hospital-page",
+
   "login-page",
   "my-favorite",
   "mypage",

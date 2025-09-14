@@ -12,7 +12,7 @@ interface ClinicListProps {
 }
 
 export default function ClinicList({ clinics }: ClinicListProps) {
-  const t = useTranslations("hospital-list");
+  const t = useTranslations("clinic");
   const locale = useLocale(); // 링크 경로용
   const loc: "ko" | "ja" = locale === "ja" ? "ja" : "ko"; // 다국어 텍스트 선택용
 

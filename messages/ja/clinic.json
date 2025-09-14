@@ -1,0 +1,26 @@
+{
+  "section": {
+    "title": "K-ウェルネスって？",
+    "desc": "",
+    "button": "もっと見る"
+  },
+  "page": {
+    "title": "ウェルネスプログラム"
+  },
+  "clinicList": {
+    "emptyMessage": "登録されたクリニックがありません。",
+    "viewDetails": "詳細を見る",
+    "searchPlaceholder": "ウェルネスプログラムを検索",
+    "searchHelper": "興味のあるウェルネスプログラムを探してみましょう。",
+    "loading": "Loading..."
+  },
+
+  "book": {
+    "bookButton": "予約",
+    "shareButton": "共有",
+    "reservePageLink": "内部予約ページへ",
+    "bookModalTitle": "予約する",
+    "openInNewTab": "新しいタブで開く",
+    "close": "閉じる"
+  }
+}

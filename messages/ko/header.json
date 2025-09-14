@@ -1,11 +1,12 @@
 {
   "articles": "웰니스 아티클",
   "main": "메인",
-  "content": "콘텐츠",
+  "contents": "콘텐츠",
   "community": "커뮤니티",
   "hospital": "웰니스 프로그램",
   "tour": "웰니스 투어",
   "mypage": "마이페이지",
+  "business": "비지니스 문의",
   "login": "로그인",
   "logout": "로그아웃"
 }

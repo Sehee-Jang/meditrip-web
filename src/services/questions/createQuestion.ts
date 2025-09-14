@@ -2,11 +2,11 @@ import { db, auth } from "@/lib/firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { supabase } from "@/lib/supabase";
 import { v4 as uuidv4 } from "uuid";
-import type { CommunityCategory } from "@/types/category";
+import type { Category } from "@/types/category";
 
 export interface CreateQuestionInput {
   title: string;
-  category: CommunityCategory;
+  category: Category;
   content: string;
   file?: File;
 }

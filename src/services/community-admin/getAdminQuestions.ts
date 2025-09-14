@@ -12,13 +12,13 @@ import {
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import type { Question } from "@/types/question";
-import type { CommunityCategoryKey } from "@/types/category";
+import type { CategoryKey } from "@/types/category";
 import { toISO } from "@/utils/date";
 import { normalizeCommunityCategory } from "@/lib/communityCategory";
 import type { AdminFilter } from "@/features/community/admin/filters";
 
 export type AdminQuestionFilter = {
-  category: "all" | CommunityCategoryKey;
+  category: "all" | CategoryKey;
   answered: "all" | "yes" | "no";
   visibility: "all" | "visible" | "hidden";
 };

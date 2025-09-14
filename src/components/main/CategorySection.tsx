@@ -125,35 +125,6 @@ export default function CategorySection({
                 {inner}
               </button>
             );
-            // <button
-            //   key={key}
-            //   type='button'
-            //   onClick={() => handleClick(key)}
-            //   aria-pressed={isActive}
-            //   className={clsx(
-            //     "h-[88px] flex flex-col items-center justify-center rounded-md border bg-white transition",
-            //     selectable ? "hover:border-gray-400" : "border-gray-200",
-            //     isActive
-            //       ? "border-gray-900 ring-2 ring-gray-900/10"
-            //       : "border-gray-200"
-            //   )}
-            // >
-            //   <Icon
-            //     size={24}
-            //     className={clsx(
-            //       "mb-1",
-            //       isActive ? "text-gray-900" : "text-gray-700"
-            //     )}
-            //   />
-            //   <span
-            //     className={clsx(
-            //       "text-xs font-medium",
-            //       isActive ? "text-gray-900" : "text-gray-800"
-            //     )}
-            //   >
-            //     {t(key)}
-            //   </span>
-            // </button>
           })}
         </div>
       </Container>
