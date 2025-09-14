@@ -1,3 +1,5 @@
+import { resolveBaseUrl } from "@/utils/baseUrl";
+
 export interface NearbyOptions {
   lang?: string;
   mapX: number;
@@ -9,14 +11,7 @@ export interface NearbyOptions {
 }
 
 export default async function fetchWellnessNearby(opts: NearbyOptions) {
-  const base =
-    process.env.NEXT_PUBLIC_BASE_URL &&
-    process.env.NEXT_PUBLIC_BASE_URL.length > 0
-      ? process.env.NEXT_PUBLIC_BASE_URL
-      : process.env.NODE_ENV !== "production"
-      ? "http://localhost:3000"
-      : "";
-  if (!base) throw new Error("NEXT_PUBLIC_BASE_URL 미설정");
+  const base = resolveBaseUrl();
 
   const {
     lang = "ko",

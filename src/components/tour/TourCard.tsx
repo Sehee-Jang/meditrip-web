@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import type { WellnessListItem } from "@/types/kto-wellness";
 import TourCardExtra from "./TourCardExtra";
 import { Globe } from "lucide-react";
+import { resolveBaseUrl } from "@/utils/baseUrl";
 
 type Props = {
   lang: "ko" | "ja";
@@ -114,12 +115,7 @@ export default function TourCard({ lang, item }: Props) {
     let cancelled = false;
     const run = async () => {
       try {
-        const base =
-          process.env.NEXT_PUBLIC_BASE_URL &&
-          process.env.NEXT_PUBLIC_BASE_URL.length > 0
-            ? process.env.NEXT_PUBLIC_BASE_URL
-            : window.location.origin;
-
+        const base = resolveBaseUrl();
         const url = `${base}/api/kto/wellness/${encodeURIComponent(
           item.id
         )}/detail?lang=${lang}`;

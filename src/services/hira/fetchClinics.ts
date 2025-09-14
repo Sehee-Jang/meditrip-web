@@ -1,5 +1,7 @@
 // src/services/hira/fetchClinics.ts
 
+import { resolveBaseUrl } from "@/utils/baseUrl";
+
 type Coord = { lat: number; lng: number } | null;
 
 export type ClinicItem = {
@@ -27,16 +29,7 @@ export interface FetchOrientalClinicsOptions {
 export default async function fetchOrientalClinics(
   opts: FetchOrientalClinicsOptions = {}
 ): Promise<ClinicListResponse> {
-  const base =
-    process.env.NEXT_PUBLIC_BASE_URL &&
-    process.env.NEXT_PUBLIC_BASE_URL.length > 0
-      ? process.env.NEXT_PUBLIC_BASE_URL
-      : process.env.NODE_ENV !== "production"
-      ? "http://localhost:3000"
-      : "";
-
-  if (!base) throw new Error("환경변수 NEXT_PUBLIC_BASE_URL 미설정");
-
+  const base = resolveBaseUrl();
   const url = new URL("/api/hira/clinics", base);
   const { numOfRows = 50, sidoCd, sgguCd, emdongNm, yadmNm } = opts;
 

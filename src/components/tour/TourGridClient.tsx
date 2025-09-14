@@ -1,12 +1,15 @@
 "use client";
 
 import * as React from "react";
-import type { WellnessListItem } from "@/types/kto-wellness";
+import type {
+  WellnessListItem,
+  Mode,
+  WellnessListApiResponse,
+} from "@/types/kto-wellness";
 import TourCard from "@/components/tour/TourCard";
 import { useState, useEffect } from "react";
 import { Button } from "../ui/button";
 import { useTranslations } from "next-intl";
-type Mode = "area" | "search" | "location";
 
 type Filters = {
   mode: Mode;
@@ -17,14 +20,6 @@ type Filters = {
   mapX?: number | undefined;
   mapY?: number | undefined;
   radius?: number | undefined;
-};
-
-type ApiListResponse = {
-  mode: Mode;
-  pageNo: number;
-  numOfRows: number;
-  totalCount: number;
-  items: WellnessListItem[];
 };
 
 type Props = {
@@ -52,7 +47,8 @@ function buildApiUrl({
   p.set("mode", filters.mode);
   p.set("pageNo", String(pageNo));
   p.set("numOfRows", String(numOfRows));
-  p.set("arrange", "C"); // 최신/이름순 등 필요시 변경
+  // ✅ location 모드면 거리순(E), 그 외 C
+  p.set("arrange", filters.mode === "location" ? "E" : "C");
   p.set("withDetail", "1");
 
   if (filters.lDongRegnCd) p.set("lDongRegnCd", filters.lDongRegnCd);
@@ -103,7 +99,7 @@ export default function TourGridClient({
         { cache: "no-store" }
       );
       if (!res.ok) throw new Error(String(res.status));
-      const data = (await res.json()) as ApiListResponse;
+      const data = (await res.json()) as WellnessListApiResponse;
 
       // id 기준 중복 제거 병합
       setItems((prev) => {
@@ -138,8 +134,6 @@ export default function TourGridClient({
             onClick={loadMore}
             disabled={loading}
             className='disabled:opacity-60 rounded-lg'
-            // className='rounded-lg border px-4 py-2 text-sm hover:bg-accent disabled:opacity-60'
-            // className='inline-flex items-center gap-1 bg-white text-black border text-sm font-medium px-4 py-2 rounded-md hover:bg-gray-100 hover:border-gray-300 transition'
           >
             {loading ? t("loading") : t("seeMore")}
           </Button>

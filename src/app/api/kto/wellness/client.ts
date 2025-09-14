@@ -17,21 +17,23 @@ export const revalidate = 0;
 const BASE = "https://apis.data.go.kr/B551011/WellnessTursmService";
 
 // --- 환경변수 ---
-const RAW_KEY =
-  process.env.KTO_SERVICE_KEY ??
-  process.env.TOURAPI_SERVICE_KEY ??
-  process.env.NEXT_PUBLIC_KTO_SERVICE_KEY ??
-  "";
-
+const RAW_KEY = (process.env.KTO_SERVICE_KEY ?? "").trim();
 if (!RAW_KEY) {
-  console.warn("[KTO] KTO_SERVICE_KEY 미설정 — 개발 테스트만 가능할 수 있음");
+  throw new Error("[KTO] KTO_SERVICE_KEY 미설정");
 }
 
-const SERVICE_KEY = RAW_KEY.includes("%")
+// env에 인코딩된 키(%)가 들어왔다면 원복 → URLSearchParams가 최종 인코딩
+const SERVICE_KEY = /%[0-9A-Fa-f]{2}/.test(RAW_KEY)
   ? decodeURIComponent(RAW_KEY)
   : RAW_KEY;
 
-const APP_NAME = process.env.KTO_APP_NAME ?? "ONYU";
+const APP_NAME = (process.env.KTO_APP_NAME ?? "ONYU").trim();
+
+// 공통 헤더 (HTML 인증 페이지 회피용)
+const KTO_COMMON_HEADERS: Record<string, string> = {
+  Accept: "application/json, text/plain, */*",
+  "User-Agent": "Meditrip/1.0 (+vercel)",
+};
 
 // --- 언어/타입 ---
 export function langFromLocale(loc?: string): string {
@@ -52,11 +54,11 @@ export function contentTypeFor(langDivCd: string): string {
   return langDivCd.toUpperCase() === "KOR" ? "12" : "76";
 }
 
-// --- 공통 쿼리: 항상 JSON---
+// --- 공통 쿼리: 항상 JSON ---
 function qsCommon(lang: string): URLSearchParams {
   const qs = new URLSearchParams();
-  qs.set("serviceKey", SERVICE_KEY);
-  qs.set("MobileOS", "WIN");
+  qs.set("serviceKey", SERVICE_KEY); // 디코딩 키 넣기(최종 인코딩은 toString에서)
+  qs.set("MobileOS", "ETC"); // ← WIN → ETC 권장
   qs.set("MobileApp", APP_NAME);
   qs.set("langDivCd", lang.toUpperCase());
   qs.set("_type", "json");
@@ -135,6 +137,53 @@ function parseXml<T>(xml: string): T {
   return response as T;
 }
 
+// --- JSON/XML 자동 판별 + 헤더/타임아웃/HTML 가드 ---
+async function getJSONorXML<T>(url: string): Promise<T> {
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 12_000);
+
+  try {
+    const res = await fetch(url, {
+      cache: "no-store",
+      signal: ctrl.signal,
+      headers: KTO_COMMON_HEADERS, // ⬅️ 헤더 추가
+    });
+
+    const ct = (res.headers.get("content-type") ?? "").toLowerCase();
+    const text = await res.text();
+
+    if (!res.ok) {
+      throw new Error(
+        `[KTO] 요청 실패 ${res.status} @ ${maskServiceKey(url)} :: ${text.slice(
+          0,
+          200
+        )}`
+      );
+    }
+
+    if (ct.includes("json") || /^[\s\r\n]*[{[]/.test(text)) {
+      try {
+        return JSON.parse(text) as T;
+      } catch {}
+    }
+    if (/^[\s\r\n]*</.test(text)) {
+      return parseXml<T>(text);
+    }
+    try {
+      return JSON.parse(text) as T;
+    } catch {
+      throw new Error(
+        `[KTO] 알 수 없는 응답 @ ${maskServiceKey(url)} :: ${text.slice(
+          0,
+          200
+        )}`
+      );
+    }
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 // ===================== 법정동 코드 API =====================
 
 /**
@@ -163,32 +212,6 @@ export async function getLdongCode(params: {
   // _type=json, serviceKey 등은 qsCommon에 이미 포함
   const url = `${BASE}/ldongCode?${qs.toString()}`;
   return await getJSONorXML<KtoLdongCodeItemResponse<KtoLdongCodeItem>>(url);
-}
-
-// --- JSON/XML 자동 판별 ---
-async function getJSONorXML<T>(url: string): Promise<T> {
-  const res = await fetch(url, { cache: "no-store" });
-  if (!res.ok) {
-    throw new Error(`[KTO] 요청 실패 ${res.status} @ ${maskServiceKey(url)}`);
-  }
-  const ct = (res.headers.get("content-type") ?? "").toLowerCase();
-  const text = await res.text();
-
-  if (ct.includes("json") || /^[\s\r\n]*[{[]/.test(text)) {
-    try {
-      return JSON.parse(text) as T;
-    } catch {}
-  }
-  if (/^[\s\r\n]*</.test(text)) {
-    return parseXml<T>(text);
-  }
-  try {
-    return JSON.parse(text) as T;
-  } catch {
-    throw new Error(
-      `[KTO] 알 수 없는 응답 @ ${maskServiceKey(url)} :: ${text.slice(0, 200)}`
-    );
-  }
 }
 
 // --- 느슨한 items 추출 ---

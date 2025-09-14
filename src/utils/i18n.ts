@@ -1,4 +1,3 @@
-// src/utils/i18n.ts
 import { defaultLocale, contentLocales, type Locale } from "@/i18n/routing";
 
 export function isLocale(v: string): v is Locale {

@@ -36,28 +36,40 @@ export default async function TourPage({
   const lDongRegnCd = sp.sido;
   const lDongSignguCd = sp.sigungu;
   const wellnessThemaCd = sp.theme;
-  const mode = sp.mode ?? (sp.q ? "search" : "area");
+  const mode: "area" | "search" | "location" =
+    sp.mode ?? (sp.q ? "search" : "area");
 
   const keyword = sp.q?.trim();
   const mapX = sp.mapX ? Number(sp.mapX) : undefined;
   const mapY = sp.mapY ? Number(sp.mapY) : undefined;
   const radius = sp.radius ? Number(sp.radius) : undefined;
 
-  const { items, totalCount } = await fetchWellness({
-    lang,
-    pageNo,
-    numOfRows,
-    lDongRegnCd,
-    lDongSignguCd,
-    wellnessThemaCd,
-    arrange: mode === "location" ? "C" : "C",
-    mode,
-    keyword,
-    withDetail: true,
-    mapX,
-    mapY,
-    radius,
-  });
+  const arrange = mode === "location" ? "E" : "C";
+  let items: Awaited<ReturnType<typeof fetchWellness>>["items"] = [];
+  let totalCount = 0;
+  try { 
+     const res = await fetchWellness({
+       lang,
+       pageNo,
+       numOfRows,
+       lDongRegnCd,
+       lDongSignguCd,
+       wellnessThemaCd,
+       arrange,
+       mode,
+       keyword,
+       withDetail: false,
+       mapX,
+       mapY,
+       radius,
+     });
+        items = res.items;
+        totalCount = res.totalCount ?? res.items.length;
+  } catch (e) {
+    // 서버가 터지지 않도록 흡수 + 로깅
+    console.error("[/ko/tour] wellness fetch failed:", e);
+  }
+ 
 
   const gridKey = JSON.stringify({
     mode,
@@ -96,7 +108,9 @@ export default async function TourPage({
 
       {items.length === 0 ? (
         <div className='rounded-xl border p-6 text-center text-sm text-muted-foreground'>
-          {lang === "ko" ? "조회 결과가 없습니다." : "No results."}
+          {lang === "ko"
+            ? "현재 조건에 맞는 결과가 없거나, 데이터를 불러오지 못했습니다."
+            : "No results or failed to load data."}
         </div>
       ) : (
         <TourGridClient
