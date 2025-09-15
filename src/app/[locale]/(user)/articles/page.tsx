@@ -1,6 +1,8 @@
 import { getTranslations } from "next-intl/server";
 import { CATEGORY_KEYS, type CategoryKey } from "@/constants/categories";
 import Container from "@/components/common/Container";
+import ArticlesListClient from "@/components/articles/ArticlesListClient";
+import PageHeader from "@/components/common/PageHeader";
 
 type SearchParams = {
   categories?: string | string[];
@@ -17,10 +19,9 @@ function isCategoryKey(v: unknown): v is CategoryKey {
 export default async function ArticlesPage({
   searchParams,
 }: {
-  searchParams: Promise<SearchParams>;
+  searchParams: SearchParams;
 }) {
-  const t = await getTranslations("coming-soon");
-
+  const t = await getTranslations("article");
   const sp = await searchParams;
 
   // categories 파싱: 단일/배열/콤마 모두 허용
@@ -36,23 +37,37 @@ export default async function ArticlesPage({
     new Set(flat.filter(isCategoryKey))
   );
 
-  const initialKeyword = typeof sp?.q === "string" ? sp.q : "";
+  const initialKeyword =
+    typeof searchParams?.q === "string" ? searchParams.q : "";
 
   return (
-    <main className='mx-auto min-h-[70vh] px-4'>
-      <Container className='max-w-2xl'>
-        <section className='flex min-h-[60vh] flex-col items-center justify-center text-center'>
-          {/* 간단 배지 */}
+    <main className='md:px-4 md:py-8'>
+      <PageHeader
+        desktopTitle={t("common.title")}
+        mobileTitle={t("common.title")}
+        desc={t("common.desc")}
+        showBackIcon
+        center
+      />
+
+      <Container>
+        {/* 클라이언트: 목록/검색/필터/페이지네이션 */}
+        <ArticlesListClient
+          initialSelectedCategories={initialSelectedCategories}
+          initialKeyword={initialKeyword}
+        />
+        {/* <section className='flex min-h-[60vh] flex-col items-center justify-center text-center'>
+          
           <div className='mb-4 rounded-2xl border border-dashed p-3 text-sm text-slate-500'>
-            {t("underConstruction.badge")}
+            {c("underConstruction.badge")}
           </div>
 
           <h1 className='text-2xl font-semibold'>
-            {t("underConstruction.title")}
+            {c("underConstruction.title")}
           </h1>
-          <p className='mt-2 text-slate-600'>{t("underConstruction.desc")}</p>
+          <p className='mt-2 text-slate-600'>{c("underConstruction.desc")}</p>
 
-          {/* 선택 상태 시각 확인용 임시 표시(향후 제거 가능) */}
+       
           <div className='mt-6 text-sm text-slate-500'>
             {initialSelectedCategories.length > 0 ? (
               <p>카테고리: {initialSelectedCategories.join(", ")}</p>
@@ -61,7 +76,7 @@ export default async function ArticlesPage({
             )}
             {initialKeyword && <p>키워드: {initialKeyword}</p>}
           </div>
-        </section>
+        </section> */}
       </Container>
     </main>
   );
