@@ -1,4 +1,3 @@
-// src/components/tiptap-templates/simple/simple-editor.tsx
 "use client";
 
 import * as React from "react";
@@ -15,7 +14,7 @@ import { Typography } from "@tiptap/extension-typography";
 import { Highlight } from "@tiptap/extension-highlight";
 import { Subscript } from "@tiptap/extension-subscript";
 import { Superscript } from "@tiptap/extension-superscript";
-import Placeholder from "@tiptap/extension-placeholder"; // ✅ 추가
+import Placeholder from "@tiptap/extension-placeholder";
 
 // --- UI Primitives ---
 import { Button } from "@/components/tiptap-ui-primitive/button";
@@ -235,7 +234,7 @@ export function SimpleEditor({
       Typography,
       Superscript,
       Subscript,
-      Placeholder.configure({ placeholder }), // ✅ placeholder 적용
+      Placeholder.configure({ placeholder }),
       // 파일 업로드 노드: 외부 업로더(onUploadImage) 우선 사용
       ImageUploadNode.configure({
         accept: "image/*",
