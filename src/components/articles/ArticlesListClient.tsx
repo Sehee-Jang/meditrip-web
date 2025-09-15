@@ -4,12 +4,7 @@ import { useEffect, useMemo, useState, useDeferredValue, useId } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { listArticles } from "@/services/articles/listArticles";
 import type { Article } from "@/types/articles";
-import {
-  CATEGORIES,
-  CATEGORY_ICONS,
-  CategoryKey,
-  type Category,
-} from "@/constants/categories";
+import { CATEGORIES, CategoryKey, type Category } from "@/constants/categories";
 import { normalizeArticles } from "@/utils/articles";
 import ArticleCard from "./ArticleCard";
 
@@ -113,7 +108,7 @@ export default function ArticlesListClient({
     const span = 5;
     const half = Math.floor(span / 2);
     let start = Math.max(1, current - half);
-    let end = Math.min(pageMax, start + span - 1);
+    const end = Math.min(pageMax, start + span - 1);
     start = Math.max(1, end - span + 1);
     return Array.from({ length: end - start + 1 }, (_, i) => start + i);
   }, [current, pageMax]);
