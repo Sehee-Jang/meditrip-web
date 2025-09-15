@@ -75,6 +75,13 @@ body,
   padding: 3rem 2rem 30vh;
 }
 
+.article-content a {
+  text-decoration: underline;
+}
+.article-content a:hover {
+  opacity: 0.85;
+}
+
 @media screen and (max-width: 480px) {
   .simple-editor-content .tiptap.ProseMirror.simple-editor {
     padding: 1rem 1.5rem 30vh;

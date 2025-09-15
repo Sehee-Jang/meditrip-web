@@ -51,7 +51,7 @@ export default function ArticleDetailClient({ id }: { id: string }) {
   const body = data.body?.[locale];
 
   return (
-    <article className='prose max-w-none dark:prose-invert'>
+    <article className='article-content prose max-w-none dark:prose-invert'>
       <div className='text-center p-10'>
         <h1 className='mb-4 text-3xl font-bold'>{title}</h1>
         <h3 className=''> {excerpt}</h3>
