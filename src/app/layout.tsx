@@ -3,6 +3,7 @@ import "./globals.scss";
 import Script from "next/script";
 import GtmBridge from "@/components/system/GtmBridge";
 import { Suspense } from "react";
+import GlobalPointerGuard from "@/components/common/GlobalPointerGuard";
 
 export default function RootLayout({
   children,
@@ -55,14 +56,14 @@ export default function RootLayout({
               width='0'
               style={{ display: "none", visibility: "hidden" }}
             />
-          </noscript>
+          </noscripㅅt>
         )}
 
         {/* SPA 라우팅 시 page_view 커스텀 이벤트 푸시 */}
         <Suspense fallback={null}>
           <GtmBridge enabled={Boolean(gtmId)} />
         </Suspense>
-
+        <GlobalPointerGuard />
         {children}
       </body>
     </html>
