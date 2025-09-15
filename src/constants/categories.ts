@@ -47,6 +47,7 @@ export const CATEGORY_ICONS: Record<CategoryKey, LucideIcon> = {
   etc: CircleEllipsis,
 };
 
+// 한국어 기본 라벨(SSR/로깅 등에서 임시로 쓸 수 있는 로컬 fallback)
 export const CATEGORY_LABELS_KO: Record<CategoryKey, string> = {
   stress: "멘탈·스트레스 관리",
   // diet: "다이어트&디톡스",
