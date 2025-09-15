@@ -20,7 +20,7 @@ export default function RichTextViewer({ doc }: { doc: JSONContent }) {
   if (!editor) return null;
 
   return (
-    <div className='rounded-md border p-3'>
+    <div className=' p-3'>
       <EditorContent editor={editor} />
     </div>
   );
