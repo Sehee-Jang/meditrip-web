@@ -1,16 +1,13 @@
 "use client";
 
 import * as React from "react";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import FormSheet from "@/components/admin/common/FormSheet";
-import SectionCard from "@/components/admin/common/SectionCard";
-import FormRow from "@/components/admin/common/FormRow";
 import ImagesUploader from "@/components/admin/common/ImagesUploader";
 import LocalizedTabsField from "@/components/admin/common/LocalizedTabsField";
 import { z } from "zod";
 import { Controller, type SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-
 import { articlesFormSchema } from "@/validations/articles";
 import type {
   CreateArticleInput,
@@ -20,7 +17,6 @@ import type {
 import { createArticle } from "@/services/articles/createArticle";
 import { updateArticle } from "@/services/articles/updateArticle";
 import { getArticleById } from "@/services/articles/getArticleById";
-
 import {
   CATEGORY_LABELS_KO,
   type CategoryKey,
@@ -28,7 +24,6 @@ import {
   CATEGORIES,
 } from "@/constants/categories";
 import { LOCALES_TUPLE, type LocaleKey } from "@/constants/locales";
-
 import {
   Select,
   SelectContent,
@@ -36,10 +31,37 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
-import EditorClient from "@/components/editor/EditorClient";
 import type { JSONContent } from "@tiptap/core";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import { storage } from "@/lib/firebase";
+import { SimpleEditor } from "@/components/tiptap-templates/simple/simple-editor";
+
+/* -------------------------------------------------------------------------- */
+/* 유틸                                                                        */
+/* -------------------------------------------------------------------------- */
+
+const EMPTY_DOC: JSONContent = {
+  type: "doc",
+  content: [{ type: "paragraph" }],
+};
+
+function isJSONContent(v: unknown): v is JSONContent {
+  return (
+    !!v && typeof v === "object" && (v as { type?: unknown }).type === "doc"
+  );
+}
+
+async function uploadArticleImage(file: File): Promise<string> {
+  const key = `articles/body/${Date.now()}_${encodeURIComponent(file.name)}`;
+  const storageRef = ref(storage, key);
+  await uploadBytes(storageRef, file, { contentType: file.type });
+  return await getDownloadURL(storageRef);
+}
+
+/* -------------------------------------------------------------------------- */
+/* 메인 다이얼로그                                                             */
+/* -------------------------------------------------------------------------- */
 
 interface ArticlesFormDialogProps {
   id: string; // 빈 문자열이면 create
@@ -47,19 +69,6 @@ interface ArticlesFormDialogProps {
   onOpenChange: (open: boolean) => void;
   onCreated?: () => void;
   onUpdated?: () => void;
-}
-
-// 빈 문서(Tiptap JSON)
-const EMPTY_DOC: JSONContent = {
-  type: "doc",
-  content: [{ type: "paragraph" }],
-};
-
-// JSONContent 형태 체크
-function isJSONContent(v: unknown): v is JSONContent {
-  return (
-    !!v && typeof v === "object" && (v as { type?: unknown }).type === "doc"
-  );
 }
 
 export default function ArticlesFormDialog({
@@ -77,13 +86,13 @@ export default function ArticlesFormDialog({
   type FormIn = z.input<typeof articlesFormSchema>;
   type FormOut = z.output<typeof articlesFormSchema>;
 
-  // RHF 초기화
   const form = useForm<FormIn, unknown, FormOut>({
     resolver: zodResolver<FormIn, unknown, FormOut>(articlesFormSchema),
     defaultValues: {
       title: { ko: "", ja: "", zh: "", en: "" },
       excerpt: { ko: "", ja: "", zh: "", en: "" },
-      body: { ko: EMPTY_DOC, ja: EMPTY_DOC, zh: EMPTY_DOC, en: EMPTY_DOC }, // FormIn: JSONContent | undefined OK
+      body: { ko: EMPTY_DOC, ja: EMPTY_DOC, zh: EMPTY_DOC, en: EMPTY_DOC },
+      category: undefined,
       tags: [],
       images: [],
       isHidden: false,
@@ -95,15 +104,13 @@ export default function ArticlesFormDialog({
   const { register, setValue, handleSubmit, formState, control, reset, watch } =
     form;
 
-  // 편집 모드일 때 기존 데이터 로드
+  // 편집 모드 데이터 로드
   useEffect(() => {
     if (!open || mode !== "edit" || !id) return;
-
     (async () => {
       const data: Article | null = await getArticleById(id);
       if (!data) return;
 
-      // 안전하게 각 로케일별 본문 보정
       const bodyByLocale: Record<LocaleKey, JSONContent> = LOCALES_TUPLE.reduce(
         (acc, loc) => {
           const v = data.body?.[loc];
@@ -119,9 +126,9 @@ export default function ArticlesFormDialog({
       );
 
       reset({
-        title: data.title, // Record<LocaleKey, string>
-        excerpt: data.excerpt, // Record<LocaleKey, string>
-        body: bodyByLocale, // Record<LocaleKey, JSONContent>
+        title: data.title,
+        excerpt: data.excerpt,
+        body: bodyByLocale,
         category: data.category,
         tags: data.tags ?? [],
         images: data.images ?? [],
@@ -156,16 +163,13 @@ export default function ArticlesFormDialog({
       };
 
       if (mode === "create") {
-        const input: CreateArticleInput = base;
-        await createArticle(input);
+        await createArticle(base as CreateArticleInput);
         onCreated?.();
         reset();
       } else {
-        const patch: UpdateArticleInput = base;
-        await updateArticle(id, patch);
+        await updateArticle(id, base as UpdateArticleInput);
         onUpdated?.();
       }
-
       onOpenChange(false);
     } finally {
       submittingRef.current = false;
@@ -173,7 +177,9 @@ export default function ArticlesFormDialog({
   };
 
   const onInvalid = (): void => {
-    requestAnimationFrame(focusFirstInvalid);
+    requestAnimationFrame(() => {
+      focusFirstInvalid();
+    });
   };
 
   const images = watch("images") ?? [];
@@ -185,90 +191,67 @@ export default function ArticlesFormDialog({
       title={mode === "create" ? "아티클 등록" : "아티클 수정"}
       description='필수 정보를 입력하세요.'
       formId={formId}
-      submitLabel={mode === "create" ? "등록" : "수정"}
-      widthClassName='sm:max-w-[880px]'
+      submitLabel='저장'
+      widthClassName='sm:max-w-[960px]'
+      submitDisabled={formState.isSubmitting}
     >
+      {/* 작성 레이아웃 */}
       <form
         id={formId}
         ref={formElRef}
         className='space-y-6'
         onSubmit={handleSubmit(onSubmit, onInvalid)}
       >
-        {/* 기본 정보 */}
-        <SectionCard title='기본 정보'>
-          <FormRow
-            label='제목'
-            control={
-              <LocalizedTabsField
-                register={register}
-                basePath='title'
-                locales={LOCALES_TUPLE}
-                placeholder='제목을 입력하세요'
-                mode='input'
-                errors={formState.errors}
-              />
-            }
-          />
-
-          <FormRow
-            label='요약'
-            control={
-              <LocalizedTabsField
-                register={register}
-                basePath='excerpt'
-                locales={LOCALES_TUPLE}
-                placeholder='목록에 표시될 설명문'
-                mode='input'
-                errors={formState.errors}
-              />
-            }
-          />
-
-          <FormRow
-            label='카테고리'
-            control={
-              <Controller
-                name='category'
-                control={control}
-                render={({ field, fieldState }) => (
-                  <div>
-                    <Select
-                      value={(field.value as string | undefined) ?? undefined}
-                      onValueChange={(v) => field.onChange(v as Category)}
+        {/* 상단 헤더: 카테고리 + 큰 제목 */}
+        <div className='flex flex-col gap-3 border-b pb-4'>
+          <div className='w-52'>
+            <Controller
+              name='category'
+              control={control}
+              render={({ field, fieldState }) => (
+                <div>
+                  <Select
+                    value={(field.value as string | undefined) ?? undefined}
+                    onValueChange={(v) => field.onChange(v as Category)}
+                  >
+                    <SelectTrigger
+                      aria-invalid={!!fieldState.error}
+                      className='h-9'
                     >
-                      <SelectTrigger
-                        aria-invalid={!!fieldState.error}
-                        aria-describedby='category-error'
-                        className='h-9'
-                      >
-                        <SelectValue placeholder='카테고리를 선택하세요' />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {Object.entries(CATEGORIES).map(([key, value]) => (
-                          <SelectItem key={value} value={value}>
-                            {CATEGORY_LABELS_KO[key as CategoryKey]}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                      <SelectValue placeholder='카테고리' />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Object.entries(CATEGORIES).map(([key, value]) => (
+                        <SelectItem key={value} value={value}>
+                          {CATEGORY_LABELS_KO[key as CategoryKey]}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {typeof fieldState.error?.message === "string" && (
+                    <p className='mt-1 text-[11px] text-red-600'>
+                      {fieldState.error.message}
+                    </p>
+                  )}
+                </div>
+              )}
+            />
+          </div>
 
-                    {typeof fieldState.error?.message === "string" && (
-                      <p
-                        id='category-error'
-                        className='mt-1 text-[11px] text-red-600'
-                      >
-                        {fieldState.error.message}
-                      </p>
-                    )}
-                  </div>
-                )}
-              />
-            }
-          />
-        </SectionCard>
+          <div>
+            <LocalizedTabsField
+              register={register}
+              basePath='title'
+              locales={LOCALES_TUPLE}
+              placeholder='제목을 입력하세요'
+              mode='input'
+              errors={formState.errors}
+            />
+          </div>
+        </div>
 
-        {/* 본문(Tiptap) */}
-        <SectionCard title='본문' description='언어별로 본문을 입력하세요.'>
+        {/* 본문 편집기(언어 탭 + Tiptap + 이미지 첨부 업로드) */}
+        <div className='space-y-3'>
           <Tabs defaultValue='ko' className='w-full'>
             <TabsList className='mb-3'>
               {LOCALES_TUPLE.map((loc) => (
@@ -279,41 +262,139 @@ export default function ArticlesFormDialog({
             </TabsList>
 
             {LOCALES_TUPLE.map((loc) => (
-              <TabsContent key={loc} value={loc} className='mt-0'>
+              <TabsContent key={loc} value={loc} className='mt-0 space-y-3'>
                 <Controller
                   name={`body.${loc}`}
                   control={control}
                   render={({ field }) => (
-                    <EditorClient
+                    <SimpleEditor
                       value={
                         isJSONContent(field.value) ? field.value : EMPTY_DOC
                       }
-                      onChange={(doc) => field.onChange(doc)} // doc: JSONContent
+                      onChange={(doc) => field.onChange(doc)}
+                      onUploadImage={uploadArticleImage}
                       placeholder={`(${loc.toUpperCase()}) 본문을 입력하세요…`}
+                      minHeight={480}
                     />
                   )}
                 />
               </TabsContent>
             ))}
           </Tabs>
-        </SectionCard>
+        </div>
 
-        {/* 이미지 */}
-        <SectionCard title='이미지' description='대표 이미지를 업로드하세요.'>
-          <FormRow
-            label='대표 이미지'
-            control={
-              <ImagesUploader
-                value={images}
-                onChange={(urls: string[]) =>
-                  setValue("images", urls, { shouldDirty: true })
-                }
-                dir='articles'
-              />
-            }
-          />
-        </SectionCard>
+        {/* 요약 + 태그 + 대표 이미지 */}
+        <div className='space-y-4'>
+          <div>
+            <LocalizedTabsField
+              register={register}
+              basePath='excerpt'
+              locales={LOCALES_TUPLE}
+              placeholder='목록에 표시될 설명문'
+              mode='input'
+              errors={formState.errors}
+            />
+          </div>
+
+          <div>
+            <label className='mb-1 block text-sm font-medium'>태그</label>
+            <Controller
+              name='tags'
+              control={control}
+              render={({ field }) => (
+                <TagsInput
+                  value={field.value ?? []}
+                  onChange={(v) => field.onChange(v)}
+                />
+              )}
+            />
+          </div>
+
+          <div>
+            <label className='mb-1 block text-sm font-medium'>
+              대표 이미지
+            </label>
+            <ImagesUploader
+              value={images}
+              onChange={(urls: string[]) =>
+                setValue("images", urls, { shouldDirty: true })
+              }
+              dir='articles'
+            />
+          </div>
+        </div>
       </form>
     </FormSheet>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/* 태그 인풋 (칩)                                                              */
+/* -------------------------------------------------------------------------- */
+function TagsInput({
+  value,
+  onChange,
+  placeholder = "#태그입력",
+  className,
+}: {
+  value: string[];
+  onChange: (next: string[]) => void;
+  placeholder?: string;
+  className?: string;
+}) {
+  const [input, setInput] = useState("");
+
+  const addTag = (raw: string) => {
+    const v = raw.trim();
+    if (!v) return;
+    if (value.includes(v)) return;
+    onChange([...value, v]);
+    setInput("");
+  };
+
+  const removeTag = (t: string) => onChange(value.filter((x) => x !== t));
+
+  const onKeyDown: React.KeyboardEventHandler<HTMLInputElement> = (e) => {
+    if (e.key === "Enter" || e.key === "," || e.key === "Tab") {
+      e.preventDefault();
+      addTag(input);
+    } else if (e.key === "Backspace" && input.length === 0 && value.length) {
+      e.preventDefault();
+      removeTag(value[value.length - 1]);
+    }
+  };
+
+  return (
+    <div
+      className={[
+        "min-h-10 w-full rounded-md border px-2 py-1.5",
+        "flex flex-wrap items-center gap-1",
+        className ?? "",
+      ].join(" ")}
+    >
+      {value.map((t) => (
+        <span
+          key={t}
+          className='inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs'
+        >
+          #{t}
+          <button
+            type='button'
+            aria-label={`${t} 태그 제거`}
+            className='text-gray-500'
+            onClick={() => removeTag(t)}
+          >
+            ×
+          </button>
+        </span>
+      ))}
+      <input
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
+        onKeyDown={onKeyDown}
+        placeholder={value.length === 0 ? placeholder : undefined}
+        className='flex-1 min-w-[120px] border-0 bg-transparent outline-none text-sm'
+      />
+    </div>
   );
 }

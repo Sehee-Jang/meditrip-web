@@ -1,16 +1,20 @@
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
-import { FilterRow, SelectFilter } from "../common/FilterControls";
-import { CATEGORY_KEYS, CATEGORY_LABELS_KO } from "@/constants/categories";
-import SearchInput from "@/components/common/SearchInput";
-import IconOnlyAddButton from "../common/IconOnlyAddButton";
-import ArticlesTable from "./ArticlesTable";
-import { Article } from "@/types/articles";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { listArticles } from "@/services/articles/listArticles";
+import { CATEGORY_KEYS, CATEGORY_LABELS_KO } from "@/constants/categories";
+import {
+  FilterRow,
+  SelectFilter,
+} from "@/components/admin/common/FilterControls";
+import SearchInput from "@/components/common/SearchInput";
+import IconOnlyAddButton from "@/components/admin/common/IconOnlyAddButton";
+import { Article } from "@/types/articles";
+import ArticlesTable from "./ArticlesTable";
 import ArticlesFormDialog from "./ArticlesFormDialog";
+
+import { listArticles } from "@/services/articles/listArticles";
 
 type CatFilter = "all" | (typeof CATEGORY_KEYS)[number];
 
