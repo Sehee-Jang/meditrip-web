@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { Button } from "@/components/ui/button";
-import { MoreHorizontal } from "lucide-react";
+import { MoreHorizontal, SquarePen, Trash2 } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -53,6 +53,7 @@ export default function ClinicRowActions({
             onEdit(); // 시트 열기
           }}
         >
+          <SquarePen className='mr-2 size-4' />
           수정
         </DropdownMenuItem>
         <DropdownMenuItem
@@ -63,6 +64,7 @@ export default function ClinicRowActions({
             onDelete();
           }}
         >
+          <Trash2 className='mr-2 size-4' />
           삭제
         </DropdownMenuItem>
       </DropdownMenuContent>

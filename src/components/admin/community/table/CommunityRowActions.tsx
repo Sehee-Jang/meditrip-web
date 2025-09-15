@@ -13,11 +13,7 @@ import {
 import { setQuestionHidden } from "@/services/community-admin/hideQuestion";
 import { deleteQuestion } from "@/services/community-admin/deleteQuestion";
 
-export default function RowActions({
-  questionId,
-}: {
-  questionId: string;
-}) {
+export default function RowActions({ questionId }: { questionId: string }) {
   const qc = useQueryClient();
   const router = useRouter();
 
@@ -30,9 +26,7 @@ export default function RowActions({
       </DropdownMenuTrigger>
       <DropdownMenuContent align='end' className='w-36'>
         <DropdownMenuItem
-          onClick={() =>
-            router.push(`/admin/community/${questionId}`)
-          }
+          onClick={() => router.push(`/admin/community/${questionId}`)}
         >
           답변 작성
         </DropdownMenuItem>

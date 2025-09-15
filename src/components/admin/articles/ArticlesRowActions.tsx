@@ -8,7 +8,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { MoreHorizontal, Trash2 } from "lucide-react";
+import { MoreHorizontal, SquarePen, Trash2 } from "lucide-react";
 import type { Article } from "@/types/articles";
 
 type Props = {
@@ -38,6 +38,7 @@ export default function ArticlesRowActions({ onEdit, onDelete }: Props) {
             onEdit();
           }}
         >
+          <SquarePen className='mr-2 size-4' />
           수정
         </DropdownMenuItem>
 

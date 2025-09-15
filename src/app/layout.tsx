@@ -56,7 +56,7 @@ export default function RootLayout({
               width='0'
               style={{ display: "none", visibility: "hidden" }}
             />
-          </noscripㅅt>
+          </noscript>
         )}
 
         {/* SPA 라우팅 시 page_view 커스텀 이벤트 푸시 */}
