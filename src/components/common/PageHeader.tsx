@@ -10,6 +10,7 @@ interface PageHeaderProps {
   showBackIcon?: boolean;
   center?: boolean;
   children?: React.ReactNode;
+  desc?: string;
 }
 
 export default function PageHeader({
@@ -18,6 +19,7 @@ export default function PageHeader({
   showBackIcon = false,
   center = false,
   children,
+  desc,
 }: PageHeaderProps) {
   const router = useRouter();
 
@@ -53,10 +55,13 @@ export default function PageHeader({
         {/* 왼쪽 공간(비움) */}
         <div className='w-6' />
 
-        {/* 가운데 병원명 */}
-        <h1 className='md:text-4xl font-bold text-center flex-1'>
-          {desktopTitle}
-        </h1>
+        <div className='text-center flex-1'>
+          {/* 가운데 병원명 */}
+          <h1 className='md:text-4xl font-bold mb-2'>{desktopTitle}</h1>
+
+          {/* 설명 */}
+          <p className='mb-6 text-sm text-muted-foreground'>{desc}</p>
+        </div>
 
         {/* 오른쪽 찜 버튼 */}
         {children && <div>{children}</div>}
