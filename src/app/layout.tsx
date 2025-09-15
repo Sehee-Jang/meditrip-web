@@ -1,4 +1,4 @@
-import "./globals.css";
+import "./globals.scss";
 import Script from "next/script";
 import GtmBridge from "@/components/system/GtmBridge";
 import { Suspense } from "react";
