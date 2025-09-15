@@ -19,7 +19,7 @@ function isCategoryKey(v: unknown): v is CategoryKey {
 export default async function ArticlesPage({
   searchParams,
 }: {
-  searchParams: SearchParams;
+  searchParams: Promise<SearchParams>;
 }) {
   const t = await getTranslations("article");
   const sp = await searchParams;
@@ -37,8 +37,7 @@ export default async function ArticlesPage({
     new Set(flat.filter(isCategoryKey))
   );
 
-  const initialKeyword =
-    typeof searchParams?.q === "string" ? searchParams.q : "";
+  const initialKeyword = typeof sp?.q === "string" ? sp.q : "";
 
   return (
     <main className='md:px-4 md:py-8'>
