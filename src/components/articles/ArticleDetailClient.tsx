@@ -47,11 +47,15 @@ export default function ArticleDetailClient({ id }: { id: string }) {
   }
 
   const title = data.title?.[locale] || data.title?.ko || "제목 없음";
+  const excerpt = data.excerpt?.[locale] || data.excerpt?.ko || "요약 없음";
   const body = data.body?.[locale];
 
   return (
     <article className='prose max-w-none dark:prose-invert'>
-      <h1 className='mb-4 text-2xl font-bold'>{title}</h1>
+      <div className='text-center p-10'>
+        <h1 className='mb-4 text-3xl font-bold'>{title}</h1>
+        <h3 className=''> {excerpt}</h3>
+      </div>
 
       {data.images?.[0] ? (
         // eslint-disable-next-line @next/next/no-img-element
