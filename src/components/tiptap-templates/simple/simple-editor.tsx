@@ -194,7 +194,6 @@ export function SimpleEditor({
   value,
   onChange,
   onUploadImage,
-  placeholder = "여기에 내용을 입력하세요…",
   minHeight = 420,
   className,
 }: SimpleEditorProps) {
