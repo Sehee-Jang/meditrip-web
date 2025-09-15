@@ -55,7 +55,15 @@ export default function Header() {
             {t("login")}
           </Link>
         )}
-        <Link href='/community'>{t("business")}</Link>
+        {/* 비지니스*/}
+        <a
+          href='https://forms.gle/6rKFuysK8qjtvoxr7'
+          target='_blank'
+          rel='noopener noreferrer'
+          className='hover:underline'
+        >
+          {t("business")}
+        </a>
         <LanguageSwitcher /> {/* 드롭다운만 표시 */}
       </nav>
 
@@ -91,9 +99,14 @@ export default function Header() {
         )}
 
         {/* 비지니스 문의 */}
-        <Link href='/community' aria-label='business'>
+        <a
+          href='https://forms.gle/6rKFuysK8qjtvoxr7'
+          target='_blank'
+          rel='noopener noreferrer'
+          aria-label='business'
+        >
           <BriefcaseBusiness size={20} />
-        </Link>
+        </a>
 
         <LanguageSwitcher mobileOnly />
       </nav>
