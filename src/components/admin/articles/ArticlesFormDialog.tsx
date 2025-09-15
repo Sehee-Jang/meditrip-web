@@ -33,8 +33,8 @@ import {
 } from "@/components/ui/select";
 import type { JSONContent } from "@tiptap/core";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
-import { storage } from "@/lib/firebase";
+import { supabase } from "@/lib/supabase";
+import { resolveStorage } from "@/constants/storage";
 import { SimpleEditor } from "@/components/tiptap-templates/simple/simple-editor";
 
 /* -------------------------------------------------------------------------- */
@@ -52,13 +52,40 @@ function isJSONContent(v: unknown): v is JSONContent {
   );
 }
 
-async function uploadArticleImage(file: File): Promise<string> {
-  const key = `articles/body/${Date.now()}_${encodeURIComponent(file.name)}`;
-  const storageRef = ref(storage, key);
-  await uploadBytes(storageRef, file, { contentType: file.type });
-  return await getDownloadURL(storageRef);
+// 파일명 안전화(ImagesUploader와 동일 규칙 유지)
+function toSafeFileName(name: string): string {
+  return name
+    .normalize("NFKD")
+    .replace(/\s+/g, "-")
+    .replace(/[^a-zA-Z0-9._-]/g, "")
+    .toLowerCase();
 }
 
+/** 본문 이미지 업로드(Supabase) → public URL 반환 */
+async function uploadArticleImage(file: File): Promise<string> {
+  // articles/body 폴더로 저장 (버킷/경로 계산은 공통 헬퍼 사용)
+  const { bucket: finalBucket, dir: baseDir } = resolveStorage(
+    undefined,
+    undefined,
+    "articles/body"
+  );
+  const safe = toSafeFileName(file.name);
+  const path = `${baseDir}/${crypto.randomUUID()}-${safe}`;
+
+  const { error } = await supabase.storage
+    .from(finalBucket)
+    .upload(path, file, {
+      upsert: false,
+      contentType: file.type || "application/octet-stream",
+    });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  const { data } = supabase.storage.from(finalBucket).getPublicUrl(path);
+  return data.publicUrl; // ← Tiptap가 이 URL로 이미지 노드 삽입
+}
 /* -------------------------------------------------------------------------- */
 /* 메인 다이얼로그                                                             */
 /* -------------------------------------------------------------------------- */

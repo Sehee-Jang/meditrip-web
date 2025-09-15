@@ -1,3 +1,4 @@
+// src/components/tiptap-templates/simple/simple-editor.tsx
 "use client";
 
 import * as React from "react";
@@ -14,6 +15,7 @@ import { Typography } from "@tiptap/extension-typography";
 import { Highlight } from "@tiptap/extension-highlight";
 import { Subscript } from "@tiptap/extension-subscript";
 import { Superscript } from "@tiptap/extension-superscript";
+import Placeholder from "@tiptap/extension-placeholder"; // ✅ 추가
 
 // --- UI Primitives ---
 import { Button } from "@/components/tiptap-ui-primitive/button";
@@ -74,7 +76,7 @@ import { handleImageUpload, MAX_FILE_SIZE } from "@/lib/tiptap-utils";
 // --- Styles ---
 import "@/components/tiptap-templates/simple/simple-editor.scss";
 
-type SimpleEditorProps = {
+export type SimpleEditorProps = {
   value: JSONContent;
   onChange: (doc: JSONContent, plainText: string) => void;
   onUploadImage?: (file: File) => Promise<string>;
@@ -95,7 +97,6 @@ const MainToolbarContent = ({
   return (
     <>
       <Spacer />
-
       <ToolbarGroup>
         <UndoRedoButton action='undo' />
         <UndoRedoButton action='redo' />
@@ -194,6 +195,7 @@ export function SimpleEditor({
   value,
   onChange,
   onUploadImage,
+  placeholder = "여기에 내용을 입력하세요…", // ✅ 기본값
   minHeight = 420,
   className,
 }: SimpleEditorProps) {
@@ -233,7 +235,8 @@ export function SimpleEditor({
       Typography,
       Superscript,
       Subscript,
-      // 파일 업로드 노드: onUploadImage가 있으면 그걸 우선 사용
+      Placeholder.configure({ placeholder }), // ✅ placeholder 적용
+      // 파일 업로드 노드: 외부 업로더(onUploadImage) 우선 사용
       ImageUploadNode.configure({
         accept: "image/*",
         maxSize: MAX_FILE_SIZE,
@@ -251,7 +254,7 @@ export function SimpleEditor({
     },
   });
 
-  // 외부 value 변경 시 동기화
+  // 외부 value 변경 시 동기화(불필요 업데이트 방지)
   React.useEffect(() => {
     if (!editor) return;
     const prev = JSON.stringify(editor.getJSON());
@@ -305,6 +308,4 @@ export function SimpleEditor({
   );
 }
 
-// 두 가지 방식 모두 허용(실수 방지용)
 export default SimpleEditor;
-export type { SimpleEditorProps };
