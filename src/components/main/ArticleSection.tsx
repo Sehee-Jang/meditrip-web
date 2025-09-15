@@ -1,13 +1,39 @@
 "use client";
 
-import { useTranslations } from "next-intl";
+import { useEffect, useState } from "react";
+import { useTranslations, useLocale } from "next-intl";
 import { ChevronRight } from "lucide-react";
 import Container from "../common/Container";
 import { Link } from "@/i18n/navigation";
-import CommunityList from "./CommunityList";
+import { listArticles } from "@/services/articles/listArticles";
+import type { Article } from "@/types/articles";
+import { normalizeArticles } from "@/utils/articles";
+import ArticleCard from "../articles/ArticleCard";
 
 export default function ArticleSection() {
   const t = useTranslations("article");
+
+  const locale = useLocale() as keyof Article["title"];
+  const [rows, setRows] = useState<Article[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      try {
+        setLoading(true);
+        const res = await listArticles();
+        const all = normalizeArticles(res);
+        if (!alive) return;
+        setRows(all.filter((a) => !a.isHidden).slice(0, 3));
+      } finally {
+        if (alive) setLoading(false);
+      }
+    })();
+    return () => {
+      alive = false;
+    };
+  }, []);
 
   return (
     <section className='bg-white py-10'>
@@ -30,9 +56,28 @@ export default function ArticleSection() {
           </Link>
         </div>
 
-        {/* 커뮤니티 리스트 */}
-        <CommunityList />
-
+        {/* 아티클 리스트 */}
+        {/* 리스트 */}
+        {loading ? (
+          <div className='grid grid-cols-1 gap-4 sm:grid-cols-3'>
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div
+                key={i}
+                className='h-40 animate-pulse rounded-md border bg-gray-50'
+              />
+            ))}
+          </div>
+        ) : rows.length === 0 ? (
+          <div className='rounded-md border p-6 text-center text-sm text-muted-foreground'>
+            아티클이 없습니다.
+          </div>
+        ) : (
+          <div className='grid grid-cols-1 gap-4 sm:grid-cols-3'>
+            {rows.map((a) => (
+              <ArticleCard key={a.id} article={a} locale={locale} />
+            ))}
+          </div>
+        )}
         {/* 모바일: 질문올리기 버튼 */}
         <div className='md:hidden mt-6 flex justify-center'>
           <Link
