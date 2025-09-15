@@ -105,12 +105,12 @@ export default function ArticlesListClient({
   const current = Math.min(page, pageMax);
   const items = filtered.slice((current - 1) * PAGE_SIZE, current * PAGE_SIZE);
 
-  // 페이지 번호(토스식 깔끔한 5창 윈도우)
+  // 페이지 번호
   const pages = useMemo(() => {
     const span = 5;
     const half = Math.floor(span / 2);
     let start = Math.max(1, current - half);
-    let end = Math.min(pageMax, start + span - 1);
+    const end = Math.min(pageMax, start + span - 1);
     start = Math.max(1, end - span + 1);
     return Array.from({ length: end - start + 1 }, (_, i) => start + i);
   }, [current, pageMax]);
