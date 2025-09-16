@@ -7,15 +7,16 @@ import type { Article } from "@/types/articles";
 import { CATEGORIES, CategoryKey, type Category } from "@/constants/categories";
 import { normalizeArticles } from "@/utils/articles";
 import ArticleCard from "./ArticleCard";
+import { Link } from "@/i18n/navigation";
 
 type Props = {
   initialSelectedCategories: CategoryKey[];
   initialKeyword: string;
+  view?: "grid" | "list"; // ⬅️ 추가
 };
 
 const PAGE_SIZE = 12;
 
-// 칩 버튼 하나를 깔끔하게 렌더링
 function FilterChip({
   label,
   active,
@@ -51,6 +52,7 @@ function FilterChip({
 export default function ArticlesListClient({
   initialSelectedCategories,
   initialKeyword,
+  view = "grid",
 }: Props) {
   const tCat = useTranslations("categories");
   const locale = useLocale() as keyof Article["title"]; // ko|ja|zh|en
@@ -60,7 +62,7 @@ export default function ArticlesListClient({
     new Set(initialSelectedCategories)
   );
   const [keyword, setKeyword] = useState<string>(initialKeyword);
-  const deferredKeyword = useDeferredValue(keyword); // 입력 지연으로 검색 과민 반응 방지
+  const deferredKeyword = useDeferredValue(keyword);
   const [page, setPage] = useState<number>(1);
   const searchId = useId();
 
@@ -82,7 +84,6 @@ export default function ArticlesListClient({
     };
   }, []);
 
-  // 카테고리/검색어 필터링
   const filtered = useMemo(() => {
     const cats: Category[] =
       selected.size > 0 ? Array.from(selected).map((k) => CATEGORIES[k]) : [];
@@ -103,7 +104,6 @@ export default function ArticlesListClient({
   const current = Math.min(page, pageMax);
   const items = filtered.slice((current - 1) * PAGE_SIZE, current * PAGE_SIZE);
 
-  // 페이지 번호
   const pages = useMemo(() => {
     const span = 5;
     const half = Math.floor(span / 2);
@@ -113,7 +113,6 @@ export default function ArticlesListClient({
     return Array.from({ length: end - start + 1 }, (_, i) => start + i);
   }, [current, pageMax]);
 
-  // 카테고리 레이블은 key를 크게 표기하기보다 소문자·가독형으로
   const categoryKeys = Object.keys(CATEGORIES) as CategoryKey[];
 
   return (
@@ -145,8 +144,7 @@ export default function ArticlesListClient({
               />
             );
           })}
-          {/* 초기화 */}
-          {selected.size > 0 || keyword ? (
+          {(selected.size > 0 || keyword) && (
             <button
               type='button'
               onClick={() => {
@@ -158,7 +156,7 @@ export default function ArticlesListClient({
             >
               초기화
             </button>
-          ) : null}
+          )}
         </div>
 
         {/* 검색 입력 */}
@@ -183,27 +181,78 @@ export default function ArticlesListClient({
         </div>
       </div>
 
-      {/* 리스트 */}
+      {/* 리스트 영역 */}
       {loading ? (
-        <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3'>
-          {Array.from({ length: 6 }).map((_, i) => (
-            <div
-              key={i}
-              className='overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm'
-            >
-              <div className='aspect-[16/9] w-full bg-gray-100 animate-pulse' />
-              <div className='p-3 space-y-2'>
-                <div className='h-4 w-3/4 bg-gray-100 animate-pulse rounded' />
-                <div className='h-3 w-5/6 bg-gray-100 animate-pulse rounded' />
+        <div
+          className={
+            view === "list"
+              ? "space-y-2"
+              : "grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
+          }
+        >
+          {Array.from({ length: 6 }).map((_, i) =>
+            view === "list" ? (
+              <div
+                key={i}
+                className='h-12 animate-pulse rounded-lg border bg-gray-50'
+              />
+            ) : (
+              <div
+                key={i}
+                className='overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm'
+              >
+                <div className='aspect-[16/9] w-full bg-gray-100 animate-pulse' />
+                <div className='p-3 space-y-2'>
+                  <div className='h-4 w-3/4 bg-gray-100 animate-pulse rounded' />
+                  <div className='h-3 w-5/6 bg-gray-100 animate-pulse rounded' />
+                </div>
               </div>
-            </div>
-          ))}
+            )
+          )}
         </div>
       ) : items.length === 0 ? (
         <div className='rounded-2xl border border-gray-200 bg-white p-10 text-center text-sm text-gray-500 shadow-sm'>
           조건에 맞는 아티클이 없습니다.
         </div>
+      ) : view === "list" ? (
+        // ⬅️ 행 리스트 모드
+        <div className='rounded-2xl border border-gray-200 bg-white'>
+          <ul className='divide-y'>
+            {items.map((a) => {
+              const title = a.title?.[locale] || a.title?.ko || "제목 없음";
+              const createdAtRaw = (a as { createdAt?: string | number | Date })
+                ?.createdAt;
+              const createdAt = createdAtRaw ? new Date(createdAtRaw) : null;
+              const views = (a as { views?: number })?.views;
+
+              return (
+                <li
+                  key={a.id}
+                  className='flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition'
+                >
+                  <div className='flex-1 min-w-0'>
+                    <Link
+                      href={`/articles/${a.id}`}
+                      className='block truncate text-sm md:text-base font-medium text-gray-900 hover:underline'
+                    >
+                      {title}
+                    </Link>
+                  </div>
+                  <div className='shrink-0 hidden sm:flex items-center gap-6 text-xs text-gray-500'>
+                    <span className='whitespace-nowrap'>
+                      {typeof views === "number" ? `조회수 ${views}` : ""}
+                    </span>
+                    <span className='whitespace-nowrap'>
+                      {createdAt ? createdAt.toLocaleDateString() : ""}
+                    </span>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
       ) : (
+        // 기존 카드 그리드
         <div className='grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3'>
           {items.map((a) => (
             <ArticleCard
@@ -233,7 +282,7 @@ export default function ArticlesListClient({
             이전
           </button>
 
-          {pages[0] > 1 ? (
+          {pages[0] > 1 && (
             <>
               <button
                 type='button'
@@ -244,7 +293,7 @@ export default function ArticlesListClient({
               </button>
               <span className='px-1 text-gray-400'>…</span>
             </>
-          ) : null}
+          )}
 
           {pages.map((p) => {
             const isCurrent = p === current;
@@ -266,7 +315,7 @@ export default function ArticlesListClient({
             );
           })}
 
-          {pages[pages.length - 1] < pageMax ? (
+          {pages[pages.length - 1] < pageMax && (
             <>
               <span className='px-1 text-gray-400'>…</span>
               <button
@@ -277,7 +326,7 @@ export default function ArticlesListClient({
                 {pageMax}
               </button>
             </>
-          ) : null}
+          )}
 
           <button
             type='button'
