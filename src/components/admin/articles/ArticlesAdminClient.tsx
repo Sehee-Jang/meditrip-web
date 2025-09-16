@@ -36,7 +36,7 @@ export default function ArticlesAdminClient() {
     const hasKw = kw.length > 0;
 
     return items.filter((w) => {
-      // 카테고리ㅍ 필터(단일)
+      // 카테고리 필터(단일)
       const hitCat = cat === "all" ? true : w.category === cat;
       if (!hitCat) return false;
 
