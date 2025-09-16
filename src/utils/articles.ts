@@ -21,3 +21,27 @@ export function normalizeArticles(input: unknown): Article[] {
 
   return [];
 }
+
+export function titleFor(a: Article, locale: keyof Article["title"]): string {
+  return a.title?.[locale] || a.title?.ko || "제목 없음";
+}
+export function excerptFor(
+  a: Article,
+  locale: keyof Article["excerpt"]
+): string {
+  return a.excerpt?.[locale] || a.excerpt?.ko || "";
+}
+export function viewsOf(a: Article): number {
+  return (a as { views?: number }).views ?? 0;
+}
+export function createdAtOf(a: Article): Date | null {
+  const raw = (a as { createdAt?: string | number | Date })?.createdAt;
+  return raw ? new Date(raw) : null;
+}
+export function sortByCreatedAtDesc<T extends Article>(arr: T[]): T[] {
+  return [...arr].sort((a, b) => {
+    const an = createdAtOf(a)?.getTime() ?? 0;
+    const bn = createdAtOf(b)?.getTime() ?? 0;
+    return bn - an;
+  });
+}
