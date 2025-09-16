@@ -20,39 +20,8 @@ type Props = {
   initialKeyword: string;
 };
 
-const PAGE_SIZE = 5;
-
-function FilterChip({
-  label,
-  active,
-  onClick,
-}: {
-  label: string;
-  active: boolean;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type='button'
-      onClick={onClick}
-      aria-pressed={active}
-      className={[
-        "inline-flex items-center gap-1 rounded-full border px-3 py-1 text-xs md:text-sm",
-        "transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-black/10",
-        active
-          ? "bg-black text-white border-black"
-          : "bg-white text-gray-900 hover:bg-gray-50",
-      ].join(" ")}
-    >
-      {label}
-      {active ? (
-        <span className='ml-0.5 text-[10px] opacity-80' aria-hidden>
-          ●
-        </span>
-      ) : null}
-    </button>
-  );
-}
+const DESKTOP_PAGE_SIZE = 5;
+const MOBILE_PAGE_SIZE = 3;
 
 export default function ArticlesListClient({
   initialSelectedCategories,
@@ -69,6 +38,8 @@ export default function ArticlesListClient({
   const deferredKeyword = useDeferredValue(keyword);
   const [page, setPage] = useState<number>(1);
   const [selectedId, setSelectedId] = useState<string | null>(null); // 하단 인라인 상세용
+  const [pageSize, setPageSize] = useState<number>(DESKTOP_PAGE_SIZE);
+
   const searchId = useId();
 
   // 하단 상세 위치로 스크롤하기 위한 ref
@@ -92,6 +63,16 @@ export default function ArticlesListClient({
     };
   }, []);
 
+  useEffect(() => {
+    // Tailwind sm 기준(640px)과 동일한 미디어쿼리
+    const mq = window.matchMedia("(min-width: 640px)");
+    const apply = () =>
+      setPageSize(mq.matches ? DESKTOP_PAGE_SIZE : MOBILE_PAGE_SIZE);
+    apply();
+    mq.addEventListener("change", apply);
+    return () => mq.removeEventListener("change", apply);
+  }, []);
+
   // 필터링
   const filtered = useMemo(() => {
     const cats: Category[] =
@@ -109,9 +90,9 @@ export default function ArticlesListClient({
   }, [all, selected, deferredKeyword, locale]);
 
   const total = filtered.length;
-  const pageMax = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const pageMax = Math.max(1, Math.ceil(total / pageSize));
   const current = Math.min(page, pageMax);
-  const items = filtered.slice((current - 1) * PAGE_SIZE, current * PAGE_SIZE);
+  const items = filtered.slice((current - 1) * pageSize, current * pageSize);
 
   // 페이지 번호
   const pages = useMemo(() => {
@@ -128,51 +109,55 @@ export default function ArticlesListClient({
   return (
     <div className='space-y-6'>
       {/* 컨트롤 바 */}
-      <div className=' bg-white p-4 shadow-sm'>
-        <div className='flex flex-wrap items-center gap-2'>
-          {categoryKeys.map((k) => {
-            const active = selected.has(k);
-            return (
-              <button
-                key={k}
-                type='button'
-                aria-pressed={active}
-                onClick={() => {
-                  const next = new Set(selected);
-                  active ? next.delete(k) : next.add(k);
-                  setSelected(next);
-                  setPage(1);
-                  setSelectedId(null);
-                }}
-                className={[
-                  "rounded-full border px-3 py-1 text-xs md:text-sm transition-colors",
-                  active
-                    ? "bg-gray-900 text-white border-gray-900"
-                    : "bg-white hover:bg-gray-50",
-                ].join(" ")}
-              >
-                {tCat(k)}
-              </button>
-            );
-          })}
+      <div className='bg-white p-4 shadow-sm rounded-xl'>
+        <div className='flex flex-col gap-3 md:flex-row md:items-center'>
+          {/* 칩: 모바일 가로 스크롤, 데스크탑 래핑 */}
+          <div className='-mx-3 px-3 overflow-x-auto md:overflow-visible'>
+            <div className='flex gap-2 whitespace-nowrap md:flex-wrap'>
+              {categoryKeys.map((k) => {
+                const active = selected.has(k);
+                return (
+                  <button
+                    key={k}
+                    type='button'
+                    aria-pressed={active}
+                    onClick={() => {
+                      const next = new Set(selected);
+                      active ? next.delete(k) : next.add(k);
+                      setSelected(next);
+                      setPage(1);
+                      setSelectedId(null);
+                    }}
+                    className={[
+                      "rounded-full border px-3 py-1 text-xs md:text-sm transition-colors",
+                      active
+                        ? "bg-gray-900 text-white border-gray-900"
+                        : "bg-white hover:bg-gray-50",
+                    ].join(" ")}
+                  >
+                    {tCat(k)}
+                  </button>
+                );
+              })}
+              {(selected.size > 0 || keyword) && (
+                <button
+                  type='button'
+                  onClick={() => {
+                    setSelected(new Set());
+                    setKeyword("");
+                    setPage(1);
+                    setSelectedId(null);
+                  }}
+                  className='rounded-full border px-3 py-1 text-xs md:text-sm text-gray-600 hover:bg-gray-50'
+                >
+                  초기화
+                </button>
+              )}
+            </div>
+          </div>
 
-          {(selected.size > 0 || keyword) && (
-            <button
-              type='button'
-              onClick={() => {
-                setSelected(new Set());
-                setKeyword("");
-                setPage(1);
-                setSelectedId(null);
-              }}
-              className='ml-1 rounded-full border px-3 py-1 text-xs md:text-sm text-gray-600 hover:bg-gray-50'
-            >
-              초기화
-            </button>
-          )}
-
-          {/* 검색 */}
-          <div className='ml-auto flex items-center gap-2'>
+          {/* 검색: 모바일 전체폭, 데스크탑 w-72 */}
+          <div className='md:ml-auto'>
             <label htmlFor={searchId} className='sr-only'>
               검색어
             </label>
@@ -185,7 +170,7 @@ export default function ArticlesListClient({
                 setSelectedId(null);
               }}
               placeholder='검색어를 입력하세요'
-              className='h-10 w-64 rounded-lg border border-gray-200 px-3 text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-black/10 placeholder:text-gray-400'
+              className='h-10 w-full md:w-72 rounded-lg border border-gray-200 px-3 text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-black/10 placeholder:text-gray-400'
             />
           </div>
         </div>
@@ -194,7 +179,7 @@ export default function ArticlesListClient({
       {/* 목록형 리스트 */}
       {loading ? (
         <div className='space-y-2'>
-          {Array.from({ length: PAGE_SIZE }).map((_, i) => (
+          {Array.from({ length: pageSize }).map((_, i) => (
             <div
               key={i}
               className='h-12 animate-pulse rounded-lg border bg-gray-50'
@@ -207,12 +192,22 @@ export default function ArticlesListClient({
         </div>
       ) : (
         <div className='rounded-xl border border-gray-200 bg-white overflow-hidden'>
-          <div className='flex items-center px-4 py-2 text-xs text-gray-500 border-b'>
+          {/* 헤더 라인 */}
+          {/* 모바일: No. / 글 제목 */}
+          <div className='flex sm:hidden items-center border-b px-4 py-2 text-xs text-gray-500'>
             <div className='w-12 text-center'>No.</div>
-            <div className='flex-1 text-center'>글 제목</div>
+            <div className='flex-1'>글 제목</div>
+          </div>
+
+          {/* 데스크탑: No. / 글 제목 / 조회수 / 작성일 */}
+          <div className='hidden sm:flex items-center border-b px-4 py-2 text-xs text-gray-500'>
+            <div className='w-12 text-center'>No.</div>
+            <div className='flex-1'>글 제목</div>
             <div className='w-20 text-right'>조회수</div>
             <div className='w-28 text-right'>작성일</div>
           </div>
+
+          {/* 리스트 아이템 */}
           <ul role='list' className='divide-y'>
             {items.map((a, i) => {
               const no = items.length - i;
@@ -238,23 +233,35 @@ export default function ArticlesListClient({
                       );
                     }}
                     className={[
-                      "flex w-full items-center gap-3 px-4 py-3 text-left transition-colors",
-                      "hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/10",
+                      "w-full px-4 py-3 text-left transition-colors hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/10",
                       selectedState ? "bg-gray-50" : "",
                     ].join(" ")}
                     aria-expanded={selectedState}
                   >
-                    <span className='w-12 text-center text-xs text-gray-500'>
-                      {no}
-                    </span>
-                    <div className='flex-1 min-w-0 truncate text-sm md:text-base text-gray-900 hover:underline'>
-                      {title}
+                    {/* 모바일(<=sm): No. / 제목 */}
+                    <div className='flex sm:hidden items-center gap-3'>
+                      <div className='w-12 text-center text-xs text-gray-500'>
+                        {no}
+                      </div>
+                      <div className='flex-1 min-w-0 truncate text-sm text-gray-900'>
+                        {title}
+                      </div>
                     </div>
-                    <span className='w-20 text-right text-xs text-gray-500 whitespace-nowrap'>
-                      {views.toLocaleString()}
-                    </span>
-                    <div className='w-28 text-right text-xs text-gray-500 whitespace-nowrap'>
-                      {createdAt ? createdAt.toLocaleDateString() : ""}
+
+                    {/* 데스크탑(sm+): No. / 제목 / 조회수 / 작성일 */}
+                    <div className='hidden sm:flex items-center gap-3'>
+                      <div className='w-12 text-center text-xs text-gray-500'>
+                        {no}
+                      </div>
+                      <div className='flex-1 min-w-0 truncate text-sm md:text-base text-gray-900 hover:underline'>
+                        {title}
+                      </div>
+                      <div className='w-20 text-right text-xs text-gray-500 whitespace-nowrap'>
+                        {views.toLocaleString()}
+                      </div>
+                      <div className='w-28 text-right text-xs text-gray-500 whitespace-nowrap'>
+                        {createdAt ? createdAt.toLocaleDateString() : ""}
+                      </div>
                     </div>
                   </button>
                 </li>
@@ -264,7 +271,7 @@ export default function ArticlesListClient({
         </div>
       )}
 
-      {/* 페이지네이션 - 블로그 느낌의 작은 pill 버튼 */}
+      {/* 페이지네이션 */}
       {pageMax > 1 && (
         <nav
           aria-label='페이지네이션'
