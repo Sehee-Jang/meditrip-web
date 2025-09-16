@@ -1,40 +1,30 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useLocale } from "next-intl";
 import type { LocaleKey } from "@/constants/locales";
 import type { Article } from "@/types/articles";
 import { getArticleById } from "@/services/articles/getArticleById";
 import { incrementView } from "@/services/articles/incrementView";
 import RichTextViewer from "./RichTextViewer";
+import { useQuery } from "@tanstack/react-query";
+import { useEffect } from "react";
 
 export default function ArticleDetailClient({ id }: { id: string }) {
   const locale = useLocale() as LocaleKey;
-  const [data, setData] = useState<Article | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
 
+  const { data, isLoading } = useQuery({
+    queryKey: ["article", id],
+    queryFn: () => getArticleById(id),
+    staleTime: 1000 * 60 * 3, // 3분
+  });
+
+  // 조회수 증가(실패 무시)
   useEffect(() => {
-    let alive = true;
-    (async () => {
-      try {
-        setLoading(true);
-        const doc = await getArticleById(id);
-        if (!alive) return;
-        setData(doc);
-        // 조회수 증가 (실패해도 무시)
-        try {
-          await incrementView(id);
-        } catch {}
-      } finally {
-        if (alive) setLoading(false);
-      }
-    })();
-    return () => {
-      alive = false;
-    };
+    if (!id) return;
+    void incrementView(id).catch(() => {});
   }, [id]);
 
-  if (loading) {
+  if (isLoading) {
     return <div className='h-40 animate-pulse rounded-md border bg-gray-50' />;
   }
   if (!data) {
@@ -51,9 +41,9 @@ export default function ArticleDetailClient({ id }: { id: string }) {
   const createdAtRaw = (data as { createdAt?: string | number | Date })
     ?.createdAt;
   const createdAt = createdAtRaw ? new Date(createdAtRaw) : null;
+
   return (
     <article className='article-content prose max-w-none dark:prose-invert'>
-      {/* 헤더: 중앙 정렬 · 날짜/구분선 */}
       <header className='mb-6 text-center p-10 border-b'>
         <h1 className='text-2xl md:text-3xl font-bold tracking-tight text-gray-900'>
           {title}
