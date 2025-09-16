@@ -21,10 +21,10 @@ export default function CommunitySection() {
           {/* 데스크탑 CTA */}
           <Link
             href='/community'
-            className='hidden md:flex items-center gap-1 bg-white text-black border text-sm font-medium px-4 py-2 rounded-md hover:bg-gray-100 hover:border-gray-300 transition'
+            className='hidden md:inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs border border-gray-200 text-gray-600 hover:bg-gray-50'
           >
             {t("cta")}
-            <ChevronRight size={16} />
+            <ChevronRight size={14} />
           </Link>
         </div>
 

@@ -125,18 +125,9 @@ export default function ArticlesListClient({
 
   const categoryKeys = Object.keys(CATEGORIES) as CategoryKey[];
 
-  // 행 클릭 핸들러(list 모드): 인라인 상세용 id 설정
-  const handleRowClick = (id: string) => {
-    setSelectedId((prev) => (prev === id ? prev : id));
-    // 선택 즉시 하단 상세로 부드럽게 스크롤(선택 바뀔 때만)
-    setTimeout(() => {
-      detailRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-    }, 0);
-  };
-
   return (
     <div className='space-y-6'>
-      {/* 컨트롤 바 - 여백만 살짝 키움 */}
+      {/* 컨트롤 바 */}
       <div className=' bg-white p-4 shadow-sm'>
         <div className='flex flex-wrap items-center gap-2'>
           {categoryKeys.map((k) => {
@@ -200,7 +191,7 @@ export default function ArticlesListClient({
         </div>
       </div>
 
-      {/* 리스트: 타이틀 왼쪽/날짜 오른쪽 */}
+      {/* 목록형 리스트 */}
       {loading ? (
         <div className='space-y-2'>
           {Array.from({ length: PAGE_SIZE }).map((_, i) => (
@@ -217,12 +208,16 @@ export default function ArticlesListClient({
       ) : (
         <div className='rounded-xl border border-gray-200 bg-white overflow-hidden'>
           <div className='flex items-center px-4 py-2 text-xs text-gray-500 border-b'>
-            <div className='flex-1'>글 제목</div>
+            <div className='w-12 text-center'>No.</div>
+            <div className='flex-1 text-center'>글 제목</div>
+            <div className='w-20 text-right'>조회수</div>
             <div className='w-28 text-right'>작성일</div>
           </div>
           <ul role='list' className='divide-y'>
-            {items.map((a) => {
+            {items.map((a, i) => {
+              const no = items.length - i;
               const title = a.title?.[locale] || a.title?.ko || "제목 없음";
+              const views = (a as { views?: number })?.views ?? 0;
               const createdAtRaw = (a as { createdAt?: string | number | Date })
                 ?.createdAt;
               const createdAt = createdAtRaw ? new Date(createdAtRaw) : null;
@@ -249,9 +244,15 @@ export default function ArticlesListClient({
                     ].join(" ")}
                     aria-expanded={selectedState}
                   >
+                    <span className='w-12 text-center text-xs text-gray-500'>
+                      {no}
+                    </span>
                     <div className='flex-1 min-w-0 truncate text-sm md:text-base text-gray-900 hover:underline'>
                       {title}
                     </div>
+                    <span className='w-20 text-right text-xs text-gray-500 whitespace-nowrap'>
+                      {views.toLocaleString()}
+                    </span>
                     <div className='w-28 text-right text-xs text-gray-500 whitespace-nowrap'>
                       {createdAt ? createdAt.toLocaleDateString() : ""}
                     </div>
