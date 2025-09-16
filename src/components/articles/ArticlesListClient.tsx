@@ -29,6 +29,7 @@ export default function ArticlesListClient({
 }: Props) {
   const tCat = useTranslations("categories");
   const locale = useLocale() as keyof Article["title"];
+  const [isOpen, setIsOpen] = useState<boolean>(true);
   const [all, setAll] = useState<Article[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [selected, setSelected] = useState<Set<CategoryKey>>(
@@ -93,6 +94,31 @@ export default function ArticlesListClient({
   const pageMax = Math.max(1, Math.ceil(total / pageSize));
   const current = Math.min(page, pageMax);
   const items = filtered.slice((current - 1) * pageSize, current * pageSize);
+
+  // 가장 최신 글 자동 선택
+  useEffect(() => {
+    if (loading || selectedId) return;
+    if (filtered.length === 0) return;
+
+    // createdAt 기준 최신 1건
+    const latest = [...filtered].sort((a, b) => {
+      const an =
+        a && (a as { createdAt?: string | number | Date }).createdAt
+          ? new Date(
+              (a as { createdAt?: string | number | Date }).createdAt!
+            ).getTime()
+          : 0;
+      const bn =
+        b && (b as { createdAt?: string | number | Date }).createdAt
+          ? new Date(
+              (b as { createdAt?: string | number | Date }).createdAt!
+            ).getTime()
+          : 0;
+      return bn - an;
+    })[0];
+
+    setSelectedId(latest.id); // 스크롤은 클릭 시에만
+  }, [loading, filtered, selectedId]);
 
   // 페이지 번호
   const pages = useMemo(() => {
@@ -176,154 +202,181 @@ export default function ArticlesListClient({
         </div>
       </div>
 
-      {/* 목록형 리스트 */}
-      {loading ? (
-        <div className='space-y-2'>
-          {Array.from({ length: pageSize }).map((_, i) => (
-            <div
-              key={i}
-              className='h-12 animate-pulse rounded-lg border bg-gray-50'
-            />
-          ))}
+      {/* 목록 헤더: 콘텐츠 n개의 글 + 열기/닫기 */}
+      <div className='flex items-center justify-between'>
+        <div className='text-[13px] text-gray-600'>
+          <span className='font-medium text-gray-900'>
+            {total.toLocaleString()}
+          </span>
+          개의 글
         </div>
-      ) : items.length === 0 ? (
-        <div className='rounded-xl border border-gray-200 bg-white p-10 text-center text-sm text-gray-500 shadow-sm'>
-          조건에 맞는 아티클이 없습니다.
-        </div>
-      ) : (
-        <div className='rounded-xl border border-gray-200 bg-white overflow-hidden'>
-          {/* 헤더 라인 */}
-          {/* 모바일: No. / 글 제목 */}
-          <div className='flex sm:hidden items-center border-b px-4 py-2 text-xs text-gray-500'>
-            <div className='w-12 text-center'>No.</div>
-            <div className='flex-1'>글 제목</div>
-          </div>
+        <button
+          type='button'
+          onClick={() => {
+            setIsOpen((v) => !v);
+          }}
+          aria-expanded={isOpen}
+          className='inline-flex items-center gap-1 text-sm text-gray-600 hover:text-gray-900 hover:underline underline-offset-4'
+        >
+          {isOpen ? "목록닫기" : "목록열기"}
+        </button>
+      </div>
 
-          {/* 데스크탑: No. / 글 제목 / 조회수 / 작성일 */}
-          <div className='hidden sm:flex items-center border-b px-4 py-2 text-xs text-gray-500'>
-            <div className='w-12 text-center'>No.</div>
-            <div className='flex-1'>글 제목</div>
-            <div className='w-20 text-right'>조회수</div>
-            <div className='w-28 text-right'>작성일</div>
-          </div>
+      {!isOpen ? null : (
+        <>
+          {loading ? (
+            <div className='mt-2 space-y-2'>
+              {Array.from({ length: pageSize }).map((_, i) => (
+                <div
+                  key={i}
+                  className='h-12 animate-pulse rounded-lg border bg-gray-50'
+                />
+              ))}
+            </div>
+          ) : items.length === 0 ? (
+            <div className='mt-2 rounded-xl border border-gray-200 bg-white p-10 text-center text-sm text-gray-500 shadow-sm'>
+              조건에 맞는 아티클이 없습니다.
+            </div>
+          ) : (
+            <>
+              {/* 테이블 헤더 */}
+              <div className='mt-2 rounded-md border border-gray-200 bg-white overflow-hidden'>
+                {/* 모바일: No./글 제목 */}
+                <div className='flex sm:hidden items-center border-b px-4 py-2 text-xs text-gray-500'>
+                  <div className='w-12 text-center'>No.</div>
+                  <div className='flex-1'>글 제목</div>
+                </div>
+                {/* 데스크탑: No./글 제목/조회수/작성일 */}
+                <div className='hidden sm:flex items-center border-b px-4 py-2 text-xs text-gray-500'>
+                  <div className='w-12 text-center'>No.</div>
+                  <div className='flex-1'>글 제목</div>
+                  <div className='w-20 text-right'>조회수</div>
+                  <div className='w-28 text-right'>작성일</div>
+                </div>
 
-          {/* 리스트 아이템 */}
-          <ul role='list' className='divide-y'>
-            {items.map((a, i) => {
-              const no = items.length - i;
-              const title = a.title?.[locale] || a.title?.ko || "제목 없음";
-              const views = (a as { views?: number })?.views ?? 0;
-              const createdAtRaw = (a as { createdAt?: string | number | Date })
-                ?.createdAt;
-              const createdAt = createdAtRaw ? new Date(createdAtRaw) : null;
-              const selectedState = selectedId === a.id;
+                {/* 리스트(현재 페이지 slice = items) */}
+                <ul role='list' className='divide-y'>
+                  {items.map((a, i) => {
+                    const no = total - ((current - 1) * pageSize + i); // 전체 글 수 기준 역순 번호
+                    const title =
+                      a.title?.[locale] || a.title?.ko || "제목 없음";
+                    const views = (a as { views?: number })?.views ?? 0;
+                    const createdAtRaw = (
+                      a as { createdAt?: string | number | Date }
+                    )?.createdAt;
+                    const createdAt = createdAtRaw
+                      ? new Date(createdAtRaw)
+                      : null;
+                    const selectedState = selectedId === a.id;
 
-              return (
-                <li key={a.id}>
+                    return (
+                      <li key={a.id}>
+                        <button
+                          type='button'
+                          onClick={() => {
+                            setSelectedId((prev) =>
+                              prev === a.id ? prev : a.id
+                            );
+                            setTimeout(
+                              () =>
+                                detailRef.current?.scrollIntoView({
+                                  behavior: "smooth",
+                                }),
+                              0
+                            );
+                          }}
+                          className={[
+                            "w-full px-4 py-3 text-left transition-colors hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/10",
+                            selectedState ? "bg-gray-50" : "",
+                          ].join(" ")}
+                          aria-expanded={selectedState}
+                        >
+                          {/* 모바일 행 */}
+                          <div className='flex sm:hidden items-center gap-3'>
+                            <div className='w-12 text-center text-xs text-gray-500'>
+                              {no}
+                            </div>
+                            <div className='flex-1 min-w-0 truncate text-sm text-gray-900'>
+                              {title}
+                            </div>
+                          </div>
+                          {/* 데스크탑 행 */}
+                          <div className='hidden sm:flex items-center gap-3'>
+                            <div className='w-12 text-center text-xs text-gray-500'>
+                              {no}
+                            </div>
+                            <div className='flex-1 min-w-0 truncate text-sm md:text-base text-gray-900 hover:underline'>
+                              {title}
+                            </div>
+                            <div className='w-20 text-right text-xs text-gray-500 whitespace-nowrap'>
+                              {views.toLocaleString()}
+                            </div>
+                            <div className='w-28 text-right text-xs text-gray-500 whitespace-nowrap'>
+                              {createdAt ? createdAt.toLocaleDateString() : ""}
+                            </div>
+                          </div>
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+
+              {/* 페이지네이션(톤 다운) */}
+              {pageMax > 1 && (
+                <nav
+                  aria-label='페이지네이션'
+                  className='flex items-center justify-center gap-1 py-3'
+                >
                   <button
                     type='button'
+                    disabled={current === 1}
                     onClick={() => {
-                      setSelectedId((prev) => (prev === a.id ? prev : a.id));
-                      setTimeout(
-                        () =>
-                          detailRef.current?.scrollIntoView({
-                            behavior: "smooth",
-                          }),
-                        0
-                      );
+                      setPage((p) => Math.max(1, p - 1));
+                      setSelectedId(null);
                     }}
-                    className={[
-                      "w-full px-4 py-3 text-left transition-colors hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/10",
-                      selectedState ? "bg-gray-50" : "",
-                    ].join(" ")}
-                    aria-expanded={selectedState}
+                    className='h-8 px-3 rounded-full border text-xs bg-white border-gray-200 disabled:opacity-50 hover:bg-gray-50'
                   >
-                    {/* 모바일(<=sm): No. / 제목 */}
-                    <div className='flex sm:hidden items-center gap-3'>
-                      <div className='w-12 text-center text-xs text-gray-500'>
-                        {no}
-                      </div>
-                      <div className='flex-1 min-w-0 truncate text-sm text-gray-900'>
-                        {title}
-                      </div>
-                    </div>
-
-                    {/* 데스크탑(sm+): No. / 제목 / 조회수 / 작성일 */}
-                    <div className='hidden sm:flex items-center gap-3'>
-                      <div className='w-12 text-center text-xs text-gray-500'>
-                        {no}
-                      </div>
-                      <div className='flex-1 min-w-0 truncate text-sm md:text-base text-gray-900 hover:underline'>
-                        {title}
-                      </div>
-                      <div className='w-20 text-right text-xs text-gray-500 whitespace-nowrap'>
-                        {views.toLocaleString()}
-                      </div>
-                      <div className='w-28 text-right text-xs text-gray-500 whitespace-nowrap'>
-                        {createdAt ? createdAt.toLocaleDateString() : ""}
-                      </div>
-                    </div>
+                    이전
                   </button>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
-      )}
-
-      {/* 페이지네이션 */}
-      {pageMax > 1 && (
-        <nav
-          aria-label='페이지네이션'
-          className='flex items-center justify-center gap-2 py-2'
-        >
-          <button
-            type='button'
-            disabled={current === 1}
-            onClick={() => {
-              setPage((p) => Math.max(1, p - 1));
-              setSelectedId(null);
-            }}
-            className='h-8 px-3 rounded-full border text-sm bg-white border-gray-200 disabled:opacity-50 hover:bg-gray-50'
-          >
-            이전
-          </button>
-
-          {pages.map((p) => {
-            const isCurrent = p === current;
-            return (
-              <button
-                key={p}
-                type='button'
-                aria-current={isCurrent ? "page" : undefined}
-                onClick={() => {
-                  setPage(p);
-                  setSelectedId(null);
-                }}
-                className={[
-                  "h-8 min-w-8 px-3 rounded-full border text-sm",
-                  isCurrent
-                    ? "bg-black border-black text-white"
-                    : "bg-white border-gray-200 hover:bg-gray-50",
-                ].join(" ")}
-              >
-                {p}
-              </button>
-            );
-          })}
-
-          <button
-            type='button'
-            disabled={current === pageMax}
-            onClick={() => {
-              setPage((p) => Math.min(pageMax, p + 1));
-              setSelectedId(null);
-            }}
-            className='h-8 px-3 rounded-full border text-sm bg-white border-gray-200 disabled:opacity-50 hover:bg-gray-50'
-          >
-            다음
-          </button>
-        </nav>
+                  {pages.map((p) => {
+                    const isCurrent = p === current;
+                    return (
+                      <button
+                        key={p}
+                        type='button'
+                        aria-current={isCurrent ? "page" : undefined}
+                        onClick={() => {
+                          setPage(p);
+                          setSelectedId(null);
+                        }}
+                        className={[
+                          "h-8 min-w-8 px-3 rounded-full border text-xs",
+                          isCurrent
+                            ? "bg-gray-900 border-gray-900 text-white"
+                            : "bg-white border-gray-200 hover:bg-gray-50",
+                        ].join(" ")}
+                      >
+                        {p}
+                      </button>
+                    );
+                  })}
+                  <button
+                    type='button'
+                    disabled={current === pageMax}
+                    onClick={() => {
+                      setPage((p) => Math.min(pageMax, p + 1));
+                      setSelectedId(null);
+                    }}
+                    className='h-8 px-3 rounded-full border text-xs bg-white border-gray-200 disabled:opacity-50 hover:bg-gray-50'
+                  >
+                    다음
+                  </button>
+                </nav>
+              )}
+            </>
+          )}
+        </>
       )}
 
       {/* 리스트 “하단 한 곳”에만 본문 인라인 */}
