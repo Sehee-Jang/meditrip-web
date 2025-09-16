@@ -26,7 +26,11 @@ export function CategoryChips({
               aria-pressed={active}
               onClick={() => {
                 const next = new Set(value);
-                active ? next.delete(k) : next.add(k);
+                if (active) {
+                  next.delete(k);
+                } else {
+                  next.add(k);
+                }
                 onChange(next);
               }}
               className={[

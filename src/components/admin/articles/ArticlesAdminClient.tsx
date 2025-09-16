@@ -1,4 +1,3 @@
-// src/components/admin/articles/ArticlesAdminClient.tsx
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";

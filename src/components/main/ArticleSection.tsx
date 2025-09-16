@@ -1,10 +1,9 @@
 "use client";
 
-import { useTranslations, useLocale } from "next-intl";
+import { useTranslations } from "next-intl";
 import { ChevronRight } from "lucide-react";
 import Container from "../common/Container";
 import { Link } from "@/i18n/navigation";
-import type { Article } from "@/types/articles";
 import { useArticles } from "@/hooks/useArticles";
 import { sortByCreatedAtDesc } from "@/utils/articles";
 import {
@@ -16,7 +15,6 @@ const LIMIT = 5;
 
 export default function ArticleSection() {
   const t = useTranslations("article");
-  const locale = useLocale() as keyof Article["title"];
 
   const { data: rows = [], isLoading } = useArticles();
 
