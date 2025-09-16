@@ -2,20 +2,16 @@
 
 import { useLocale } from "next-intl";
 import type { LocaleKey } from "@/constants/locales";
-import { getArticleById } from "@/services/articles/getArticleById";
 import { incrementView } from "@/services/articles/incrementView";
 import RichTextViewer from "./RichTextViewer";
-import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
+import { useArticle } from "@/hooks/useArticles";
+import { titleFor, excerptFor, createdAtOf } from "@/utils/articles";
 
 export default function ArticleDetailClient({ id }: { id: string }) {
   const locale = useLocale() as LocaleKey;
 
-  const { data, isLoading } = useQuery({
-    queryKey: ["article", id],
-    queryFn: () => getArticleById(id),
-    staleTime: 1000 * 60 * 3, // 3분
-  });
+  const { data, isLoading } = useArticle(id);
 
   // 조회수 증가(실패 무시)
   useEffect(() => {
@@ -34,12 +30,9 @@ export default function ArticleDetailClient({ id }: { id: string }) {
     );
   }
 
-  const title = data.title?.[locale] || data.title?.ko || "제목 없음";
-  const excerpt = data.excerpt?.[locale] || data.excerpt?.ko || "";
-  const body = data.body?.[locale];
-  const createdAtRaw = (data as { createdAt?: string | number | Date })
-    ?.createdAt;
-  const createdAt = createdAtRaw ? new Date(createdAtRaw) : null;
+  const title = titleFor(data, locale);
+  const excerpt = excerptFor(data, locale);
+  const createdAt = createdAtOf(data);
 
   return (
     <article className='article-content prose max-w-none dark:prose-invert'>
@@ -64,7 +57,11 @@ export default function ArticleDetailClient({ id }: { id: string }) {
         />
       ) : null}
 
-      {body ? <RichTextViewer doc={body} /> : <p>본문이 없습니다.</p>}
+      {data.body?.[locale] ? (
+        <RichTextViewer doc={data.body[locale]} />
+      ) : (
+        <p>본문이 없습니다.</p>
+      )}
     </article>
   );
 }
