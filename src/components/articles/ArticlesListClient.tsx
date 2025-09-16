@@ -14,7 +14,7 @@ import type { Article } from "@/types/articles";
 import { CATEGORIES, CategoryKey, type Category } from "@/constants/categories";
 import { normalizeArticles } from "@/utils/articles";
 import ArticleDetailClient from "./ArticleDetailClient";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 type Props = {
   initialSelectedCategories: CategoryKey[];
@@ -30,6 +30,9 @@ export default function ArticlesListClient({
 }: Props) {
   const tCat = useTranslations("categories");
   const locale = useLocale() as keyof Article["title"];
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
   const [isOpen, setIsOpen] = useState<boolean>(true);
   const [all, setAll] = useState<Article[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -39,14 +42,13 @@ export default function ArticlesListClient({
   const [keyword, setKeyword] = useState<string>(initialKeyword);
   const deferredKeyword = useDeferredValue(keyword);
   const [page, setPage] = useState<number>(1);
-  const [selectedId, setSelectedId] = useState<string | null>(null); // 하단 인라인 상세용
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   const [pageSize, setPageSize] = useState<number>(DESKTOP_PAGE_SIZE);
 
   const searchId = useId();
-
-  // 하단 상세 위치로 스크롤하기 위한 ref
   const detailRef = useRef<HTMLDivElement | null>(null);
 
+  // 목록 로드
   useEffect(() => {
     let alive = true;
     (async () => {
@@ -65,8 +67,8 @@ export default function ArticlesListClient({
     };
   }, []);
 
+  // 반응형 페이지 사이즈
   useEffect(() => {
-    // Tailwind sm 기준(640px)과 동일한 미디어쿼리
     const mq = window.matchMedia("(min-width: 640px)");
     const apply = () =>
       setPageSize(mq.matches ? DESKTOP_PAGE_SIZE : MOBILE_PAGE_SIZE);
@@ -91,7 +93,7 @@ export default function ArticlesListClient({
     });
   }, [all, selected, deferredKeyword, locale]);
 
-  // createdAt 내림차순 정렬을 공통 적용
+  // 정렬: 최신 우선
   const filteredSorted = useMemo(() => {
     return [...filtered].sort((a, b) => {
       const ad = (a as { createdAt?: string | number | Date })?.createdAt;
@@ -109,31 +111,27 @@ export default function ArticlesListClient({
     (current - 1) * pageSize,
     current * pageSize
   );
-  const searchParams = useSearchParams();
 
-  // 가장 최신 글 자동 선택
+  // 초기 선택: URL id 우선 → 없으면 최신 글
   useEffect(() => {
     if (loading || selectedId) return;
-    if (filtered.length === 0) return;
+    if (filteredSorted.length === 0) return;
 
     const urlId = searchParams.get("id");
-
     if (urlId) {
-      // URL로 전달된 글이 현재 결과에 있다면 그 페이지로 이동해서 선택
       const idx = filteredSorted.findIndex((x) => x.id === urlId);
       if (idx >= 0) {
         const nextPage = Math.floor(idx / pageSize) + 1;
         if (nextPage !== current) setPage(nextPage);
         setSelectedId(urlId);
-        return; // 해시 #detail이 있으면 브라우저가 앵커로 바로 스크롤
+        // 앵커는 브라우저가 처리(#detail)
+        return;
       }
     }
-
-    // URL id 없거나 찾지 못한 경우: 최신 글 자동 선택
     setSelectedId(filteredSorted[0].id);
-  }, [loading, filtered, selectedId]);
+  }, [loading, filteredSorted, selectedId, searchParams, pageSize, current]);
 
-  // 페이지 번호
+  // 페이지 버튼 목록
   const pages = useMemo(() => {
     const span = 5;
     const half = Math.floor(span / 2);
@@ -145,12 +143,24 @@ export default function ArticlesListClient({
 
   const categoryKeys = Object.keys(CATEGORIES) as CategoryKey[];
 
+  // 선택 시 URL 동기화(+ 앵커)
+  const selectArticle = (id: string) => {
+    setSelectedId((prev) => (prev === id ? prev : id));
+    const params = new URLSearchParams(Array.from(searchParams.entries()));
+    params.set("id", id);
+    router.replace(`/articles?${params.toString()}#detail`, { scroll: false });
+    // 브라우저 앵커 스크롤이 동작하지 않을 매우 드문 케이스 대비
+    requestAnimationFrame(() => {
+      detailRef.current?.scrollIntoView({ behavior: "smooth" });
+    });
+  };
+
   return (
     <div className='space-y-6'>
       {/* 컨트롤 바 */}
       <div className='bg-white p-4 shadow-sm rounded-xl'>
         <div className='flex flex-col gap-3 md:flex-row md:items-center'>
-          {/* 칩: 모바일 가로 스크롤, 데스크탑 래핑 */}
+          {/* 카테고리 칩 */}
           <div className='-mx-3 px-3 overflow-x-auto md:overflow-visible'>
             <div className='flex gap-2 whitespace-nowrap md:flex-wrap'>
               {categoryKeys.map((k) => {
@@ -162,11 +172,8 @@ export default function ArticlesListClient({
                     aria-pressed={active}
                     onClick={() => {
                       const next = new Set(selected);
-                      if (active) {
-                        next.delete(k);
-                      } else {
-                        next.add(k);
-                      }
+                      if (active) next.delete(k);
+                      else next.add(k);
                       setSelected(next);
                       setPage(1);
                       setSelectedId(null);
@@ -199,7 +206,7 @@ export default function ArticlesListClient({
             </div>
           </div>
 
-          {/* 검색: 모바일 전체폭, 데스크탑 w-72 */}
+          {/* 검색 */}
           <div className='md:ml-auto'>
             <label htmlFor={searchId} className='sr-only'>
               검색어
@@ -219,7 +226,7 @@ export default function ArticlesListClient({
         </div>
       </div>
 
-      {/* 목록 헤더: 콘텐츠 n개의 글 + 열기/닫기 */}
+      {/* 목록 헤더 */}
       <div className='flex items-center justify-between'>
         <div className='text-[13px] text-gray-600'>
           <span className='font-medium text-gray-900'>
@@ -229,9 +236,7 @@ export default function ArticlesListClient({
         </div>
         <button
           type='button'
-          onClick={() => {
-            setIsOpen((v) => !v);
-          }}
+          onClick={() => setIsOpen((v) => !v)}
           aria-expanded={isOpen}
           className='inline-flex items-center gap-1 text-sm text-gray-600 hover:text-gray-900 hover:underline underline-offset-4'
         >
@@ -256,14 +261,12 @@ export default function ArticlesListClient({
             </div>
           ) : (
             <>
-              {/* 테이블 헤더 */}
+              {/* 테이블 */}
               <div className='mt-2 rounded-md border border-gray-200 bg-white overflow-hidden'>
-                {/* 모바일: No./글 제목 */}
                 <div className='flex sm:hidden items-center border-b px-4 py-2 text-xs text-gray-500'>
                   <div className='w-12 text-center'>No.</div>
                   <div className='flex-1'>글 제목</div>
                 </div>
-                {/* 데스크탑: No./글 제목/조회수/작성일 */}
                 <div className='hidden sm:flex items-center border-b px-4 py-2 text-xs text-gray-500'>
                   <div className='w-12 text-center'>No.</div>
                   <div className='flex-1'>글 제목</div>
@@ -271,10 +274,9 @@ export default function ArticlesListClient({
                   <div className='w-28 text-right'>작성일</div>
                 </div>
 
-                {/* 리스트(현재 페이지 slice = items) */}
                 <ul role='list' className='divide-y'>
                   {items.map((a, i) => {
-                    const no = total - ((current - 1) * pageSize + i); // 전체 글 수 기준 역순 번호
+                    const no = total - ((current - 1) * pageSize + i);
                     const title =
                       a.title?.[locale] || a.title?.ko || "제목 없음";
                     const views = (a as { views?: number })?.views ?? 0;
@@ -284,31 +286,20 @@ export default function ArticlesListClient({
                     const createdAt = createdAtRaw
                       ? new Date(createdAtRaw)
                       : null;
-                    const selectedState = selectedId === a.id;
+                    const isSelected = selectedId === a.id;
 
                     return (
                       <li key={a.id}>
                         <button
                           type='button'
-                          onClick={() => {
-                            setSelectedId((prev) =>
-                              prev === a.id ? prev : a.id
-                            );
-                            setTimeout(
-                              () =>
-                                detailRef.current?.scrollIntoView({
-                                  behavior: "smooth",
-                                }),
-                              0
-                            );
-                          }}
+                          onClick={() => selectArticle(a.id)}
                           className={[
                             "w-full px-4 py-3 text-left transition-colors hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/10",
-                            selectedState ? "bg-gray-50" : "",
+                            isSelected ? "bg-gray-50" : "",
                           ].join(" ")}
-                          aria-expanded={selectedState}
+                          aria-expanded={isSelected}
                         >
-                          {/* 모바일 행 */}
+                          {/* 모바일 */}
                           <div className='flex sm:hidden items-center gap-3'>
                             <div className='w-12 text-center text-xs text-gray-500'>
                               {no}
@@ -317,7 +308,7 @@ export default function ArticlesListClient({
                               {title}
                             </div>
                           </div>
-                          {/* 데스크탑 행 */}
+                          {/* 데스크탑 */}
                           <div className='hidden sm:flex items-center gap-3'>
                             <div className='w-12 text-center text-xs text-gray-500'>
                               {no}
@@ -339,7 +330,7 @@ export default function ArticlesListClient({
                 </ul>
               </div>
 
-              {/* 페이지네이션(톤 다운) */}
+              {/* 페이지네이션 */}
               {pageMax > 1 && (
                 <nav
                   aria-label='페이지네이션'
