@@ -6,6 +6,7 @@ import Image from "@tiptap/extension-image";
 import Link from "@tiptap/extension-link";
 import TextAlign from "@tiptap/extension-text-align";
 import type { JSONContent } from "@tiptap/core";
+import { useEffect } from "react";
 
 export default function RichTextViewer({ doc }: { doc: JSONContent }) {
   const editor = useEditor({
@@ -16,7 +17,11 @@ export default function RichTextViewer({ doc }: { doc: JSONContent }) {
       Link.configure({
         autolink: true,
         openOnClick: true,
-        HTMLAttributes: { class: "tiptap-link" }, // 스타일용 클래스 부여
+        HTMLAttributes: {
+          class: "tiptap-link,",
+          rel: "noopener noreferrer",
+          target: "_blank",
+        }, // 스타일용 클래스 부여
       }),
       // 정렬 확장: paragraph/heading의 text-align 유지
       TextAlign.configure({
@@ -32,6 +37,13 @@ export default function RichTextViewer({ doc }: { doc: JSONContent }) {
       editor?.commands.blur();
     },
   });
+
+  // doc이 바뀔 때마다 내용 갱신
+  useEffect(() => {
+    if (!editor) return;
+    // false = 트랜잭션 기록 최소화(히스토리 영향 없음)
+    editor.commands.setContent(doc, { emitUpdate: false });
+  }, [editor, doc]);
 
   if (!editor) return null;
 
