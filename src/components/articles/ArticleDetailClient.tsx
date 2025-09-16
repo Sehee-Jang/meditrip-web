@@ -2,7 +2,6 @@
 
 import { useLocale } from "next-intl";
 import type { LocaleKey } from "@/constants/locales";
-import type { Article } from "@/types/articles";
 import { getArticleById } from "@/services/articles/getArticleById";
 import { incrementView } from "@/services/articles/incrementView";
 import RichTextViewer from "./RichTextViewer";
