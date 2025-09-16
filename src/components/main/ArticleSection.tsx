@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { ChevronRight } from "lucide-react";
 import Container from "../common/Container";
@@ -8,33 +7,33 @@ import { Link } from "@/i18n/navigation";
 import { listArticles } from "@/services/articles/listArticles";
 import type { Article } from "@/types/articles";
 import { normalizeArticles } from "@/utils/articles";
+import { useQuery } from "@tanstack/react-query";
 
 const LIMIT = 5;
 
 export default function ArticleSection() {
   const t = useTranslations("article");
-
   const locale = useLocale() as keyof Article["title"];
-  const [items, setItems] = useState<Article[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
 
-  useEffect(() => {
-    let alive = true;
-    (async () => {
-      try {
-        setLoading(true);
-        const res = await listArticles();
-        const all = normalizeArticles(res);
-        if (!alive) return;
-        setItems(all.filter((a) => !a.isHidden).slice(0, 3));
-      } finally {
-        if (alive) setLoading(false);
-      }
-    })();
-    return () => {
-      alive = false;
-    };
-  }, []);
+  const { data, isLoading } = useQuery({
+    queryKey: ["articles-preview"],
+    queryFn: async () => {
+      const res = await listArticles();
+      const all = normalizeArticles(res).filter((a) => !a.isHidden);
+      // createdAt desc 정렬 후 상위 LIMIT
+      const sorted = all.sort((a, b) => {
+        const ad = (a as { createdAt?: string | number | Date })?.createdAt;
+        const bd = (b as { createdAt?: string | number | Date })?.createdAt;
+        const an = ad ? new Date(ad).getTime() : 0;
+        const bn = bd ? new Date(bd).getTime() : 0;
+        return bn - an;
+      });
+      return sorted.slice(0, LIMIT);
+    },
+    staleTime: 1000 * 60 * 3,
+  });
+
+  const items = data ?? [];
 
   return (
     <section className='bg-white py-10'>
@@ -47,7 +46,6 @@ export default function ArticleSection() {
             <p className='text-sm text-gray-500'>{t("section.desc")}</p>
           </div>
 
-          {/* 데스크탑 CTA */}
           <Link
             href='/articles'
             className='hidden md:inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs border border-gray-200 text-gray-600 hover:bg-gray-50'
@@ -57,8 +55,7 @@ export default function ArticleSection() {
           </Link>
         </div>
 
-        {/* 목록형 리스트 */}
-        {loading ? (
+        {isLoading ? (
           <div className='space-y-2'>
             {Array.from({ length: LIMIT }).map((_, i) => (
               <div
@@ -115,7 +112,6 @@ export default function ArticleSection() {
           </div>
         )}
 
-        {/* 모바일: 더보기 버튼 */}
         <div className='md:hidden mt-6 flex justify-center'>
           <Link
             href='/articles'
