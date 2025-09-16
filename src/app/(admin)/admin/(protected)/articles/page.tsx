@@ -9,7 +9,7 @@ export default function AdminContentsPage() {
         title='K-웰니스 아티클 관리'
         description='블로그형 콘텐츠를 등록·수정하고 노출을 관리합니다.'
       />
-      <ArticlesAdminClient initialSelectedCategories={[]} initialKeyword='' />
+      <ArticlesAdminClient />
     </>
   );
 }
