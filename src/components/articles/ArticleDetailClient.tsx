@@ -37,7 +37,6 @@ export default function ArticleDetailClient({ id }: { id: string }) {
   if (loading) {
     return <div className='h-40 animate-pulse rounded-md border bg-gray-50' />;
   }
-
   if (!data) {
     return (
       <div className='rounded-md border p-6 text-center text-sm text-muted-foreground'>
@@ -47,15 +46,25 @@ export default function ArticleDetailClient({ id }: { id: string }) {
   }
 
   const title = data.title?.[locale] || data.title?.ko || "제목 없음";
-  const excerpt = data.excerpt?.[locale] || data.excerpt?.ko || "요약 없음";
+  const excerpt = data.excerpt?.[locale] || data.excerpt?.ko || "";
   const body = data.body?.[locale];
-
+  const createdAtRaw = (data as { createdAt?: string | number | Date })
+    ?.createdAt;
+  const createdAt = createdAtRaw ? new Date(createdAtRaw) : null;
   return (
     <article className='article-content prose max-w-none dark:prose-invert'>
-      <div className='text-center p-10'>
-        <h1 className='mb-4 text-3xl font-bold'>{title}</h1>
-        <h3 className=''> {excerpt}</h3>
-      </div>
+      {/* 헤더: 중앙 정렬 · 날짜/구분선 */}
+      <header className='mb-6 text-center p-10 border-b'>
+        <h1 className='text-2xl md:text-3xl font-bold tracking-tight text-gray-900'>
+          {title}
+        </h1>
+        {excerpt ? (
+          <p className='mt-2 text-gray-600 text-sm md:text-base'>{excerpt}</p>
+        ) : null}
+        <div className='mt-3 text-xs text-gray-500'>
+          {createdAt ? createdAt.toLocaleDateString() : ""}
+        </div>
+      </header>
 
       {data.images?.[0] ? (
         // eslint-disable-next-line @next/next/no-img-element

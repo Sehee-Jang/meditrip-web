@@ -3,7 +3,6 @@ import { CATEGORY_KEYS, type CategoryKey } from "@/constants/categories";
 import Container from "@/components/common/Container";
 import ArticlesListClient from "@/components/articles/ArticlesListClient";
 import PageHeader from "@/components/common/PageHeader";
-import LatestArticleClient from "@/components/articles/LatestArticleClient";
 
 type SearchParams = {
   categories?: string | string[];
@@ -50,13 +49,7 @@ export default async function ArticlesPage({
         <ArticlesListClient
           initialSelectedCategories={initialSelectedCategories}
           initialKeyword={initialKeyword}
-          view='list' // ⬅️ 행 리스트 모드
         />
-      </Container>
-
-      {/* 2) 최신글 */}
-      <Container>
-        <LatestArticleClient /> {/* ⬅️ 카드로 최신글 1개 강조 */}
       </Container>
     </main>
   );
