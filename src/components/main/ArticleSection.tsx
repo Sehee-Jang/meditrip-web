@@ -92,7 +92,7 @@ export default function ArticleSection() {
                 return (
                   <li key={a.id}>
                     <Link
-                      href={`/articles/${a.id}`}
+                      href={`/articles?id=${encodeURIComponent(a.id)}#detail`}
                       className='flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/10'
                     >
                       <span className='w-12 text-center text-xs text-gray-500'>

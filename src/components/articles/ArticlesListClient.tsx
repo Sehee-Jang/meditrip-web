@@ -14,6 +14,7 @@ import type { Article } from "@/types/articles";
 import { CATEGORIES, CategoryKey, type Category } from "@/constants/categories";
 import { normalizeArticles } from "@/utils/articles";
 import ArticleDetailClient from "./ArticleDetailClient";
+import { useSearchParams } from "next/navigation";
 
 type Props = {
   initialSelectedCategories: CategoryKey[];
@@ -90,34 +91,46 @@ export default function ArticlesListClient({
     });
   }, [all, selected, deferredKeyword, locale]);
 
-  const total = filtered.length;
+  // createdAt 내림차순 정렬을 공통 적용
+  const filteredSorted = useMemo(() => {
+    return [...filtered].sort((a, b) => {
+      const ad = (a as { createdAt?: string | number | Date })?.createdAt;
+      const bd = (b as { createdAt?: string | number | Date })?.createdAt;
+      const an = ad ? new Date(ad).getTime() : 0;
+      const bn = bd ? new Date(bd).getTime() : 0;
+      return bn - an;
+    });
+  }, [filtered]);
+
+  const total = filteredSorted.length;
   const pageMax = Math.max(1, Math.ceil(total / pageSize));
   const current = Math.min(page, pageMax);
-  const items = filtered.slice((current - 1) * pageSize, current * pageSize);
+  const items = filteredSorted.slice(
+    (current - 1) * pageSize,
+    current * pageSize
+  );
+  const searchParams = useSearchParams();
 
   // 가장 최신 글 자동 선택
   useEffect(() => {
     if (loading || selectedId) return;
     if (filtered.length === 0) return;
 
-    // createdAt 기준 최신 1건
-    const latest = [...filtered].sort((a, b) => {
-      const an =
-        a && (a as { createdAt?: string | number | Date }).createdAt
-          ? new Date(
-              (a as { createdAt?: string | number | Date }).createdAt!
-            ).getTime()
-          : 0;
-      const bn =
-        b && (b as { createdAt?: string | number | Date }).createdAt
-          ? new Date(
-              (b as { createdAt?: string | number | Date }).createdAt!
-            ).getTime()
-          : 0;
-      return bn - an;
-    })[0];
+    const urlId = searchParams.get("id");
 
-    setSelectedId(latest.id); // 스크롤은 클릭 시에만
+    if (urlId) {
+      // URL로 전달된 글이 현재 결과에 있다면 그 페이지로 이동해서 선택
+      const idx = filteredSorted.findIndex((x) => x.id === urlId);
+      if (idx >= 0) {
+        const nextPage = Math.floor(idx / pageSize) + 1;
+        if (nextPage !== current) setPage(nextPage);
+        setSelectedId(urlId);
+        return; // 해시 #detail이 있으면 브라우저가 앵커로 바로 스크롤
+      }
+    }
+
+    // URL id 없거나 찾지 못한 경우: 최신 글 자동 선택
+    setSelectedId(filteredSorted[0].id);
   }, [loading, filtered, selectedId]);
 
   // 페이지 번호
@@ -383,8 +396,8 @@ export default function ArticlesListClient({
         </>
       )}
 
-      {/* 리스트 “하단 한 곳”에만 본문 인라인 */}
-      <div ref={detailRef}>
+      {/* 리스트 하단: 본문 인라인 */}
+      <div id='detail' ref={detailRef}>
         {selectedId ? <ArticleDetailClient id={selectedId} /> : null}
       </div>
     </div>
