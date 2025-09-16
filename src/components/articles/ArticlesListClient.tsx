@@ -149,7 +149,11 @@ export default function ArticlesListClient({
                     aria-pressed={active}
                     onClick={() => {
                       const next = new Set(selected);
-                      active ? next.delete(k) : next.add(k);
+                      if (active) {
+                        next.delete(k);
+                      } else {
+                        next.add(k);
+                      }
                       setSelected(next);
                       setPage(1);
                       setSelectedId(null);
