@@ -13,9 +13,10 @@ import {
   VisibilitySelect,
 } from "@/components/admin/common/FilterControls";
 import {
-  COMMUNITY_CATEGORY_KEYS,
-  COMMUNITY_CATEGORY_LABELS,
-} from "@/constants/communityCategories";
+  CATEGORY_KEYS,
+  CATEGORY_LABELS_KO,
+  type CategoryKey,
+} from "@/constants/categories";
 
 export default function CommunityAdminClient({
   initialFilter,
@@ -41,9 +42,9 @@ export default function CommunityAdminClient({
           onChange={setCategory}
           options={[
             { value: "all", label: "전체 카테고리" },
-            ...COMMUNITY_CATEGORY_KEYS.map((k) => ({
+            ...CATEGORY_KEYS.map((k: CategoryKey) => ({
               value: k,
-              label: COMMUNITY_CATEGORY_LABELS[k],
+              label: CATEGORY_LABELS_KO[k],
             })),
           ]}
         />

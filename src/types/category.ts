@@ -8,7 +8,7 @@ export {
   CATEGORY_LABELS_KO,
   getCategoryLabelKo,
 } from "@/constants/categories";
-export type {
-  CommunityCategory,
-  CommunityCategoryKey,
-} from "@/constants/communityCategories";
+// export type {
+//   CommunityCategory,
+//   CommunityCategoryKey,
+// } from "@/constants/communityCategories";

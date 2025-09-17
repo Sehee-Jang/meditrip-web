@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import CommunityCategoryPill from "./CommunityCategoryPill";
 import RowActions from "./CommunityRowActions";
 import type { Question } from "@/types/question";
-import type { CommunityCategoryKey } from "@/types/category";
+import type { CategoryKey } from "@/constants/categories";
 import UserNameById from "@/components/common/UserNameById";
 import { formatDateTimeCompact } from "@/utils/date";
 
@@ -33,7 +33,7 @@ export default function CommunityTableRow({ q }: { q: Question }) {
 
       {/* 카테고리 */}
       <td className='px-4 py-3 text-center'>
-        <CommunityCategoryPill category={q.category as CommunityCategoryKey} />
+        <CommunityCategoryPill category={q.category as CategoryKey} />
       </td>
 
       {/* 작성자명 */}

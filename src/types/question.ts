@@ -1,10 +1,10 @@
-import type { CommunityCategory } from "@/types/category";
+import type { CategoryKey } from "@/constants/categories";
 
 export interface Question {
   id: string;
   title: string;
   content: string;
-  category: CommunityCategory;
+  category: CategoryKey;
   imageUrl?: string;
   userId: string;
   isHidden?: boolean; // 기본 false
