@@ -44,7 +44,7 @@ export default function HeroSection() {
 
       {/* 오버레이 텍스트 영역 */}
       <div className='absolute inset-0 flex items-center justify-center'>
-        <Container className='pb-0 text-center text-white px-4'>
+        <Container className='!pb-0 text-center text-white px-4'>
           <h2 className='text-2xl md:text-4xl font-bold whitespace-pre-line drop-shadow-lg'>
             {t("title")}
           </h2>
