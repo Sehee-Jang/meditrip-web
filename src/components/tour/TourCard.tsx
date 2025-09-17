@@ -1,14 +1,17 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import type { WellnessListItem } from "@/types/kto-wellness";
+import type { TourListItem } from "@/types/kto-wellness";
 import TourCardExtra from "./TourCardExtra";
 import { Globe } from "lucide-react";
 import { resolveBaseUrl } from "@/utils/baseUrl";
+import { resolveTourImageSrc } from "@/utils/tourImage";
+import type { TourThemeCode } from "@/constants/tourTheme";
 
 type Props = {
   lang: "ko" | "ja";
-  item: WellnessListItem;
+  item: TourListItem;
+  forcedThemeCode?: TourThemeCode;
 };
 
 type DetailMini = {
@@ -106,7 +109,7 @@ function feeFromExtras(extras: unknown): string | undefined {
   return undefined;
 }
 
-export default function TourCard({ lang, item }: Props) {
+export default function TourCard({ lang, item, forcedThemeCode }: Props) {
   const [detail, setDetail] = useState<DetailMini | null>(null);
   const [openMap, setOpenMap] = useState(false);
 
@@ -152,7 +155,7 @@ export default function TourCard({ lang, item }: Props) {
     };
   }, [item.id, lang, item.homepage, item.phone]);
 
-  const imgSrc = item.image.original || item.image.thumb || "";
+  const imgSrc = resolveTourImageSrc(item as unknown as any, forcedThemeCode);
   const addr = item.address || "-";
 
   // 상세값이 비정상일 때 목록값으로 폴백 + 정규화
