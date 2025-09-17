@@ -155,7 +155,7 @@ export default function TourCard({ lang, item, forcedThemeCode }: Props) {
     };
   }, [item.id, lang, item.homepage, item.phone]);
 
-  const imgSrc = resolveTourImageSrc(item as unknown as any, forcedThemeCode);
+  const imgSrc = resolveTourImageSrc(item, forcedThemeCode);
   const addr = item.address || "-";
 
   // 상세값이 비정상일 때 목록값으로 폴백 + 정규화
