@@ -13,7 +13,7 @@ import type {
   KtoSearchKeywordItem,
   KtoLocationBasedItem,
   KtoDetailCommonItem,
-  WellnessListItem,
+  TourListItem,
   Mode,
   ArrangeArea,
   ArrangeLocation,
@@ -85,7 +85,7 @@ function joinAddress(base?: string, detail?: string): string {
   const b = (detail ?? "").trim();
   return [a, b].filter(Boolean).join(" ");
 }
-function mapToListItem<T extends KtoAreaBasedItem>(it: T): WellnessListItem {
+function mapToListItem<T extends KtoAreaBasedItem>(it: T): TourListItem {
   const mapX = toNumberSafe(it.mapX);
   const mapY = toNumberSafe(it.mapY);
   const coord =
@@ -153,9 +153,9 @@ function extractHomepage(raw?: string): string | undefined {
 
 /** detailCommon만으로 homepage 보강 (contentTypeId 미전달) */
 async function enrichHomepages(
-  baseItems: WellnessListItem[],
+  baseItems: TourListItem[],
   localeParam: string
-): Promise<WellnessListItem[]> {
+): Promise<TourListItem[]> {
   if (baseItems.length === 0) return baseItems;
 
   const items = baseItems.slice();
@@ -328,7 +328,7 @@ export async function GET(req: Request) {
         if (it.homepage?.trim()) return it;
         return Object.fromEntries(
           Object.entries(it).filter(([k]) => k !== "homepage")
-        ) as WellnessListItem;
+        ) as TourListItem;
       });
     }
 

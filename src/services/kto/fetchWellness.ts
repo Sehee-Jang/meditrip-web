@@ -1,4 +1,4 @@
-import type { WellnessListItem, Arrange, Mode } from "@/types/kto-wellness";
+import type { TourListItem, Arrange, Mode } from "@/types/kto-wellness";
 import { resolveBaseUrl } from "@/utils/baseUrl";
 
 export interface FetchWellnessOptions {
@@ -21,7 +21,7 @@ export interface WellnessListResponse {
   totalCount: number;
   pageNo: number;
   numOfRows: number;
-  items: WellnessListItem[];
+  items: TourListItem[];
   mode?: string;
 }
 

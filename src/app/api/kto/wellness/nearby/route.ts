@@ -10,7 +10,7 @@ import type {
   KtoListResponse,
   KtoLocationBasedItem,
   KtoAreaBasedItem,
-  WellnessListItem,
+  TourListItem,
   ArrangeLocation,
 } from "@/types/kto-wellness";
 
@@ -53,7 +53,7 @@ function joinAddress(base?: string, detail?: string): string {
   return [a, b].filter(Boolean).join(" ");
 }
 
-function mapToListItem<T extends KtoAreaBasedItem>(it: T): WellnessListItem {
+function mapToListItem<T extends KtoAreaBasedItem>(it: T): TourListItem {
   const mapX = toNumberSafe(it.mapX); // 경도
   const mapY = toNumberSafe(it.mapY); // 위도
   const coord =

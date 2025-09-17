@@ -1,7 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import fetchWellness from "@/services/kto/fetchWellness";
-import type { WellnessListItem } from "@/types/kto-wellness";
+import type { TourListItem } from "@/types/kto-wellness";
 
 type PageParams = { locale: string };
 type SearchParams = {
@@ -80,7 +80,7 @@ export default async function WellnessPage({
         </div>
       ) : (
         <ul className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
-          {items.map((w: WellnessListItem) => {
+          {items.map((w: TourListItem) => {
             const href =
               `/${locale}/wellness/${encodeURIComponent(w.id)}?` +
               (w.address ? `a=${encodeURIComponent(w.address)}&` : "") +

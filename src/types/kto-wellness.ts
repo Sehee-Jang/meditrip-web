@@ -132,7 +132,7 @@ export type SigunguOption = { code: string; name: string; parent: string };
 // ---------- 앱 내에서 쓰는 정규화 타입 ----------
 export type Coord = { lat: number; lng: number } | null;
 
-export interface WellnessListItem {
+export interface TourListItem {
   id: string;
   title: string;
   address: string;
@@ -150,7 +150,7 @@ export interface WellnessListApiResponse {
   pageNo: number;
   numOfRows: number;
   totalCount: number;
-  items: WellnessListItem[];
+  items: TourListItem[];
 }
 
 export interface WellnessDetail {
