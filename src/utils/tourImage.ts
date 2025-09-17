@@ -10,8 +10,8 @@ type ImageLike = { image?: { original?: string; thumb?: string } };
 // 다양한 어댑터 케이스 고려해 테마 후보 키를 포괄
 type ThemeLike =
   | { wellnessThemaCd?: string }
-  | { themaCode?: string }
-  | { thema?: { code?: string } }
+  | { themeCode?: string }
+  | { theme?: { code?: string } }
   | { theme?: string }
   | { categoryCode?: string };
 
@@ -21,8 +21,9 @@ export type TourListLike = ImageLike & Partial<ThemeLike>;
 function extractThemeCode(item: TourListLike): TourThemeCode | null {
   const candidates: Array<unknown> = [
     (item as { wellnessThemaCd?: unknown }).wellnessThemaCd,
-    (item as { themaCode?: unknown }).themaCode,
-    (item as { thema?: { code?: unknown } }).thema?.code,
+    (item as { themeCode?: unknown }).themeCode,
+    (item as { themeCode?: unknown }).themeCode,
+    (item as { theme?: { code?: unknown } }).theme?.code,
     (item as { theme?: unknown }).theme,
     (item as { categoryCode?: unknown }).categoryCode,
   ];
