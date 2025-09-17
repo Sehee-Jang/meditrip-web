@@ -10,6 +10,29 @@ export const revalidate = 0;
 
 type Option = { label: string; value: string };
 
+const LDONG_CACHE_TTL = 1000 * 60 * 10; // 10분
+
+type LdongCacheEntry = {
+  expires: number;
+  data: KtoLdongCodeItem[];
+};
+
+const ldongCache = new Map<string, LdongCacheEntry>();
+
+function getLdongCacheKey(locale: string, lDongRegnCd?: string) {
+  const normalizedLocale = (locale ?? "").toLowerCase();
+  const normalizedRegion = (lDongRegnCd ?? "").trim();
+  return `${normalizedLocale}::${normalizedRegion}`;
+}
+
+function pruneExpiredLdongCache(now = Date.now()) {
+  for (const [key, entry] of ldongCache.entries()) {
+    if (entry.expires <= now) {
+      ldongCache.delete(key);
+    }
+  }
+}
+
 function isRecord(v: unknown): v is Record<string, unknown> {
   return typeof v === "object" && v !== null;
 }
@@ -59,6 +82,15 @@ async function fetchAllLdong(params: {
   pageNo?: number;
   numOfRows?: number;
 }) {
+  const key = getLdongCacheKey(params.locale, params.lDongRegnCd);
+  const now = Date.now();
+  pruneExpiredLdongCache(now);
+
+  const cached = ldongCache.get(key);
+  if (cached) {
+    return cached.data.map((item) => ({ ...item }));
+  }
+
   const all: KtoLdongCodeItem[] = [];
   let pageNo = params.pageNo ?? 1;
   const numOfRows = params.numOfRows ?? 1000;
@@ -85,6 +117,10 @@ async function fetchAllLdong(params: {
     if (pageNo * numOfRows >= total || chunk.length === 0) break;
     pageNo += 1;
   }
+  const expires = Date.now() + LDONG_CACHE_TTL;
+  const dataToCache = all.map((item) => ({ ...item }));
+  ldongCache.set(key, { expires, data: dataToCache });
+  
   return all;
 }
 
