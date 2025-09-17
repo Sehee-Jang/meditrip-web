@@ -121,27 +121,6 @@ export default function ArticlesListClient({
     });
   };
 
-  // 페이지 버튼 목록 생성 (1, …, n-1 n n+1, …, last 형태)
-  const makePageItems = (cur: number, max: number): Array<number | "…"> => {
-    const pages = new Set<number>();
-    pages.add(1);
-    pages.add(max);
-    for (let p = cur - 1; p <= cur + 1; p += 1) {
-      if (p >= 1 && p <= max) pages.add(p);
-    }
-    const sorted = Array.from(pages).sort((a, b) => a - b);
-
-    const out: Array<number | "…"> = [];
-    for (let i = 0; i < sorted.length; i += 1) {
-      const p = sorted[i];
-      if (i > 0 && p - sorted[i - 1] > 1) out.push("…");
-      out.push(p);
-    }
-    return out;
-  };
-
-  const pageItems = makePageItems(current, pageMax);
-
   return (
     <div className='space-y-6'>
       {/* 컨트롤 바 */}
