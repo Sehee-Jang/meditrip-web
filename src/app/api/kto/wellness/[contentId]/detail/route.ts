@@ -1,5 +1,3 @@
-
-
 import { NextResponse } from "next/server";
 import {
   getDetailCommon,
@@ -239,27 +237,30 @@ async function ensureCommon(
   ctHint?: string
 ): Promise<KtoDetailCommonItem | undefined> {
   // 0) no-ct
-  let arr = await getDetailCommon({ contentId, locale: langParam });
+  const arr = await getDetailCommon({ contentId, locale: langParam });
   if (arr[0]?.contentId) return arr[0];
 
-  // 1) hinted(ctHint)
-  if (ctHint) {
-    arr = await getDetailCommon({
-      contentId,
-      locale: langParam,
-      contentTypeId: ctHint,
-    });
-    if (arr[0]?.contentId) return arr[0];
-  }
+  const candidates = Array.from(
+    new Set(
+      [ctHint, "12", "76"].filter(
+        (ct): ct is string => typeof ct === "string" && ct.length > 0
+      )
+    )
+  );
 
-  // 2) 12 / 76 둘 다 시도
-  for (const ct of ["12", "76"]) {
-    arr = await getDetailCommon({
-      contentId,
-      locale: langParam,
-      contentTypeId: ct,
-    });
-    if (arr[0]?.contentId) return arr[0];
+  if (candidates.length === 0) return undefined;
+
+  const settled = await Promise.allSettled(
+    candidates.map((contentTypeId) =>
+      getDetailCommon({ contentId, locale: langParam, contentTypeId })
+    )
+  );
+
+  for (const result of settled) {
+    if (result.status === "fulfilled") {
+      const [item] = result.value;
+      if (item?.contentId) return item;
+    }
   }
   return undefined;
 }
