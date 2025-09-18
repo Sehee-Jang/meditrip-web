@@ -4,12 +4,13 @@ import {
   Pagination as Pg,
   PaginationContent,
   PaginationItem,
-  PaginationLink,
   PaginationPrevious,
   PaginationNext,
   PaginationEllipsis,
 } from "@/components/ui/pagination";
 import { buildPageRange } from "@/utils/pagination";
+import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 type Props = {
   current: number; // 현재 페이지(1-base)
@@ -31,6 +32,7 @@ export default function PaginationControls({
   return (
     <Pg className={className}>
       <PaginationContent>
+        {/* 이전*/}
         <PaginationItem>
           <PaginationPrevious
             href='#'
@@ -44,6 +46,7 @@ export default function PaginationControls({
           />
         </PaginationItem>
 
+        {/* 숫자버튼 */}
         {items.map((it, i) =>
           it === "…" ? (
             <PaginationItem key={`e-${i}`}>
@@ -51,20 +54,27 @@ export default function PaginationControls({
             </PaginationItem>
           ) : (
             <PaginationItem key={it}>
-              <PaginationLink
-                href='#'
-                isActive={it === current}
-                onClick={(e) => {
-                  e.preventDefault();
+              <button
+                type='button'
+                aria-current={it === current ? "page" : undefined}
+                className={cn(
+                  buttonVariants({
+                    variant: it === current ? "outline" : "ghost",
+                    size: "icon",
+                  }),
+                  it === current ? "cursor-default" : undefined
+                )}
+                onClick={() => {
                   if (it !== current) onChange(it);
                 }}
               >
                 {it}
-              </PaginationLink>
+              </button>
             </PaginationItem>
           )
         )}
 
+        {/* 다음 */}
         <PaginationItem>
           <PaginationNext
             href='#'
