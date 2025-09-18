@@ -18,7 +18,7 @@ export default function RichTextViewer({ doc }: { doc: JSONContent }) {
         autolink: true,
         openOnClick: true,
         HTMLAttributes: {
-          class: "tiptap-link,",
+          class: "tiptap-link",
           rel: "noopener noreferrer",
           target: "_blank",
         }, // 스타일용 클래스 부여
