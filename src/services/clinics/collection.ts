@@ -5,16 +5,26 @@ import {
   type DocumentReference,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import { ClinicDoc } from "@/types/clinic";
+import { ClinicDoc, PackageDoc } from "@/types/clinic";
 
 export const CLINICS_COLLECTION = "clinics" as const;
 
 // 컬렉션 참조
-export function articlesColRef(): CollectionReference<ClinicDoc> {
+export function clinicsColRef(): CollectionReference<ClinicDoc> {
   return collection(db, CLINICS_COLLECTION) as CollectionReference<ClinicDoc>;
 }
 
-// 특정 문서 참조
-export function articleDocRef(id: string): DocumentReference<ClinicDoc> {
+// clinics/{id} 문서
+export function clinicDocRef(id: string): DocumentReference<ClinicDoc> {
   return doc(db, CLINICS_COLLECTION, id) as DocumentReference<ClinicDoc>;
+}
+
+// linics/{id}/packages 컬렉션
+export function packagesColRef(
+  clinicId: string
+): CollectionReference<PackageDoc> {
+  return collection(
+    clinicDocRef(clinicId),
+    "packages"
+  ) as CollectionReference<PackageDoc>;
 }

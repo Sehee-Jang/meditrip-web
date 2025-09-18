@@ -1,12 +1,4 @@
-import { db } from "@/lib/firebase";
-import {
-  collection,
-  doc,
-  getDoc,
-  getDocs,
-  orderBy,
-  query,
-} from "firebase/firestore";
+import { getDoc, getDocs, orderBy, query } from "firebase/firestore";
 import type {
   ClinicDetail,
   ClinicDoc,
@@ -14,6 +6,7 @@ import type {
   PackageDoc,
   PackageWithId,
 } from "@/types/clinic";
+import { clinicDocRef, packagesColRef } from "./collection";
 
 /**
  * 병원 상세 조회 (서브컬렉션 우선 + 레거시 packages 맵 fallback)
@@ -21,7 +14,7 @@ import type {
  * - clinics/{id}/packages 서브컬렉션을 배열로 조회해 packagesList로 합침
  */
 export async function getClinicById(id: string): Promise<ClinicDetail | null> {
-  const clinicRef = doc(db, "clinics", id);
+  const clinicRef = clinicDocRef(id);
   const clinicSnap = await getDoc(clinicRef);
 
   if (!clinicSnap.exists()) return null;
@@ -34,7 +27,7 @@ export async function getClinicById(id: string): Promise<ClinicDetail | null> {
   };
 
   // 패키지 서브컬렉션 조회 (createdAt desc 우선, 실패 시 무정렬 폴백)
-  const pkgColRef = collection(clinicRef, "packages");
+  const pkgColRef = packagesColRef(clinic.id);
 
   let packagesList: PackageWithId[] = [];
   try {
