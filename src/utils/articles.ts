@@ -32,7 +32,7 @@ export function excerptFor(
   return a.excerpt?.[locale] || a.excerpt?.ko || "";
 }
 export function viewsOf(a: Article): number {
-  return (a as { views?: number }).views ?? 0;
+  return (a as { viewCount?: number }).viewCount ?? 0;
 }
 export function createdAtOf(a: Article): Date | null {
   const raw = (a as { createdAt?: string | number | Date })?.createdAt;

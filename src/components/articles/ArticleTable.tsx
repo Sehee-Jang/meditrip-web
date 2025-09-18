@@ -1,5 +1,5 @@
 "use client";
-import { titleFor, viewsOf, createdAtOf } from "@/utils/articles";
+import { titleFor, createdAtOf } from "@/utils/articles";
 import type { Article } from "@/types/articles";
 import type { ReactNode, ReactElement } from "react";
 import { useLocale } from "next-intl";
@@ -28,7 +28,9 @@ export function ArticleRow({
 }) {
   const locale = useLocale() as keyof Article["title"];
   const title = titleFor(article, locale);
-  const views = viewsOf(article);
+  const viewCount =
+    typeof article.viewCount === "number" ? article.viewCount : 0;
+
   const createdAt = createdAtOf(article);
 
   const row = (
@@ -40,7 +42,7 @@ export function ArticleRow({
         {title}
       </span>
       <span className='w-20 text-right text-xs text-gray-500 whitespace-nowrap'>
-        {views.toLocaleString()}
+        {viewCount.toLocaleString()}
       </span>
       <span className='w-28 text-right text-xs text-gray-500 whitespace-nowrap'>
         {createdAt ? createdAt.toLocaleDateString() : ""}

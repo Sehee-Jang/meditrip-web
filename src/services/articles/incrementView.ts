@@ -1,8 +1,12 @@
-import { doc, updateDoc, increment } from "firebase/firestore";
-import { db } from "@/lib/firebase";
+import { updateDoc, increment } from "firebase/firestore";
+import { articleDocRef } from "./collection";
 
-const COL = "wellness";
+export async function incrementView(articleId: string): Promise<void> {
+  if (!articleId || typeof window === "undefined") return;
 
-export async function incrementView(id: string): Promise<void> {
-  await updateDoc(doc(db, COL, id), { viewCount: increment(1) });
+  const key = `viewed:article:${articleId}`;
+  if (sessionStorage.getItem(key)) return;
+  sessionStorage.setItem(key, "1");
+
+  await updateDoc(articleDocRef(articleId), { viewCount: increment(1) });
 }

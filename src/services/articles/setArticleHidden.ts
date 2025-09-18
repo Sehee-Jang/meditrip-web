@@ -1,13 +1,11 @@
-import { doc, updateDoc, serverTimestamp } from "firebase/firestore";
-import { db } from "@/lib/firebase";
-
-const COL = "wellness";
+import { updateDoc, serverTimestamp } from "firebase/firestore";
+import { articleDocRef } from "./collection";
 
 export async function setArticleHidden(
   id: string,
   isHidden: boolean
 ): Promise<void> {
-  await updateDoc(doc(db, COL, id), {
+  await updateDoc(articleDocRef(id), {
     isHidden,
     updatedAt: serverTimestamp(),
   });

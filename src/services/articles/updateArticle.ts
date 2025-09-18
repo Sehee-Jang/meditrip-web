@@ -1,13 +1,11 @@
-import { doc, updateDoc } from "firebase/firestore";
-import { db } from "@/lib/firebase";
+import { updateDoc } from "firebase/firestore";
 import type { UpdateArticleInput } from "@/types/articles";
 import { mapUpdateInputToDoc } from "./mapArticles";
-
-const COL = "wellness";
+import { articleDocRef } from "./collection";
 
 export async function updateArticle(
   id: string,
   patch: UpdateArticleInput
 ): Promise<void> {
-  await updateDoc(doc(db, COL, id), mapUpdateInputToDoc(patch));
+  await updateDoc(articleDocRef(id), mapUpdateInputToDoc(patch));
 }

@@ -1,8 +1,6 @@
-import { deleteDoc, doc } from "firebase/firestore";
-import { db } from "@/lib/firebase";
-
-const COL = "wellness";
+import { deleteDoc } from "firebase/firestore";
+import { articleDocRef } from "./collection";
 
 export async function deleteArticle(id: string): Promise<void> {
-  await deleteDoc(doc(db, COL, id));
+  await deleteDoc(articleDocRef(id));
 }
