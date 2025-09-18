@@ -1,5 +1,4 @@
 import {
-  collection,
   getDocs,
   orderBy,
   query,
@@ -10,10 +9,10 @@ import {
   type QueryConstraint,
   type QueryDocumentSnapshot,
 } from "firebase/firestore";
-import { db } from "@/lib/firebase";
 import type { Article } from "@/types/articles";
 import type { CategoryKey } from "@/constants/categories";
 import { mapSnapToArticle } from "./mapArticles";
+import { articlesColRef } from "./collection";
 
 export type ListOptions = {
   limit?: number; // 기본 12
@@ -29,8 +28,6 @@ export type ListResult = {
   hasMore: boolean;
 };
 
-const COL = "wellness";
-
 export async function listArticles(
   opts: ListOptions = {}
 ): Promise<ListResult> {
@@ -38,14 +35,12 @@ export async function listArticles(
     limit = 12,
     cursor = null,
     category = "all",
-    includeHidden = false,
     order = "latest",
   } = opts;
 
-  const col = collection(db, COL);
+  const col = articlesColRef();
   const qc: QueryConstraint[] = [];
 
-  if (!includeHidden) qc.push(where("isHidden", "==", false));
   if (category !== "all") qc.push(where("category", "==", category));
 
   if (order === "popular") {
