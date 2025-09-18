@@ -5,6 +5,7 @@ import type {
   UpdateArticleInput,
   Article,
   ArticleDoc,
+  ArticleStatus,
 } from "@/types/articles";
 import { CATEGORY_KEYS, type CategoryKey } from "@/constants/categories";
 import { toISO } from "@/utils/date";
@@ -73,7 +74,8 @@ function normalizeRichI18n(v: unknown): LocalizedRichTextDoc {
   // 과거 데이터가 통째로 문자열이면 ko에만 채우기
   if (typeof v === "string") {
     const out: Partial<Record<LocaleKey, JSONContent>> = {};
-    for (const loc of LOCALES_TUPLE) out[loc] = loc === "ko" ? toTiptapDoc(v) : EMPTY_DOC;
+    for (const loc of LOCALES_TUPLE)
+      out[loc] = loc === "ko" ? toTiptapDoc(v) : EMPTY_DOC;
     return out as LocalizedRichTextDoc;
   }
 
@@ -106,6 +108,11 @@ function normalizeImages(v: unknown): string[] {
   return [];
 }
 
+/** status 정규화 */
+function normalizeStatus(v: unknown): ArticleStatus {
+  return v === "hidden" ? "hidden" : "visible";
+}
+
 /** Firestore → 앱 표준(ko 문자열 뽑아서, ISO/기본값 보장) */
 export function mapSnapToArticle(
   snap: QueryDocumentSnapshot<DocumentData>
@@ -127,7 +134,7 @@ export function mapSnapToArticle(
 
     viewCount: typeof raw.viewCount === "number" ? raw.viewCount : 0,
     likeCount: typeof raw.likeCount === "number" ? raw.likeCount : 0,
-    isHidden: Boolean(raw.isHidden ?? false),
+    status: normalizeStatus((raw as { status?: unknown }).status),
 
     createdAt: createdAtISO || new Date().toISOString(),
     updatedAt: updatedAtISO || createdAtISO || new Date().toISOString(),
@@ -154,7 +161,7 @@ export function mapDocToArticle(id: string, raw: ArticleDoc): Article {
 
     viewCount: typeof raw.viewCount === "number" ? raw.viewCount : 0,
     likeCount: typeof raw.likeCount === "number" ? raw.likeCount : 0,
-    isHidden: Boolean(raw.isHidden ?? false),
+    status: normalizeStatus((raw as { status?: unknown }).status),
 
     createdAt: createdAtISO || new Date().toISOString(),
     updatedAt: updatedAtISO || createdAtISO || new Date().toISOString(),
@@ -172,7 +179,7 @@ export function mapCreateInputToDoc(input: CreateArticleInput): ArticleDoc {
       ? (input.tags.filter(Boolean) as string[])
       : [],
     images: normalizeImages(input.images),
-    isHidden: Boolean(input.isHidden ?? false),
+    status: input.status ?? "visible",
 
     viewCount: 0,
     likeCount: 0,
@@ -191,11 +198,13 @@ export function mapUpdateInputToDoc(
     data.title = normalizeI18n(patch.title);
   if (typeof patch.excerpt !== "undefined")
     data.excerpt = normalizeI18n(patch.excerpt);
-  if (typeof patch.body !== "undefined") data.body = normalizeRichI18n(patch.body);
+  if (typeof patch.body !== "undefined")
+    data.body = normalizeRichI18n(patch.body);
   if (typeof patch.category === "string") data.category = patch.category;
   if (Array.isArray(patch.tags)) data.tags = patch.tags;
   if (Array.isArray(patch.images)) data.images = normalizeImages(patch.images);
-  if (typeof patch.isHidden === "boolean") data.isHidden = patch.isHidden;
+  if (typeof patch.status === "string")
+    data.status = patch.status as ArticleStatus;
 
   return data;
 }

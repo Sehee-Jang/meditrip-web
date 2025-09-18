@@ -3,6 +3,8 @@ import type { DateInput } from "@/utils/date";
 import type { FieldValue } from "firebase/firestore";
 import { LocalizedRichTextDoc, LocalizedTextDoc } from "./common";
 
+export type ArticleStatus = "visible" | "hidden";
+
 /** Firestore 저장용 */
 export interface Article {
   id: string;
@@ -16,8 +18,7 @@ export interface Article {
 
   viewCount: number;
   likeCount: number;
-
-  isHidden: boolean;
+  status: ArticleStatus;
   createdAt: string;
   updatedAt: string;
 }
@@ -34,7 +35,7 @@ export type ArticleDoc = {
 
   viewCount?: number;
   likeCount?: number;
-  isHidden?: boolean;
+  status?: ArticleStatus;
 
   createdAt?: DateInput | FieldValue;
   updatedAt?: DateInput | FieldValue;
@@ -49,7 +50,7 @@ export type CreateArticleInput = {
   // categories: CategoryKey[]; // 다중 카테고리
   tags: string[];
   images: string[];
-  isHidden?: boolean;
+  status?: ArticleStatus;
 };
 
 export type UpdateArticleInput = Partial<CreateArticleInput>;

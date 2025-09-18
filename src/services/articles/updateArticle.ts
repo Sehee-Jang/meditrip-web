@@ -9,3 +9,4 @@ export async function updateArticle(
 ): Promise<void> {
   await updateDoc(articleDocRef(id), mapUpdateInputToDoc(patch));
 }
+

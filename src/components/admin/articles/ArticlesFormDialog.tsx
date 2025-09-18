@@ -122,7 +122,6 @@ export default function ArticlesFormDialog({
       category: undefined,
       tags: [],
       images: [],
-      isHidden: false,
     },
     mode: "onChange",
     shouldFocusError: true,
@@ -159,7 +158,6 @@ export default function ArticlesFormDialog({
         category: data.category,
         tags: data.tags ?? [],
         images: data.images ?? [],
-        isHidden: data.isHidden ?? false,
       });
     })();
   }, [open, mode, id, reset]);
@@ -186,7 +184,6 @@ export default function ArticlesFormDialog({
         category: values.category,
         tags: values.tags,
         images: values.images ?? [],
-        isHidden: values.isHidden,
       };
 
       if (mode === "create") {
