@@ -3,16 +3,16 @@ import type { Unsubscribe } from "firebase/firestore";
 import {
   subscribeFavoriteHospitalIds,
   toggleFavoriteHospital as svcToggle,
-} from "@/services/hospitals/favorites";
+} from "@/services/clinics/favorites";
 
 type FavoritesState = {
   ids: Set<string>;
   init: (uid: string) => Unsubscribe | undefined;
   setFavorites: (ids: string[]) => void;
   setIds: (ids: string[]) => void;
-  isFavorited: (hospitalId: string) => boolean;
-  toggleFavoriteLocal: (hospitalId: string) => void;
-  toggleAndSync: (uid: string, hospitalId: string) => Promise<boolean>;
+  isFavorited: (clinicId: string) => boolean;
+  toggleFavoriteLocal: (clinicId: string) => void;
+  toggleAndSync: (uid: string, clinicId: string) => Promise<boolean>;
   reset: () => void;
 };
 
@@ -28,20 +28,20 @@ export const useFavoritesStore = create<FavoritesState>((set, get) => ({
 
   setFavorites: (ids: string[]) => set({ ids: new Set(ids) }),
   setIds: (ids: string[]) => set({ ids: new Set(ids) }),
-  isFavorited: (hospitalId: string) => get().ids.has(hospitalId),
+  isFavorited: (clinicId: string) => get().ids.has(clinicId),
 
-  toggleFavoriteLocal: (hospitalId: string) => {
+  toggleFavoriteLocal: (clinicId: string) => {
     const next = new Set(get().ids);
-    if (next.has(hospitalId)) next.delete(hospitalId);
-    else next.add(hospitalId);
+    if (next.has(clinicId)) next.delete(clinicId);
+    else next.add(clinicId);
     set({ ids: next });
   },
 
-  toggleAndSync: async (uid: string, hospitalId: string) => {
-    const added = await svcToggle(uid, hospitalId);
+  toggleAndSync: async (uid: string, clinicId: string) => {
+    const added = await svcToggle(uid, clinicId);
     const next = new Set(get().ids);
-    if (added) next.add(hospitalId);
-    else next.delete(hospitalId);
+    if (added) next.add(clinicId);
+    else next.delete(clinicId);
     set({ ids: next });
     return added;
   },

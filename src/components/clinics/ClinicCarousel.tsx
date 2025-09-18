@@ -9,11 +9,11 @@ import {
 } from "@/components/ui/carousel";
 import Image from "next/image";
 
-interface HospitalCarouselProps {
+interface ClinicCarouselProps {
   photos: string[];
 }
 
-export default function HospitalCarousel({ photos }: HospitalCarouselProps) {
+export default function ClinicCarousel({ photos }: ClinicCarouselProps) {
   return (
     <Carousel
       opts={{ loop: true }}

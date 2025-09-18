@@ -5,9 +5,9 @@ import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 export interface NewReservation {
   patientName: string;
   nationality: string;
-  hospitalId: string;
+  clinicId: string;
   packageId: string;
-  hospitalName: string;
+  clinicName: string;
   packageName: string;
   date: string;
   time: string;

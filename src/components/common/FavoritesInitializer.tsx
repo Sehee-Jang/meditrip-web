@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import { useFavoritesStore } from "@/stores/useFavoritesStore";
-import { subscribeFavoriteHospitalIds } from "@/services/hospitals/favorites";
+import { subscribeFavoriteHospitalIds } from "@/services/clinics/favorites";
 import type { Unsubscribe } from "firebase/firestore";
 
 export default function FavoritesInitializer() {

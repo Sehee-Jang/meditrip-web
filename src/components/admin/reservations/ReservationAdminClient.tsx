@@ -39,7 +39,7 @@ export default function ReservationAdminClient() {
         kw.length === 0 ||
         r.id.toLowerCase().includes(kw) ||
         r.patientName.toLowerCase().includes(kw) ||
-        r.hospitalName.toLowerCase().includes(kw) ||
+        r.clinicName.toLowerCase().includes(kw) ||
         r.packageName.toLowerCase().includes(kw);
       const hitStatus = status === "all" ? true : r.status === status;
       return hitKw && hitStatus;

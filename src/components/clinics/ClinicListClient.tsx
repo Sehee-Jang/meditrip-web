@@ -6,10 +6,10 @@ import SearchInput from "@/components/common/SearchInput";
 import LoadingSpinner from "../common/LoadingSpinner";
 import ClinicList from "./ClinicList";
 import type { ClinicListItem } from "@/types/clinic";
-import { fetchClinics } from "@/services/hospitals/fetchClinics";
+import { fetchClinics } from "@/services/clinics/fetchClinics";
 import Container from "../common/Container";
 
-export default function HospitalListClient() {
+export default function ClinicListClient() {
   const t = useTranslations("clinic");
   const locale = useLocale();
   const loc: "ko" | "ja" = locale === "ja" ? "ja" : "ko";

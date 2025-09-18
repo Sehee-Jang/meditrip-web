@@ -5,25 +5,25 @@ import { getTranslations } from "next-intl/server";
 import type { ClinicDetail } from "@/types/clinic";
 import type { Locale } from "@/i18n/routing";
 import Image from "next/image";
-import HospitalActions from "@/components/hospitals/HospitalActions";
-import { getClinicById } from "@/services/hospitals/getClinicById";
+import ClinicActions from "@/components/clinics/ClinicActions";
+import { getClinicById } from "@/services/clinics/getClinicById";
 import { toSupportedLocale } from "@/utils/i18n";
 import { pickText } from "@/utils/i18n";
 
 interface Props {
   params: Promise<{
     locale: string;
-    hospitalId: string;
+    clinicId: string;
     packageId: string;
   }>;
 }
 
 export default async function PackageDetailPage({ params }: Props) {
-  const { locale, hospitalId, packageId } = await params;
+  const { locale, clinicId, packageId } = await params;
   const t = await getTranslations("package-detail");
 
   // 병원 상세(서브컬렉션 우선 + 레거시 fallback)
-  const clinic: ClinicDetail | null = await getClinicById(hospitalId);
+  const clinic: ClinicDetail | null = await getClinicById(clinicId);
   if (!clinic) return notFound();
 
   const pkg = clinic.packagesList.find((p) => p.id === packageId);
@@ -44,7 +44,7 @@ export default async function PackageDetailPage({ params }: Props) {
 
       <section className='max-w-4xl mx-auto space-y-8 px-4 mb-8'>
         {/* 이미지 슬라이더 or 썸네일 */}
-        {/* <HospitalCarousel photos={pkg.packageImages} /> */}
+        {/* <ClinicCarousel photos={pkg.packageImages} /> */}
         {pkg.packageImages?.length ? (
           <div className='w-full h-60 sm:h-80 md:h-[360px] rounded overflow-hidden'>
             {pkg.packageImages.map((img, i) => (
@@ -150,9 +150,9 @@ export default async function PackageDetailPage({ params }: Props) {
         )}
 
         {/* Actions: 예약 & 공유 */}
-        <HospitalActions
+        <ClinicActions
           locale={locale}
-          hospitalId={hospitalId}
+          clinicId={clinicId}
           packageId={packageId}
         />
       </section>

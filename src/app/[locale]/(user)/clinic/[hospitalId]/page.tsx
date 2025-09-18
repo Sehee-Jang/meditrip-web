@@ -4,10 +4,10 @@ import PageHeader from "@/components/common/PageHeader";
 import Image from "next/image";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
-import { getClinicById } from "@/services/hospitals/getClinicById";
+import { getClinicById } from "@/services/clinics/getClinicById";
 import type { ClinicDetail, DayOfWeek } from "@/types/clinic";
 import type { Locale } from "@/i18n/routing";
-import FavoriteButton from "@/components/hospitals/FavoriteButton";
+import FavoriteButton from "@/components/clinics/FavoriteButton";
 import GoogleMapEmbed from "@/components/common/GoogleMapEmbed";
 import { formatPrice, formatDuration } from "@/lib/format";
 import { toSupportedLocale, pickText, pickLocalized } from "@/utils/i18n";
@@ -25,10 +25,10 @@ import {
   Plane,
 } from "lucide-react";
 import type { AmenityKey, Doctor } from "@/types/clinic";
-import { getTagsCatalogServer } from "@/services/hospitals/getTagsCatalog";
-import HospitalCarousel from "@/components/hospitals/HospitalCarousel";
+import { getTagsCatalogServer } from "@/services/clinics/getTagsCatalog";
+import ClinicCarousel from "@/components/clinics/ClinicCarousel";
 
-type PageParams = Promise<{ locale: string; hospitalId: string }>;
+type PageParams = Promise<{ locale: string; clinicId: string }>;
 type SearchParams = Promise<{ tab?: string }>;
 
 export const revalidate = 120;
@@ -100,7 +100,7 @@ export default async function ClinicDetailPage({
   params: PageParams;
   searchParams: SearchParams;
 }) {
-  const { locale, hospitalId } = await params;
+  const { locale, clinicId } = await params;
   const { tab } = await searchParams;
   const activeTab: "info" | "reviews" = tab === "reviews" ? "reviews" : "info";
 
@@ -108,7 +108,7 @@ export default async function ClinicDetailPage({
   const tAmenity = await getTranslations("amenities");
 
   // 단일 문서만 읽기
-  const clinic: ClinicDetail | null = await getClinicById(hospitalId);
+  const clinic: ClinicDetail | null = await getClinicById(clinicId);
   if (!clinic) return notFound();
 
   const loc: Locale = toSupportedLocale(locale);
@@ -167,17 +167,17 @@ export default async function ClinicDetailPage({
       <PageHeader desktopTitle={name} mobileTitle={name} showBackIcon center>
         {/* 모바일 전용 하트(헤더 내부) */}
         <div className='md:hidden'>
-          <FavoriteButton hospitalId={hospitalId} className='p-1' />
+          <FavoriteButton clinicId={clinicId} className='p-1' />
         </div>
       </PageHeader>
 
       <section className='max-w-4xl mx-auto px-4 py-6 flex flex-col gap-8'>
         {/* 대표 이미지 슬라이더 */}
         <div className='relative '>
-          <HospitalCarousel photos={clinic.images} />
+          <ClinicCarousel photos={clinic.images} />
           <div className='absolute top-3 right-3 hidden md:block'>
             <FavoriteButton
-              hospitalId={clinic.id}
+              clinicId={clinic.id}
               className='p-2 rounded-full bg-white/90 hover:bg-white shadow'
             />
           </div>
@@ -194,7 +194,7 @@ export default async function ClinicDetailPage({
 
           <div className='absolute top-3 right-3 hidden md:block'>
             <FavoriteButton
-              hospitalId={clinic.id}
+              clinicId={clinic.id}
               className='p-2 rounded-full bg-white/90 hover:bg-white shadow'
             />
           </div>
@@ -239,7 +239,7 @@ export default async function ClinicDetailPage({
           <div className='border-b'>
             <nav className='grid grid-cols-2 text-sm'>
               <Link
-                href={`/${locale}/hospital/${hospitalId}?tab=info`}
+                href={`/${locale}/clinic/${clinicId}?tab=info`}
                 className={`block text-center no-underline py-3 border-b-2 ${
                   activeTab === "info"
                     ? "text-[#EB7F65] border-[#EB7F65] font-medium"
@@ -250,7 +250,7 @@ export default async function ClinicDetailPage({
                 {t("infoTab")}
               </Link>
               <Link
-                href={`/${locale}/hospital/${hospitalId}?tab=reviews`}
+                href={`/${locale}/clinic/${clinicId}?tab=reviews`}
                 className={`block text-center no-underline py-3 border-b-2 ${
                   activeTab === "reviews"
                     ? "text-[#EB7F65] border-[#EB7F65] font-medium"
@@ -735,7 +735,7 @@ export default async function ClinicDetailPage({
               return (
                 <Link
                   key={pkg.id}
-                  href={`/${locale}/hospital/${hospitalId}/package/${pkgId}`}
+                  href={`/${locale}/clinic/${clinicId}/package/${pkgId}`}
                   className='border rounded-2xl overflow-hidden hover:shadow-lg transition'
                 >
                   {/* 1. 패키지 이미지 */}

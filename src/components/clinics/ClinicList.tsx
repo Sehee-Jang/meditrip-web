@@ -22,7 +22,7 @@ export default function ClinicList({ clinics }: ClinicListProps) {
         {clinics.map((c) => (
           <li key={c.id}>
             <Card className='group hover:shadow-lg transition-shadow rounded-2xl overflow-hidden'>
-              <Link href={`/hospital/${c.id}`} className='block'>
+              <Link href={`/clinic/${c.id}`} className='block'>
                 {/* 대표 이미지 */}
                 <div className='relative w-full h-40'>
                   <Image
@@ -34,7 +34,7 @@ export default function ClinicList({ clinics }: ClinicListProps) {
                   />
                   {/* 찜 아이콘 */}
                   <FavoriteButton
-                    hospitalId={c.id}
+                    clinicId={c.id}
                     className='absolute top-2 right-2 p-2 rounded-full bg-white/90 hover:bg-white shadow'
                   />
                 </div>

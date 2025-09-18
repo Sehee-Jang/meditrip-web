@@ -16,19 +16,19 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 interface FavoriteButtonProps {
-  hospitalId: string;
+  clinicId: string;
   position?: "absolute" | "inline";
   className?: string;
   onToggle?: (next: boolean) => void;
 }
 
 export default function FavoriteButton({
-  hospitalId,
+  clinicId,
   position = "inline",
   className = "",
   onToggle,
 }: FavoriteButtonProps) {
-  const isActive = useFavoritesStore((s) => s.isFavorited(hospitalId));
+  const isActive = useFavoritesStore((s) => s.isFavorited(clinicId));
   const toggleAndSync = useFavoritesStore((s) => s.toggleAndSync);
   const t = useTranslations("my-favorite");
   const [open, setOpen] = useState(false);
@@ -48,7 +48,7 @@ export default function FavoriteButton({
     try {
       setLoading(true);
       // toggleAndSync가 true(추가) / false(해제) 반환
-      const added = await toggleAndSync(user.uid, hospitalId);
+      const added = await toggleAndSync(user.uid, clinicId);
       onToggle?.(added);
 
       // 추가 시에만 성공 토스트 (기존 UX 유지)

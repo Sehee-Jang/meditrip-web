@@ -44,7 +44,7 @@ export default function Header() {
         <Link href='/'>{t("main")}</Link>
         <Link href='/articles'>{t("contents")}</Link>
         {/* <Link href='/community'>{t("community")}</Link> */}
-        <Link href='/hospital'>{t("hospital")}</Link>
+        <Link href='/clinic'>{t("clinic")}</Link>
         <Link href='/tour'>{t("tour")}</Link>
         {user ? (
           <>
@@ -80,7 +80,7 @@ export default function Header() {
         </Link> */}
 
         {/* 병원 */}
-        <Link href='/hospital' aria-label='hospital'>
+        <Link href='/clinic' aria-label='clinic'>
           <HospitalIcon size={20} />
         </Link>
 
