@@ -38,20 +38,24 @@ export default function ClinicSection() {
   );
 
   return (
-    <section className='bg-white py-10'>
+    <section className='py-10'>
       <Container>
         <div className='flex justify-between items-center mb-4'>
           <div>
             <h2 className='text-xl md:text-2xl font-semibold'>
               {t("section.title")}
             </h2>
-            <p className='text-sm text-gray-500'>{t("section.desc")}</p>
+            <p className='text-sm text-muted-foreground'>{t("section.desc")}</p>
           </div>
 
           {/* 데스크탑 CTA */}
           <Link
             href='/hospital'
-            className='hidden md:inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs border border-gray-200 text-gray-600 hover:bg-gray-50'
+            className='hidden md:inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs
+                       border border-border
+                       text-foreground/70
+                       hover:bg-accent hover:text-accent-foreground
+                       transition-colors'
           >
             {t("section.button")}
             <ChevronRight size={14} />
@@ -60,7 +64,7 @@ export default function ClinicSection() {
 
         {/* 병원 리스트 */}
         {loading ? (
-          <div className='min-h-[16rem] grid place-items-center text-gray-500'>
+          <div className='min-h-[16rem] grid place-items-center text-muted-foreground'>
             {t("clinicList.loading")}
           </div>
         ) : (
@@ -72,7 +76,12 @@ export default function ClinicSection() {
           <Link
             href='/hospital'
             locale={locale}
-            className='w-full max-w-xs bg-white text-black border flex items-center justify-center gap-1 text-sm font-medium px-4 py-3 rounded-md'
+            className='flex w-full max-w-xs items-center justify-center gap-1 rounded-md
+                       border border-border
+                       bg-card text-card-foreground
+                       px-4 py-3 text-sm font-medium
+                       hover:bg-accent hover:text-accent-foreground
+                       transition-colors'
           >
             {t("section.button")}
             <ChevronRight size={16} />

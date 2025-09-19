@@ -4,6 +4,7 @@ import Script from "next/script";
 import GtmBridge from "@/components/system/GtmBridge";
 import { Suspense } from "react";
 import GlobalPointerGuard from "@/components/common/GlobalPointerGuard";
+import { ThemeProvider } from "@/providers/ThemeProvider";
 
 export default function RootLayout({
   children,
@@ -13,7 +14,7 @@ export default function RootLayout({
   const gtmId = process.env.NEXT_PUBLIC_GTM_ID ?? "";
 
   return (
-    <html lang='ko'>
+    <html lang='ko' suppressHydrationWarning>
       <head>
         {/* 동의 기본값: GTM 로드 이전(beforeInteractive)에 선언 */}
         <Script id='consent-default' strategy='beforeInteractive'>
@@ -47,24 +48,26 @@ export default function RootLayout({
         )}
       </head>
       <body>
-        {/* JS 비활성 사용자 대응용 noscript 권장 */}
-        {gtmId && (
-          <noscript>
-            <iframe
-              src={`https://www.googletagmanager.com/ns.html?id=${gtmId}`}
-              height='0'
-              width='0'
-              style={{ display: "none", visibility: "hidden" }}
-            />
-          </noscript>
-        )}
+        <ThemeProvider>
+          {/* JS 비활성 사용자 대응용 noscript 권장 */}
+          {gtmId && (
+            <noscript>
+              <iframe
+                src={`https://www.googletagmanager.com/ns.html?id=${gtmId}`}
+                height='0'
+                width='0'
+                style={{ display: "none", visibility: "hidden" }}
+              />
+            </noscript>
+          )}
 
-        {/* SPA 라우팅 시 page_view 커스텀 이벤트 푸시 */}
-        <Suspense fallback={null}>
-          <GtmBridge enabled={Boolean(gtmId)} />
-        </Suspense>
-        <GlobalPointerGuard />
-        {children}
+          {/* SPA 라우팅 시 page_view 커스텀 이벤트 푸시 */}
+          <Suspense fallback={null}>
+            <GtmBridge enabled={Boolean(gtmId)} />
+          </Suspense>
+          <GlobalPointerGuard />
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

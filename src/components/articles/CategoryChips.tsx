@@ -37,7 +37,7 @@ export function CategoryChips({
                 "rounded-full border px-3 py-1 text-xs md:text-sm transition-colors",
                 active
                   ? "bg-gray-900 text-white border-gray-900"
-                  : "bg-white hover:bg-gray-50",
+                  : "bg-background hover:bg-accent",
               ].join(" ")}
             >
               {tCat(k)}

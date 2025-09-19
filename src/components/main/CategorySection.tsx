@@ -62,7 +62,7 @@ export default function CategorySection({
   };
 
   return (
-    <section className='md:y-10 bg-white'>
+    <section className='md:y-10'>
       <Container className={clsx("px-0 md:px-6", className)}>
         <div className='grid grid-cols-5 gap-2 sm:gap-3 md:gap-4'>
           {categoryKeys.map((key) => {
@@ -71,32 +71,32 @@ export default function CategorySection({
               mode === "interactive" && selectable && selected.includes(key);
 
             const classes = clsx(
-              "h-[88px] flex flex-col items-center justify-center rounded-md border bg-white transition",
+              // 컨테이너: 카드 톤 + 테두리
+              "h-[88px] rounded-md border border-border bg-card",
+              // 레이아웃
+              "flex flex-col items-center justify-center",
+              // 인터랙션
+              "transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
               mode === "interactive" && selectable
-                ? "hover:border-gray-400"
-                : "border-gray-200",
-              isActive
-                ? "border-gray-900 ring-2 ring-gray-900/10"
-                : "border-gray-200"
+                ? "hover:bg-accent hover:text-accent-foreground"
+                : "hover:bg-muted/50",
+              // 활성 상태 강조
+              isActive && "ring-2 ring-ring"
+            );
+            const labelClasses = clsx(
+              "text-xs font-medium",
+              isActive ? "text-foreground" : "text-foreground/90"
+            );
+
+            const iconClasses = clsx(
+              "mb-1",
+              isActive ? "text-foreground" : "text-muted-foreground"
             );
 
             const inner = (
               <>
-                <Icon
-                  size={24}
-                  className={clsx(
-                    "mb-1",
-                    isActive ? "text-gray-900" : "text-gray-700"
-                  )}
-                />
-                <span
-                  className={clsx(
-                    "text-xs font-medium",
-                    isActive ? "text-gray-900" : "text-gray-800"
-                  )}
-                >
-                  {t(key)}
-                </span>
+                <Icon size={24} className={iconClasses} />
+                <span className={labelClasses}>{t(key)}</span>
               </>
             );
 

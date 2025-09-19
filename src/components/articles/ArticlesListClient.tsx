@@ -124,7 +124,7 @@ export default function ArticlesListClient({
   return (
     <div className='space-y-6'>
       {/* 컨트롤 바 */}
-      <div className='bg-white p-4 shadow-sm rounded-xl'>
+      <div className='bg-background p-4 shadow-sm rounded-xl'>
         <div className='flex flex-col gap-3 md:flex-row md:items-center'>
           {/* 카테고리 칩 */}
           <CategoryChips
@@ -156,7 +156,7 @@ export default function ArticlesListClient({
                 setSelectedId(null);
               }}
               placeholder='검색어를 입력하세요'
-              className='h-10 w-full md:w-72 rounded-lg border border-gray-200 px-3 text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-black/10 placeholder:text-gray-400'
+              className='h-10 w-full md:w-72 rounded-lg border border-border px-3 text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-black/10 placeholder:text-gray-400'
             />
           </div>
         </div>
@@ -192,12 +192,12 @@ export default function ArticlesListClient({
               ))}
             </div>
           ) : items.length === 0 ? (
-            <div className='mt-2 rounded-xl border border-gray-200 bg-white p-10 text-center text-sm text-gray-500 shadow-sm'>
+            <div className='mt-2 rounded-xl border border border-border bg-background p-10 text-center text-sm text-gray-500 shadow-sm'>
               조건에 맞는 아티클이 없습니다.
             </div>
           ) : (
             <>
-              <div className='mt-2 rounded-md border border-gray-200 bg-white overflow-hidden'>
+              <div className='mt-2 rounded-md border border border-border bg-background overflow-hidden'>
                 {/* 헤더 */}
                 <div className='hidden sm:block'>
                   <ArticleTableHeader />

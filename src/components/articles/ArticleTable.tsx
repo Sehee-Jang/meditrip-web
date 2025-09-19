@@ -6,7 +6,7 @@ import { useLocale } from "next-intl";
 
 export function ArticleTableHeader() {
   return (
-    <div className='flex items-center border-b px-4 py-2 text-xs text-gray-500'>
+    <div className='flex items-center border-b border-border px-4 py-2 text-xs text-muted-foreground bg-background'>
       <div className='w-12 text-center'>No.</div>
       <div className='flex-1 text-center'>글 제목</div>
       <div className='w-20 text-right'>조회수</div>
@@ -32,17 +32,21 @@ export function ArticleRow({
   const createdAt = createdAtOf(article);
 
   const row = (
-    <div className='flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-black/10'>
-      <span className='w-12 text-center text-xs text-gray-500'>
+    <div
+      className='flex w-full items-center gap-3 px-4 py-3 text-left transition-colors bg-background
+                 hover:bg-accent hover:text-accent-foreground
+                 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
+    >
+      <span className='w-12 text-center text-xs text-muted-foreground'>
         {indexReverse}
       </span>
-      <span className='flex-1 min-w-0 truncate text-sm md:text-base text-gray-900'>
+      <span className='min-w-0 flex-1 truncate text-sm md:text-base text-foreground'>
         {title}
       </span>
-      <span className='w-20 text-right text-xs text-gray-500 whitespace-nowrap'>
+      <span className='w-20 whitespace-nowrap text-right text-xs text-muted-foreground'>
         {views.toLocaleString()}
       </span>
-      <span className='w-28 text-right text-xs text-gray-500 whitespace-nowrap'>
+      <span className='w-28 whitespace-nowrap text-right text-xs text-muted-foreground'>
         {createdAt ? createdAt.toLocaleDateString() : ""}
       </span>
     </div>

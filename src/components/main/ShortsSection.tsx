@@ -116,7 +116,7 @@ export default function ShortsSection() {
   const shortsToShow = items.slice(0, visibleCount);
 
   return (
-    <section className='py-10 bg-white'>
+    <section className='py-10 '>
       <Container>
         {/* 제목 및 더보기 버튼 */}
         <div className='flex justify-between items-center mb-4'>

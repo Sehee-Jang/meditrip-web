@@ -12,15 +12,15 @@ export default function FAQSection() {
   const items = t.raw("items") as Array<{ question: string; answer: string }>;
 
   return (
-    <section className='bg-white py-10'>
+    <section className='py-10'>
       <Container>
         <h2 className='text-xl md:text-2xl font-semibold mb-1'>{t("title")}</h2>
-        <p className='text-sm text-gray-500 mb-4'>{t("description")}</p>
+        <p className='text-sm text-muted-foreground mb-4'>{t("description")}</p>
 
-        <div className=''>
+        <div>
           <Link
             href={`/faq`}
-            className='divide-y borde-b rounded-md overflow-hidden bg-white'
+            className='divide-y borde-b rounded-md overflow-hidde'
           >
             {items.map((item, index) => {
               const Icon = faqIcons[index % faqIcons.length]; // 순환

@@ -15,7 +15,7 @@ export default function CommunitySection() {
         <div className='flex justify-between items-center mb-4'>
           <div>
             <h2 className='text-xl md:text-2xl font-semibold'>{t("title")}</h2>
-            <p className='text-sm text-gray-500'>{t("description")}</p>
+            <p className='text-smtext-muted-foreground'>{t("description")}</p>
           </div>
 
           {/* 데스크탑 CTA */}

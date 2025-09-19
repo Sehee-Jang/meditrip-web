@@ -63,6 +63,16 @@
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
   }
+  section {
+    /* 라이트/다크 모두 토큰으로 처리됨 */
+    @apply bg-background;
+    @apply text-foreground;
+  }
+
+  p,
+  span {
+    @apply text-muted-foreground;
+  }
 }
 
 @layer base {
@@ -70,7 +80,7 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply min-h-screen bg-background text-foreground;
   }
 }
 

@@ -35,26 +35,26 @@ export default function ClinicList({ clinics }: ClinicListProps) {
                   {/* 찜 아이콘 */}
                   <FavoriteButton
                     hospitalId={c.id}
-                    className='absolute top-2 right-2 p-2 rounded-full bg-white/90 hover:bg-white shadow'
+                    className='absolute right-2 top-2 rounded-full bg-card/90 p-2 shadow backdrop-blur hover:bg-card'
                   />
                 </div>
 
                 <CardContent className='p-4'>
                   {/* 병원 이름, 주소, 설명 */}
                   <div className='flex flex-col justify-between items-start'>
-                    <h2 className='text-lg font-medium text-gray-900'>
+                    <h2 className='text-lg font-medium text-card-foreground'>
                       {c.name?.[loc]}
                     </h2>
-                    <p className='text-gray-500'>{c.address?.[loc]}</p>
+                    <p className='text-muted-foreground'>{c.address?.[loc]}</p>
                   </div>
 
                   {/* 리뷰 및 별점 */}
-                  <div className='mt-3 flex items-center text-sm text-gray-700'>
-                    <Star className='w-4 h-4 text-yellow-500' />
+                  <div className='mt-3 flex items-center text-sm text-foreground/80'>
+                    <Star className='h-4 w-4 text-yellow-500 dark:text-yellow-400' />
                     <span className='ml-1 font-medium'>
                       {typeof c.rating === "number" ? c.rating.toFixed(1) : "-"}
                     </span>
-                    <span className='ml-2 text-gray-400'>
+                    <span className='ml-2 text-muted-foreground'>
                       ({c.reviewCount ?? 0})
                     </span>
                   </div>
@@ -62,7 +62,7 @@ export default function ClinicList({ clinics }: ClinicListProps) {
 
                 <CardFooter className='px-4 py-2 border-t'>
                   <div className='flex items-center justify-between w-full'>
-                    <span className='text-sm font-medium text-primary'>
+                    <span className='text-sm font-medium text-primary group-hover:underline'>
                       {t("clinicList.viewDetails")}
                     </span>
                     <ChevronRight className='w-5 h-5 text-primary' />

@@ -5,7 +5,7 @@ export default function Footer() {
   const t = useTranslations("footer");
 
   return (
-    <footer className='w-full border-t bg-white px-4 py-8 text-sm text-gray-600'>
+    <footer className='w-full border-t px-4 py-8 text-sm text-gray-600'>
       <div className='max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6'>
         {/* 사업자 정보 */}
         <div className='space-y-1'>

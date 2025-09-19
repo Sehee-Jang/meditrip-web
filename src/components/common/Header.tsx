@@ -34,13 +34,13 @@ export default function Header() {
   }, []);
 
   return (
-    <header className='flex justify-between items-center px-4 py-3 border-b bg-white'>
-      <Link href='/' className='text-xl font-bold text-black'>
+    <header className='flex justify-between items-center px-4 py-3 border-b'>
+      <Link href='/' className='text-xl font-bold'>
         ONYU
       </Link>
 
       {/* 데스크탑 메뉴 */}
-      <nav className='hidden md:flex items-center gap-6 text-sm text-gray-800'>
+      <nav className='hidden md:flex items-center gap-6 text-sm'>
         <Link href='/'>{t("main")}</Link>
         <Link href='/articles'>{t("contents")}</Link>
         {/* <Link href='/community'>{t("community")}</Link> */}
