@@ -17,7 +17,7 @@ import { useArticles } from "@/hooks/useArticles";
 import { sortByCreatedAtDesc } from "@/utils/articles";
 import { ArticleTableHeader, ArticleRow } from "./ArticleTable";
 import { CategoryChips } from "./CategoryChips";
-import { Pagination } from "@/components/common/Pagination";
+import PaginationControls from "@/components/common/PaginationControls";
 
 type Props = {
   initialSelectedCategories: CategoryKey[];
@@ -222,9 +222,10 @@ export default function ArticlesListClient({
 
               {/* 페이지네이션 */}
               {pageMax > 1 && (
-                <Pagination
+                <PaginationControls
+                  className='pt-2'
                   current={current}
-                  pageMax={pageMax}
+                  totalPages={pageMax}
                   onChange={(p) => {
                     setPage(p);
                     setSelectedId(null);

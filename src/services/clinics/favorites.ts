@@ -65,9 +65,9 @@ export async function getUserFavoriteHospitalIds(
 
 export async function toggleFavoriteHospital(
   uid: string,
-  hospitalId: string
+  clinicId: string
 ): Promise<boolean> {
-  const ref = doc(db, "users", uid, "favorites", hospitalId);
+  const ref = doc(db, "users", uid, "favorites", clinicId);
   const snap = await getDoc(ref);
   if (snap.exists()) {
     await deleteDoc(ref);

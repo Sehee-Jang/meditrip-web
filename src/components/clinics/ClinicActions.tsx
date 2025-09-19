@@ -6,14 +6,14 @@ import { useAuthCheck } from "@/hooks/useAuthCheck";
 import { CalendarCheck, Share2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 
-interface HospitalActionsProps {
+interface ClinicActionsProps {
   locale: string;
-  hospitalId: string;
+  clinicId: string;
   packageId: string;
   bookingUrl?: string;
 }
 
-export default function HospitalActions(props: HospitalActionsProps) {
+export default function ClinicActions(props: ClinicActionsProps) {
   const { bookingUrl = "https://ko.surveymonkey.com/r/YXDPQ5Q" } = props;
 
   const t = useTranslations("clinic");
@@ -115,7 +115,7 @@ export default function HospitalActions(props: HospitalActionsProps) {
         {/* 내부 예약 링크(추후 활성화) */}
         {/* <div className='mt-2 text-center'>
           <Link
-            href={`/hospital/${hospitalId}/package/${packageId}/reserve`}
+            href={`/clinic/${clinicId}/package/${packageId}/reserve`}
             className='text-xs text-gray-600 hover:text-gray-800 underline underline-offset-4'
           >
             {t("book.reservePageLink")}

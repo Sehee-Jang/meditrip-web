@@ -17,7 +17,7 @@ export default function BottomNav({ active }: BottomNavProps) {
     label: string;
   }[] = [
     { key: "home", href: "/", Icon: Home, label: "Home" },
-    { key: "clinics", href: "/hospital", Icon: List, label: "Clinics" },
+    { key: "clinics", href: "/clinic", Icon: List, label: "Clinics" },
     { key: "package", href: "/package", Icon: Package, label: "Package" },
     { key: "mypage", href: "/mypage", Icon: User, label: "My page" },
   ];

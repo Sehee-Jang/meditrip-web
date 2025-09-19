@@ -5,9 +5,9 @@ import { ChevronRight } from "lucide-react";
 import Container from "../common/Container";
 import { Link } from "@/i18n/navigation";
 import { ClinicListItem } from "@/types/clinic";
-import { fetchClinics } from "@/services/hospitals/fetchClinics";
-import { selectRecommendedClinics } from "@/services/hospitals/selectRecommendedClinics";
-import ClinicList from "@/components/hospitals/ClinicList";
+import { fetchClinics } from "@/services/clinics/fetchClinics";
+import { selectRecommendedClinics } from "@/services/clinics/selectRecommendedClinics";
+import ClinicList from "@/components/clinics/ClinicList";
 
 export default function ClinicSection() {
   const t = useTranslations("clinic");
@@ -50,7 +50,7 @@ export default function ClinicSection() {
 
           {/* 데스크탑 CTA */}
           <Link
-            href='/hospital'
+            href='/clinic'
             className='hidden md:inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs
                        border border-border
                        text-foreground/70
@@ -74,7 +74,7 @@ export default function ClinicSection() {
         {/* 모바일 CTA */}
         <div className='md:hidden mt-6 flex justify-center'>
           <Link
-            href='/hospital'
+            href='/clinic'
             locale={locale}
             className='flex w-full max-w-xs items-center justify-center gap-1 rounded-md
                        border border-border

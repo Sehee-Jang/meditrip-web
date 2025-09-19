@@ -25,6 +25,11 @@ import type {
   ClinicStatus,
 } from "@/types/clinic";
 import { CATEGORY_KEYS, type CategoryKey } from "@/constants/categories";
+import {
+  clinicsColRef,
+  clinicDocRef,
+  packagesColRef,
+} from "@/services/clinics/collection";
 
 // undefined/빈 문자열 제거 유틸
 function compactSocials(
@@ -187,15 +192,16 @@ export async function listClinics(
   cursor?: QueryDocumentSnapshot<DocumentData>,
   sortKey: string = "createdAt"
 ): Promise<ListResult<ClinicWithId>> {
+  const base = clinicsColRef().withConverter(clinicConverter);
   const q = cursor
     ? query(
-        clinicsCol.withConverter(clinicConverter),
+        base,
         orderBy(sortKey as never, "desc" as never),
         startAfter(cursor),
         limitFn(pageSize)
       )
     : query(
-        clinicsCol.withConverter(clinicConverter),
+        base,
         orderBy(sortKey as never, "desc" as never),
         limitFn(pageSize)
       );
@@ -209,7 +215,7 @@ export async function listClinics(
 export async function getClinicByIdAdmin(
   id: string
 ): Promise<ClinicWithId | null> {
-  const ref = doc(db, "clinics", id).withConverter(clinicConverter);
+  const ref = clinicDocRef(id).withConverter(clinicConverter);
   const snap = await getDoc(ref);
   if (!snap.exists()) return null;
   return { id: snap.id, ...snap.data() };
@@ -243,7 +249,7 @@ export async function updateClinic(
   id: string,
   values: Partial<Omit<ClinicDoc, "createdAt" | "updatedAt">>
 ): Promise<void> {
-  const ref = doc(db, "clinics", id).withConverter(clinicConverter);
+  const ref = clinicDocRef(id).withConverter(clinicConverter);
 
   // socials 정리
   const socialsClean = compactSocials(values.socials);
@@ -259,7 +265,7 @@ export async function updateClinic(
 }
 
 export async function deleteClinic(id: string): Promise<void> {
-  await deleteDoc(doc(db, "clinics", id));
+  await deleteDoc(clinicDocRef(id));
 }
 
 export async function updateClinicStatus(
@@ -274,7 +280,7 @@ export async function updateClinicStatus(
  * Packages (subcollection)
  * =============================== */
 export function packagesCol(clinicId: string) {
-  return collection(db, "clinics", clinicId, "packages");
+  return packagesColRef(clinicId);
 }
 
 export async function listPackagesAdmin(

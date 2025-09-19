@@ -11,7 +11,7 @@ export interface Reservation {
   id: string;
   patientName: string;
   nationality: string;
-  hospitalName: string;
+  clinicName: string;
   packageName: string;
   status: string;
   reservedAt: Timestamp;
@@ -30,7 +30,7 @@ export async function getReservations(): Promise<Reservation[]> {
       id: doc.id,
       patientName: data.patientName,
       nationality: data.nationality,
-      hospitalName: data.hospitalName,
+      clinicName: data.clinicName,
       packageName: data.packageName,
       status: data.status,
       reservedAt: data.reservedAt,

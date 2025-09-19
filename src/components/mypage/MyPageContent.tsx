@@ -80,7 +80,7 @@ export default function MyPageContent() {
           const dt = (d.data().date as Timestamp).toDate();
           return {
             id: d.id,
-            hospital: d.data().hospital as string,
+            clinic: d.data().clinic as string,
             date: dt.toLocaleString("ko-KR", {
               year: "numeric",
               month: "2-digit",

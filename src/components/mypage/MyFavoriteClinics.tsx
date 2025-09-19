@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { fetchClinics } from "@/services/hospitals/fetchClinics";
+import { fetchClinics } from "@/services/clinics/fetchClinics";
 import type { ClinicListItem } from "@/types/clinic";
 import type { LocaleKey } from "@/constants/locales";
-import FavoriteButton from "../hospitals/FavoriteButton";
+import FavoriteButton from "../clinics/FavoriteButton";
 import { Link } from "@/i18n/navigation";
 import Image from "next/image";
 import { ChevronRight, Star } from "lucide-react";
@@ -38,7 +38,7 @@ export default function MyFavoriteClinics() {
           {favorites.map((c) => (
             <li key={c.id} className='relative'>
               <Link
-                href={`/hospital/${c.id}`}
+                href={`/clinic/${c.id}`}
                 className='group block rounded-2xl border bg-white shadow-sm p-4 hover:bg-gray-50 transition'
               >
                 <div className='flex items-center gap-4'>
@@ -59,7 +59,7 @@ export default function MyFavoriteClinics() {
                       }}
                     >
                       <FavoriteButton
-                        hospitalId={c.id}
+                        clinicId={c.id}
                         className='p-0 [&_svg]:w-4 [&_svg]:h-4'
                         aria-label='toggle favorite'
                       />

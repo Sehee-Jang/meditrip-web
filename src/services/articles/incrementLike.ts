@@ -1,8 +1,6 @@
-import { doc, updateDoc, increment } from "firebase/firestore";
-import { db } from "@/lib/firebase";
-
-const COL = "wellness";
+import { updateDoc, increment } from "firebase/firestore";
+import { articleDocRef } from "./collection";
 
 export async function incrementWellnessLike(id: string): Promise<void> {
-  await updateDoc(doc(db, COL, id), { likeCount: increment(1) });
+  await updateDoc(articleDocRef(id), { likeCount: increment(1) });
 }

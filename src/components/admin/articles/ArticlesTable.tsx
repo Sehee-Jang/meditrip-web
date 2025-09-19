@@ -27,8 +27,9 @@ export default function ArticlesTable({
 
   const columns = [
     { header: "제목" },
-    { header: "카테고리", widthClass: "w-[22%]", align: "center" },
-    { header: "등록일", widthClass: "w-[22%]", align: "center" },
+    { header: "카테고리", widthClass: "w-[18%]", align: "center" },
+    { header: "등록일", widthClass: "w-[18%]", align: "center" },
+    { header: "상태", widthClass: "w-[14%]", align: "center" },
     { header: "작업", widthClass: "w-[20%]", align: "right" },
   ] as const satisfies ReadonlyArray<DataTableColumn>;
 
@@ -56,6 +57,7 @@ export default function ArticlesTable({
         renderRow={(w) => (
           <ArticlesTableRow
             article={w}
+            onUpdated={onChanged ?? (() => {})}
             onEdit={(id) => setEditId(id)}
             onDelete={(id) => void handleDelete(id)}
           />

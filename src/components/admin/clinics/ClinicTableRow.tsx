@@ -58,8 +58,10 @@ export default function ClinicTableRow({
 
   return (
     <tr className='border-t hover:bg-muted/20'>
+      {/* 병원명 */}
       <td className='px-4 py-3'>{clinic.name?.ko ?? "-"}</td>
 
+      {/* 카테고리 */}
       <td className='px-4 py-3'>
         {categoryLabels.length > 0 ? (
           <div className='flex flex-wrap gap-1'>
@@ -77,6 +79,7 @@ export default function ClinicTableRow({
         )}
       </td>
 
+      {/* 상태관리 */}
       <td className='px-4 py-3 text-center'>
         <Select
           value={clinic.status}

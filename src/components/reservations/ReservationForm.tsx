@@ -14,17 +14,17 @@ import { onAuthStateChanged } from "firebase/auth";
 
 interface ReservationFormProps {
   locale: string;
-  hospitalId: string;
+  clinicId: string;
   packageId: string;
-  hospitalName: string;
+  clinicName: string;
   packageName: string;
 }
 
 export default function ReservationForm({
   locale,
-  hospitalId,
+  clinicId,
   packageId,
-  hospitalName,
+  clinicName,
   packageName,
 }: ReservationFormProps) {
   const router = useRouter();
@@ -54,9 +54,9 @@ export default function ReservationForm({
     const newRes: NewReservation = {
       patientName,
       nationality,
-      hospitalId,
+      clinicId,
       packageId,
-      hospitalName,
+      clinicName,
       packageName,
       date,
       time,
@@ -114,7 +114,7 @@ export default function ReservationForm({
         </select>
       </div>
 
-      <CommonInput label='병원명' value={hospitalName} disabled />
+      <CommonInput label='병원명' value={clinicName} disabled />
       <CommonInput label='진료 패키지' value={packageName} disabled />
       <CommonInput
         label='예약 날짜'

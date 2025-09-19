@@ -14,7 +14,9 @@ export function useArticles(opts?: ListOpts) {
     queryFn: async () => {
       const res = await listArticles(opts);
       const rows = normalizeArticles(res);
-      return opts?.includeHidden ? rows : rows.filter((r) => !r.isHidden);
+      return opts?.includeHidden
+        ? rows
+        : rows.filter((r) => r.status === "visible");
     },
     staleTime: 1000 * 60 * 3,
   });

@@ -66,7 +66,7 @@ export const articlesFormSchema = z.object({
   category: z.enum(CATEGORY_VALUES_TUPLE),
   tags: z.array(z.string().trim().min(1)).optional().default([]),
   images: z.array(z.string().trim().min(1)).optional().default([]),
-  isHidden: z.boolean().default(false),
+  status: z.enum(["visible", "hidden"]).default("visible"),
 });
 
 export type ArticlesFormValues = z.infer<typeof articlesFormSchema>;

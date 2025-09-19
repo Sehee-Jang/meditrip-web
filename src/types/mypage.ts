@@ -1,6 +1,6 @@
 export interface Reservation {
   id: string;
-  hospital: string;
+  clinic: string;
   date: string; // 표시용 포맷 문자열
   status: "completed" | "pending" | string;
 }

@@ -1,13 +1,11 @@
-import { addDoc, collection } from "firebase/firestore";
-import { db } from "@/lib/firebase";
+import { addDoc } from "firebase/firestore";
 import type { CreateArticleInput } from "@/types/articles";
 import { mapCreateInputToDoc } from "./mapArticles";
-
-const COL = "wellness";
+import { articlesColRef } from "./collection";
 
 export async function createArticle(
   input: CreateArticleInput
 ): Promise<string> {
-  const ref = await addDoc(collection(db, COL), mapCreateInputToDoc(input));
+  const ref = await addDoc(articlesColRef(), mapCreateInputToDoc(input));
   return ref.id;
 }

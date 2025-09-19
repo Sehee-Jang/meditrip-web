@@ -28,7 +28,7 @@ export default function ReservationsSection({
               key={r.id}
               className='rounded-2xl border bg-white shadow-sm p-5 flex flex-col gap-2'
             >
-              <div className='font-medium'>{r.hospital}</div>
+              <div className='font-medium'>{r.clinic}</div>
               <div className='text-sm text-gray-600'>
                 {t("reservations.datetime")}: {r.date}
               </div>

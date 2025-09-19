@@ -3,14 +3,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "@/i18n/navigation";
 import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationPrevious,
-  PaginationNext,
-} from "@/components/ui/pagination";
-import {
   getQuestions,
   getQuestionsCount,
 } from "@/services/questions/getQuestions";
@@ -20,6 +12,7 @@ import { Question } from "@/types/question";
 import { formatDateCompact } from "@/utils/date";
 import { MessageSquare, CheckCircle, Clock } from "lucide-react";
 import UserNameById from "@/components/common/UserNameById";
+import PaginationControls from "../common/PaginationControls";
 
 export default function PaginatedQuestionList({
   pageSize = 5,
@@ -115,56 +108,12 @@ export default function PaginatedQuestionList({
         })}
       </ul>
 
-      <Pagination className='pt-8'>
-        <PaginationContent>
-          <PaginationItem>
-            <PaginationPrevious
-              href='#'
-              aria-disabled={page === 1}
-              className={
-                page === 1 ? "pointer-events-none opacity-50 mr-2" : "mr-2"
-              }
-              onClick={(e) => {
-                e.preventDefault();
-                if (page > 1) setPage((p) => p - 1);
-              }}
-            />
-
-            {Array.from({ length: totalPages }, (_, i) => (
-              <PaginationLink
-                key={i}
-                href='#'
-                isActive={i + 1 === page}
-                className={
-                  i + 1 === page ? "pointer-events-none opacity-50" : ""
-                }
-                onClick={(e) => {
-                  e.preventDefault();
-
-                  setPage(i + 1);
-                }}
-              >
-                {i + 1}
-              </PaginationLink>
-            ))}
-          </PaginationItem>
-          <PaginationItem>
-            <PaginationNext
-              href='#'
-              aria-disabled={page === totalPages}
-              className={
-                page === totalPages
-                  ? "pointer-events-none opacity-50 ml-2"
-                  : "ml-2"
-              }
-              onClick={(e) => {
-                e.preventDefault();
-                if (page < totalPages) setPage((p) => p + 1);
-              }}
-            />
-          </PaginationItem>
-        </PaginationContent>
-      </Pagination>
+      <PaginationControls
+        className='pt-8'
+        current={page}
+        totalPages={totalPages}
+        onChange={setPage}
+      />
     </div>
   );
 }

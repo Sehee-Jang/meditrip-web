@@ -1,7 +1,7 @@
 import React from "react";
 import PageHeader from "@/components/common/PageHeader";
 import { getTranslations } from "next-intl/server";
-import HospitalListClient from "@/components/hospitals/HospitalListClient";
+import ClinicListClient from "@/components/clinics/ClinicListClient";
 
 export default async function HospitalPage() {
   const t = await getTranslations("clinic");
@@ -16,7 +16,7 @@ export default async function HospitalPage() {
       />
 
       {/* 병원 카드 목록 */}
-      <HospitalListClient />
+      <ClinicListClient />
     </main>
   );
 }

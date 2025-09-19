@@ -50,8 +50,8 @@ export default function ReservationTableRow({
 
       {/* 병원명 */}
       <td className='px-4 py-3'>
-        <span className='block truncate' title={r.hospitalName}>
-          {r.hospitalName}
+        <span className='block truncate' title={r.clinicName}>
+          {r.clinicName}
         </span>
       </td>
 
