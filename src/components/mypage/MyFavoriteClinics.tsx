@@ -30,7 +30,7 @@ export default function MyFavoriteClinics() {
     <section>
       <h2 className='text-base font-semibold mb-3'>{t("title")}</h2>
       {favorites.length === 0 ? (
-        <div className='rounded-2xl border bg-white shadow-sm px-5 py-6 text-center text-gray-500'>
+        <div className='rounded-2xl border border-border bg-card px-5 py-6 text-center text-sm text-muted-foreground shadow-sm'>
           {t("empty")}
         </div>
       ) : (
@@ -39,7 +39,7 @@ export default function MyFavoriteClinics() {
             <li key={c.id} className='relative'>
               <Link
                 href={`/clinic/${c.id}`}
-                className='group block rounded-2xl border bg-white shadow-sm p-4 hover:bg-gray-50 transition'
+                className='group block rounded-2xl border bg-card shadow-sm p-4 hover:bg-accent transition'
               >
                 <div className='flex items-center gap-4'>
                   <div className='relative w-20 h-20 shrink-0 rounded-xl overflow-hidden'>
@@ -52,7 +52,7 @@ export default function MyFavoriteClinics() {
                     />
                     {/* 오버레이 즐겨찾기 */}
                     <span
-                      className='absolute top-1.5 right-1.5 grid place-items-center w-7 h-7 rounded-full bg-white/90 backdrop-blur shadow ring-1 ring-black/5'
+                      className='absolute right-1.5 top-1.5 grid h-7 w-7 place-items-center rounded-full bg-card/90 backdrop-blur shadow ring-1 ring-border'
                       onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
@@ -67,28 +67,26 @@ export default function MyFavoriteClinics() {
                   </div>
 
                   <div className='min-w-0 flex-1'>
-                    <h3 className='font-semibold text-base truncate'>
+                    <h3 className='truncate text-base font-semibold text-foreground'>
                       {c.name[locale]}
                     </h3>
-                    <p className='text-sm text-gray-500 mt-1 line-clamp-1'>
+                    <p className='mt-1 line-clamp-1 text-sm text-muted-foreground'>
                       {c.address?.[locale]}
                     </p>
-                    <div className='mt-1 text-sm text-gray-600 flex items-center gap-1'>
-                      <Star className='w-4 h-4 text-yellow-400' />
+                    <div className='mt-1 flex items-center gap-1 text-sm text-muted-foreground'>
+                      <Star className='h-4 w-4 text-yellow-500 dark:text-yellow-400' />
                       <span>
                         {typeof c.rating === "number"
                           ? c.rating.toFixed(1)
                           : "-"}
                       </span>
-                      <span className='text-gray-400'>
-                        ({c.reviewCount ?? 0})
-                      </span>
+                      <span>({c.reviewCount ?? 0})</span>
                     </div>
                   </div>
 
                   <ChevronRight
                     size={18}
-                    className='text-gray-300 group-hover:text-gray-400'
+                    className='text-muted-foreground transition-colors group-hover:text-foreground/80'
                   />
                 </div>
               </Link>

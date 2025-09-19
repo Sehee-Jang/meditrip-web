@@ -36,6 +36,15 @@
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
     --radius: 0.5rem;
+    /* Brand (코랄: #EB7F65 근사값) */
+    --brand: 12 77% 66%;
+    --brand-foreground: 0 0% 100%;
+    --brand-muted: 12 70% 92%;
+
+    /* Info (Tailwind blue-600 / blue-50 대응) */
+    --info: 217 91% 59%;
+    --info-foreground: 0 0% 100%;
+    --info-muted: 217 100% 97%;
   }
   .dark {
     --background: 222.2 84% 4.9%;
@@ -62,6 +71,14 @@
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
+    /* 다크에선 명도↑/채도↓로 가독성 확보 */
+    --brand: 12 75% 64%;
+    --brand-foreground: 0 0% 100%;
+    --brand-muted: 12 50% 18%;
+
+    --info: 217 92% 72%;
+    --info-foreground: 0 0% 100%;
+    --info-muted: 217 35% 20%;
   }
   section {
     /* 라이트/다크 모두 토큰으로 처리됨 */
@@ -69,10 +86,10 @@
     @apply text-foreground;
   }
 
-  p,
+  /* p,
   span {
     @apply text-muted-foreground;
-  }
+  } */
 }
 
 @layer base {

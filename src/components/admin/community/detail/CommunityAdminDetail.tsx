@@ -23,12 +23,14 @@ export default function CommunityAdminDetail({
 
   if (isLoading) {
     return (
-      <div className='rounded-2xl border bg-white shadow-sm p-6'>로딩 중…</div>
+      <div className='rounded-2xl border bg-background shadow-sm p-6'>
+        로딩 중…
+      </div>
     );
   }
   if (!question) {
     return (
-      <div className='rounded-2xl border bg-white shadow-sm p-6'>
+      <div className='rounded-2xl border bg-background shadow-sm p-6'>
         데이터가 없습니다.
       </div>
     );
@@ -50,7 +52,7 @@ export default function CommunityAdminDetail({
       </div>
 
       {/* 본문 카드 */}
-      <div className='rounded-2xl border bg-white shadow-sm'>
+      <div className='rounded-2xl border bg-background shadow-sm'>
         <div className='flex items-start justify-between gap-4 px-6 py-5 border-b'>
           <DetailHeader question={question} />
           <DetailActions questionId={question.id} />

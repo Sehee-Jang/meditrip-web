@@ -14,7 +14,6 @@ import {
 import CommonButton from "@/components/common/CommonButton";
 import { serverTimestamp } from "firebase/firestore";
 
-
 interface Props {
   onEventSaved: () => void;
 }
@@ -54,7 +53,7 @@ export default function EventSettingForm({ onEventSaved }: Props) {
   };
 
   return (
-    <div className='p-6 bg-white border border-gray-200 rounded-2xl shadow-sm space-y-4'>
+    <div className='p-6 bg-background border border-border rounded-2xl shadow-sm space-y-4'>
       <h2 className='text-lg font-semibold mb-4'>이벤트 생성</h2>
       <div className='space-y-1'>
         <label className='text-sm font-medium'>이벤트 설명</label>

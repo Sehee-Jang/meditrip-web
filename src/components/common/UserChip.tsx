@@ -73,7 +73,7 @@ export default function UserChip({
         </span>
       ) : (
         <span
-          className='grid place-items-center rounded-full bg-gray-200 text-[10px] sm:text-xs text-gray-600 shrink-0'
+          className='grid place-items-center rounded-full bg-gray-200 text-[10px] sm:text-xs text-muted-foreground shrink-0'
           style={{ width: size, height: size }}
           aria-label={t("avatarAlt", { name })}
         >

@@ -14,10 +14,10 @@ export default function QuestionsSection({
 
   return (
     <section>
-      <h2 className='text-base font-semibold mb-3'>{t("questions.title")}</h2>
+      <h2 className='mb-3 text-base font-semibold'>{t("questions.title")}</h2>
 
       {questions.length === 0 ? (
-        <div className='rounded-2xl border bg-white shadow-sm px-5 py-6 text-center text-gray-500'>
+        <div className='rounded-2xl border border-border bg-card px-5 py-6 text-center text-sm text-muted-foreground shadow-sm'>
           {t("questions.empty")}
         </div>
       ) : (
@@ -26,7 +26,7 @@ export default function QuestionsSection({
             <li key={q.id}>
               <Link
                 href={`/community/questions/${q.id}`}
-                className='group block rounded-2xl border bg-white shadow-sm p-4 sm:p-5 hover:bg-gray-100 transition'
+                className='group block rounded-2xl border border-border bg-card p-4 shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground sm:p-5'
               >
                 <div className='flex items-start justify-between gap-4'>
                   {/* 왼쪽: 제목 + 날짜 */}
@@ -34,7 +34,7 @@ export default function QuestionsSection({
                     <h3 className='font-medium leading-6 line-clamp-2'>
                       {q.title}
                     </h3>
-                    <p className='mt-1 text-sm text-gray-600'>
+                    <p className='mt-1 text-sm text-muted-foreground'>
                       {t("questions.writtenDate")}: {q.date}
                     </p>
                   </div>
@@ -45,8 +45,10 @@ export default function QuestionsSection({
                       className={[
                         "inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium ring-1",
                         q.answered
-                          ? "bg-emerald-50 text-emerald-700 ring-emerald-200"
-                          : "bg-rose-50 text-rose-700 ring-rose-200",
+                          ? // 답변됨(성공) — 라이트/다크 쌍
+                            "bg-emerald-50 text-emerald-700 ring-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-300 dark:ring-emerald-700"
+                          : // 대기중(경고) — 라이트/다크 쌍
+                            "bg-rose-50 text-rose-700 ring-rose-200 dark:bg-rose-900/30 dark:text-rose-300 dark:ring-rose-700",
                       ].join(" ")}
                     >
                       {q.answered
@@ -55,7 +57,7 @@ export default function QuestionsSection({
                     </span>
                     <ChevronRight
                       size={18}
-                      className='text-gray-300 group-hover:text-gray-400'
+                      className='text-muted-foreground transition-colors group-hover:text-foreground/80'
                     />
                   </div>
                 </div>

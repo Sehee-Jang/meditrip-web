@@ -8,11 +8,13 @@ export default async function ForgotEmailPage() {
   return (
     <main className='px-4 py-10 md:py-16'>
       <div className='mx-auto w-full max-w-lg'>
-        <section className='rounded-2xl border border-gray-200 bg-white p-6 md:p-8 shadow-sm'>
-          <h1 className='text-2xl md:text-3xl font-semibold tracking-tight text-gray-900'>
+        <section className='rounded-2xl border border-border bg-background p-6 md:p-8 shadow-sm'>
+          <h1 className='text-2xl md:text-3xl font-semibold tracking-tight text-foreground'>
             {t("findEmail.title")}
           </h1>
-          <p className='mt-2 text-sm text-gray-500'>{t("findEmail.desc")}</p>
+          <p className='mt-2 text-sm text-muted-foreground'>
+            {t("findEmail.desc")}
+          </p>
 
           <div className='mt-6'>
             <FindEmailForm />

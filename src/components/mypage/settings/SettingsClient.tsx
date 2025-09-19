@@ -249,10 +249,10 @@ export default function SettingsClient() {
             className='flex items-center gap-4 cursor-pointer'
             onClick={handlePasswordReset}
           >
-            <Lock className='w-6 h-6 text-gray-600' />
+            <Lock className='w-6 h-6 text-muted-foreground' />
             <div>
               <p className='font-medium'>{t("account.password")}</p>
-              <p className='text-sm text-gray-500'>
+              <p className='text-sm text-muted-foreground'>
                 {t("account.passwordDesc")}
               </p>
             </div>
@@ -263,10 +263,12 @@ export default function SettingsClient() {
             className='flex items-center gap-4 cursor-pointer'
             onClick={() => setShowDialog(true)}
           >
-            <Trash2 className='w-6 h-6 text-gray-600' />
+            <Trash2 className='w-6 h-6 text-muted-foreground' />
             <div>
               <p className='font-medium'>{t("account.delete")}</p>
-              <p className='text-sm text-gray-500'>{t("account.deleteDesc")}</p>
+              <p className='text-sm text-muted-foreground'>
+                {t("account.deleteDesc")}
+              </p>
             </div>
           </div>
         </div>
@@ -282,7 +284,7 @@ export default function SettingsClient() {
           onChange={(e) => setNickname(e.target.value)}
           className='w-full border rounded px-4 py-2 mb-2'
         />
-        <p className='text-sm text-gray-500'>{t("nickname.note")}</p>
+        <p className='text-sm text-muted-foreground'>{t("nickname.note")}</p>
       </section>
 
       {/* 앱 설정 */}
@@ -292,7 +294,7 @@ export default function SettingsClient() {
         {/* 마케팅 수신 */}
         <div className='flex items-center justify-between py-2'>
           <div className='flex items-center gap-2'>
-            <Bell className='w-5 h-5 text-gray-600' />
+            <Bell className='w-5 h-5 text-muted-foreground' />
             <p>{t("app.marketing")}</p>
           </div>
           <Switch checked={marketing} onCheckedChange={setMarketing} />
@@ -301,7 +303,7 @@ export default function SettingsClient() {
         {/* 언어 설정 */}
         <div className='flex items-center justify-between py-2'>
           <div className='flex items-center gap-2'>
-            <Globe className='w-5 h-5 text-gray-600' />
+            <Globe className='w-5 h-5 text-muted-foreground' />
             <p>{t("app.language")}</p>
           </div>
 
@@ -341,7 +343,7 @@ export default function SettingsClient() {
           className='flex items-center my-2 py-2 gap-2 cursor-pointer hover:underline'
           onClick={handleContactClick}
         >
-          <HelpCircle className='w-5 h-5 text-gray-600' />
+          <HelpCircle className='w-5 h-5 text-muted-foreground' />
           <p>{t("support.contact")}</p>
         </div>
 
@@ -356,7 +358,7 @@ export default function SettingsClient() {
             rel='noopener noreferrer'
             className='flex items-center gap-2 hover:underline'
           >
-            <ClipboardList className='w-5 h-5 text-gray-600' />
+            <ClipboardList className='w-5 h-5 text-muted-foreground' />
             <p>{t("support.improve")}</p>
           </a>
         </div>
@@ -366,7 +368,7 @@ export default function SettingsClient() {
       {/* 데스크탑 */}
       <div className='hidden md:flex justify-end gap-2'>
         <CommonButton
-          className='text-sm bg-white text-gray-900 border hover:bg-gray-100'
+          className='text-sm bg-background text-foreground border hover:bg-accent'
           onClick={handleCancel}
         >
           {t("buttons.cancel")}
@@ -383,7 +385,7 @@ export default function SettingsClient() {
       {/* 모바일 */}
       <div className='md:hidden grid grid-cols-2 gap-2 mb-8'>
         <CommonButton
-          className='text-sm bg-white text-gray-900 border hover:bg-gray-100'
+          className='text-sm bg-background text-foreground border hover:bg-accent'
           onClick={handleCancel}
         >
           {t("buttons.cancel")}
@@ -403,7 +405,7 @@ export default function SettingsClient() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>정말 탈퇴하시겠어요?</DialogTitle>
-            <p className='text-sm text-gray-500'>
+            <p className='text-sm text-muted-foreground'>
               비밀번호를 입력하시면 탈퇴가 진행돼요.
             </p>
           </DialogHeader>

@@ -18,7 +18,7 @@ export default function ReservationsSection({
       </div>
 
       {reservations.length === 0 ? (
-        <div className='rounded-2xl border bg-white shadow-sm px-5 py-6 text-center text-gray-500'>
+        <div className='rounded-2xl border border-border bg-card px-5 py-6 text-center text-sm text-muted-foreground shadow-sm'>
           {t("reservations.empty")}
         </div>
       ) : (
@@ -26,10 +26,10 @@ export default function ReservationsSection({
           {reservations.map((r) => (
             <li
               key={r.id}
-              className='rounded-2xl border bg-white shadow-sm p-5 flex flex-col gap-2'
+              className='flex flex-col gap-2 rounded-2xl border border-border bg-card p-5 text-card-foreground shadow-sm'
             >
               <div className='font-medium'>{r.clinic}</div>
-              <div className='text-sm text-gray-600'>
+              <div className='text-sm text-muted-foreground'>
                 {t("reservations.datetime")}: {r.date}
               </div>
               <div className='text-sm'>
@@ -42,7 +42,7 @@ export default function ReservationsSection({
                 <CommonButton className='text-sm'>
                   {t("reservations.details")}
                 </CommonButton>
-                <CommonButton className='text-sm bg-white text-gray-900 border hover:bg-gray-100'>
+                <CommonButton className='text-sm border border-border bg-card text-card-foreground hover:bg-accent hover:text-accent-foreground'>
                   {t("reservations.modify")}
                 </CommonButton>
               </div>

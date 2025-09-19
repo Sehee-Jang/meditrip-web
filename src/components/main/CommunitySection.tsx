@@ -10,7 +10,7 @@ export default function CommunitySection() {
   const t = useTranslations("community-section");
 
   return (
-    <section className='bg-white py-10'>
+    <section className='bg-background py-10'>
       <Container>
         <div className='flex justify-between items-center mb-4'>
           <div>
@@ -21,7 +21,7 @@ export default function CommunitySection() {
           {/* 데스크탑 CTA */}
           <Link
             href='/community'
-            className='hidden md:inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs border border-gray-200 text-gray-600 hover:bg-gray-50'
+            className='hidden md:inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs border border-border text-muted-foreground hover:bg-accent'
           >
             {t("cta")}
             <ChevronRight size={14} />
@@ -35,7 +35,7 @@ export default function CommunitySection() {
         <div className='md:hidden mt-6 flex justify-center'>
           <Link
             href='/community'
-            className='w-full max-w-xs bg-white text-black border flex items-center justify-center gap-1 text-sm font-medium px-4 py-3 rounded-md'
+            className='w-full max-w-xs bg-background text-black border flex items-center justify-center gap-1 text-sm font-medium px-4 py-3 rounded-md'
           >
             {t("cta")}
             <ChevronRight size={16} />

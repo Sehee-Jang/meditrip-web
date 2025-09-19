@@ -34,22 +34,22 @@ export default function CommunityListItem({ question, anonymousLabel }: Props) {
     <li>
       <Link
         href={`/community/questions/${id}`}
-        className='group flex items-center justify-between gap-3 px-4 py-3.5 hover:bg-gray-50 transition'
+        className='group flex items-center justify-between gap-3 px-4 py-3.5 hover:bg-accent transition'
       >
         {/* 앞쪽 아이콘 */}
         <MessageSquare
           size={18}
-          className='shrink-0 text-gray-400 group-hover:text-gray-600 transition'
+          className='shrink-0 text-muted-foreground group-hover:text-muted-foreground transition'
           aria-hidden
         />
 
         {/* 본문 */}
         <div className='min-w-0 flex-1'>
-          <p className='truncate text-[15px] font-medium text-gray-900'>
+          <p className='truncate text-[15px] font-medium text-foreground'>
             {title}
           </p>
 
-          <div className='mt-1 flex items-center gap-3 text-[12px] text-gray-600'>
+          <div className='mt-1 flex items-center gap-3 text-[12px] text-muted-foreground'>
             <UserChip
               userId={userId ?? ""}
               fallbackName={fallbackName}
@@ -67,7 +67,7 @@ export default function CommunityListItem({ question, anonymousLabel }: Props) {
         {/* 오른쪽 화살표 */}
         <ChevronRight
           size={16}
-          className='shrink-0 text-gray-400 group-hover:text-gray-600 transition'
+          className='shrink-0 text-muted-foreground group-hover:text-muted-foreground transition'
           aria-hidden
         />
       </Link>

@@ -54,7 +54,7 @@ export default function TagsInput({
           <button
             type='button'
             aria-label={`${t} 태그 제거`}
-            className='text-gray-500'
+            className='text-muted-foreground'
             onClick={() => removeTag(t)}
           >
             ×

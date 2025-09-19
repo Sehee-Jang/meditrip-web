@@ -46,7 +46,7 @@ export function SelectFilter<T extends string>({
     <Select value={value} onValueChange={(v) => onChange(v as T)}>
       <SelectTrigger
         aria-label={ariaLabel}
-        className={triggerClassName ?? "h-9 w-[140px] text-sm bg-white"}
+        className={triggerClassName ?? "h-9 w-[140px] text-sm bg-background"}
       >
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>

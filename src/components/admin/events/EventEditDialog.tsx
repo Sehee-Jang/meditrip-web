@@ -53,7 +53,7 @@ export default function EventEditDialog({
         </thead>
         <tbody>
           {events.map((e) => (
-            <tr key={e.id} className='border-t hover:bg-gray-50'>
+            <tr key={e.id} className='border-t hover:bg-accent'>
               <td className='p-2'>{e.description}</td>
               <td className='p-2'>{e.points}P</td>
               <td className='p-2'>{e.condition}</td>

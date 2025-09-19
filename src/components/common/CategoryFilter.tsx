@@ -32,7 +32,7 @@ export default function CategoryFilter({
               ${
                 isActive
                   ? "bg-[#4A90E2] text-white border-primary"
-                  : "bg-white text-gray-700 border-gray-200 hover:bg-gray-100"
+                  : "bg-background text-gray-700 border-border hover:bg-accent"
               }
             `}
           >

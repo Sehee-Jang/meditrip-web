@@ -28,7 +28,7 @@ export default async function PrivacyPage({ params }: { params: PageParams }) {
         <article className='prose lg:prose-lg'>
           {/* 개인정보 처리방침 전문 */}
           <h1>{data.h1}</h1>
-          <h2 className='text-sm text-gray-500'>{data.h2}</h2>
+          <h2 className='text-sm text-muted-foreground'>{data.h2}</h2>
           <p>{data.description}</p>
 
           {/* 섹션1 */}

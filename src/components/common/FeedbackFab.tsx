@@ -111,7 +111,7 @@ export default function FeedbackFab({
             className='absolute inset-0 bg-black/50'
             onClick={() => setOpen(false)}
           />
-          <div className='relative z-[61] w-[92vw] max-w-3xl bg-white dark:bg-slate-900 rounded-2xl shadow-2xl p-4 md:p-5'>
+          <div className='relative z-[61] w-[92vw] max-w-3xl bg-background dark:bg-slate-900 rounded-2xl shadow-2xl p-4 md:p-5'>
             <div className='flex items-center justify-between mb-3'>
               <h2 className='text-base md:text-lg font-semibold'>
                 {t("modalTitle")}

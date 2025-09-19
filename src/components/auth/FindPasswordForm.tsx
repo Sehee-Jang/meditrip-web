@@ -135,7 +135,7 @@ export default function FindPasswordForm() {
             <AccordionTrigger className='text-sm font-medium'>
               {t("help.title")}
             </AccordionTrigger>
-            <AccordionContent className='text-sm text-gray-600 space-y-3'>
+            <AccordionContent className='text-sm text-muted-foreground space-y-3'>
               <div>• {t("help.spam")}</div>
               <div>• {t("help.address")}</div>
               <div className='flex flex-col gap-2'>

@@ -58,7 +58,9 @@ export default function QuestionFormFields({
           className='w-full p-3 border rounded-md'
         />
         {showGuideTexts && (
-          <p className='text-xs text-gray-400 mt-1'>{copy.form.title.max}</p>
+          <p className='text-xs text-muted-foreground mt-1'>
+            {copy.form.title.max}
+          </p>
         )}
         {errors.title?.message && (
           <p className='text-red-500 text-sm mt-1'>{errors.title.message}</p>
@@ -99,7 +101,9 @@ export default function QuestionFormFields({
           className='w-full p-3 border rounded-md min-h-[120px]'
         />
         {showGuideTexts && (
-          <p className='text-xs text-gray-400 mt-1'>{copy.form.content.max}</p>
+          <p className='text-xs text-muted-foreground mt-1'>
+            {copy.form.content.max}
+          </p>
         )}
         {errors.content?.message && (
           <p className='text-red-500 text-sm mt-1'>{errors.content.message}</p>
@@ -120,7 +124,7 @@ export default function QuestionFormFields({
 
         <div
           {...getRootProps()}
-          className={`border-2 border-dashed border-gray-300 rounded-md p-6 text-center cursor-pointer hover:bg-gray-50 ${dropzoneSpacing}`}
+          className={`border-2 border-dashed border-border rounded-md p-6 text-center cursor-pointer hover:bg-accent ${dropzoneSpacing}`}
         >
           <input {...getInputProps()} />
           {preview ? (
@@ -132,7 +136,9 @@ export default function QuestionFormFields({
               className='mx-auto rounded'
             />
           ) : (
-            <p className='text-gray-500 text-sm'>{copy.form.image.helper}</p>
+            <p className='text-muted-foreground text-sm'>
+              {copy.form.image.helper}
+            </p>
           )}
         </div>
       </div>

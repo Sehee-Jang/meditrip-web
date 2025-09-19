@@ -69,13 +69,13 @@ export default function UserPointLogDialog({ open, onClose }: Props) {
       <DialogContent className='max-w-md w-full rounded-2xl'>
         <DialogHeader>
           <DialogTitle>{t("logTitle")}</DialogTitle>
-          <DialogDescription className='text-sm text-gray-500'>
+          <DialogDescription className='text-sm text-muted-foreground'>
             {t("logDescription")}
           </DialogDescription>
         </DialogHeader>
 
         {loading ? (
-          <p className='text-gray-500 text-sm'>{t("logLoading")}</p>
+          <p className='text-muted-foreground text-sm'>{t("logLoading")}</p>
         ) : (
           <PointLogList logs={logs} emptyMessage={t("logEmpty")} />
         )}

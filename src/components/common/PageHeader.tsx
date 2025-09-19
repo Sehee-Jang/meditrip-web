@@ -30,20 +30,24 @@ export default function PageHeader({
   return (
     <>
       {/* 모바일 헤더 */}
-      <div className='flex md:hidden w-full shadow-md items-center justify-between py-3 px-4 mb-6'>
-        <div className='flex items-center gap-2'>
-          {showBackIcon && (
-            <button
-              onClick={handleBack}
-              className='p-2 rounded-lg hover:bg-gray-100 transition'
-              aria-label='뒤로가기'
-            >
-              <ChevronLeft className='w-6 h-6' />
-            </button>
-          )}
-          <h1 className='text-xl font-bold'>{mobileTitle}</h1>
+      <div className='md:hidden mb-6 w-full border-b border-border bg-card text-card-foreground'>
+        <div className='flex items-center justify-between px-4 py-3'>
+          <div className='flex items-center gap-2'>
+            {showBackIcon && (
+              <button
+                onClick={handleBack}
+                className='rounded-lg p-2 transition-colors
+                           hover:bg-accent hover:text-accent-foreground
+                           focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
+                aria-label='뒤로가기'
+              >
+                <ChevronLeft className='h-6 w-6' />
+              </button>
+            )}
+            <h1 className='text-xl font-bold'>{mobileTitle}</h1>
+          </div>
+          {children && <div className='ml-auto'>{children}</div>}
         </div>
-        {children && <div className='ml-auto'>{children}</div>}
       </div>
 
       {/* 데스크탑 헤더 */}

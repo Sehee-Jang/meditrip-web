@@ -95,7 +95,7 @@ export default function LanguageSwitcher({ mobileOnly = false }: Props) {
       {open && (
         <div
           role='menu'
-          className='absolute right-0 top-10 z-50 w-44 rounded-md border bg-white shadow-lg'
+          className='absolute right-0 top-10 z-50 w-44 rounded-md border bg-background shadow-lg'
         >
           <button
             role='menuitem'

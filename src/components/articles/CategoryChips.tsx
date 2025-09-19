@@ -36,7 +36,7 @@ export function CategoryChips({
               className={[
                 "rounded-full border px-3 py-1 text-xs md:text-sm transition-colors",
                 active
-                  ? "bg-gray-900 text-white border-gray-900"
+                  ? "bg-gray-900 text-white border-border"
                   : "bg-background hover:bg-accent",
               ].join(" ")}
             >
@@ -48,7 +48,7 @@ export function CategoryChips({
           <button
             type='button'
             onClick={onReset}
-            className='rounded-full border px-3 py-1 text-xs md:text-sm text-gray-600 hover:bg-gray-50'
+            className='rounded-full border px-3 py-1 text-xs md:text-sm text-muted-foreground hover:bg-accent'
           >
             초기화
           </button>

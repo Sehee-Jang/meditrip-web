@@ -49,7 +49,7 @@ const LoginForm = () => {
   };
 
   return (
-    <div className='w-full max-w-md bg-white p-8 rounded-xl shadow-lg'>
+    <div className='w-full max-w-md bg-background p-8 rounded-xl shadow-lg'>
       <h1 className='text-3xl font-bold mb-6 text-center'>{t("title")}</h1>
 
       {/* Email Login Form */}
@@ -92,7 +92,7 @@ const LoginForm = () => {
       {/* OR Divider */}
       <div className='flex items-center my-4'>
         <span className='flex-grow h-px bg-gray-200'></span>
-        <span className='px-2 text-gray-400 text-sm'>{t("or")}</span>
+        <span className='px-2 text-muted-foreground text-sm'>{t("or")}</span>
         <span className='flex-grow h-px bg-gray-200'></span>
       </div>
 
@@ -100,7 +100,7 @@ const LoginForm = () => {
       <button
         onClick={handleGoogleLogin}
         disabled={loadingGoogle}
-        className='w-full flex items-center justify-center gap-2 border border-gray-300 rounded py-2 hover:bg-gray-100 transition disabled:opacity-50 mb-4'
+        className='w-full flex items-center justify-center gap-2 border border-border rounded py-2 hover:bg-accent transition disabled:opacity-50 mb-4'
       >
         <FcGoogle className='w-6 h-6' />
         {loadingGoogle ? t("loading") : t("googleLogin")}

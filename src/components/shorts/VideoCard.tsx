@@ -25,7 +25,7 @@ export default function VideoCard({
   return (
     <div
       data-id={id}
-      className='shorts-item w-full h-full border border-black/10 rounded-lg overflow-hidden bg-white relative'
+      className='shorts-item w-full h-full border border-black/10 rounded-lg overflow-hidden bg-background relative'
       style={{
         filter: isBlocked ? "blur(4px)" : "none",
         pointerEvents: isBlocked ? "none" : "auto",
@@ -47,7 +47,7 @@ export default function VideoCard({
         </div>
 
         <div className='p-2'>
-          <p className='text-xs text-gray-500'>
+          <p className='text-xs text-muted-foreground'>
             {t(category, { fallback: category })}
           </p>
           <p className='text-sm font-bold mt-1 line-clamp-2'>{title}</p>

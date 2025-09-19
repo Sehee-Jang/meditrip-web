@@ -23,10 +23,10 @@ export default function BottomNav({ active }: BottomNavProps) {
   ];
 
   return (
-    <nav className='fixed bottom-0 left-0 right-0 bg-white border-t flex justify-around py-2'>
+    <nav className='fixed bottom-0 left-0 right-0 bg-background border-t flex justify-around py-2'>
       {items.map(({ key, href, Icon, label }) => {
         const isActive = key === active;
-        const colorClass = isActive ? "text-primary" : "text-gray-400";
+        const colorClass = isActive ? "text-primary" : "text-muted-foreground";
         return (
           <Link key={key} href={href} className='flex flex-col items-center'>
             <Icon className={`w-6 h-6 ${colorClass}`} />

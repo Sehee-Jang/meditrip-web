@@ -53,7 +53,7 @@ export default function ClinicListClient() {
             placeholder={t("clinicList.searchPlaceholder")}
             icon
           />
-          <p className='text-sm text-center text-gray-500 mt-2'>
+          <p className='text-sm text-center text-muted-foreground mt-2'>
             {t("clinicList.searchHelper")}
           </p>
         </div>
@@ -62,7 +62,9 @@ export default function ClinicListClient() {
         {loading ? (
           <div className='min-h-[50vh] flex flex-col items-center justify-center'>
             <LoadingSpinner />
-            <p className='mt-4 text-gray-500'>{t("clinicList.loading")}</p>
+            <p className='mt-4 text-muted-foreground'>
+              {t("clinicList.loading")}
+            </p>
           </div>
         ) : (
           <ClinicList clinics={filtered} />

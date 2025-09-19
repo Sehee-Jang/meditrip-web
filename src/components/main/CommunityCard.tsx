@@ -40,7 +40,7 @@ export default function CommunityCard({
   return (
     <Link
       href={`/community/questions/${q.id}`}
-      className='overflow-hidden rounded-lg border bg-gray-50 shadow-sm transition hover:bg-gray-100'
+      className='overflow-hidden rounded-lg border bg-gray-50 shadow-sm transition hover:bg-accent'
     >
       <div className='relative h-32 w-full sm:h-40'>
         <CardThumb src={q.imageUrl} alt={alt} />
@@ -48,7 +48,7 @@ export default function CommunityCard({
 
       <div className='p-4'>
         <h3 className='line-clamp-2 text-sm font-semibold'>{q.title}</h3>
-        <div className='mt-2 text-xs text-gray-500'>
+        <div className='mt-2 text-xs text-muted-foreground'>
           <div className='flex items-center gap-2'>
             <UserChip userId={userId} fallbackName={fallbackName} size={24} />
           </div>

@@ -27,7 +27,7 @@ export default function VideoAdminTable() {
   const items = data?.items ?? [];
 
   return (
-    <div className='rounded-2xl border bg-white shadow-sm'>
+    <div className='rounded-2xl border bg-whibackgroundte shadow-sm'>
       <div className='flex items-center justify-between px-4 py-3 border-b'>
         <div className='font-medium'>콘텐츠 목록</div>
         <div className='text-sm text-muted-foreground'>총 {items.length}건</div>

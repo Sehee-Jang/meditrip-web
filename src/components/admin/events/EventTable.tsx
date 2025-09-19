@@ -106,10 +106,10 @@ export default function EventTable({ events, onRefresh }: Props) {
   };
 
   return (
-    <div className='p-6 bg-white border border-gray-200 rounded-2xl shadow-sm'>
+    <div className='p-6 bg-background border border-border rounded-2xl shadow-sm'>
       <h2 className='text-lg font-semibold mb-4'>이벤트 목록</h2>
       <table className='w-full text-sm table-fixed'>
-        <thead className='text-gray-500'>
+        <thead className='text-muted-foreground'>
           <tr>
             <th className='text-left p-2 w-1/12'>No.</th>
             <th className='text-left p-2 w-4/12'>설명</th>
@@ -233,7 +233,7 @@ export default function EventTable({ events, onRefresh }: Props) {
                       </button>
                       <button
                         onClick={() => setEditingId(null)}
-                        className='text-gray-500'
+                        className='text-muted-foreground'
                       >
                         취소
                       </button>

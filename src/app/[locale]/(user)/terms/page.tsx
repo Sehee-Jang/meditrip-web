@@ -26,7 +26,7 @@ export default async function TermsPage({ params }: { params: PageParams }) {
         <article className='prose lg:prose-lg space-y-6'>
           {/* 페이지 타이틀 */}
           <h1>{data.h1}</h1>
-          <h2 className='text-sm text-gray-500'>{data.h2}</h2>
+          <h2 className='text-sm text-muted-foreground'>{data.h2}</h2>
 
           {/* 조문별 반복 렌더링 */}
           {([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] as const).map((n) => {

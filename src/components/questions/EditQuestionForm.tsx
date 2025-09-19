@@ -80,7 +80,7 @@ export default function EditQuestionForm({ question }: { question: Question }) {
         <div className='flex justify-end gap-2'>
           <CommonButton
             type='button'
-            className='bg-white text-gray-700 border border-gray-300 hover:bg-gray-100'
+            className='bg-background text-gray-700 border border-border hover:bg-accent'
             onClick={() => router.push(`/community/questions/${question.id}`)}
           >
             {copy.cancel}

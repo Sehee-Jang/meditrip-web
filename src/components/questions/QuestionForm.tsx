@@ -70,13 +70,13 @@ export default function QuestionForm() {
   };
 
   return (
-    <section className='max-w-4xl mx-auto px-4 py-6'>
+    <section className='mx-auto max-w-4xl px-4 py-6'>
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className='w-full max-w-2xl mx-auto px-4 md:px-8 py-10 space-y-6'
+        className='mx-auto w-full max-w-2xl space-y-6 rounded-none px-4 py-10 md:px-8'
       >
         <div className='text-center'>
-          <h2 className='text-xl md:text-2xl font-bold'>{copy.subtitle}</h2>
+          <h2 className='text-xl font-bold md:text-2xl'>{copy.subtitle}</h2>
         </div>
 
         <QuestionFormFields
@@ -91,29 +91,36 @@ export default function QuestionForm() {
           showGuideTexts
           fileInputClassName='block w-full'
           dropzoneClassName='mt-3'
-          categoryOptionClassName='hover:bg-gray-100'
+          categoryOptionClassName='hover:bg-accent hover:text-accent-foreground'
         />
 
         {/* 포인트 안내 */}
-        <div className='bg-gray-50 border px-4 py-3 rounded-md'>
-          <p className='font-semibold text-sm'>{copy.pointInfo.title}</p>
-          <p className='text-sm text-gray-600 mt-1'>
+        <div className='rounded-md border border-border bg-muted px-4 py-3'>
+          <p className='text-sm font-semibold'>{copy.pointInfo.title}</p>
+          <p className='mt-1 text-sm text-muted-foreground'>
             {copy.pointInfo.description}
           </p>
         </div>
 
         <div className='flex justify-end gap-2'>
+          {/* 취소: 중립 버튼 */}
           <button
             type='button'
-            className='border border-gray-400 text-gray-700 py-2 px-4 rounded-md'
+            className='rounded-md border border-border bg-card px-4 py-2 text-sm text-card-foreground
+                       hover:bg-accent hover:text-accent-foreground
+                       focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
             onClick={() => router.push("/community")}
           >
             {copy.cancel}
           </button>
+
+          {/* 제출: 프라이머리 */}
           <button
             type='submit'
             disabled={isSubmitting}
-            className='bg-black text-white py-2 px-4 rounded-md hover:bg-gray-800'
+            className='rounded-md bg-foreground px-4 py-2 text-sm font-medium text-primary-foreground
+                       hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50
+                       focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
           >
             {isSubmitting ? `${copy.submit.create}...` : copy.submit.create}
           </button>

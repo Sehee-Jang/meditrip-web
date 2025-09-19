@@ -20,11 +20,24 @@ export default function FaqAccordion({ items }: Props) {
     <Container>
       <Accordion type='multiple' className='w-full'>
         {items.map((item, index) => (
-          <AccordionItem value={`item-${index}`} key={index}>
-            <AccordionTrigger className='data-[state=open]:bg-gray-100 data-[state=open]:font-bold transition-colors px-4'>
+          <AccordionItem
+            value={`item-${index}`}
+            key={index}
+            className='border-b border-border'
+          >
+            <AccordionTrigger
+              className='
+                px-4
+                transition-colors
+                data-[state=open]:bg-muted data-[state=open]:font-semibold
+                hover:bg-accent hover:text-accent-foreground
+                focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring
+              '
+            >
               {item.question}
             </AccordionTrigger>
-            <AccordionContent className='whitespace-pre-line text-sm text-gray600 p-4'>
+
+            <AccordionContent className='p-4 whitespace-pre-line text-sm text-muted-foreground'>
               {item.answer}
             </AccordionContent>
           </AccordionItem>

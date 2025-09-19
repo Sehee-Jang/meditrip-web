@@ -94,7 +94,7 @@ export default function Sidebar() {
     <nav
       className={`${
         collapsed ? "w-16" : "w-64"
-      } h-full bg-white border-r flex flex-col transition-[width]`}
+      } h-full bg-background border-r flex flex-col transition-[width]`}
     >
       {/* 상단: 로고 + 토글 */}
       <div className='flex items-center justify-between px-6 py-4'>
@@ -107,7 +107,7 @@ export default function Sidebar() {
         </Link>
         <button
           onClick={() => setCollapsed((v) => !v)}
-          className='p-1 rounded hover:bg-gray-100'
+          className='p-1 rounded hover:bg-accent'
           aria-label='사이드바 토글'
         >
           {collapsed ? (
@@ -132,8 +132,8 @@ export default function Sidebar() {
                 } py-3 transition-colors
                   ${
                     active
-                      ? "bg-blue-50 font-medium text-blue-700"
-                      : "text-gray-700 hover:bg-gray-100"
+                      ? "bg-accent font-medium text-blue-700"
+                      : "text-muted-foreground hover:bg-accent"
                   }`}
               >
                 <Icon className='w-5 h-5' />
@@ -151,8 +151,8 @@ export default function Sidebar() {
             type='button'
             onClick={handleLogout}
             disabled={signingOut}
-            className={`flex items-center justify-center w-full py-2 rounded hover:bg-gray-100
-            ${signingOut ? "text-gray-400" : "text-red-600"}`}
+            className={`flex items-center justify-center w-full py-2 rounded hover:bg-accent
+            ${signingOut ? "text-muted-foreground" : "text-red-600"}`}
           >
             {signingOut ? (
               <Loader2 className='w-4 h-4 animate-spin' />
@@ -169,7 +169,7 @@ export default function Sidebar() {
           <button
             type='button'
             onClick={handleLogin}
-            className='flex items-center justify-center w-full py-2 rounded hover:bg-gray-100 text-gray-800'
+            className='flex items-center justify-center w-full py-2 rounded hover:bg-accent text-muted-foreground'
           >
             <LogIn className='w-4 h-4' />
             {!collapsed && <span className='ml-2'>로그인</span>}

@@ -29,7 +29,9 @@ export default function FAQSection() {
                   <Icon className='text-red-400 mt-1 shrink-0' size={20} />
                   <div>
                     <p className='text-sm font-semibold'>{item.question}</p>
-                    <p className='text-sm text-gray-500'>{item.answer}</p>
+                    <p className='text-sm text-muted-foreground'>
+                      {item.answer}
+                    </p>
                   </div>
                 </div>
               );

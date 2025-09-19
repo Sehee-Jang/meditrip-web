@@ -58,7 +58,7 @@ export default function FavoriteButton({
             <div className='font-medium text-black'>
               {t("toast.favoriteSuccess")}
             </div>
-            <div className='text-sm text-gray-600 mt-1'>
+            <div className='text-sm text-muted-foreground mt-1'>
               {t("toast.favoriteDescription")}
             </div>
           </>
@@ -96,7 +96,7 @@ export default function FavoriteButton({
             className={`w-5 h-5 cursor-pointer transition stroke-2 ${
               isActive
                 ? "fill-red-500 text-red-500"
-                : "text-gray-400 hover:text-red-500"
+                : "text-muted-foreground hover:text-red-500"
             }`}
           />
         </button>

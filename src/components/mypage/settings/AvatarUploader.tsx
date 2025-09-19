@@ -59,7 +59,7 @@ export default function AvatarUploader({ photoURL, onUploaded }: Props) {
         className='
           absolute -bottom-1 -right-1 grid place-items-center
           w-7 h-7 rounded-full
-          bg-white/90 backdrop-blur shadow ring-1 ring-black/5
+          bg-background/90 backdrop-blur shadow ring-1 ring-black/5
           cursor-pointer
         '
         title={t("avatar.change")}

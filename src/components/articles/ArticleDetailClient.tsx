@@ -20,7 +20,9 @@ export default function ArticleDetailClient({ id }: { id: string }) {
   }, [id]);
 
   if (isLoading) {
-    return <div className='h-40 animate-pulse rounded-md border bg-gray-50' />;
+    return (
+      <div className='h-40 animate-pulse rounded-md border bg-background' />
+    );
   }
   if (!data) {
     return (
@@ -36,14 +38,16 @@ export default function ArticleDetailClient({ id }: { id: string }) {
 
   return (
     <article className='article-content prose max-w-none dark:prose-invert'>
-      <header className='mb-6 text-center p-10 border-b'>
-        <h1 className='text-2xl md:text-3xl font-bold tracking-tight text-gray-900'>
+      <header className='mb-6 border-b border-border p-10 text-center'>
+        <h1 className='text-2xl font-bold tracking-tight md:text-3xl text-foreground'>
           {title}
         </h1>
         {excerpt ? (
-          <p className='mt-2 text-gray-600 text-sm md:text-base'>{excerpt}</p>
+          <p className='mt-2 text-sm md:text-base text-muted-foreground'>
+            {excerpt}
+          </p>
         ) : null}
-        <div className='mt-3 text-xs text-gray-500'>
+        <div className='mt-3 text-xs text-muted-foreground'>
           {createdAt ? createdAt.toLocaleDateString() : ""}
         </div>
       </header>

@@ -57,7 +57,7 @@ export default async function PackageDetailPage({ params }: Props) {
             ))}
           </div>
         ) : (
-          <div className='w-full h-40 bg-gray-100 flex items-center justify-center text-gray-400'>
+          <div className='flex h-40 w-full items-center justify-center rounded border border-border bg-muted text-muted-foreground'>
             {t("noImage")}
           </div>
         )}
@@ -70,9 +70,9 @@ export default async function PackageDetailPage({ params }: Props) {
               {pkg.treatmentDetails.map((step, i) => (
                 <div
                   key={i}
-                  className='h-full rounded-2xl border border-gray-200 bg-white shadow-sm px-5 py-6 flex flex-col items-center text-center'
+                  className='flex h-full flex-col items-center rounded-2xl border border-border bg-card px-5 py-6 text-center shadow-sm'
                 >
-                  <div className='text-blue-600  text-sm font-semibold mb-2'>
+                  <div className='text-info text-sm font-semibold mb-2'>
                     {`Step ${String(i + 1).padStart(2, "0")}`}
                   </div>
                   <p>{step.title[loc]}</p>
@@ -89,7 +89,7 @@ export default async function PackageDetailPage({ params }: Props) {
                 return (
                   <li key={i}>
                     <article
-                      className='group rounded-2xl border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md'
+                      className='group rounded-2xl border border-border bg-card shadow-sm transition-shadow hover:shadow-md'
                       aria-label={`Step ${String(i + 1).padStart(2, "0")} - ${
                         step.title[loc]
                       }`}
@@ -97,7 +97,7 @@ export default async function PackageDetailPage({ params }: Props) {
                       <div className='grid grid-cols-1 md:grid-cols-[160px,1fr]'>
                         {/* 왼쪽 썸네일 */}
                         {hasImg ? (
-                          <div className='relative md:rounded-l-2xl overflow-hidden aspect-[4/3] md:aspect-square'>
+                          <div className='relative aspect-[4/3] overflow-hidden md:aspect-square rounded-t-2xl md:rounded-tr-none md:rounded-bl-2xl'>
                             <Image
                               src={step.imageUrl!}
                               alt={step.title[loc]}
@@ -108,22 +108,22 @@ export default async function PackageDetailPage({ params }: Props) {
                           </div>
                         ) : (
                           // 이미지가 없을 때는 공간을 차지하지 않음(모바일/데스크 공통)
-                          <div className='hidden md:block md:rounded-l-2xl bg-gray-50' />
+                          <div className='hidden bg-muted md:block md:rounded-l-2xl' />
                         )}
 
                         {/* 오른쪽 본문 */}
                         <div className='p-4 md:p-6'>
                           <div className='flex items-center gap-3 mb-2'>
-                            <span className='inline-flex items-center rounded-full bg-blue-50 text-blue-600 text-xs font-semibold px-3 py-1'>
+                            <span className='inline-flex items-center rounded-full bg-info-muted text-info text-xs font-semibold px-3 py-1'>
                               {`Step ${String(i + 1).padStart(2, "0")}`}
                             </span>
-                            <h3 className='text-base md:text-lg font-semibold text-gray-900'>
+                            <h3 className='text-base font-semibold text-foreground md:text-lg'>
                               {step.title[loc]}
                             </h3>
                           </div>
 
                           {step.description?.[loc] && (
-                            <p className='text-sm md:text-base leading-6 text-gray-700'>
+                            <p className='text-sm eading-6 text-foreground/80 md:text-base l '>
                               {step.description[loc]}
                             </p>
                           )}
@@ -140,10 +140,10 @@ export default async function PackageDetailPage({ params }: Props) {
         {/* 주의사항 */}
         {pkg.precautions?.[loc] && (
           <>
-            <h2 className='text-lg font-semibold mt-10 mb-2'>
+            <h2 className='mt-10 mb-2 text-lg font-semibold '>
               {t("noteTitle")}
             </h2>
-            <div className='bg-gray-50 border rounded-md p-4 text-sm text-gray-600'>
+            <div className='rounded-md border bg-muted p-4 text-sm text-foreground'>
               {precautions}
             </div>
           </>

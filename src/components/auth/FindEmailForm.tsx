@@ -102,7 +102,7 @@ export default function FindEmailForm() {
   return (
     <form onSubmit={handleSubmit} className='space-y-5' noValidate>
       {/* 이 브라우저의 최근 로그인 힌트 */}
-      <div className='rounded-lg border border-gray-200 bg-gray-50 px-3 py-3'>
+      <div className='rounded-lg border border-border bg-gray-50 px-3 py-3'>
         <div className='flex items-start gap-2 text-sm text-gray-700'>
           <Mail className='h-4 w-4 mt-0.5 flex-none' />
           <div>
@@ -192,7 +192,7 @@ export default function FindEmailForm() {
             <AccordionTrigger className='text-sm font-medium'>
               {t("help.title")}
             </AccordionTrigger>
-            <AccordionContent className='text-sm text-gray-600 space-y-3'>
+            <AccordionContent className='text-sm text-muted-foreground space-y-3'>
               <div>• {t("help.spam")}</div>
               <div>• {t("help.address")}</div>
               <div className='flex flex-col gap-2'>

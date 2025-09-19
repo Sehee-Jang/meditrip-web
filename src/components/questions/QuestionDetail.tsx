@@ -17,7 +17,7 @@ import { onAuthStateChanged, type User as FirebaseUser } from "firebase/auth";
 export default function QuestionDetail({ question }: { question: Question }) {
   const router = useRouter();
   const t = useTranslations("question-detail");
-  const tCat = useTranslations("categories"); // ⬅️ 카테고리 i18n
+  const tCat = useTranslations("categories");
 
   const [answers, setAnswers] = useState<AnswerItem[]>([]);
   const [loadingAnswers, setLoadingAnswers] = useState(false);
@@ -67,18 +67,18 @@ export default function QuestionDetail({ question }: { question: Question }) {
     <article className='max-w-3xl mx-auto px-4 py-8 space-y-8'>
       {/* 헤더 */}
       <header className='space-y-3'>
-        <h1 className='text-2xl md:text-3xl font-bold tracking-[-0.01em] text-gray-900'>
+        <h1 className='text-2xl md:text-3xl font-bold tracking-[-0.01em] text-foreground'>
           {question.title}
         </h1>
 
         {/* 카테고리 · 작성자 · 작성일 */}
-        <div className='flex flex-wrap items-center gap-2 text-xs text-gray-500'>
+        <div className='flex flex-wrap items-center gap-2 text-xs text-muted-foreground'>
           {/* 카테고리 */}
-          <span className='inline-flex items-center rounded-full bg-gray-100 text-gray-700 px-2.5 py-1'>
+          <span className='inline-flex items-center rounded-full bg-muted text-muted-foreground px-2.5 py-1'>
             {tCat(question.category)}
           </span>
 
-          {question.userId && <span className='text-gray-300'>•</span>}
+          {question.userId && <span className='text-muted-foreground'>•</span>}
 
           {/* 작성자명 */}
           {question.userId ? (
@@ -90,7 +90,7 @@ export default function QuestionDetail({ question }: { question: Question }) {
             </span>
           ) : null}
 
-          <span className='text-gray-300'>•</span>
+          <span className='text-muted-foreground'>•</span>
 
           {/* 작성일 */}
           <time dateTime={createdDate.toISOString()}>
@@ -101,12 +101,12 @@ export default function QuestionDetail({ question }: { question: Question }) {
 
       {/* 본문 */}
       <section className='space-y-4'>
-        <div className='text-[15px] leading-7 text-gray-900 whitespace-pre-wrap'>
+        <div className='text-[15px] leading-7 text-foreground whitespace-pre-wrap'>
           {question.content}
         </div>
 
         {question.imageUrl && (
-          <div className='relative w-full overflow-hidden rounded-2xl border border-gray-200'>
+          <div className='relative w-full overflow-hidden rounded-2xl border border-border'>
             <Image
               src={question.imageUrl}
               alt={t("image.alt")}
@@ -119,12 +119,12 @@ export default function QuestionDetail({ question }: { question: Question }) {
         )}
       </section>
 
-      <hr className='border-gray-100' />
+      <hr className='border-border' />
 
       {/* 운영자 답변 */}
       <section className='space-y-4'>
         <div className='flex items-center justify-between'>
-          <h2 className='text-[17px] font-semibold text-gray-900'>
+          <h2 className='text-[17px] font-semibold text-foreground'>
             {t("answers.title")}
           </h2>
         </div>
@@ -134,24 +134,26 @@ export default function QuestionDetail({ question }: { question: Question }) {
             {Array.from({ length: 2 }).map((_, i) => (
               <li
                 key={i}
-                className='rounded-xl border border-gray-200 bg-white p-4'
+                className='rounded-xl border border-border bg-background p-4'
               >
-                <div className='h-3 w-24 rounded bg-gray-100 mb-3 animate-pulse' />
-                <div className='h-3 w-full rounded bg-gray-100 mb-2 animate-pulse' />
-                <div className='h-3 w-2/3 rounded bg-gray-100 animate-pulse' />
+                <div className='mb-3 h-3 w-24 animate-pulse rounded bg-muted' />
+                <div className='mb-2 h-3 w-full animate-pulse rounded bg-muted' />
+                <div className='h-3 w-2/3 animate-pulse rounded bg-muted' />
               </li>
             ))}
           </ul>
         ) : answers.length === 0 ? (
-          <div className='text-sm text-gray-500'>{t("answers.none")}</div>
+          <div className='text-sm text-muted-foreground'>
+            {t("answers.none")}
+          </div>
         ) : (
           <ul className='space-y-3'>
             {answers.map((a) => (
               <li
                 key={a.id}
-                className='rounded-xl border border-gray-200 bg-white p-4'
+                className='rounded-xl border border-border bg-background p-4'
               >
-                <div className='text-[12px] text-gray-500 mb-2'>
+                <div className='mb-2 text-[12px] text-muted-foreground'>
                   {formatDateCompact(new Date(a.createdAt))}
                   {a.updatedAt && (
                     <span className='ml-2'>
@@ -160,7 +162,7 @@ export default function QuestionDetail({ question }: { question: Question }) {
                     </span>
                   )}
                 </div>
-                <div className='text-[15px] leading-7 text-gray-900 whitespace-pre-wrap'>
+                <div className='whitespace-pre-wrap text-[15px] leading-7 text-foreground'>
                   {a.content}
                 </div>
               </li>
@@ -174,7 +176,8 @@ export default function QuestionDetail({ question }: { question: Question }) {
         <div className='pt-2 flex flex-col sm:flex-row gap-2 justify-end'>
           {/* 목록 버튼 */}
           <CommonButton
-            className='sm:w-auto w-full bg-white text-gray-900 border border-gray-200 hover:bg-gray-50'
+            className='w-full sm:w-auto border border-border bg-card text-card-foreground
+                       hover:bg-accent hover:text-accent-foreground'
             onClick={() => router.push("/community")}
           >
             {t("back")}
@@ -182,7 +185,8 @@ export default function QuestionDetail({ question }: { question: Question }) {
 
           {/* 수정 버튼 */}
           <CommonButton
-            className='sm:w-auto w-full bg-white text-gray-900 border border-gray-200 hover:bg-gray-50'
+            className='w-full sm:w-auto border border-border bg-card text-card-foreground
+                       hover:bg-accent hover:text-accent-foreground'
             onClick={() =>
               router.push(`/community/questions/${question.id}/edit/`)
             }
@@ -190,9 +194,9 @@ export default function QuestionDetail({ question }: { question: Question }) {
             {t("edit")}
           </CommonButton>
 
-          {/* 삭제 버튼 */}
+          {/* 삭제 버튼 (위험 동작은 명확히 강조) */}
           <CommonButton
-            className='sm:w-auto w-full bg-red-500 hover:bg-red-600'
+            className='w-full bg-red-500 hover:bg-red-600 sm:w-auto'
             onClick={handleDelete}
           >
             {t("delete")}
@@ -205,7 +209,8 @@ export default function QuestionDetail({ question }: { question: Question }) {
         <div className='pt-2 flex justify-end'>
           {/* 목록 버튼 */}
           <CommonButton
-            className='sm:w-auto w-full bg-white text-gray-900 border border-gray-200 hover:bg-gray-50'
+            className='w-full sm:w-auto border border-border bg-card text-card-foreground
+                       hover:bg-accent hover:text-accent-foreground'
             onClick={() => router.push("/community")}
           >
             {t("back")}

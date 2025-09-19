@@ -16,7 +16,7 @@ export default async function AdminLayout({
   return (
     <QueryProvider>
       <AdminAuthGuard>
-        <div className='flex h-dvh min-h-screen bg-gray-50'>
+        <div className='flex h-dvh min-h-screen bg-background'>
           {/* 1) 사이드바 */}
           <Sidebar />
 

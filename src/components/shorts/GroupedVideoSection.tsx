@@ -65,7 +65,7 @@ export default function GroupedVideoSection({
 
     if (total === 0) {
       return (
-        <p className='text-center text-sm text-gray-500 py-8'>
+        <p className='text-center text-sm text-muted-foreground py-8'>
           {tCont("noContentMessage")}
         </p>
       );
@@ -99,7 +99,7 @@ export default function GroupedVideoSection({
   const entries = Object.entries(grouped);
 
   return entries.length === 0 ? (
-    <p className='text-center text-sm text-gray-500 py-8'>
+    <p className='text-center text-sm text-muted-foreground py-8'>
       {tCont("noContentMessage")}
     </p>
   ) : (

@@ -74,7 +74,7 @@ export default function MyPageContent() {
       // 예약
       const resSnap = await getDocs(
         query(collection(db, "reservations"), where("user.id", "==", u.uid))
-      )
+      );
       setReservations(
         resSnap.docs.map((d) => {
           const dt = (d.data().date as Timestamp).toDate();
@@ -154,7 +154,7 @@ export default function MyPageContent() {
     return (
       <div className='min-h-[50vh] flex flex-col items-center justify-center'>
         <LoadingSpinner />
-        <p className='mt-4 text-gray-500'>{t("loading")}</p>
+        <p className='mt-4 text-muted-foreground'>{t("loading")}</p>
       </div>
     );
   }

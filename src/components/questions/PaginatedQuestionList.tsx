@@ -61,14 +61,14 @@ export default function PaginatedQuestionList({
           return (
             <li
               key={q.id}
-              className='py-6 px-4 border-b hover:bg-gray-50 transition'
+              className='py-6 px-4 border-b hover:bg-accent transition'
             >
               <Link href={`/community/questions/${q.id}`}>
                 <div className='flex items-center gap-3'>
-                  <MessageSquare className='w-5 h-5 text-gray-400' />
+                  <MessageSquare className='w-5 h-5 text-muted-foreground' />
                   <div className='flex-1'>
                     <h3 className='font-medium'>{q.title}</h3>
-                    <div className='flex flex-wrap items-center gap-2 text-sm text-gray-400'>
+                    <div className='flex flex-wrap items-center gap-2 text-sm text-muted-foreground'>
                       <span>
                         👤 {t("question.user")}:{" "}
                         {userId ? (
@@ -95,7 +95,7 @@ export default function PaginatedQuestionList({
                         {t("question.hasAnswer")} ({answerCount})
                       </span>
                     ) : (
-                      <span className='flex items-center text-sm text-gray-400'>
+                      <span className='flex items-center text-sm text-muted-foreground'>
                         <Clock className='w-4 h-4 mr-1' />
                         {t("question.pending")} (0)
                       </span>

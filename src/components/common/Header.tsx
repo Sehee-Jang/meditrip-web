@@ -51,7 +51,7 @@ export default function Header() {
             <Link href='/mypage'>{t("mypage")}</Link>
           </>
         ) : (
-          <Link href='/login' className='px-2 py-1 rounded hover:bg-gray-100'>
+          <Link href='/login' className='px-2 py-1 rounded hover:bg-accent'>
             {t("login")}
           </Link>
         )}

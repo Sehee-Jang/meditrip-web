@@ -178,27 +178,10 @@ export default async function ClinicDetailPage({
           <div className='absolute top-3 right-3 hidden md:block'>
             <FavoriteButton
               clinicId={clinic.id}
-              className='p-2 rounded-full bg-white/90 hover:bg-white shadow'
+              className='rounded-full bg-card/90 p-2 shadow backdrop-blur hover:bg-card'
             />
           </div>
         </div>
-
-        {/* <div className='relative w-full h-72 rounded-xl overflow-hidden '>
-          <Image
-            src={clinic.images[0] || "/images/placeholder.png"}
-            alt={name || "clinic image"}
-            fill
-            sizes='(max-width: 768px) 100vw, 896px'
-            className='object-cover'
-          />
-
-          <div className='absolute top-3 right-3 hidden md:block'>
-            <FavoriteButton
-              clinicId={clinic.id}
-              className='p-2 rounded-full bg-white/90 hover:bg-white shadow'
-            />
-          </div>
-        </div> */}
 
         {/* 타이틀 + 위치 + 별점 + 태그 */}
         <div className='px-4 pt-4'>
@@ -225,7 +208,7 @@ export default async function ClinicDetailPage({
               {tagLabels.map((label, i) => (
                 <span
                   key={`${label}-${i}`}
-                  className='inline-flex rounded-md border px-2.5 py-1 text-xs bg-background'
+                  className='inline-flex rounded-md border border-border bg-background px-2.5 py-1 text-xs'
                 >
                   {label}
                 </span>
@@ -242,7 +225,7 @@ export default async function ClinicDetailPage({
                 href={`/${locale}/clinic/${clinicId}?tab=info`}
                 className={`block text-center no-underline py-3 border-b-2 ${
                   activeTab === "info"
-                    ? "text-[#EB7F65] border-[#EB7F65] font-medium"
+                    ? "text-brand border-brand font-medium"
                     : "text-muted-foreground border-transparent"
                 }`}
                 aria-current={activeTab === "info" ? "page" : undefined}
@@ -253,7 +236,7 @@ export default async function ClinicDetailPage({
                 href={`/${locale}/clinic/${clinicId}?tab=reviews`}
                 className={`block text-center no-underline py-3 border-b-2 ${
                   activeTab === "reviews"
-                    ? "text-[#EB7F65] border-[#EB7F65] font-medium"
+                    ? "text-brand border-brand font-medium"
                     : "text-muted-foreground border-transparent"
                 }`}
                 aria-current={activeTab === "reviews" ? "page" : undefined}
@@ -266,7 +249,8 @@ export default async function ClinicDetailPage({
           {/* 탭 컨텐츠: info / reviews */}
           <div>
             {activeTab === "info" ? (
-              <section className='mt-2 bg-white border-b divide-y'>
+              <section className='mt-2 divide-y divide-border rounded-2xl border border-border bg-card'>
+                {/* <section className='mt-2 border-b divide-y'> */}
                 {/* 주소 */}
                 <InfoRow icon={<MapPin size={18} />}>
                   <div className='leading-relaxed'>{address}</div>
@@ -393,7 +377,7 @@ export default async function ClinicDetailPage({
                   );
 
                   return (
-                    <details className='group border-b rounded-lg'>
+                    <details className='group border-t border-border'>
                       <summary className='list-none cursor-pointer'>
                         <div className='flex items-center gap-3 px-4 py-4 text-[15px]'>
                           <span className='mt-0.5 shrink-0 text-muted-foreground'>
@@ -408,7 +392,7 @@ export default async function ClinicDetailPage({
                                 : t("hours.closed")}
                             </span>
                           </div>
-                          <span className='ml-3 shrink-0 inline-flex items-center gap-2 text-sm text-muted-foreground'>
+                          <span className='ml-3 inline-flex shrink-0 items-center gap-2 text-sm text-muted-foreground'>
                             {hoursNote}
                             <ChevronDown
                               size={16}
@@ -600,43 +584,6 @@ export default async function ClinicDetailPage({
                   })}
                 </ul>
               </div>
-
-              {/* <div className='flex flex-col gap-4 px-8  py-4 text-sm leading-7 text-foreground/90'>
-                {doctors.map((d, idx) => {
-                  const doctorName = pickText(d.name, loc);
-                  const lines = pickLocalized<string[]>(d.lines, loc) ?? [];
-                  return (
-                    <li key={idx} className='grid grid-cols-[88px_1fr] gap-4'>
-                    
-                      <div className='relative w-[88px] h-[88px] rounded-lg overflow-hidden border bg-muted'>
-                        {d.photoUrl ? (
-                          <Image
-                            src={d.photoUrl}
-                            alt={doctorName || "doctor photo"}
-                            fill
-                            sizes='88px'
-                            className='object-cover'
-                          />
-                        ) : null}
-                      </div>
-
-          
-                      <div>
-                        <div className='text-base font-medium'>
-                          {doctorName}
-                        </div>
-                        {lines.length > 0 && (
-                          <ul className='mt-2 list-disc list-inside text-sm text-foreground/80 space-y-1'>
-                            {lines.map((l, i) => (
-                              <li key={i}>{l}</li>
-                            ))}
-                          </ul>
-                        )}
-                      </div>
-                    </li>
-                  );
-                })}
-              </div> */}
             </details>
           )}
         </section>
@@ -712,7 +659,7 @@ export default async function ClinicDetailPage({
         </section>
 
         {/* 패키지 리스트 */}
-        <section className='space-y-2'>
+        <section className='space-y-2 '>
           <h2 className='text-xl font-semibold'>{t("packagesLabel")}</h2>
 
           <div className='grid grid-cols-1 sm:grid-cols-2 gap-6'>
@@ -736,7 +683,7 @@ export default async function ClinicDetailPage({
                 <Link
                   key={pkg.id}
                   href={`/${locale}/clinic/${clinicId}/package/${pkgId}`}
-                  className='border rounded-2xl overflow-hidden hover:shadow-lg transition'
+                  className='border rounded-2xl overflow-hidden hover:shadow-sm transition hover:bg-accent'
                 >
                   {/* 1. 패키지 이미지 */}
                   {pkg.packageImages?.map((img, i) => (
@@ -754,10 +701,10 @@ export default async function ClinicDetailPage({
                   <div className='p-4 space-y-2'>
                     {/* 2. 제목/부제 */}
                     <h3 className='font-medium text-lg'>{title}</h3>
-                    <p className='text-sm text-gray-500'>{subtitle}</p>
+                    <p className='text-sm text-muted-foreground'>{subtitle}</p>
 
                     {/* 3. 가격·시간 */}
-                    <div className='mt-2 flex items-center justify-between text-gray-700'>
+                    <div className='mt-2 flex items-center justify-between text-foreground/80'>
                       <span>{durationText}</span>
                       <span>{priceText}</span>
                     </div>

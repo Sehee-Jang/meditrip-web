@@ -66,7 +66,7 @@ export default function ClinicActions(props: ClinicActionsProps) {
       {/* 플로팅 액션들 */}
       <div
         className='
-          fixed z-50 right-4 md:right-6
+          fixed right-4 z-50 md:right-6
           bottom-[calc(env(safe-area-inset-bottom)+16px)]
           md:bottom-[calc(env(safe-area-inset-bottom)+24px)]
         '

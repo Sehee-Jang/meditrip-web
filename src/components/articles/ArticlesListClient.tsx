@@ -156,7 +156,10 @@ export default function ArticlesListClient({
                 setSelectedId(null);
               }}
               placeholder='검색어를 입력하세요'
-              className='h-10 w-full md:w-72 rounded-lg border border-border px-3 text-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-black/10 placeholder:text-gray-400'
+              className='h-10 w-full rounded-lg border border-border px-3 text-sm
+                         placeholder:text-muted-foreground
+                         focus:outline-none focus-visible:ring-2 focus-visible:ring-ring
+                         md:w-72'
             />
           </div>
         </div>
@@ -164,8 +167,8 @@ export default function ArticlesListClient({
 
       {/* 리스트 헤더 */}
       <div className='flex items-center justify-between'>
-        <div className='text-[13px] text-gray-600'>
-          <span className='font-medium text-gray-900'>
+        <div className='text-[13px] text-muted-foreground'>
+          <span className='font-medium text-foreground'>
             {total.toLocaleString()}
           </span>
           개의 글
@@ -174,7 +177,8 @@ export default function ArticlesListClient({
           type='button'
           onClick={() => setIsOpen((v) => !v)}
           aria-expanded={isOpen}
-          className='inline-flex items-center gap-1 text-sm text-gray-600 hover:text-gray-900 hover:underline underline-offset-4'
+          className='inline-flex items-center gap-1 text-sm text-muted-foreground
+                     hover:text-foreground hover:underline underline-offset-4'
         >
           {isOpen ? "목록닫기" : "목록열기"}
         </button>
@@ -187,17 +191,17 @@ export default function ArticlesListClient({
               {Array.from({ length: pageSize }).map((_, i) => (
                 <div
                   key={i}
-                  className='h-12 animate-pulse rounded-lg border bg-gray-50'
+                  className='h-12 animate-pulse rounded-lg border border-border bg-muted'
                 />
               ))}
             </div>
           ) : items.length === 0 ? (
-            <div className='mt-2 rounded-xl border border border-border bg-background p-10 text-center text-sm text-gray-500 shadow-sm'>
+            <div className='mt-2 rounded-xl border border-border bg-background p-10 text-center text-sm text-muted-foreground shadow-sm'>
               조건에 맞는 아티클이 없습니다.
             </div>
           ) : (
             <>
-              <div className='mt-2 rounded-md border border border-border bg-background overflow-hidden'>
+              <div className='mt-2 rounded-md border border-border bg-background overflow-hidden'>
                 {/* 헤더 */}
                 <div className='hidden sm:block'>
                   <ArticleTableHeader />

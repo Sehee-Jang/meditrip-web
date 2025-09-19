@@ -11,7 +11,7 @@ export default function CommunityList() {
   const { questions, loading } = useQuestions(LIMIT);
 
   return (
-    <div className='bg-white'>
+    <div className='bg-background'>
       <ul className='divide-y divide-gray-200/70'>
         {loading
           ? Array.from({ length: LIMIT }).map((_, i) => (

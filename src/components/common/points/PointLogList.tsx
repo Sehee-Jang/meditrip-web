@@ -15,7 +15,7 @@ interface Props {
 export default function PointLogList({ logs, emptyMessage }: Props) {
   if (logs.length === 0) {
     return (
-      <p className='text-sm text-gray-500'>
+      <p className='text-sm text-muted-foreground'>
         {emptyMessage || "포인트 내역이 없습니다."}
       </p>
     );
@@ -31,13 +31,15 @@ export default function PointLogList({ logs, emptyMessage }: Props) {
             key={log.id || idx}
             className='flex justify-between items-center border-b pb-2'
           >
-            <div className='text-sm text-gray-800'>
+            <div className='text-sm text-muted-foreground'>
               <p className='font-medium'>{log.description}</p>
-              <p className='text-xs text-gray-400'>{date}</p>
+              <p className='text-xs text-muted-foreground'>{date}</p>
             </div>
             <div
               className={`text-sm font-semibold ${
-                isPlus ? "text-green-600" : "text-red-500"
+                isPlus
+                  ? "text-green-600 dark:text-green-300"
+                  : "text-red-500 dark:text-red-300"
               }`}
             >
               {isPlus ? "+" : ""}

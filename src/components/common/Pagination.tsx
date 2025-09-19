@@ -24,7 +24,7 @@ export function Pagination({
         type='button'
         disabled={current === 1}
         onClick={() => onChange(current - 1)}
-        className='h-8 px-3 rounded-full border text-xs bg-white border-gray-200 disabled:opacity-50 hover:bg-gray-50'
+        className='h-8 px-3 rounded-full border text-xs bg-background border-border disabled:opacity-50 hover:bg-accent'
       >
         이전
       </button>
@@ -39,8 +39,8 @@ export function Pagination({
             className={[
               "h-8 min-w-8 px-3 rounded-full border text-xs",
               isCurrent
-                ? "bg-gray-900 border-gray-900 text-white"
-                : "bg-white border-gray-200 hover:bg-gray-50",
+                ? "bg-gray-900 border-border text-white"
+                : "bg-background border-border hover:bg-accent",
             ].join(" ")}
           >
             {p}
@@ -51,7 +51,7 @@ export function Pagination({
         type='button'
         disabled={current === pageMax}
         onClick={() => onChange(current + 1)}
-        className='h-8 px-3 rounded-full border text-xs bg-white border-gray-200 disabled:opacity-50 hover:bg-gray-50'
+        className='h-8 px-3 rounded-full border text-xs bg-background border-border disabled:opacity-50 hover:bg-accent'
       >
         다음
       </button>

@@ -21,7 +21,7 @@ export default function CommunityAnswerDialog({
       </button>
       {open && (
         <div className='fixed inset-0 bg-black/40 flex items-center justify-center'>
-          <div className='bg-white rounded-xl p-4 w-full max-w-lg'>
+          <div className='bg-background rounded-xl p-4 w-full max-w-lg'>
             <h3 className='font-semibold mb-2'>답변 작성</h3>
             <textarea
               className='w-full border rounded p-2 min-h-[120px]'

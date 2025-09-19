@@ -19,7 +19,7 @@ export default function ArticleCard({
     <Link
       href={`/articles/${article.id}`}
       className={[
-        "group block overflow-hidden rounded-2xl border border-gray-200 bg-white",
+        "group block overflow-hidden rounded-2xl border border-border bg-background",
         "transition-shadow hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-black/10",
       ].join(" ")}
     >
@@ -38,11 +38,11 @@ export default function ArticleCard({
       )}
 
       <div className='space-y-1 p-3'>
-        <h3 className='line-clamp-2 text-sm font-semibold tracking-tight md:text-base text-gray-900'>
+        <h3 className='line-clamp-2 text-sm font-semibold tracking-tight md:text-base text-foreground'>
           {title}
         </h3>
         {excerpt ? (
-          <p className='line-clamp-2 text-xs md:text-sm text-gray-500'>
+          <p className='line-clamp-2 text-xs md:text-sm text-muted-foreground'>
             {excerpt}
           </p>
         ) : null}
