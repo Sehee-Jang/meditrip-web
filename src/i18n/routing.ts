@@ -1,4 +1,3 @@
-// src/i18n/routing.ts
 import { defineRouting } from "next-intl/routing";
 
 /** ① UI(라우팅)에서 실제로 활성화할 로케일들 — 메시지 번들이 있는 언어만 */

@@ -57,3 +57,14 @@ export type UpdateArticleInput = Partial<CreateArticleInput>;
 
 /** 병원 문서 + id (조회용) */
 export type ArticleWithId = ArticleDoc & { id: string };
+
+export type ArticleSeo = {
+  title: string;
+  description: string;
+  imageUrl: string;
+  tags: string[];
+  section: string; // 카테고리
+  published: string; // ISO
+  modified: string; // ISO
+  hidden: boolean; // status === "hidden"
+};

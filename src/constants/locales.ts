@@ -12,3 +12,11 @@ export const LOCALE_LABELS_KO: Record<LocaleKey, string> = {
 // 필수 언어: 한국어 + 일본어 → 추후 ["ko", "ja","zh"]로 바꾸면 스키마가 자동 반영됨.
 // export const REQUIRED_LOCALES = ["ko", "ja"] as const;
 export const REQUIRED_LOCALES: readonly LocaleKey[] = ["ko", "ja"];
+
+// Open Graph locale 코드 매핑 (필요시 언제든 확장/수정)
+export const OG_LOCALE_MAP: Record<LocaleKey, string> = {
+  ko: "ko_KR",
+  ja: "ja_JP",
+  zh: "zh_CN",
+  en: "en_US",
+};
