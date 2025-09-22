@@ -201,19 +201,25 @@ export default function ClinicFormDialog({
         )
           ? (data as { categoryKeys: CategoryKey[] }).categoryKeys
           : [],
-        vision: (data.vision as Record<string, string>) ?? {
-          ko: "",
-          ja: "",
-          zh: "",
-          en: "",
-        },
-        mission: (data.mission as Record<string, string>) ?? {
-          ko: "",
-          ja: "",
-          zh: "",
-          en: "",
-        },
+        // vision: (data.vision as Record<string, string>) ?? {
+        //   ko: "",
+        //   ja: "",
+        //   zh: "",
+        //   en: "",
+        // },
+        // mission: (data.mission as Record<string, string>) ?? {
+        //   ko: "",
+        //   ja: "",
+        //   zh: "",
+        //   en: "",
+        // },
         description: (data.description as Record<string, string>) ?? {
+          ko: "",
+          ja: "",
+          zh: "",
+          en: "",
+        },
+        highlights: (data.highlights as Record<string, string>) ?? {
           ko: "",
           ja: "",
           zh: "",
@@ -223,8 +229,7 @@ export default function ClinicFormDialog({
           (data as { events?: unknown }).events
         ),
         reservationNotices: ensureLocalizedStringArrays(
-          (data as { reservationNotices?: unknown }).reservationNotices,
-          3
+          (data as { reservationNotices?: unknown }).reservationNotices
         ),
         images: data.images ?? [],
         tagSlugs: data.tagSlugs ?? [],
@@ -528,6 +533,19 @@ export default function ClinicFormDialog({
                       errors={formState.errors}
                       placeholder='병원의 미션을 입력하세요.'
                       mode='input'
+                    />
+                  }
+                />
+                <FormRow
+                  label='하이라이트'
+                  control={
+                    <LocalizedTabsField
+                      register={register}
+                      basePath='highlights'
+                      locales={LOCALES_TUPLE}
+                      errors={formState.errors}
+                      placeholder='병원의 미션을 입력하세요.'
+                      mode='textarea'
                     />
                   }
                 />

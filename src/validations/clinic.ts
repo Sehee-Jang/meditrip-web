@@ -103,20 +103,24 @@ export const clinicFormSchema = z.object({
   vision: localizedStringDynamicSchema,
   mission: localizedStringDynamicSchema,
   description: localizedStringDynamicSchema,
+  highlights: localizedStringDynamicSchema,
   hoursNote: localizedStringDynamicSchema,
 
   categoryKeys: categoryKeysSchema,
   geo: geoSchema,
   events: localizedStringArrayDynamicSchema,
-  reservationNotices: localizedStringArrayDynamicSchema.transform((obj) => {
-    const pad3 = (arr: string[]) =>
-      arr.length >= 3 ? arr : [...arr, "", "", ""].slice(0, 3);
-    const out = {} as Record<LocaleKey, string[]>;
-    LOCALES_TUPLE.forEach((k) => {
-      out[k] = pad3(obj[k]);
-    });
-    return out;
-  }),
+  reservationNotices: localizedStringArrayDynamicSchema
+    .transform((obj) => {
+      const out = {} as Record<LocaleKey, string[]>;
+      LOCALES_TUPLE.forEach((k) => {
+        const src = Array.isArray(obj[k]) ? obj[k] : [];
+        out[k] = src.filter(
+          (s) => typeof s === "string" && s.trim().length > 0
+        );
+      });
+      return out;
+    })
+    .default({ ko: [], ja: [], zh: [], en: [] }),
 
   // 이미지/태그
   images: z.array(z.string().url().or(z.string().min(1))).default([]),

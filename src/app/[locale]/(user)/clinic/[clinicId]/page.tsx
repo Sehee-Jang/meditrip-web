@@ -116,8 +116,9 @@ export default async function ClinicDetailPage({
   const name = pickText(clinic.name, loc);
   const address = pickText(clinic.address, loc);
   const description = pickText(clinic.description, loc);
-  const vision = pickText(clinic.vision, loc);
-  const mission = pickText(clinic.mission, loc);
+  // const vision = pickText(clinic.vision, loc);
+  // const mission = pickText(clinic.mission, loc);
+  const highlights = pickText(clinic.highlights, loc);
   const hoursNote = pickText(clinic.hoursNote ?? null, loc);
   const events = pickLocalized<string[]>(clinic.events ?? null, loc) ?? [];
   const open = isOpenNow(clinic.weeklyHours);
@@ -500,12 +501,12 @@ export default async function ClinicDetailPage({
           </div>
         </div>
 
-        {/* 병원소개, 비전, 미션 */}
+        {/* Introduce */}
         <section className='space-y-2'>
           <details className='group rounded-2xl border bg-card'>
             <summary className='list-none cursor-pointer px-4 py-3 flex items-center justify-between'>
               <span className='text-xl font-semibold'>
-                {t("aboutLabel") ?? "병원소개"}
+                {t("aboutLabel") ?? "Introduce"}
               </span>
               <ChevronDown
                 size={18}
@@ -515,19 +516,37 @@ export default async function ClinicDetailPage({
 
             <div className='flex flex-col gap-4 px-8  py-4 text-sm leading-7 text-foreground/90'>
               {/* 설명 */}
-              <p>{description}</p>
+              <p style={{ whiteSpace: "pre-wrap" }}>{description}</p>
 
               {/* 비전 */}
-              <h3 className='text-xl font-semibold'>{t("visionLabel")}</h3>
-              <p>{vision}</p>
+              {/* <h3 className='text-xl font-semibold'>{t("visionLabel")}</h3>
+              <p>{vision}</p> */}
 
               {/* 미션 */}
-              <h3 className='text-xl font-semibold'>{t("missionLabel")}</h3>
-              <p>{mission}</p>
+              {/* <h3 className='text-xl font-semibold'>{t("missionLabel")}</h3>
+              <p>{mission}</p> */}
             </div>
           </details>
         </section>
 
+        {/* Highlights */}
+        <section className='space-y-2'>
+          <details className='group rounded-2xl border bg-card'>
+            <summary className='list-none cursor-pointer px-4 py-3 flex items-center justify-between'>
+              <span className='text-xl font-semibold'>
+                {t("highlightsLabel") ?? "Highlights"}
+              </span>
+              <ChevronDown
+                size={18}
+                className='text-muted-foreground transition-transform group-open:rotate-180'
+              />
+            </summary>
+
+            <div className='flex flex-col gap-4 px-8  py-4 text-sm leading-7 text-foreground/90'>
+              <p style={{ whiteSpace: "pre-wrap" }}>{highlights}</p>
+            </div>
+          </details>
+        </section>
         {/* 의료진 소개 */}
         <section className='space-y-2'>
           {doctors.length > 0 && (

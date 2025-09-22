@@ -82,8 +82,9 @@ export interface ClinicDoc {
 
   // 병원소개: 소개글, 비전, 미션, 이벤트
   description?: LocalizedTextDoc;
-  vision?: LocalizedTextDoc;
-  mission?: LocalizedTextDoc;
+  highlights?: LocalizedTextDoc;
+  // vision?: LocalizedTextDoc;
+  // mission?: LocalizedTextDoc;
   events?: LocalizedStringArray;
   reservationNotices?: LocalizedStringArray;
 

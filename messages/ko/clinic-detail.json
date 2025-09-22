@@ -1,7 +1,8 @@
 {
-  "aboutLabel": "병원 소개",
+  "aboutLabel": "Introduce",
   "visionLabel": "Vision",
   "missionLabel": "Mission",
+  "highlightsLabel": "Highlights",
   "doctorsLabel": "의료진 소개",
   "eventsLabel": "예약 이벤트",
   "packagesLabel": "진료 패키지",

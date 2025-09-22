@@ -1,7 +1,8 @@
 {
-  "aboutLabel": "病院紹介",
+  "aboutLabel": "Introduce",
   "visionLabel": "ビジョン",
   "missionLabel": "ミッション",
+  "highlightsLabel": "Highlights",
   "doctorsLabel": "医療陣の紹介",
   "eventsLabel": "予約特典",
   "packagesLabel": "診療パッケージ",
