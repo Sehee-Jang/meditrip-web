@@ -27,8 +27,7 @@ import {
 import type { AmenityKey, Doctor } from "@/types/clinic";
 import { getTagsCatalogServer } from "@/services/clinics/getTagsCatalog";
 import ClinicCarousel from "@/components/clinics/ClinicCarousel";
-import type { JSONContent } from "@tiptap/core";
-import { renderTiptapHTML, isDoc, isDocEmpty } from "@/utils/tiptapRender";
+import { renderTiptapHTML, isDocEmpty } from "@/utils/tiptapRender";
 
 type PageParams = Promise<{ locale: string; clinicId: string }>;
 type SearchParams = Promise<{ tab?: string }>;
@@ -196,15 +195,10 @@ export default async function ClinicDetailPage({
 
   const name = pickText(clinic.name, loc);
   const address = pickText(clinic.address, loc);
-  const descriptionDoc: JSONContent | null =
-    clinic.description && isDoc(clinic.description[loc])
-      ? (clinic.description[loc] as JSONContent)
-      : null;
-
-  const highlightsDoc: JSONContent | null =
-    clinic.highlights && isDoc(clinic.highlights[loc])
-      ? (clinic.highlights[loc] as JSONContent)
-      : null;
+  const descriptionDoc =
+    (clinic.description as Record<string, unknown>)?.[loc] ?? null;
+  const highlightsDoc =
+    (clinic.highlights as Record<string, unknown>)?.[loc] ?? null;
   const hoursNote = pickText(clinic.hoursNote ?? null, loc);
   const events = pickLocalized<string[]>(clinic.events ?? null, loc) ?? [];
   const open = isOpenNow(clinic.weeklyHours);
@@ -605,10 +599,9 @@ export default async function ClinicDetailPage({
               {!isDocEmpty(descriptionDoc ?? undefined) ? (
                 <div
                   className='prose prose-sm max-w-none dark:prose-invert
-                            prose-p:my-3 prose-ul:my-2 prose-li:my-0.5
-                            prose-img:rounded-xl'
+                     prose-p:my-3 prose-ul:my-2 prose-li:my-0.5 prose-img:rounded-xl'
                   dangerouslySetInnerHTML={{
-                    __html: renderTiptapHTML(descriptionDoc as JSONContent),
+                    __html: renderTiptapHTML(descriptionDoc),
                   }}
                 />
               ) : (
@@ -640,7 +633,7 @@ export default async function ClinicDetailPage({
                             prose-p:my-3 prose-ul:my-2 prose-li:my-0.5
                             prose-img:rounded-xl'
                   dangerouslySetInnerHTML={{
-                    __html: renderTiptapHTML(highlightsDoc as JSONContent),
+                    __html: renderTiptapHTML(highlightsDoc),
                   }}
                 />
               ) : (
