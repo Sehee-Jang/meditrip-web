@@ -33,12 +33,38 @@ type SearchParams = Promise<{ tab?: string }>;
 
 export const revalidate = 120;
 
-/** 오늘 지금 시각 기준 영업중 판단 */
+/** 오늘 지금 시각 기준 영업중 판단 (타임존/오버나이트/마감분 포함 제외) */
 function isOpenNow(
-  weeklyHours: ClinicDetail["weeklyHours"] | undefined
+  weeklyHours: ClinicDetail["weeklyHours"] | undefined,
+  opts?: { timezone?: string; closedDays?: DayOfWeek[] }
 ): boolean | null {
   if (!weeklyHours) return null;
-  const now = new Date();
+
+  const tz = opts?.timezone ?? "Asia/Seoul";
+  const closedDays = opts?.closedDays ?? [];
+
+  // 타임존 기준 현재 요일/시각 파트 얻기
+  const fmt = new Intl.DateTimeFormat("en-US", {
+    timeZone: tz,
+    hour12: false,
+    weekday: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+  const parts = fmt.formatToParts(new Date());
+  const weekday = parts.find((p) => p.type === "weekday")?.value ?? "Sun";
+  const hourStr = parts.find((p) => p.type === "hour")?.value ?? "00";
+  const minStr = parts.find((p) => p.type === "minute")?.value ?? "00";
+
+  const weekdayMap: Record<string, DayOfWeek> = {
+    Sun: "sun",
+    Mon: "mon",
+    Tue: "tue",
+    Wed: "wed",
+    Thu: "thu",
+    Fri: "fri",
+    Sat: "sat",
+  };
   const dayKeys: DayOfWeek[] = [
     "sun",
     "mon",
@@ -48,12 +74,65 @@ function isOpenNow(
     "fri",
     "sat",
   ];
-  const d = dayKeys[now.getDay()];
-  const ranges = weeklyHours[d] ?? [];
-  const hh = now.getHours().toString().padStart(2, "0");
-  const mm = now.getMinutes().toString().padStart(2, "0");
-  const cur = `${hh}:${mm}`;
-  return ranges.some((r) => r.open <= cur && cur <= r.close);
+  const today: DayOfWeek = weekdayMap[weekday] ?? "sun";
+  const todayIdx = dayKeys.indexOf(today);
+  const prevIdx = (todayIdx + 6) % 7;
+  const prev: DayOfWeek = dayKeys[prevIdx];
+
+  const toMin = (hhmm: string): number => {
+    const [h, m] = hhmm.split(":").map((n) => parseInt(n, 10));
+    return h * 60 + m;
+  };
+
+  const nowMin = parseInt(hourStr, 10) * 60 + parseInt(minStr, 10);
+  const minutesInDay = 24 * 60;
+
+  // 특정 요일의 시간대를 "오늘에 해당하는 구간"으로 변환
+  // - 같은날 구간(open <= close): [open, close)
+  // - 오버나이트(open > close): 오늘분은 [open, 1440)
+  const segmentsForToday = (d: DayOfWeek) => {
+    const ranges = weeklyHours[d] ?? [];
+    return ranges.flatMap((r) => {
+      const o = toMin(r.open);
+      const c = toMin(r.close);
+      if (o === c) return []; // 0분 운영(마감)으로 취급
+      if (o < c) {
+        // 같은날
+        return [[o, c]] as Array<[number, number]>;
+      }
+      // 오버나이트 → 오늘 분
+      return [[o, minutesInDay]] as Array<[number, number]>;
+    });
+  };
+
+  // 전날의 오버나이트 구간이 오늘 새벽까지 이어지는 부분: [0, close)
+  const overnightFromPrevToToday = (d: DayOfWeek) => {
+    const ranges = weeklyHours[d] ?? [];
+    return ranges.flatMap((r) => {
+      const o = toMin(r.open);
+      const c = toMin(r.close);
+      if (o > c) {
+        // 전날 분이 오늘 새벽까지 이어짐
+        return [[0, c]] as Array<[number, number]>;
+      }
+      return [];
+    });
+  };
+
+  // 휴무일 처리: 명시적으로 휴무이거나 시간대가 없으면 닫힘
+  const isExplicitlyClosed = (d: DayOfWeek) =>
+    closedDays.includes(d) || (weeklyHours[d]?.length ?? 0) === 0;
+
+  // 오늘 기준에서 유효한 모든 구간
+  const segments: Array<[number, number]> = [];
+  if (!isExplicitlyClosed(today)) segments.push(...segmentsForToday(today));
+  if (!isExplicitlyClosed(prev))
+    segments.push(...overnightFromPrevToToday(prev));
+
+  if (segments.length === 0) return false;
+
+  // 마감 시각은 포함하지 않음: [open, close)
+  return segments.some(([s, e]) => s <= nowMin && nowMin < e);
 }
 
 /** 별점 표시 (정수 5개 아이콘) */
