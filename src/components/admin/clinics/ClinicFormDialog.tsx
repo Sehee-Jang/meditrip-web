@@ -47,6 +47,8 @@ import {
   CATEGORY_ICONS,
   type CategoryKey,
 } from "@/constants/categories";
+import type { JSONContent } from "@tiptap/core";
+import { LocalizedTiptapField } from "@/components/admin/common/LocalizedTiptapField";
 
 /* ====== 카테고리 다중선택 UI (체크리스트) ====== */
 function CategoriesChecklist({
@@ -114,6 +116,29 @@ export default function ClinicFormDialog({
   const submittingRef = useRef<boolean>(false);
   const formElRef = useRef<HTMLFormElement | null>(null);
 
+  const EMPTY_DOC: JSONContent = {
+    type: "doc",
+    content: [{ type: "paragraph" }],
+  };
+
+  function isDoc(v: unknown): v is JSONContent {
+    return (
+      !!v && typeof v === "object" && (v as { type?: unknown }).type === "doc"
+    );
+  }
+
+  // 부분 레코드(일부 undefined) → 모든 로케일을 가진 완전한 레코드로 보정
+  function ensureLocalizedRichText(
+    input: Partial<Record<LocaleKey, unknown>> | undefined
+  ): Record<LocaleKey, JSONContent> {
+    const out = {} as Record<LocaleKey, JSONContent>;
+    for (const lc of LOCALES_TUPLE) {
+      const v = input?.[lc];
+      out[lc] = isDoc(v) ? v : EMPTY_DOC;
+    }
+    return out;
+  }
+
   const form = useForm<ClinicFormInputZod, unknown, ClinicFormOutputZod>({
     resolver: zodResolver<ClinicFormInputZod, unknown, ClinicFormOutputZod>(
       clinicFormSchema
@@ -127,8 +152,18 @@ export default function ClinicFormDialog({
         subtitle: { ko: "", ja: "", zh: "", en: "" },
       },
       categoryKeys: [],
-      description: { ko: "", ja: "", zh: "", en: "" },
-      highlights: { ko: "", ja: "", zh: "", en: "" },
+      description: {
+        ko: EMPTY_DOC,
+        ja: EMPTY_DOC,
+        zh: EMPTY_DOC,
+        en: EMPTY_DOC,
+      },
+      highlights: {
+        ko: EMPTY_DOC,
+        ja: EMPTY_DOC,
+        zh: EMPTY_DOC,
+        en: EMPTY_DOC,
+      },
       events: { ko: [], ja: [], zh: [], en: [] },
       reservationNotices: { ko: [], ja: [], zh: [], en: [] },
       images: [],
@@ -155,6 +190,23 @@ export default function ClinicFormDialog({
 
   const { data: tagCatalog, loading: tagsLoading } = useTagsCatalog();
   const currentLocale = LOCALES_TUPLE[0]; // 관리자 UI 기본 표시언어
+
+  function asDoc(v: unknown): JSONContent {
+    if (
+      v &&
+      typeof v === "object" &&
+      (v as { type?: unknown }).type === "doc"
+    ) {
+      return v as JSONContent;
+    }
+    if (typeof v === "string" && v.trim().length) {
+      return {
+        type: "doc",
+        content: [{ type: "paragraph", content: [{ type: "text", text: v }] }],
+      };
+    }
+    return EMPTY_DOC;
+  }
 
   // 데이터 로딩
   useEffect(() => {
@@ -194,24 +246,39 @@ export default function ClinicFormDialog({
             en: "",
           },
         },
-        // category 제거됨
         categoryKeys: Array.isArray(
           (data as { categoryKeys?: unknown }).categoryKeys
         )
           ? (data as { categoryKeys: CategoryKey[] }).categoryKeys
           : [],
-        description: (data.description as Record<string, string>) ?? {
-          ko: "",
-          ja: "",
-          zh: "",
-          en: "",
-        },
-        highlights: (data.highlights as Record<string, string>) ?? {
-          ko: "",
-          ja: "",
-          zh: "",
-          en: "",
-        },
+        description: LOCALES_TUPLE.reduce(
+          (acc, lc) => {
+            acc[lc] = asDoc(
+              (data.description as Record<string, unknown>)?.[lc]
+            );
+            return acc;
+          },
+          {
+            ko: EMPTY_DOC,
+            ja: EMPTY_DOC,
+            zh: EMPTY_DOC,
+            en: EMPTY_DOC,
+          } as Record<LocaleKey, JSONContent>
+        ),
+
+        highlights: LOCALES_TUPLE.reduce(
+          (acc, lc) => {
+            acc[lc] = asDoc((data.highlights as Record<string, unknown>)?.[lc]);
+            return acc;
+          },
+          {
+            ko: EMPTY_DOC,
+            ja: EMPTY_DOC,
+            zh: EMPTY_DOC,
+            en: EMPTY_DOC,
+          } as Record<LocaleKey, JSONContent>
+        ),
+
         events: ensureLocalizedStringArrays(
           (data as { events?: unknown }).events
         ),
@@ -272,7 +339,8 @@ export default function ClinicFormDialog({
     if (submittingRef.current) return;
     submittingRef.current = true;
     try {
-      const { geo, weeklyHours, amenities, ...rest } = values;
+      const { geo, weeklyHours, amenities, description, highlights, ...rest } =
+        values;
 
       const geoClean: Geo | undefined =
         geo && typeof geo.lat === "number" && typeof geo.lng === "number"
@@ -282,8 +350,14 @@ export default function ClinicFormDialog({
       const weeklyHoursClean = toDocWeeklyHours(weeklyHours);
       const amenitiesClean = asAmenityKeys(amenities);
 
+      // 여기서 필수/옵션 로케일 관계없이 모두 채워서 완전한 타입으로 만든다.
+      const descriptionClean = ensureLocalizedRichText(description);
+      const highlightsClean = ensureLocalizedRichText(highlights);
+
       const finalPayload: Omit<ClinicDoc, "createdAt" | "updatedAt"> = {
         ...rest, // categoryKeys 포함
+        description: descriptionClean,
+        highlights: highlightsClean,
         weeklyHours: weeklyHoursClean,
         amenities: amenitiesClean,
         ...(geoClean ? { geo: geoClean } : {}),
@@ -485,19 +559,18 @@ export default function ClinicFormDialog({
               className='scroll-mt-24'
             >
               <SectionCard title='병원 소개 (선택)'>
-                <FormRow
-                  label='설명(Description)'
-                  control={
-                    <LocalizedTabsField
-                      register={register}
-                      basePath='description'
-                      locales={LOCALES_TUPLE}
-                      errors={formState.errors}
-                      placeholder='병원 소개/설명을 입력하세요.'
-                      mode='textarea'
-                    />
-                  }
-                />
+                <div className='px-5 py-4 space-y-2'>
+                  <div className='text-xs text-muted-foreground'>
+                    설명(Description)
+                  </div>
+                  <LocalizedTiptapField
+                    control={control}
+                    basePath='description'
+                    locales={LOCALES_TUPLE}
+                    placeholder='병원 소개/설명을 입력하세요.'
+                    minHeight={100}
+                  />
+                </div>
               </SectionCard>
             </section>
 
@@ -507,20 +580,19 @@ export default function ClinicFormDialog({
               data-section='sec-highlights'
               className='scroll-mt-24'
             >
-              <SectionCard title='하이라이트 (선택)'>
-                <FormRow
-                  label='기관 인증 및 선정 이력'
-                  control={
-                    <LocalizedTabsField
-                      register={register}
-                      basePath='highlights'
-                      locales={LOCALES_TUPLE}
-                      errors={formState.errors}
-                      placeholder={`예)\n• 2024 우수 웰니스업체 선정 — 한국관광공사 / 선정 사유 간단 설명\n• 한국관광공사 의료관광 공식 인증 — 인증번호 A-2024-01-01-5650, 유효기간 2024.01–2026.12\n• 서울관광재단 의료관광 협력기관 — 지정연도 2025, 주요 협력 프로그램 소개`}
-                      mode='textarea'
-                    />
-                  }
-                />
+              <SectionCard
+                title='하이라이트 (선택)'
+                description='기관 인증 및 선정 이력'
+              >
+                <div className='px-5 pb-4'>
+                  <LocalizedTiptapField
+                    control={control}
+                    basePath='highlights'
+                    locales={LOCALES_TUPLE}
+                    placeholder='예) 기관 인증/선정 이력을 항목별로 작성'
+                    minHeight={100}
+                  />
+                </div>
               </SectionCard>
             </section>
 

@@ -3,6 +3,7 @@ import { TagSlug } from "./tag";
 import type { CategoryKey } from "@/types/category";
 import {
   LocalizedNumber,
+  LocalizedRichTextDoc,
   LocalizedStringArray,
   LocalizedTextDoc,
 } from "./common";
@@ -80,8 +81,8 @@ export interface ClinicDoc {
   website?: string;
   socials?: Partial<Record<SocialPlatform, string>>;
 
-  description?: LocalizedTextDoc;
-  highlights?: LocalizedTextDoc;
+  description?: LocalizedRichTextDoc;
+  highlights?: LocalizedRichTextDoc;
   events?: LocalizedStringArray;
   reservationNotices?: LocalizedStringArray;
 

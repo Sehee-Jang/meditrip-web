@@ -17,5 +17,7 @@
     "closed": "영업종료",
     "unknown": "영업시간 정보 없음"
   },
-  "reservationNoticesLabel": "예약 시 주의사항"
+  "reservationNoticesLabel": "예약 시 주의사항",
+  "noDescription": "설명 정보가 없습니다.",
+  "noHighlights": "하이라이트 정보가 없습니다."
 }

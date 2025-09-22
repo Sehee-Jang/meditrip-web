@@ -6,8 +6,13 @@ import {
   localizedStringArrayDynamicSchema,
   treatmentStepSchema,
 } from "./common";
-import { LOCALES_TUPLE, type LocaleKey } from "@/constants/locales";
+import {
+  LOCALES_TUPLE,
+  type LocaleKey,
+  REQUIRED_LOCALES,
+} from "@/constants/locales";
 import { CATEGORY_KEYS, type CategoryKey } from "@/constants/categories";
+import type { JSONContent } from "@tiptap/core";
 
 // 요일 키 (UI와 동일)
 export const DAY_KEYS = [
@@ -20,15 +25,6 @@ export const DAY_KEYS = [
   "sun",
 ] as const;
 export type DayKey = (typeof DAY_KEYS)[number];
-
-// 기본값 헬퍼들(Record<LocaleKey, ...>를 정확히 생성)
-// const makeLocalizedArray = (length = 0): Record<LocaleKey, string[]> => {
-//   const out = {} as Record<LocaleKey, string[]>;
-//   LOCALES_TUPLE.forEach((k) => {
-//     out[k] = Array.from({ length }, () => "");
-//   });
-//   return out;
-// };
 
 // 시간 형태(HH:mm). 빈 문자열/undefined도 허용
 const timeHHmm = z.string().regex(/^\d{2}:\d{2}$/);
@@ -89,6 +85,45 @@ const categoryKeysSchema = z
   )
   .default([]);
 
+// Tiptap JSON 최소 구조만 강제(나머지는 통과)
+const tiptapDocSchema = z
+  .object({ type: z.literal("doc") })
+  .passthrough() as z.ZodType<JSONContent>;
+
+/**
+ * 로케일 배열과 필수 로케일 배열을 받아 LocalizedRichText 스키마를 생성
+ * - requiredLocales 에 포함된 키는 필수
+ * - 그 외 LOCALES_TUPLE 키는 선택
+ * - 정의되지 않은 추가 키는 거부(strict)
+ */
+function makeLocalizedRichTextSchema(
+  locales: readonly LocaleKey[],
+  requiredLocales: readonly LocaleKey[]
+) {
+  const shape = Object.fromEntries(
+    locales.map((lc) => [
+      lc,
+      requiredLocales.includes(lc)
+        ? tiptapDocSchema
+        : tiptapDocSchema.optional(),
+    ])
+  ) as Record<LocaleKey, z.ZodType<JSONContent | undefined>>;
+
+  return z
+    .object(shape)
+    .strict()
+    .refine(
+      (obj) => requiredLocales.every((lc) => !!obj[lc]),
+      `필수 언어(${requiredLocales.join(", ")})는 비울 수 없습니다.`
+    );
+}
+
+// 필요 시 재사용 가능하도록 export
+export const localizedRichText = makeLocalizedRichTextSchema(
+  LOCALES_TUPLE,
+  REQUIRED_LOCALES
+);
+
 // 메인 스키마
 export const clinicFormSchema = z.object({
   // ko/ja 필수, zh/en 선택
@@ -101,8 +136,8 @@ export const clinicFormSchema = z.object({
     subtitle: localizedStringDynamicSchema,
   }),
 
-  description: localizedStringDynamicSchema,
-  highlights: localizedStringDynamicSchema,
+  description: localizedRichText,
+  highlights: localizedRichText,
   hoursNote: localizedStringDynamicSchema,
 
   categoryKeys: categoryKeysSchema,

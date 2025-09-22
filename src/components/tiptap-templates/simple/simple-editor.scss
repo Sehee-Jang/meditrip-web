@@ -54,36 +54,94 @@ body,
   font-family: "DM Sans", sans-serif;
 }
 
+/* 기존 주석 처리 래퍼는 유지 */
 .simple-editor-wrapper {
-  // width: 100vw;
-  // height: 100vh;
-  // overflow: auto;
+  /* width: 100vw; */
+  /* height: 100vh; */
+  /* overflow: auto; */
 }
 
+/* -----------------------------
+   가로 스크롤 방지 핵심 보정
+   ----------------------------- */
+
+/* 래퍼/콘텐츠 박스가 부모를 넘지 않도록 강제 */
+.simple-editor-wrapper,
 .simple-editor-content {
-  max-width: 800px;
   width: 100%;
-  margin: 0 auto;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+
+/* 폼 내부에서는 전체폭 사용이 안전 (기존 800px 제한 제거) */
+.simple-editor-content {
+  /* max-width: 800px; */
+  /* margin: 0 auto; */
+  margin: 0;
   height: 100%;
   display: flex;
   flex-direction: column;
   flex: 1;
 }
 
-.simple-editor-content .tiptap.ProseMirror.simple-editor {
-  flex: 1;
-  padding: 3rem 2rem 30vh;
+/* ProseMirror 본문: 선택자 단순화 + 폭 고정 */
+.simple-editor-content .ProseMirror {
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 3rem 2rem 3rem;
 }
 
+/* 모바일 패딩 */
+@media screen and (max-width: 480px) {
+  .simple-editor-content .ProseMirror {
+    padding: 1rem 1.5rem 20vh;
+  }
+}
+
+/* 미디어/코드/테이블 넘침 방지 */
+.simple-editor-content .ProseMirror img,
+.simple-editor-content .ProseMirror video,
+.simple-editor-content .ProseMirror table,
+.simple-editor-content .ProseMirror pre,
+.simple-editor-content .ProseMirror code {
+  max-width: 100%;
+}
+
+.simple-editor-content .ProseMirror pre {
+  white-space: pre-wrap;
+  overflow-x: auto; /* 긴 코드 라인은 내부 스크롤 */
+}
+
+/* 툴바: 줄바꿈 허용 + 필요 시 툴바 내부에만 스크롤 */
+.tiptap-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-x: auto; /* 페이지가 아니라 툴바만 스크롤 */
+}
+
+.tiptap-toolbar > .tiptap-toolbar-group {
+  flex-wrap: wrap;
+  min-width: 0; /* 버튼 그룹 수축 허용 */
+}
+
+.tiptap-toolbar .tiptap-button,
+.tiptap-toolbar .tiptap-dropdown,
+.tiptap-toolbar .tiptap-spacer {
+  min-width: 0; /* 긴 레이블로 인한 밀림 방지 */
+}
+
+/* 아티클 전용 링크 스타일(기존 유지) */
 .article-content a {
   text-decoration: underline;
 }
 .article-content a:hover {
   opacity: 0.85;
-}
-
-@media screen and (max-width: 480px) {
-  .simple-editor-content .tiptap.ProseMirror.simple-editor {
-    padding: 1rem 1.5rem 30vh;
-  }
 }

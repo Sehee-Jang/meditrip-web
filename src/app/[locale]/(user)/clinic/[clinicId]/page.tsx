@@ -27,6 +27,8 @@ import {
 import type { AmenityKey, Doctor } from "@/types/clinic";
 import { getTagsCatalogServer } from "@/services/clinics/getTagsCatalog";
 import ClinicCarousel from "@/components/clinics/ClinicCarousel";
+import type { JSONContent } from "@tiptap/core";
+import { renderTiptapHTML, isDoc, isDocEmpty } from "@/utils/tiptapRender";
 
 type PageParams = Promise<{ locale: string; clinicId: string }>;
 type SearchParams = Promise<{ tab?: string }>;
@@ -194,8 +196,15 @@ export default async function ClinicDetailPage({
 
   const name = pickText(clinic.name, loc);
   const address = pickText(clinic.address, loc);
-  const description = pickText(clinic.description, loc);
-  const highlights = pickText(clinic.highlights, loc);
+  const descriptionDoc: JSONContent | null =
+    clinic.description && isDoc(clinic.description[loc])
+      ? (clinic.description[loc] as JSONContent)
+      : null;
+
+  const highlightsDoc: JSONContent | null =
+    clinic.highlights && isDoc(clinic.highlights[loc])
+      ? (clinic.highlights[loc] as JSONContent)
+      : null;
   const hoursNote = pickText(clinic.hoursNote ?? null, loc);
   const events = pickLocalized<string[]>(clinic.events ?? null, loc) ?? [];
   const open = isOpenNow(clinic.weeklyHours);
@@ -593,7 +602,20 @@ export default async function ClinicDetailPage({
 
             <div className='flex flex-col gap-4 px-8  py-4 text-sm leading-7 text-foreground/90'>
               {/* 설명 */}
-              <p style={{ whiteSpace: "pre-wrap" }}>{description}</p>
+              {!isDocEmpty(descriptionDoc ?? undefined) ? (
+                <div
+                  className='prose prose-sm max-w-none dark:prose-invert
+                            prose-p:my-3 prose-ul:my-2 prose-li:my-0.5
+                            prose-img:rounded-xl'
+                  dangerouslySetInnerHTML={{
+                    __html: renderTiptapHTML(descriptionDoc as JSONContent),
+                  }}
+                />
+              ) : (
+                <p className='text-muted-foreground text-sm'>
+                  {t("noDescription") ?? "설명 정보가 없습니다."}
+                </p>
+              )}
             </div>
           </details>
         </section>
@@ -612,7 +634,20 @@ export default async function ClinicDetailPage({
             </summary>
 
             <div className='flex flex-col gap-4 px-8  py-4 text-sm leading-7 text-foreground/90'>
-              <p style={{ whiteSpace: "pre-wrap" }}>{highlights}</p>
+              {!isDocEmpty(highlightsDoc ?? undefined) ? (
+                <div
+                  className='prose prose-sm max-w-none dark:prose-invert
+                            prose-p:my-3 prose-ul:my-2 prose-li:my-0.5
+                            prose-img:rounded-xl'
+                  dangerouslySetInnerHTML={{
+                    __html: renderTiptapHTML(highlightsDoc as JSONContent),
+                  }}
+                />
+              ) : (
+                <p className='text-muted-foreground text-sm'>
+                  {t("noHighlights") ?? "하이라이트 정보가 없습니다."}
+                </p>
+              )}
             </div>
           </details>
         </section>

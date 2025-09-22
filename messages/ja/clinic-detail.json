@@ -17,5 +17,7 @@
     "closed": "営業時間外",
     "unknown": "営業時間不明"
   },
-  "reservationNoticesLabel": "予約時の注意事項"
+  "reservationNoticesLabel": "予約時の注意事項",
+  "noDescription": "説明情報がありません。",
+  "noHighlights": "ハイライト情報がありません。"
 }
