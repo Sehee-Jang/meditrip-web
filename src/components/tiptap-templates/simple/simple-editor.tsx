@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { EditorContent, EditorContext, useEditor } from "@tiptap/react";
-import type { JSONContent } from "@tiptap/core";
+import type { JSONContent } from "@/types/tiptap";
 
 // --- Tiptap Core Extensions ---
 import { StarterKit } from "@tiptap/starter-kit";
@@ -194,7 +194,7 @@ export function SimpleEditor({
   value,
   onChange,
   onUploadImage,
-  placeholder = "여기에 내용을 입력하세요…", // ✅ 기본값
+  placeholder = "여기에 내용을 입력하세요…", // 기본값
   minHeight = 420,
   className,
 }: SimpleEditorProps) {
@@ -249,7 +249,7 @@ export function SimpleEditor({
     ],
     content: value,
     onUpdate: ({ editor }) => {
-      onChange(editor.getJSON(), editor.getText());
+      onChange(editor.getJSON() as JSONContent, editor.getText());
     },
   });
 

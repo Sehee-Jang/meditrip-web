@@ -7,7 +7,7 @@ import type {
   Path,
   ControllerRenderProps,
 } from "react-hook-form";
-import type { JSONContent } from "@tiptap/core";
+import type { JSONContent } from "@/types/tiptap";
 import type { LocaleKey } from "@/constants/locales";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { SimpleEditor } from "@/components/tiptap-templates/simple/simple-editor";

@@ -47,7 +47,7 @@ import {
   CATEGORY_ICONS,
   type CategoryKey,
 } from "@/constants/categories";
-import type { JSONContent } from "@tiptap/core";
+import type { JSONContent } from "@/types/tiptap";
 import { LocalizedTiptapField } from "@/components/admin/common/LocalizedTiptapField";
 
 /* ====== 카테고리 다중선택 UI (체크리스트) ====== */

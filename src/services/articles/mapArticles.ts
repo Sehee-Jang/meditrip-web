@@ -11,7 +11,7 @@ import { CATEGORY_KEYS, type CategoryKey } from "@/constants/categories";
 import { toISO } from "@/utils/date";
 import { LocaleKey, LOCALES_TUPLE } from "@/constants/locales";
 import { LocalizedTextDoc, LocalizedRichTextDoc } from "@/types/common";
-import type { JSONContent } from "@tiptap/core";
+import type { JSONContent } from "@/types/tiptap";
 
 /** 기본 빈 문서 */
 const EMPTY_DOC: JSONContent = {

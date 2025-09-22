@@ -31,7 +31,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import type { JSONContent } from "@tiptap/core";
+import type { JSONContent } from "@/types/tiptap";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/lib/supabase";
 import { resolveStorage } from "@/constants/storage";

@@ -12,7 +12,7 @@ import {
   REQUIRED_LOCALES,
 } from "@/constants/locales";
 import { CATEGORY_KEYS, type CategoryKey } from "@/constants/categories";
-import type { JSONContent } from "@tiptap/core";
+import type { JSONContent } from "@/types/tiptap";
 
 // 요일 키 (UI와 동일)
 export const DAY_KEYS = [

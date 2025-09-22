@@ -1,4 +1,4 @@
-import type { JSONContent } from "@tiptap/core";
+import type { JSONContent } from "@/types/tiptap";
 import { LocaleKey } from "@/constants/locales";
 import type { Locale } from "@/i18n/routing";
 

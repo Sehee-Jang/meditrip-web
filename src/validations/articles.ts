@@ -5,7 +5,7 @@ import {
   REQUIRED_LOCALES,
   type LocaleKey,
 } from "@/constants/locales";
-import type { JSONContent } from "@tiptap/core";
+import type { JSONContent } from "@/types/tiptap";
 
 /** 빈 Tiptap 문서 */
 const EMPTY_DOC: JSONContent = {
