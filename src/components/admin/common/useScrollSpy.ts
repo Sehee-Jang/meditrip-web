@@ -1,33 +1,54 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { RefObject, useEffect, useState } from "react";
 
+/**
+ * 컨테이너(root) 기준 스크롤 스파이
+ */
 export default function useScrollSpy(
   ids: readonly string[],
-  rootMargin = "-45% 0px -45% 0px"
+  rootRef: RefObject<HTMLElement | null>,
+  topOffsetPx: number
 ): string | undefined {
-  const [activeId, setActiveId] = useState<string | undefined>(undefined);
+  const [activeId, setActiveId] = useState<string | undefined>(ids[0]);
 
   useEffect(() => {
+    const root = rootRef.current;
+    if (!root) return;
+
+    const elements: HTMLElement[] = [];
+    ids.forEach((id) => {
+      const el = root.querySelector<HTMLElement>(`[data-section="${id}"]`);
+      if (el) elements.push(el);
+    });
+    if (elements.length === 0) return;
+
     const observer = new IntersectionObserver(
       (entries) => {
         const visible = entries
           .filter((e) => e.isIntersecting)
-          .sort((a, b) =>
-            a.boundingClientRect.top > b.boundingClientRect.top ? 1 : -1
-          );
-        if (visible[0]?.target?.id) setActiveId(visible[0].target.id);
-      },
-      { rootMargin, threshold: [0, 1] }
-    );
+          .map((e) => {
+            const el = e.target as HTMLElement;
+            const top =
+              el.getBoundingClientRect().top - root.getBoundingClientRect().top;
+            return { id: el.dataset.section ?? el.id, top };
+          })
+          .filter((v) => !!v.id)
+          .sort((a, b) => a.top - b.top);
 
-    const elements = ids
-      .map((id) => document.getElementById(id))
-      .filter((el): el is HTMLElement => !!el);
+        if (visible[0]?.id) setActiveId(visible[0].id);
+      },
+      {
+        root,
+        // 상단: 고정 헤더만큼 제외 / 하단: -5%로 완화(마지막 섹션도 교차되도록)
+        rootMargin: `-${topOffsetPx}px 0px -5% 0px`,
+        threshold: [0.01, 0.2, 0.4, 0.6, 0.8, 1],
+      }
+    );
 
     elements.forEach((el) => observer.observe(el));
     return () => observer.disconnect();
-  }, [ids, rootMargin]);
+  }, [ids, rootRef, topOffsetPx]);
 
   return activeId;
 }
