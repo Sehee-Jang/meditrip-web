@@ -127,9 +127,8 @@ export default function ClinicFormDialog({
         subtitle: { ko: "", ja: "", zh: "", en: "" },
       },
       categoryKeys: [],
-      vision: { ko: "", ja: "", zh: "", en: "" },
-      mission: { ko: "", ja: "", zh: "", en: "" },
       description: { ko: "", ja: "", zh: "", en: "" },
+      highlights: { ko: "", ja: "", zh: "", en: "" },
       events: { ko: [], ja: [], zh: [], en: [] },
       reservationNotices: { ko: [], ja: [], zh: [], en: [] },
       images: [],
@@ -201,18 +200,6 @@ export default function ClinicFormDialog({
         )
           ? (data as { categoryKeys: CategoryKey[] }).categoryKeys
           : [],
-        // vision: (data.vision as Record<string, string>) ?? {
-        //   ko: "",
-        //   ja: "",
-        //   zh: "",
-        //   en: "",
-        // },
-        // mission: (data.mission as Record<string, string>) ?? {
-        //   ko: "",
-        //   ja: "",
-        //   zh: "",
-        //   en: "",
-        // },
         description: (data.description as Record<string, string>) ?? {
           ko: "",
           ja: "",
@@ -332,7 +319,8 @@ export default function ClinicFormDialog({
     { id: "sec-basic", label: "기본 정보" },
     { id: "sec-contacts", label: "연락처·웹/SNS" },
     { id: "sec-hours", label: "영업시간·휴무" },
-    { id: "sec-about", label: "소개" },
+    { id: "sec-intro", label: "소개" },
+    { id: "sec-highlights", label: "하이라이트" },
     { id: "sec-amenities", label: "편의시설" },
     { id: "sec-notices", label: "주의사항" },
     { id: "sec-events", label: "이벤트" },
@@ -392,7 +380,7 @@ export default function ClinicFormDialog({
                   }
                 />
                 <FormRow
-                  label='소개 제목(선택)'
+                  label='소개 제목 (선택)'
                   control={
                     <LocalizedTabsField
                       register={register}
@@ -405,7 +393,7 @@ export default function ClinicFormDialog({
                   }
                 />
                 <FormRow
-                  label='소개 부제(선택)'
+                  label='소개 부제 (선택)'
                   control={
                     <LocalizedTabsField
                       register={register}
@@ -434,7 +422,7 @@ export default function ClinicFormDialog({
                   }
                 />
                 <FormRow
-                  label='태그(선택)'
+                  label='태그 (선택)'
                   control={
                     <TagPicker
                       value={watch("tagSlugs") ?? []}
@@ -457,7 +445,7 @@ export default function ClinicFormDialog({
               data-section='sec-contacts'
               className='scroll-mt-24'
             >
-              <SectionCard title='연락처 & 웹·SNS'>
+              <SectionCard title='연락처 & 웹·SNS (선택)'>
                 <ContactsAndSocials />
               </SectionCard>
             </section>
@@ -468,14 +456,14 @@ export default function ClinicFormDialog({
               data-section='sec-hours'
               className='scroll-mt-24'
             >
-              <SectionCard title='영업시간 & 휴무'>
+              <SectionCard title='영업시간 & 휴무 (선택)'>
                 <WeeklyHoursGrid />
                 <FormRow
-                  label='정기 휴무 요일'
+                  label='정기 휴무 요일 (선택)'
                   control={<ClosedDaysChecklist />}
                 />
                 <FormRow
-                  label='휴무/영업 안내문(선택)'
+                  label='휴무/영업 안내문 (선택)'
                   control={
                     <LocalizedTabsField
                       register={register}
@@ -490,13 +478,13 @@ export default function ClinicFormDialog({
               </SectionCard>
             </section>
 
-            {/* ===== 병원 소개(비전/미션/설명) ===== */}
+            {/* ===== 병원 소개 ===== */}
             <section
-              id='sec-about'
-              data-section='sec-about'
+              id='sec-intro'
+              data-section='sec-intro'
               className='scroll-mt-24'
             >
-              <SectionCard title='소개'>
+              <SectionCard title='병원 소개 (선택)'>
                 <FormRow
                   label='설명(Description)'
                   control={
@@ -510,41 +498,25 @@ export default function ClinicFormDialog({
                     />
                   }
                 />
+              </SectionCard>
+            </section>
+
+            {/* ===== 하이라이트 ===== */}
+            <section
+              id='sec-highlights'
+              data-section='sec-highlights'
+              className='scroll-mt-24'
+            >
+              <SectionCard title='하이라이트 (선택)'>
                 <FormRow
-                  label='비전(Vision)'
-                  control={
-                    <LocalizedTabsField
-                      register={register}
-                      basePath='vision'
-                      locales={LOCALES_TUPLE}
-                      errors={formState.errors}
-                      placeholder='병원의 비전을 입력하세요.'
-                      mode='input'
-                    />
-                  }
-                />
-                <FormRow
-                  label='미션(Mission)'
-                  control={
-                    <LocalizedTabsField
-                      register={register}
-                      basePath='mission'
-                      locales={LOCALES_TUPLE}
-                      errors={formState.errors}
-                      placeholder='병원의 미션을 입력하세요.'
-                      mode='input'
-                    />
-                  }
-                />
-                <FormRow
-                  label='하이라이트'
+                  label='기관 인증 및 선정 이력'
                   control={
                     <LocalizedTabsField
                       register={register}
                       basePath='highlights'
                       locales={LOCALES_TUPLE}
                       errors={formState.errors}
-                      placeholder='병원의 미션을 입력하세요.'
+                      placeholder={`예)\n• 2024 우수 웰니스업체 선정 — 한국관광공사 / 선정 사유 간단 설명\n• 한국관광공사 의료관광 공식 인증 — 인증번호 A-2024-01-01-5650, 유효기간 2024.01–2026.12\n• 서울관광재단 의료관광 협력기관 — 지정연도 2025, 주요 협력 프로그램 소개`}
                       mode='textarea'
                     />
                   }
@@ -558,7 +530,7 @@ export default function ClinicFormDialog({
               data-section='sec-amenities'
               className='scroll-mt-24'
             >
-              <SectionCard title='편의시설'>
+              <SectionCard title='편의시설 (선택)'>
                 <AmenitiesChecklist />
               </SectionCard>
             </section>
@@ -569,11 +541,11 @@ export default function ClinicFormDialog({
               data-section='sec-notices'
               className='scroll-mt-24'
             >
-              <SectionCard title='예약 시 주의사항'>
+              <SectionCard title='예약 시 주의사항 (선택)'>
                 <LocalizedRepeaterFieldMulti
                   basePath='reservationNotices'
                   locales={LOCALES_TUPLE}
-                  addLabel='추가'
+                  addLabel='주의사항 추가'
                   removeLabel='삭제'
                   placeholders={{
                     ko: "주의사항(한국어)",
@@ -591,7 +563,7 @@ export default function ClinicFormDialog({
               data-section='sec-events'
               className='scroll-mt-24'
             >
-              <SectionCard title='예약 이벤트'>
+              <SectionCard title='예약 이벤트 (선택)'>
                 <LocalizedRepeaterFieldMulti
                   basePath='events'
                   locales={LOCALES_TUPLE}
@@ -613,7 +585,7 @@ export default function ClinicFormDialog({
               data-section='sec-doctors'
               className='scroll-mt-24'
             >
-              <SectionCard title='의료진 소개'>
+              <SectionCard title='의료진 소개 (선택)'>
                 <DoctorsField />
               </SectionCard>
             </section>
@@ -650,7 +622,7 @@ export default function ClinicFormDialog({
               className='scroll-mt-24'
             >
               <SectionCard
-                title='좌표/주소(선택)'
+                title='좌표/주소 (선택)'
                 description='위도와 경도를 추가하면 지도에 정확한 위치를 표시할 수 있습니다.'
               >
                 <div className='grid grid-cols-2 gap-3 px-5 py-4'>

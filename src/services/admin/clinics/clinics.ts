@@ -116,8 +116,7 @@ const clinicConverter: FirestoreDataConverter<ClinicDoc> = {
       categoryKeys: asCategoryKeys(
         (d as { categoryKeys?: unknown }).categoryKeys
       ),
-      // vision: d.vision,
-      // mission: d.mission,
+
       description: d.description,
       highlights: d.highlights,
       events: d.events ?? { ko: [], ja: [], zh: [], en: [] },

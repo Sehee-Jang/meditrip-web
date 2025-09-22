@@ -100,8 +100,7 @@ export const clinicFormSchema = z.object({
     title: localizedStringDynamicSchema,
     subtitle: localizedStringDynamicSchema,
   }),
-  vision: localizedStringDynamicSchema,
-  mission: localizedStringDynamicSchema,
+
   description: localizedStringDynamicSchema,
   highlights: localizedStringDynamicSchema,
   hoursNote: localizedStringDynamicSchema,

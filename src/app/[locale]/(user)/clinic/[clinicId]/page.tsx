@@ -195,8 +195,6 @@ export default async function ClinicDetailPage({
   const name = pickText(clinic.name, loc);
   const address = pickText(clinic.address, loc);
   const description = pickText(clinic.description, loc);
-  // const vision = pickText(clinic.vision, loc);
-  // const mission = pickText(clinic.mission, loc);
   const highlights = pickText(clinic.highlights, loc);
   const hoursNote = pickText(clinic.hoursNote ?? null, loc);
   const events = pickLocalized<string[]>(clinic.events ?? null, loc) ?? [];
@@ -596,14 +594,6 @@ export default async function ClinicDetailPage({
             <div className='flex flex-col gap-4 px-8  py-4 text-sm leading-7 text-foreground/90'>
               {/* 설명 */}
               <p style={{ whiteSpace: "pre-wrap" }}>{description}</p>
-
-              {/* 비전 */}
-              {/* <h3 className='text-xl font-semibold'>{t("visionLabel")}</h3>
-              <p>{vision}</p> */}
-
-              {/* 미션 */}
-              {/* <h3 className='text-xl font-semibold'>{t("missionLabel")}</h3>
-              <p>{mission}</p> */}
             </div>
           </details>
         </section>

@@ -1,4 +1,3 @@
-// src/components/admin/clinics/fields/ClosedDaysChecklist.tsx
 "use client";
 
 import { useFormContext } from "react-hook-form";

@@ -70,21 +70,18 @@ export interface ClinicDoc {
   };
   doctors?: Doctor[];
 
-  // 영업시간
+  // 영업시간 (선택)
   weeklyHours?: WeeklyHours;
   weeklyClosedDays?: DayOfWeek[];
   hoursNote?: LocalizedTextDoc;
 
-  // 연락처/링크
+  // 연락처/링크 (선택)
   phone?: string;
   website?: string;
   socials?: Partial<Record<SocialPlatform, string>>;
 
-  // 병원소개: 소개글, 비전, 미션, 이벤트
   description?: LocalizedTextDoc;
   highlights?: LocalizedTextDoc;
-  // vision?: LocalizedTextDoc;
-  // mission?: LocalizedTextDoc;
   events?: LocalizedStringArray;
   reservationNotices?: LocalizedStringArray;
 
