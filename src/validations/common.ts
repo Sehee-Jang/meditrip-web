@@ -46,21 +46,34 @@ export const localizedOptionalDynamicSchema: z.ZodType<LocalizedTextFull> = z
   .transform((m) => normalizeLocalized(m));
 
 // 배열 항목은 공백 제거 후 빈 문자열은 버림
-const arrayItem = z
-  .string()
-  .transform((s) => s.trim())
-  .pipe(z.string().min(1));
+// const arrayItem = z
+//   .string()
+//   .transform((s) => s.trim())
+//   .pipe(z.string().min(1));
 
 // 배열(전부 선택): [] 허용, 각 항목은 1자 이상
-export const localizedStringArrayDynamicSchema: z.ZodType<
-  LocalizedMap<string[]>
-> = z
-  .record(z.enum(LOCALES_TUPLE), z.array(arrayItem).optional())
+// export const localizedStringArrayDynamicSchema: z.ZodType<
+//   LocalizedMap<string[]>
+// > = z
+//   .record(z.enum(LOCALES_TUPLE), z.array(arrayItem).optional())
+//   .transform((m) => {
+//     const out = {} as { [K in LocaleKey]: string[] };
+//     for (const k of LOCALES_TUPLE) {
+//       // 키가 없으면 빈 배열로 채움
+//       out[k] = m[k] ?? [];
+//     }
+//     return out;
+//   });
+
+// 1) 원소 레벨에서는 '아무 문자열'도 받는다(빈 문자열 포함)
+// 2) 최종 transform에서 trim + 빈 문자열 제거
+export const localizedStringArrayDynamicSchema = z
+  .record(z.enum(LOCALES_TUPLE), z.array(z.string()).optional())
   .transform((m) => {
     const out = {} as { [K in LocaleKey]: string[] };
     for (const k of LOCALES_TUPLE) {
-      // 키가 없으면 빈 배열로 채움
-      out[k] = m[k] ?? [];
+      const src = Array.isArray(m[k]) ? m[k] : [];
+      out[k] = src.map((s) => s.trim()).filter((s) => s.length > 0);
     }
     return out;
   });

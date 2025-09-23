@@ -21,7 +21,11 @@ export default function LocalizedRepeaterFieldMulti(props: {
   placeholders: Record<LocaleKey, string>;
 }) {
   const { basePath, locales, addLabel, removeLabel, placeholders } = props;
-  const { register, setValue, watch } = useFormContext<ClinicFormInput>();
+  const { register, setValue, watch, formState } =
+    useFormContext<ClinicFormInput>();
+
+  // 제출 버튼을 한 번이라도 눌렀는지 여부(경고 노출 트리거)
+  const showWarnings = (formState.submitCount ?? 0) > 0;
 
   // 탭 상태
   const [active, setActive] = React.useState<LocaleKey>(locales[0]);
@@ -48,41 +52,86 @@ export default function LocalizedRepeaterFieldMulti(props: {
     });
   };
 
+  // 로케일별 "빈 항목 존재" 여부
+  const hasEmptyByLocale = React.useMemo(() => {
+    const map = new Map<LocaleKey, boolean>();
+    locales.forEach((loc) => {
+      const list = valuesOf(loc);
+      map.set(
+        loc,
+        list.some((s) => (s ?? "").trim().length === 0)
+      );
+    });
+    return map;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [locales, watch(basePath as Path<ClinicFormInput>)]);
+
   return (
     <div className='px-5 py-4'>
       <Tabs value={active} onValueChange={(v) => setActive(v as LocaleKey)}>
         <TabsList className='mb-3'>
-          {locales.map((loc) => (
-            <TabsTrigger key={loc} value={loc}>
-              {LOCALE_LABELS_KO[loc] ?? loc.toUpperCase()}
-            </TabsTrigger>
-          ))}
+          {locales.map((loc) => {
+            const hasEmpty = hasEmptyByLocale.get(loc) === true;
+            return (
+              <TabsTrigger key={loc} value={loc}>
+                {LOCALE_LABELS_KO[loc] ?? loc.toUpperCase()}
+                {/* 제출 시점에 비어있는 항목이 있는 탭에 빨간 점 표시(경고) */}
+                {showWarnings && hasEmpty && (
+                  <span
+                    aria-label='빈 항목 있음'
+                    className='ml-1 inline-block h-1.5 w-1.5 rounded-full bg-red-600'
+                  />
+                )}
+              </TabsTrigger>
+            );
+          })}
         </TabsList>
 
         {locales.map((loc) => {
           const list = valuesOf(loc);
+          const isActive = active === loc;
+          const hasEmptyHere = list.some((s) => (s ?? "").trim().length === 0);
+
           return (
             <TabsContent key={loc} value={loc} className='mt-0'>
               <div className='space-y-3'>
-                {list.map((_, i) => (
-                  <div key={i} className='flex items-center gap-2'>
-                    <Input
-                      {...register(
-                        `${basePath}.${loc}.${i}` as Path<ClinicFormInput>
+                {list.map((val, i) => {
+                  const isEmpty = (val ?? "").trim().length === 0;
+                  const showThisWarn = showWarnings && isActive && isEmpty;
+                  return (
+                    <div key={i} className='flex flex-col gap-1'>
+                      <div className='flex items-center gap-2'>
+                        <Input
+                          {...register(
+                            `${basePath}.${loc}.${i}` as Path<ClinicFormInput>
+                          )}
+                          placeholder={placeholders[loc]}
+                          className={
+                            "h-9 " +
+                            (showThisWarn
+                              ? "border-red-500 focus-visible:ring-red-500"
+                              : "")
+                          }
+                          aria-invalid={showThisWarn || undefined}
+                        />
+                        <Button
+                          type='button'
+                          variant='ghost'
+                          size='sm'
+                          onClick={() => removeAt(loc, i)}
+                        >
+                          {removeLabel}
+                        </Button>
+                      </div>
+                      {showThisWarn && (
+                        <p className='text-[11px] text-red-600'>
+                          비어 있으면 저장 시 자동 제거됩니다. 입력하거나
+                          삭제하세요.
+                        </p>
                       )}
-                      placeholder={placeholders[loc]}
-                      className='h-9'
-                    />
-                    <Button
-                      type='button'
-                      variant='ghost'
-                      size='sm'
-                      onClick={() => removeAt(loc, i)}
-                    >
-                      {removeLabel}
-                    </Button>
-                  </div>
-                ))}
+                    </div>
+                  );
+                })}
                 <Button
                   type='button'
                   variant='outline'
@@ -90,6 +139,13 @@ export default function LocalizedRepeaterFieldMulti(props: {
                 >
                   {addLabel}
                 </Button>
+
+                {/* 탭 하단에도 요약 경고(현재 탭 기준, 가시성 강화용) */}
+                {showWarnings && isActive && hasEmptyHere && (
+                  <p className='mt-1 text-[12px] text-red-600'>
+                    이 탭에 비어 있는 항목이 있습니다. 불필요하면 삭제하세요.
+                  </p>
+                )}
               </div>
             </TabsContent>
           );

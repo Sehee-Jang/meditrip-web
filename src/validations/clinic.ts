@@ -83,6 +83,7 @@ const categoryKeysSchema = z
       "유효하지 않은 카테고리입니다."
     )
   )
+  .min(1, "카테고리를 1개 이상 선택하세요.")
   .default([]);
 
 // Tiptap JSON 최소 구조만 강제(나머지는 통과)

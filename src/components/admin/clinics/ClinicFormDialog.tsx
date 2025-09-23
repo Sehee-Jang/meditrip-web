@@ -9,6 +9,7 @@ import {
   Controller,
 } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Input } from "@/components/ui/input";
 import type { z } from "zod";
 import {
   createClinic,
@@ -17,13 +18,15 @@ import {
 } from "@/services/admin/clinics/clinics";
 import type { ClinicDoc, ClinicWithId, Geo } from "@/types/clinic";
 import { clinicFormSchema, type ClinicFormValues } from "@/validations/clinic";
+import { LOCALES_TUPLE, type LocaleKey } from "@/constants/locales";
+
 import FormSheet from "@/components/admin/common/FormSheet";
 import SectionCard from "@/components/admin/common/SectionCard";
 import FormRow from "@/components/admin/common/FormRow";
 import LocalizedTabsField from "@/components/admin/common/LocalizedTabsField";
+import { LocalizedTiptapField } from "@/components/admin/common/LocalizedTiptapField";
 import ImagesUploader from "@/components/admin/common/ImagesUploader";
-import { Input } from "@/components/ui/input";
-import { LOCALES_TUPLE, type LocaleKey } from "@/constants/locales";
+
 import ContactsAndSocials from "./fields/ContactsAndSocials";
 import WeeklyHoursGrid from "./fields/WeeklyHoursGrid";
 import ClosedDaysChecklist from "./fields/ClosedDaysChecklist";
@@ -48,7 +51,7 @@ import {
   type CategoryKey,
 } from "@/constants/categories";
 import type { JSONContent } from "@/types/tiptap";
-import { LocalizedTiptapField } from "@/components/admin/common/LocalizedTiptapField";
+
 
 /* ====== 카테고리 다중선택 UI (체크리스트) ====== */
 function CategoriesChecklist({
