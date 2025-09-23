@@ -202,8 +202,6 @@ export default async function ClinicDetailPage({
   const hoursNote = pickText(clinic.hoursNote ?? null, loc);
   const events = pickLocalized<string[]>(clinic.events ?? null, loc) ?? [];
   const open = isOpenNow(clinic.weeklyHours);
-
-  // ClinicDetailPage 내부, 값 계산 직후에 추가 (도메인/소셜 안전 처리)
   const websiteHost = clinic.website ? new URL(clinic.website).hostname : null;
   const socials = (clinic.socials ?? {}) as Partial<
     Record<"instagram" | "line" | "youtube" | "whatsapp", string>
@@ -242,6 +240,35 @@ export default async function ClinicDetailPage({
     privateCare: <Shield size={24} />,
     airportPickup: <Plane size={24} />,
   };
+
+  // 안전 가드: clinic.amenities가 배열이 아닐 수도 있으니 배열 보장
+  const amenities = Array.isArray(clinic.amenities) ? clinic.amenities : [];
+
+  // AmenityKey 타입 가드 (알 수 없는 값이 섞여도 안전)
+  const isAmenityKey = (v: unknown): v is AmenityKey =>
+    typeof v === "string" && v in AMENITY_ICONS;
+
+  // 표시 여부 플래그
+  const hasDescription = !isDocEmpty(descriptionDoc ?? undefined);
+  const hasHighlights = !isDocEmpty(highlightsDoc ?? undefined);
+  const hasDoctors = (doctors?.length ?? 0) > 0;
+  const hasAmenities = amenities.some(isAmenityKey);
+  const hasEvents = (events?.length ?? 0) > 0;
+  const hasPackages = (clinic.packagesList?.length ?? 0) > 0;
+  const hasReservationNotices = (reservationNotices?.length ?? 0) > 0;
+  const hasAddress = !!address && address.trim().length > 0;
+  const hasPhone = !!clinic.phone && clinic.phone.trim().length > 0;
+  const hasWebsiteOrSocials =
+    !!clinic.website || Object.keys(socials).length > 0;
+
+  // 주간 영업시간이 하루라도 등록되어 있는지
+  const hasHours = Object.values(clinic.weeklyHours ?? {}).some(
+    (arr) => (arr?.length ?? 0) > 0
+  );
+
+  // 지도는 좌표가 있거나 주소가 있으면 노출
+  const hasMap =
+    (clinic.geo?.lat != null && clinic.geo?.lng != null) || hasAddress;
 
   return (
     <main className='md:px-4 md:py-8'>
@@ -337,174 +364,177 @@ export default async function ClinicDetailPage({
                   <div className='leading-relaxed'>{address}</div>
                 </InfoRow>
 
-                {/* 영업시간: 좌측 상태, 우측 안내 + ▾ */}
-                {(() => {
-                  const dayOrder: DayOfWeek[] = [
-                    "mon",
-                    "tue",
-                    "wed",
-                    "thu",
-                    "fri",
-                    "sat",
-                    "sun",
-                  ];
-                  const pairs: Array<[DayOfWeek, DayOfWeek | null]> = [
-                    ["mon", "tue"],
-                    ["wed", "thu"],
-                    ["fri", "sat"],
-                    ["sun", null],
-                  ];
+                {/* 영업시간(실제 시간표가 있을 때만 표시): 좌측 상태, 우측 안내 + ▾ */}
+                {hasHours &&
+                  (() => {
+                    const dayOrder: DayOfWeek[] = [
+                      "mon",
+                      "tue",
+                      "wed",
+                      "thu",
+                      "fri",
+                      "sat",
+                      "sun",
+                    ];
+                    const pairs: Array<[DayOfWeek, DayOfWeek | null]> = [
+                      ["mon", "tue"],
+                      ["wed", "thu"],
+                      ["fri", "sat"],
+                      ["sun", null],
+                    ];
 
-                  const DAY_LABELS: Record<
-                    Locale,
-                    Record<DayOfWeek, string>
-                  > = {
-                    ko: {
-                      mon: "월",
-                      tue: "화",
-                      wed: "수",
-                      thu: "목",
-                      fri: "금",
-                      sat: "토",
-                      sun: "일",
-                    },
-                    ja: {
-                      mon: "月",
-                      tue: "火",
-                      wed: "水",
-                      thu: "木",
-                      fri: "金",
-                      sat: "土",
-                      sun: "日",
-                    },
-                    zh: {
-                      mon: "周一",
-                      tue: "周二",
-                      wed: "周三",
-                      thu: "周四",
-                      fri: "周五",
-                      sat: "周六",
-                      sun: "周日",
-                    },
-                    en: {
-                      mon: "Mon",
-                      tue: "Tue",
-                      wed: "Wed",
-                      thu: "Thu",
-                      fri: "Fri",
-                      sat: "Sat",
-                      sun: "Sun",
-                    },
-                  };
-                  const CLOSED: Record<Locale, string> = {
-                    ko: "휴무",
-                    ja: "休み",
-                    zh: "休息",
-                    en: "Closed",
-                  };
-                  const NOINFO: Record<Locale, string> = {
-                    ko: "영업시간 정보가 없습니다.",
-                    ja: "営業時間情報がありません。",
-                    zh: "暂无营业时间信息。",
-                    en: "No hours information.",
-                  };
+                    const DAY_LABELS: Record<
+                      Locale,
+                      Record<DayOfWeek, string>
+                    > = {
+                      ko: {
+                        mon: "월",
+                        tue: "화",
+                        wed: "수",
+                        thu: "목",
+                        fri: "금",
+                        sat: "토",
+                        sun: "일",
+                      },
+                      ja: {
+                        mon: "月",
+                        tue: "火",
+                        wed: "水",
+                        thu: "木",
+                        fri: "金",
+                        sat: "土",
+                        sun: "日",
+                      },
+                      zh: {
+                        mon: "周一",
+                        tue: "周二",
+                        wed: "周三",
+                        thu: "周四",
+                        fri: "周五",
+                        sat: "周六",
+                        sun: "周日",
+                      },
+                      en: {
+                        mon: "Mon",
+                        tue: "Tue",
+                        wed: "Wed",
+                        thu: "Thu",
+                        fri: "Fri",
+                        sat: "Sat",
+                        sun: "Sun",
+                      },
+                    };
+                    const CLOSED: Record<Locale, string> = {
+                      ko: "휴무",
+                      ja: "休み",
+                      zh: "休息",
+                      en: "Closed",
+                    };
+                    const NOINFO: Record<Locale, string> = {
+                      ko: "영업시간 정보가 없습니다.",
+                      ja: "営業時間情報がありません。",
+                      zh: "暂无营业时间信息。",
+                      en: "No hours information.",
+                    };
 
-                  const hours = clinic.weeklyHours ?? {};
-                  const closedDays = clinic.weeklyClosedDays ?? [];
-                  const hasAny = dayOrder.some(
-                    (d) => (hours[d]?.length ?? 0) > 0
-                  );
+                    const hours = clinic.weeklyHours ?? {};
+                    const closedDays = clinic.weeklyClosedDays ?? [];
+                    const hasAny = dayOrder.some(
+                      (d) => (hours[d]?.length ?? 0) > 0
+                    );
 
-                  const labelColor =
-                    open === null
-                      ? ""
-                      : open
-                      ? "text-emerald-600 font-medium"
-                      : "text-rose-600 font-medium";
+                    const labelColor =
+                      open === null
+                        ? ""
+                        : open
+                        ? "text-emerald-600 font-medium"
+                        : "text-rose-600 font-medium";
 
-                  const todayKey: DayOfWeek = (
-                    ["sun", "mon", "tue", "wed", "thu", "fri", "sat"] as const
-                  )[new Date().getDay()];
+                    const todayKey: DayOfWeek = (
+                      ["sun", "mon", "tue", "wed", "thu", "fri", "sat"] as const
+                    )[new Date().getDay()];
 
-                  const isClosed = (d: DayOfWeek) =>
-                    closedDays.includes(d) || (hours[d]?.length ?? 0) === 0;
+                    const isClosed = (d: DayOfWeek) =>
+                      closedDays.includes(d) || (hours[d]?.length ?? 0) === 0;
 
-                  const textFor = (d: DayOfWeek) =>
-                    (hours[d]?.length ?? 0) > 0
-                      ? hours[d]!.map((r) => `${r.open} – ${r.close}`).join(
-                          ", "
-                        )
-                      : CLOSED[loc];
+                    const textFor = (d: DayOfWeek) =>
+                      (hours[d]?.length ?? 0) > 0
+                        ? hours[d]!.map((r) => `${r.open} – ${r.close}`).join(
+                            ", "
+                          )
+                        : CLOSED[loc];
 
-                  const Cell = ({ d }: { d: DayOfWeek }) => (
-                    <div className='grid grid-cols-[28px_1fr] items-baseline gap-3'>
-                      <span
-                        className={[
-                          "w-7 text-muted-foreground",
-                          todayKey === d ? "text-foreground font-medium" : "",
-                        ].join(" ")}
-                      >
-                        {(DAY_LABELS[loc] ?? DAY_LABELS.en)[d]}
-                      </span>
-                      <span
-                        className={[
-                          "font-mono tabular-nums",
-                          isClosed(d) ? "text-muted-foreground" : "font-medium",
-                        ].join(" ")}
-                      >
-                        {textFor(d)}
-                      </span>
-                    </div>
-                  );
+                    const Cell = ({ d }: { d: DayOfWeek }) => (
+                      <div className='grid grid-cols-[28px_1fr] items-baseline gap-3'>
+                        <span
+                          className={[
+                            "w-7 text-muted-foreground",
+                            todayKey === d ? "text-foreground font-medium" : "",
+                          ].join(" ")}
+                        >
+                          {(DAY_LABELS[loc] ?? DAY_LABELS.en)[d]}
+                        </span>
+                        <span
+                          className={[
+                            "font-mono tabular-nums",
+                            isClosed(d)
+                              ? "text-muted-foreground"
+                              : "font-medium",
+                          ].join(" ")}
+                        >
+                          {textFor(d)}
+                        </span>
+                      </div>
+                    );
 
-                  return (
-                    <details className='group border-t border-border'>
-                      <summary className='list-none cursor-pointer'>
-                        <div className='flex items-center gap-3 px-4 py-4 text-[15px]'>
-                          <span className='mt-0.5 shrink-0 text-muted-foreground'>
-                            <Clock size={18} />
-                          </span>
-                          <div className='flex-1'>
-                            <span className={labelColor}>
-                              {open === null
-                                ? t("hours.unknown")
-                                : open
-                                ? t("hours.open")
-                                : t("hours.closed")}
+                    return (
+                      <details className='group border-t border-border'>
+                        <summary className='list-none cursor-pointer'>
+                          <div className='flex items-center gap-3 px-4 py-4 text-[15px]'>
+                            <span className='mt-0.5 shrink-0 text-muted-foreground'>
+                              <Clock size={18} />
+                            </span>
+                            <div className='flex-1'>
+                              <span className={labelColor}>
+                                {open === null
+                                  ? t("hours.unknown")
+                                  : open
+                                  ? t("hours.open")
+                                  : t("hours.closed")}
+                              </span>
+                            </div>
+                            <span className='ml-3 inline-flex shrink-0 items-center gap-2 text-sm text-muted-foreground'>
+                              {hoursNote}
+                              <ChevronDown
+                                size={16}
+                                className='transition-transform group-open:rotate-180'
+                              />
                             </span>
                           </div>
-                          <span className='ml-3 inline-flex shrink-0 items-center gap-2 text-sm text-muted-foreground'>
-                            {hoursNote}
-                            <ChevronDown
-                              size={16}
-                              className='transition-transform group-open:rotate-180'
-                            />
-                          </span>
-                        </div>
-                      </summary>
+                        </summary>
 
-                      <div className='pl-12 pr-4 pb-4'>
-                        {hasAny ? (
-                          <div className='grid grid-cols-2 gap-x-10 gap-y-2'>
-                            {pairs.map(([a, b]) => (
-                              <React.Fragment key={a + (b ?? "")}>
-                                <Cell d={a} />
-                                {b ? <Cell d={b} /> : <div />}
-                              </React.Fragment>
-                            ))}
-                          </div>
-                        ) : (
-                          <p className='text-sm text-muted-foreground'>
-                            {NOINFO[loc]}
-                          </p>
-                        )}
-                      </div>
-                    </details>
-                  );
-                })()}
+                        <div className='pl-12 pr-4 pb-4'>
+                          {hasAny ? (
+                            <div className='grid grid-cols-2 gap-x-10 gap-y-2'>
+                              {pairs.map(([a, b]) => (
+                                <React.Fragment key={a + (b ?? "")}>
+                                  <Cell d={a} />
+                                  {b ? <Cell d={b} /> : <div />}
+                                </React.Fragment>
+                              ))}
+                            </div>
+                          ) : (
+                            <p className='text-sm text-muted-foreground'>
+                              {NOINFO[loc]}
+                            </p>
+                          )}
+                        </div>
+                      </details>
+                    );
+                  })()}
 
                 {/* 전화 */}
-                {clinic.phone && (
+                {hasPhone && (
                   <InfoRow icon={<Phone size={18} />}>
                     <a href={`tel:${clinic.phone}`} className='no-underline'>
                       {clinic.phone}
@@ -513,7 +543,7 @@ export default async function ClinicDetailPage({
                 )}
 
                 {/* Website + 소셜 */}
-                {(clinic.website || Object.keys(socials).length > 0) && (
+                {hasWebsiteOrSocials && (
                   <InfoRow icon={<Earth size={18} />}>
                     <div className='space-y-1'>
                       {/* Website */}
@@ -582,21 +612,21 @@ export default async function ClinicDetailPage({
         </div>
 
         {/* Introduce */}
-        <section className='space-y-2'>
-          <details className='group rounded-2xl border bg-card'>
-            <summary className='list-none cursor-pointer px-4 py-3 flex items-center justify-between'>
-              <span className='text-xl font-semibold'>
-                {t("aboutLabel") ?? "Introduce"}
-              </span>
-              <ChevronDown
-                size={18}
-                className='text-muted-foreground transition-transform group-open:rotate-180'
-              />
-            </summary>
+        {hasDescription && (
+          <section className='space-y-2'>
+            <details className='group rounded-2xl border bg-card'>
+              <summary className='list-none cursor-pointer px-4 py-3 flex items-center justify-between'>
+                <span className='text-xl font-semibold'>
+                  {t("aboutLabel") ?? "Introduce"}
+                </span>
+                <ChevronDown
+                  size={18}
+                  className='text-muted-foreground transition-transform group-open:rotate-180'
+                />
+              </summary>
 
-            <div className='flex flex-col gap-4 px-8  py-4 text-sm leading-7 text-foreground/90'>
-              {/* 설명 */}
-              {!isDocEmpty(descriptionDoc ?? undefined) ? (
+              <div className='flex flex-col gap-4 px-8  py-4 text-sm leading-7 text-foreground/90'>
+                {/* 설명 */}
                 <div
                   className='prose prose-sm max-w-none dark:prose-invert
                      prose-p:my-3 prose-ul:my-2 prose-li:my-0.5 prose-img:rounded-xl'
@@ -604,30 +634,26 @@ export default async function ClinicDetailPage({
                     __html: renderTiptapHTML(descriptionDoc),
                   }}
                 />
-              ) : (
-                <p className='text-muted-foreground text-sm'>
-                  {t("noDescription") ?? "설명 정보가 없습니다."}
-                </p>
-              )}
-            </div>
-          </details>
-        </section>
+              </div>
+            </details>
+          </section>
+        )}
 
         {/* Highlights */}
-        <section className='space-y-2'>
-          <details className='group rounded-2xl border bg-card'>
-            <summary className='list-none cursor-pointer px-4 py-3 flex items-center justify-between'>
-              <span className='text-xl font-semibold'>
-                {t("highlightsLabel") ?? "Highlights"}
-              </span>
-              <ChevronDown
-                size={18}
-                className='text-muted-foreground transition-transform group-open:rotate-180'
-              />
-            </summary>
+        {hasHighlights && (
+          <section className='space-y-2'>
+            <details className='group rounded-2xl border bg-card'>
+              <summary className='list-none cursor-pointer px-4 py-3 flex items-center justify-between'>
+                <span className='text-xl font-semibold'>
+                  {t("highlightsLabel") ?? "Highlights"}
+                </span>
+                <ChevronDown
+                  size={18}
+                  className='text-muted-foreground transition-transform group-open:rotate-180'
+                />
+              </summary>
 
-            <div className='flex flex-col gap-4 px-8  py-4 text-sm leading-7 text-foreground/90'>
-              {!isDocEmpty(highlightsDoc ?? undefined) ? (
+              <div className='flex flex-col gap-4 px-8  py-4 text-sm leading-7 text-foreground/90'>
                 <div
                   className='prose prose-sm max-w-none dark:prose-invert
                             prose-p:my-3 prose-ul:my-2 prose-li:my-0.5
@@ -636,18 +662,14 @@ export default async function ClinicDetailPage({
                     __html: renderTiptapHTML(highlightsDoc),
                   }}
                 />
-              ) : (
-                <p className='text-muted-foreground text-sm'>
-                  {t("noHighlights") ?? "하이라이트 정보가 없습니다."}
-                </p>
-              )}
-            </div>
-          </details>
-        </section>
-        
+              </div>
+            </details>
+          </section>
+        )}
+
         {/* 의료진 소개 */}
-        <section className='space-y-2'>
-          {doctors.length > 0 && (
+        {hasDoctors && (
+          <section className='space-y-2'>
             <details className='group rounded-2xl border bg-card'>
               <summary className='list-none cursor-pointer px-4 py-3 flex items-center justify-between'>
                 <span className='text-xl font-semibold'>
@@ -702,12 +724,12 @@ export default async function ClinicDetailPage({
                 </ul>
               </div>
             </details>
-          )}
-        </section>
+          </section>
+        )}
 
         {/* 편의시설 */}
-        <section className='space-y-2'>
-          {clinic.amenities && clinic.amenities.length > 0 && (
+        {hasAmenities && (
+          <section className='space-y-2'>
             <details className='group rounded-2xl border bg-card'>
               <summary className='list-none cursor-pointer px-4 py-3 flex items-center justify-between'>
                 <span className='text-xl font-semibold'>
@@ -721,7 +743,7 @@ export default async function ClinicDetailPage({
 
               <div className='flex flex-col gap-4 px-4 py-4 text-sm leading-7 text-foreground/90'>
                 <ul className='grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-y-4'>
-                  {clinic.amenities.map((a) => (
+                  {amenities.filter(isAmenityKey).map((a) => (
                     <li key={a} className='flex flex-col items-center gap-1'>
                       <span className='inline-flex items-center justify-center'>
                         {AMENITY_ICONS[a]}
@@ -732,12 +754,12 @@ export default async function ClinicDetailPage({
                 </ul>
               </div>
             </details>
-          )}
-        </section>
+          </section>
+        )}
 
         {/* 이벤트 안내 */}
-        <section className='space-y-2'>
-          {events.length > 0 && (
+        {hasEvents && (
+          <section className='space-y-2'>
             <details className='group rounded-2xl border bg-card'>
               <summary className='list-none cursor-pointer px-4 py-3 flex items-center justify-between'>
                 <span className='text-xl font-semibold'>
@@ -757,83 +779,89 @@ export default async function ClinicDetailPage({
                 </ul>
               </div>
             </details>
-          )}
-        </section>
+          </section>
+        )}
 
         {/* 지도 */}
-        <section className='space-y-2'>
-          <div className='rounded-2xl border bg-card p-4'>
-            <h2 className='text-xl font-semibold mb-3'>
-              {t("mapLabel") ?? "지도"}
-            </h2>
-            <GoogleMapEmbed
-              lat={clinic.geo?.lat}
-              lng={clinic.geo?.lng}
-              address={address}
-              locale={loc}
-            />
-          </div>
-        </section>
+        {hasMap && (
+          <section className='space-y-2'>
+            <div className='rounded-2xl border bg-card p-4'>
+              <h2 className='text-xl font-semibold mb-3'>
+                {t("mapLabel") ?? "지도"}
+              </h2>
+              <GoogleMapEmbed
+                lat={clinic.geo?.lat}
+                lng={clinic.geo?.lng}
+                address={address}
+                locale={loc}
+              />
+            </div>
+          </section>
+        )}
 
         {/* 패키지 리스트 */}
-        <section className='space-y-2 '>
-          <h2 className='text-xl font-semibold'>{t("packagesLabel")}</h2>
+        {hasPackages && (
+          <section className='space-y-2 '>
+            <h2 className='text-xl font-semibold'>{t("packagesLabel")}</h2>
 
-          <div className='grid grid-cols-1 sm:grid-cols-2 gap-6'>
-            {clinic.packagesList.map((pkg) => {
-              const pkgId = encodeURIComponent(pkg.id);
+            <div className='grid grid-cols-1 sm:grid-cols-2 gap-6'>
+              {clinic.packagesList.map((pkg) => {
+                const pkgId = encodeURIComponent(pkg.id);
 
-              const title = pickText(pkg.title, loc);
-              const subtitle = pickText(pkg.subtitle, loc);
+                const title = pickText(pkg.title, loc);
+                const subtitle = pickText(pkg.subtitle, loc);
 
-              const durationVal = pickLocalized<number>(pkg.duration, loc);
-              const priceVal = pickLocalized<number>(pkg.price, loc);
+                const durationVal = pickLocalized<number>(pkg.duration, loc);
+                const priceVal = pickLocalized<number>(pkg.price, loc);
 
-              const durationText =
-                durationVal !== undefined
-                  ? formatDuration(loc, durationVal)
-                  : "";
-              const priceText =
-                priceVal !== undefined ? formatPrice(loc, priceVal) : "";
+                const durationText =
+                  durationVal !== undefined
+                    ? formatDuration(loc, durationVal)
+                    : "";
+                const priceText =
+                  priceVal !== undefined ? formatPrice(loc, priceVal) : "";
 
-              return (
-                <Link
-                  key={pkg.id}
-                  href={`/${locale}/clinic/${clinicId}/package/${pkgId}`}
-                  className='border rounded-2xl overflow-hidden hover:shadow-sm transition hover:bg-accent'
-                >
-                  {/* 1. 패키지 이미지 */}
-                  {pkg.packageImages?.map((img, i) => (
-                    <div key={i} className='relative w-full h-80'>
-                      <Image
-                        src={img}
-                        alt={title || "package image"}
-                        fill
-                        sizes='(max-width: 640px) 100vw, 50vw'
-                        className='object-cover'
-                      />
+                return (
+                  <Link
+                    key={pkg.id}
+                    href={`/${locale}/clinic/${clinicId}/package/${pkgId}`}
+                    className='border rounded-2xl overflow-hidden hover:shadow-sm transition hover:bg-accent'
+                  >
+                    {/* 1. 패키지 이미지 */}
+                    {pkg.packageImages?.map((img, i) => (
+                      <div key={i} className='relative w-full h-80'>
+                        <Image
+                          src={img}
+                          alt={title || "package image"}
+                          fill
+                          sizes='(max-width: 640px) 100vw, 50vw'
+                          className='object-cover'
+                        />
+                      </div>
+                    ))}
+
+                    <div className='p-4 space-y-2'>
+                      {/* 2. 제목/부제 */}
+                      <h3 className='font-medium text-lg'>{title}</h3>
+                      <p className='text-sm text-muted-foreground'>
+                        {subtitle}
+                      </p>
+
+                      {/* 3. 가격·시간 */}
+                      <div className='mt-2 flex items-center justify-between text-foreground/80'>
+                        <span>{durationText}</span>
+                        <span>{priceText}</span>
+                      </div>
                     </div>
-                  ))}
-
-                  <div className='p-4 space-y-2'>
-                    {/* 2. 제목/부제 */}
-                    <h3 className='font-medium text-lg'>{title}</h3>
-                    <p className='text-sm text-muted-foreground'>{subtitle}</p>
-
-                    {/* 3. 가격·시간 */}
-                    <div className='mt-2 flex items-center justify-between text-foreground/80'>
-                      <span>{durationText}</span>
-                      <span>{priceText}</span>
-                    </div>
-                  </div>
-                </Link>
-              );
-            })}
-          </div>
-        </section>
+                  </Link>
+                );
+              })}
+            </div>
+          </section>
+        )}
 
         {/* 예약 시 주의사항 */}
-        {reservationNotices.length > 0 && (
+        {hasReservationNotices && (
           <section className='space-y-2'>
             <div className='rounded-2xl border bg-card'>
               <h2 className='text-xl font-semibold px-4 py-3'>
