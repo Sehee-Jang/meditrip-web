@@ -644,6 +644,7 @@ export default async function ClinicDetailPage({
             </div>
           </details>
         </section>
+        
         {/* 의료진 소개 */}
         <section className='space-y-2'>
           {doctors.length > 0 && (

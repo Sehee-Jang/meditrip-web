@@ -6,6 +6,7 @@ import {
   Carousel,
   CarouselContent,
   CarouselItem,
+  CarouselIndicators,
 } from "@/components/ui/carousel";
 import Image from "next/image";
 
@@ -34,6 +35,13 @@ export default function ClinicCarousel({ photos }: ClinicCarouselProps) {
           </CarouselItem>
         ))}
       </CarouselContent>
+
+      {/* 인디케이터: 하단 중앙 오버레이 */}
+      <div className='pointer-events-none absolute inset-x-0 bottom-3 flex justify-center'>
+        <div className='rounded-full bg-black/30 px-3 py-2 backdrop-blur'>
+          <CarouselIndicators />
+        </div>
+      </div>
     </Carousel>
   );
 }
