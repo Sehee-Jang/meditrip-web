@@ -18,7 +18,7 @@ export default function ClinicCarousel({ photos }: ClinicCarouselProps) {
   return (
     <Carousel
       opts={{ loop: true }}
-      plugins={[Autoplay({ delay: 3000 })]}
+      plugins={[Autoplay({ delay: 2000 })]}
       className='w-full h-60 sm:h-80 md:h-[360px] rounded overflow-hidden'
     >
       <CarouselContent>
