@@ -74,6 +74,15 @@ import { handleImageUpload, MAX_FILE_SIZE } from "@/lib/tiptap-utils";
 
 // --- Styles ---
 import "@/components/tiptap-templates/simple/simple-editor.scss";
+import { Map } from "lucide-react";
+import {
+  Accordion,
+  AccordionItem,
+  AccordionTrigger,
+  AccordionContent,
+} from "@/components/ui/accordion";
+
+import { MapIframe } from "@/tiptap/extensions/map-iframe";
 
 export type SimpleEditorProps = {
   value: JSONContent;
@@ -87,10 +96,12 @@ export type SimpleEditorProps = {
 const MainToolbarContent = ({
   onHighlighterClick,
   onLinkClick,
+  onMapClick,
   isMobile,
 }: {
   onHighlighterClick: () => void;
   onLinkClick: () => void;
+  onMapClick: () => void;
   isMobile: boolean;
 }) => {
   return (
@@ -149,9 +160,12 @@ const MainToolbarContent = ({
 
       <ToolbarGroup>
         <ImageUploadButton text='Add' />
+        {/* 지도 삽입 버튼 */}
+        <Button type='button' data-style='ghost' onClick={onMapClick}>
+          <Map className='tiptap-button-icon' /> Add
+        </Button>
       </ToolbarGroup>
 
-      <Spacer />
       {isMobile && <ToolbarSeparator />}
 
       <ToolbarGroup>
@@ -194,7 +208,7 @@ export function SimpleEditor({
   value,
   onChange,
   onUploadImage,
-  placeholder = "여기에 내용을 입력하세요…", // ✅ 기본값
+  placeholder = "여기에 내용을 입력하세요…",
   minHeight = 420,
   className,
 }: SimpleEditorProps) {
@@ -203,6 +217,13 @@ export function SimpleEditor({
   const [mobileView, setMobileView] = React.useState<
     "main" | "highlighter" | "link"
   >("main");
+
+  const [openMapDialog, setOpenMapDialog] = React.useState(false);
+  const [mapSrc, setMapSrc] = React.useState<string>("");
+  const [mapWidth, setMapWidth] = React.useState<string>("100%");
+  const [mapHeight, setMapHeight] = React.useState<string>("400px");
+  const [mapErr, setMapErr] = React.useState<string | null>(null);
+
   const toolbarRef = React.useRef<HTMLDivElement>(null);
 
   const editor = useEditor({
@@ -246,6 +267,7 @@ export function SimpleEditor({
         },
         onError: (error) => console.error("Upload failed:", error),
       }),
+      MapIframe,
     ],
     content: value,
     onUpdate: ({ editor }) => {
@@ -270,6 +292,42 @@ export function SimpleEditor({
     if (!isMobile && mobileView !== "main") setMobileView("main");
   }, [isMobile, mobileView]);
 
+  function isUrl(u: string): boolean {
+    try {
+      new URL(u);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  const insertMap = (): void => {
+    if (!editor) return;
+    if (!isUrl(mapSrc)) {
+      setMapErr("올바른 임베드 URL을 입력해 주세요.");
+      return;
+    }
+    const ok = editor.commands.insertMapIframe({
+      src: mapSrc,
+      width: mapWidth || "100%",
+      height: mapHeight || "400px",
+      loading: "lazy",
+      referrerpolicy: "no-referrer-when-downgrade",
+      allowfullscreen: true,
+      style: "border:0;",
+      title: "지도",
+    });
+    if (!ok) {
+      setMapErr("허용되지 않은 도메인이거나 삽입에 실패했습니다.");
+      return;
+    }
+    setOpenMapDialog(false);
+    setMapSrc("");
+    setMapWidth("100%");
+    setMapHeight("400px");
+    setMapErr(null);
+  };
+
   return (
     <div className={["simple-editor-wrapper", className ?? ""].join(" ")}>
       <EditorContext.Provider value={{ editor }}>
@@ -285,6 +343,7 @@ export function SimpleEditor({
             <MainToolbarContent
               onHighlighterClick={() => setMobileView("highlighter")}
               onLinkClick={() => setMobileView("link")}
+              onMapClick={() => setOpenMapDialog(true)}
               isMobile={isMobile}
             />
           ) : (
@@ -294,6 +353,111 @@ export function SimpleEditor({
             />
           )}
         </Toolbar>
+
+        {openMapDialog && (
+          <div
+            className='fixed inset-0 z-50 flex items-center justify-center bg-black/40'
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault(); // 부모 폼 제출 방지
+                insertMap(); // 원하면 Enter로 곧바로 삽입
+              }
+            }}
+          >
+            <div className='w-[560px] max-w-[92vw] rounded-xl bg-white p-4 shadow-lg'>
+              <h3 className='mb-3 text-lg font-semibold'>지도 임베드 추가</h3>
+
+              <label className='mb-1 block text-sm'>
+                임베드 URL (iframe의 src만)
+              </label>
+              <input
+                className='w-full rounded border px-2 py-1'
+                placeholder='https://www.google.com/maps/embed?pb=...'
+                value={mapSrc}
+                onChange={(e) => setMapSrc(e.target.value)}
+              />
+
+              {/*  가이드 */}
+              <Accordion type='single' collapsible className='mt-2'>
+                <AccordionItem value='embed-help' className='border rounded-md'>
+                  <AccordionTrigger className='px-3 py-2 text-sm font-medium'>
+                    임베드 URL 얻는 방법(퍼가기)
+                  </AccordionTrigger>
+                  <AccordionContent className='px-3 pb-3 pt-0 text-[13px] text-gray-700 leading-relaxed'>
+                    <ol className='list-decimal pl-5 space-y-1'>
+                      <li>
+                        지도 서비스에서 원하는 화면(장소/뷰/로드뷰 등)을 연 뒤{" "}
+                        <strong>공유</strong> → <strong>퍼가기(Embed)</strong>를
+                        선택합니다.
+                      </li>
+                      <li>
+                        표시되는 <code>{'<iframe ... src="여기">'}</code>의{" "}
+                        <strong>src 값만</strong> 복사해 위 입력칸에
+                        붙여넣습니다.
+                      </li>
+                    </ol>
+
+                    <div className='mt-2'>
+                      <strong>Google 지도</strong>: 공유 → 지도 퍼가기 →{" "}
+                      <em>src</em> 복사
+                      <br />
+                      <strong>네이버 지도</strong>: 공유 아이콘 → 퍼가기 →{" "}
+                      <em>src</em> 복사
+                      <br />
+                      <strong>카카오 지도</strong>: 공유 → 퍼가기 → <em>src</em>{" "}
+                      복사
+                    </div>
+
+                    <div className='mt-2 text-gray-600'>
+                      참고: 퍼가기는 보통 <em>Place(장소)/일반 뷰</em>만
+                      지원합니다.
+                      <br />
+                      <strong>길찾기(Directions)</strong>를 페이지 안에
+                      임베드하려면 <em>Google Maps Embed API</em>의 Directions
+                      모드(URL 조립, API Key 필요)를 사용하거나, 본문에 “길찾기
+                      열기” 버튼으로 외부 링크를 여는 방식을 권장합니다.
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
+
+              <div className='mt-3 grid grid-cols-2 gap-3'>
+                <div>
+                  <label className='mb-1 block text-sm'>가로(width)</label>
+                  <input
+                    className='w-full rounded border px-2 py-1'
+                    value={mapWidth}
+                    onChange={(e) => setMapWidth(e.target.value)}
+                    placeholder='100% 또는 800px'
+                  />
+                </div>
+                <div>
+                  <label className='mb-1 block text-sm'>세로(height)</label>
+                  <input
+                    className='w-full rounded border px-2 py-1'
+                    value={mapHeight}
+                    onChange={(e) => setMapHeight(e.target.value)}
+                    placeholder='400px'
+                  />
+                </div>
+              </div>
+
+              {mapErr && <p className='mt-2 text-sm text-red-600'>{mapErr}</p>}
+
+              <div className='mt-4 flex justify-end gap-2'>
+                <Button
+                  data-style='ghost'
+                  onClick={() => setOpenMapDialog(false)}
+                >
+                  취소
+                </Button>
+                <Button type='button' onClick={insertMap}>
+                  삽입
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
 
         <div style={{ minHeight }} className='rounded-xl border p-3'>
           <EditorContent

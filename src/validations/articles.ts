@@ -59,11 +59,44 @@ const localizedRichRequired = z
     return out;
   });
 
+// 카테고리 리터럴 타입
+type CategoryValue = (typeof CATEGORY_VALUES_TUPLE)[number];
+
+// 타입 가드
+function isCategoryValue(v: unknown): v is CategoryValue {
+  return (
+    typeof v === "string" &&
+    (CATEGORY_VALUES_TUPLE as readonly string[]).includes(v)
+  );
+}
+
+// ✔ 카테고리 스키마: 한글 메시지(필수/허용값 아님 구분)
+const categorySchema: z.ZodType<CategoryValue> = z
+  .unknown()
+  .superRefine((v, ctx) => {
+    // 선택 안 함/빈값
+    if (typeof v !== "string" || v.trim().length === 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "카테고리를 선택해 주세요.",
+      });
+      return;
+    }
+    // 목록 외 값
+    if (!isCategoryValue(v)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "지원하지 않는 카테고리입니다. 목록에서 선택해 주세요.",
+      });
+    }
+  })
+  .transform((v) => v as CategoryValue);
+
 export const articlesFormSchema = z.object({
   title: localizedString,
   excerpt: localizedString,
   body: localizedRichRequired,
-  category: z.enum(CATEGORY_VALUES_TUPLE),
+  category: categorySchema,
   tags: z.array(z.string().trim().min(1)).optional().default([]),
   images: z.array(z.string().trim().min(1)).optional().default([]),
   status: z.enum(["visible", "hidden"]).default("visible"),

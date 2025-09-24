@@ -7,6 +7,7 @@ import Link from "@tiptap/extension-link";
 import TextAlign from "@tiptap/extension-text-align";
 import type { JSONContent } from "@tiptap/core";
 import { useEffect } from "react";
+import { MapIframe } from "@/tiptap/extensions/map-iframe";
 
 export default function RichTextViewer({ doc }: { doc: JSONContent }) {
   const editor = useEditor({
@@ -28,6 +29,7 @@ export default function RichTextViewer({ doc }: { doc: JSONContent }) {
         types: ["heading", "paragraph"],
         alignments: ["left", "center", "right", "justify"],
       }),
+      MapIframe,
     ],
     editable: false,
     content: doc,
