@@ -12,7 +12,12 @@
     "viewDetails": "詳細を見る",
     "searchPlaceholder": "ウェルネスプログラムを検索",
     "searchHelper": "興味のあるウェルネスプログラムを探してみましょう。",
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "recommendedTitle": "おすすめの病院",
+    "resultCount": "{count} 件の病院",
+    "emptyFilteredTitle": "選択された条件に合う病院はまだありません。",
+    "emptyFilteredHelper": "ほかのカテゴリを見るか、全体一覧をご確認ください。",
+    "resetButton": "すべて見る"
   },
 
   "book": {

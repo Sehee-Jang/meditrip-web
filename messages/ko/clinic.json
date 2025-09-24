@@ -12,7 +12,12 @@
     "viewDetails": "상세보기",
     "searchPlaceholder": "웰니스 프로그램 검색",
     "searchHelper": "관심 있는 웰니스 프로그램을 검색해보세요.",
-    "loading": "로딩중"
+    "loading": "로딩중",
+    "recommendedTitle": "추천 병원",
+    "resultCount": "{count} 곳의 병원",
+    "emptyFilteredTitle": "선택하신 조건에 맞는 병원이 아직 없어요.",
+    "emptyFilteredHelper": "다른 카테고리를 보거나 전체 목록을 확인해보세요.",
+    "resetButton": "전체 보기"
   },
 
   "book": {
