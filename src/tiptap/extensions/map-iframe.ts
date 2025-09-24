@@ -1,5 +1,5 @@
 import { Node, mergeAttributes } from "@tiptap/core";
-import type { CommandProps } from "@tiptap/core";
+import type { CommandProps, RawCommands } from "@tiptap/core";
 
 // ===== 타입 정의 =====
 export type LoadingAttr = "lazy" | "eager";
@@ -41,18 +41,6 @@ function isAllowedMapHost(urlStr: string): boolean {
   }
 }
 
-// ===== Commands 타입 확장(선언 병합) =====
-declare module "@tiptap/core" {
-  interface Commands<ReturnType> {
-    mapIframe: {
-      /**
-       * 본문에 지도 iframe 노드 삽입
-       */
-      insertMapIframe: (attrs: MapIframeAttrs) => ReturnType;
-    };
-  }
-}
-
 // ===== 노드 구현 =====
 export const MapIframe = Node.create({
   name: "mapIframe",
@@ -63,36 +51,21 @@ export const MapIframe = Node.create({
 
   addAttributes() {
     return {
-      src: {
-        default: "",
-      },
-      width: {
-        default: "100%",
-      },
-      height: {
-        default: "400px",
-      },
-      loading: {
-        default: "lazy" as LoadingAttr,
-      },
+      src: { default: "" },
+      width: { default: "100%" },
+      height: { default: "400px" },
+      loading: { default: "lazy" as LoadingAttr },
       referrerpolicy: {
         default: "no-referrer-when-downgrade" as ReferrerPolicyAttr,
       },
       allowfullscreen: {
         default: true,
-        // HTML 직렬화 시 true면 속성만 출력
         renderHTML: (attrs: { allowfullscreen?: boolean }) =>
           attrs.allowfullscreen ? { allowfullscreen: "true" } : {},
       },
-      style: {
-        default: "border:0;",
-      },
-      title: {
-        default: "지도",
-      },
-      "data-type": {
-        default: "map-iframe",
-      },
+      style: { default: "border:0;" },
+      title: { default: "지도" },
+      "data-type": { default: "map-iframe" },
     };
   },
 
@@ -123,7 +96,6 @@ export const MapIframe = Node.create({
     };
 
     if (!attrs.src || !isAllowedMapHost(attrs.src)) {
-      // 허용 안 되는 경우 placeholder 출력(선택)
       return [
         "div",
         { class: "map-iframe-blocked", "data-reason": "invalid-host" },
@@ -131,6 +103,7 @@ export const MapIframe = Node.create({
       ];
     }
 
+    // 기본값을 addAttributes와 동일하게 유지
     const safeAttrs = mergeAttributes(
       { "data-type": "map-iframe" },
       {
@@ -138,7 +111,7 @@ export const MapIframe = Node.create({
         width: attrs.width ?? "100%",
         height: attrs.height ?? "400px",
         loading: attrs.loading ?? "lazy",
-        referrerpolicy: attrs.referrerpolicy ?? "no-referrer-when-cross-origin",
+        referrerpolicy: attrs.referrerpolicy ?? "no-referrer-when-downgrade",
         style: attrs.style ?? "border:0;",
         title: attrs.title ?? "지도",
       },
@@ -149,14 +122,11 @@ export const MapIframe = Node.create({
   },
 
   addCommands() {
-    return {
+    const commands = {
       insertMapIframe:
         (payload: MapIframeAttrs) =>
         ({ chain }: CommandProps): boolean => {
-          // 타입 안전 검증
-          if (!payload.src || !isAllowedMapHost(payload.src)) {
-            return false;
-          }
+          if (!payload.src || !isAllowedMapHost(payload.src)) return false;
           const attrs: MapIframeAttrs = {
             src: payload.src,
             width: payload.width ?? "100%",
@@ -168,14 +138,11 @@ export const MapIframe = Node.create({
             style: payload.style ?? "border:0;",
             title: payload.title ?? "지도",
           };
-
-          return chain()
-            .insertContent({
-              type: this.name,
-              attrs,
-            })
-            .run();
+          return chain().insertContent({ type: this.name, attrs }).run();
         },
     };
+
+    // 핵심: RawCommands(의 부분집합)으로 인식시키기
+    return commands as unknown as Partial<RawCommands>;
   },
 });

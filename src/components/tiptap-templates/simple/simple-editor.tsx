@@ -84,6 +84,17 @@ import {
 } from "@/components/ui/accordion";
 
 import { MapIframe } from "@/tiptap/extensions/map-iframe";
+import type { MapIframeAttrs } from "@/tiptap/extensions/map-iframe"; // ★ 추가: 타입 가드용
+
+// ===== insertMapIframe 커맨드 존재 체크(타입 가드) =====
+function hasInsertMapIframe(
+  ed: unknown
+): ed is { commands: { insertMapIframe: (a: MapIframeAttrs) => boolean } } {
+  const cmds = (ed as { commands?: unknown })?.commands;
+  if (typeof cmds !== "object" || cmds === null) return false;
+  const maybe = (cmds as Record<string, unknown>)["insertMapIframe"];
+  return typeof maybe === "function";
+}
 
 export type SimpleEditorProps = {
   value: JSONContent;
@@ -257,7 +268,6 @@ export function SimpleEditor({
       Superscript,
       Subscript,
       Placeholder.configure({ placeholder }),
-      // 파일 업로드 노드: 외부 업로더(onUploadImage) 우선 사용
       ImageUploadNode.configure({
         accept: "image/*",
         maxSize: MAX_FILE_SIZE,
@@ -302,12 +312,19 @@ export function SimpleEditor({
     }
   }
 
+  // ===== 패치: 지도 삽입 시 insertMapIframe 타입 가드로 안전 호출 =====
   const insertMap = (): void => {
     if (!editor) return;
     if (!isUrl(mapSrc)) {
       setMapErr("올바른 임베드 URL을 입력해 주세요.");
       return;
     }
+
+    if (!hasInsertMapIframe(editor)) {
+      setMapErr("지도 삽입 명령을 사용할 수 없습니다.");
+      return;
+    }
+
     const ok = editor.commands.insertMapIframe({
       src: mapSrc,
       width: mapWidth || "100%",
@@ -318,6 +335,7 @@ export function SimpleEditor({
       style: "border:0;",
       title: "지도",
     });
+
     if (!ok) {
       setMapErr("허용되지 않은 도메인이거나 삽입에 실패했습니다.");
       return;
@@ -360,8 +378,8 @@ export function SimpleEditor({
             className='fixed inset-0 z-50 flex items-center justify-center bg-black/40'
             onKeyDown={(e) => {
               if (e.key === "Enter") {
-                e.preventDefault(); // 부모 폼 제출 방지
-                insertMap(); // 원하면 Enter로 곧바로 삽입
+                e.preventDefault();
+                insertMap();
               }
             }}
           >
@@ -378,7 +396,6 @@ export function SimpleEditor({
                 onChange={(e) => setMapSrc(e.target.value)}
               />
 
-              {/*  가이드 */}
               <Accordion type='single' collapsible className='mt-2'>
                 <AccordionItem value='embed-help' className='border rounded-md'>
                   <AccordionTrigger className='px-3 py-2 text-sm font-medium'>
