@@ -41,7 +41,7 @@ export default function CategorySection({
   multiple = false,
   selected = [],
   onChange,
-  linkHref = "/articles",
+  linkHref = "/clinics",
   className,
 }: Props) {
   const t = useTranslations("categories");

@@ -2,17 +2,41 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
+import { useSearchParams } from "next/navigation";
 import SearchInput from "@/components/common/SearchInput";
 import LoadingSpinner from "../common/LoadingSpinner";
 import ClinicList from "./ClinicList";
 import type { ClinicListItem } from "@/types/clinic";
 import { fetchClinics } from "@/services/clinics/fetchClinics";
 import Container from "../common/Container";
+import { CATEGORY_KEYS, type CategoryKey } from "@/constants/categories";
+const VALID_CATEGORY_KEYS = new Set<string>(CATEGORY_KEYS);
 
 export default function ClinicListClient() {
   const t = useTranslations("clinic");
   const locale = useLocale();
   const loc: "ko" | "ja" = locale === "ja" ? "ja" : "ko";
+
+  const searchParams = useSearchParams();
+
+  const selectedCategories = useMemo(() => {
+    const values = searchParams
+      .getAll("categories")
+      .flatMap((value) => value.split(","))
+      .map((value) => value.trim())
+      .filter(Boolean);
+
+    if (values.length === 0) return [];
+
+    const unique = new Set<CategoryKey>();
+    values.forEach((value) => {
+      if (VALID_CATEGORY_KEYS.has(value)) {
+        unique.add(value as CategoryKey);
+      }
+    });
+
+    return Array.from(unique);
+  }, [searchParams]);
 
   const [query, setQuery] = useState("");
   const [clinics, setClinics] = useState<ClinicListItem[]>([]);
@@ -35,12 +59,25 @@ export default function ClinicListClient() {
   }, []);
 
   const filtered = useMemo(() => {
-    if (!query) return clinics;
-    const q = query.toLowerCase();
-    return clinics.filter((c) =>
-      (c.name?.[loc] ?? "").toLowerCase().includes(q)
-    );
-  }, [clinics, query, loc]);
+    const normalizedQuery = query.trim().toLowerCase();
+    const categorySet = new Set(selectedCategories);
+
+    if (normalizedQuery.length === 0 && categorySet.size === 0) {
+      return clinics;
+    }
+
+    return clinics.filter((clinic) => {
+      const matchesQuery =
+        normalizedQuery.length === 0 ||
+        (clinic.name?.[loc] ?? "").toLowerCase().includes(normalizedQuery);
+
+      const matchesCategory =
+        categorySet.size === 0 ||
+        (clinic.categoryKeys ?? []).some((key) => categorySet.has(key));
+
+      return matchesQuery && matchesCategory;
+    });
+  }, [clinics, loc, query, selectedCategories]);
 
   return (
     <Container>
@@ -65,6 +102,10 @@ export default function ClinicListClient() {
             <p className='mt-4 text-muted-foreground'>
               {t("clinicList.loading")}
             </p>
+          </div>
+        ) : filtered.length === 0 ? (
+          <div className='min-h-[50vh] flex flex-col items-center justify-center text-center text-sm text-muted-foreground'>
+            {t("clinicList.emptyMessage")}
           </div>
         ) : (
           <ClinicList clinics={filtered} />
