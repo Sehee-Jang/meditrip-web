@@ -95,7 +95,7 @@ export default async function TourPage({
       <Container>
         <TourFiltersClient lang={lang} />
 
-        <p className='mb-6 text-sm text-muted-foreground'>
+        {/* <p className='mb-6 text-sm text-muted-foreground'>
           {[
             mode ? `mode ${mode}` : null,
             lDongRegnCd ? `시도 ${lDongRegnCd}` : null,
@@ -105,7 +105,7 @@ export default async function TourPage({
           ]
             .filter(Boolean)
             .join(" · ") || (lang === "ko" ? "전체" : "All")}
-        </p>
+        </p> */}
 
         {items.length === 0 ? (
           <div className='rounded-xl border p-6 text-center text-sm text-muted-foreground'>
