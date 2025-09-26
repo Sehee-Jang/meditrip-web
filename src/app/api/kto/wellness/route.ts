@@ -80,6 +80,18 @@ function toNumberSafe(val?: string | number | null): number | undefined {
   const n = typeof val === "number" ? val : Number(String(val));
   return Number.isFinite(n) ? n : undefined;
 }
+
+const EXCLUDED_DUPLICATE_TITLES = new Set(["한방테마파크 초락당 (艸樂堂)"]);
+
+function filterDuplicateWellness(items: TourListItem[]): TourListItem[] {
+  if (!items.length) return items;
+  return items.filter((item) => {
+    const title = item.title?.trim();
+    if (!title) return true;
+    return !EXCLUDED_DUPLICATE_TITLES.has(title);
+  });
+}
+
 function joinAddress(base?: string, detail?: string): string {
   const a = (base ?? "").trim();
   const b = (detail ?? "").trim();
@@ -250,6 +262,7 @@ export async function GET(req: Request) {
           (it) => typeof it?.contentId === "string" && it.contentId.trim()
         )
         .map(mapToListItem);
+      items = filterDuplicateWellness(items);
       if (withDetail) items = await enrichHomepages(items, langParam);
 
       const totalCount =
@@ -293,7 +306,7 @@ export async function GET(req: Request) {
           (it) => typeof it?.contentId === "string" && it.contentId.trim()
         )
         .map(mapToListItem);
-
+      items = filterDuplicateWellness(items);
       if (withDetail) items = await enrichHomepages(items, langParam);
 
       const totalCount =
@@ -322,6 +335,8 @@ export async function GET(req: Request) {
     let items = itemsOfLoose<KtoAreaBasedItem>(data)
       .filter((it) => typeof it?.contentId === "string" && it.contentId.trim())
       .map(mapToListItem);
+    items = filterDuplicateWellness(items);
+
     if (withDetail) {
       items = await enrichHomepages(items, langParam);
       items = items.map((it) => {
