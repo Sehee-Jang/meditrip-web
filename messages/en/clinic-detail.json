@@ -1,0 +1,38 @@
+{
+  "aboutLabel": "Introduce",
+  "visionLabel": "Vision",
+  "missionLabel": "Mission",
+  "highlightsLabel": "Highlights",
+  "doctorsLabel": "Specialist",
+  "eventsLabel": "Reservation Events",
+  "packagesLabel": "Programs & Packages",
+  "bookButton": "Book Now",
+  "shareButton": "Share",
+  "infoTab": "Details",
+  "reviewsTab": "Reviews",
+  "mapLabel": "Map",
+  "amenitiesLabel": "Amenities",
+  "hours": {
+    "open": "Open",
+    "closed": "Closed",
+    "unknown": "No business hours available"
+  },
+  "reservationNoticesLabel": "Reservation Notices",
+  "noDescription": "No description available.",
+  "noHighlights": "No highlights available.",
+  "websiteLabel": "Website",
+  "instagramLabel": "Instagram",
+  "lineLabel": "Line",
+  "whatsappLabel": "WhatsApp",
+  "phoneLabel": "Phone",
+  "comingSoon": "Coming soon.",
+  "days": {
+    "mon": "Mon",
+    "tue": "Tue",
+    "wed": "Wed",
+    "thu": "Thu",
+    "fri": "Fri",
+    "sat": "Sat",
+    "sun": "Sun"
+  }
+}

@@ -3,13 +3,23 @@
   "visionLabel": "Vision",
   "missionLabel": "Mission",
   "highlightsLabel": "Highlights",
-  "doctorsLabel": "의료진 소개",
+  "doctorsLabel": "전문가 소개",
   "eventsLabel": "예약 이벤트",
   "packagesLabel": "프로그램 및 패키지",
   "bookButton": "예약하기",
   "shareButton": "공유하기",
-  "infoTab": "병원정보",
+  "infoTab": "업체 정보",
   "reviewsTab": "리뷰",
+  "reviews": {
+    "comingSoon": "준비중입니다",
+    "comingSoonDesc": "리뷰 기능이 곧 오픈될 예정입니다.",
+    "cta": {
+      "title": "이용 후 리뷰를 남겨주세요",
+      "desc": "여러분의 후기가 다른 분들에게 큰 도움이 됩니다.",
+      "writeReview": "리뷰 작성하기",
+      "howTo": "리뷰 가이드 보기"
+    }
+  },
   "mapLabel": "지도",
   "amenitiesLabel": "편의시설",
   "hours": {
