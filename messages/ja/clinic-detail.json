@@ -3,13 +3,23 @@
   "visionLabel": "ビジョン",
   "missionLabel": "ミッション",
   "highlightsLabel": "Highlights",
-  "doctorsLabel": "医療陣の紹介",
+  "doctorsLabel": "専門家紹介",
   "eventsLabel": "予約特典",
   "packagesLabel": "プログラム及びパッケージ",
   "bookButton": "予約する",
   "shareButton": "共有する",
-  "infoTab": "病院情報",
+  "infoTab": "美容・健康",
   "reviewsTab": "レビュー",
+  "reviews": {
+    "comingSoon": "準備中です",
+    "comingSoonDesc": "まもなくレビュー機能を公開します。",
+    "cta": {
+      "title": "ご利用後、レビューのご協力をお願いします",
+      "desc": "皆さまの声が他の方の参考になります。",
+      "writeReview": "レビューを書く",
+      "howTo": "レビューガイドを見る"
+    }
+  },
   "mapLabel": "地図",
   "amenitiesLabel": "便益施設",
   "hours": {
