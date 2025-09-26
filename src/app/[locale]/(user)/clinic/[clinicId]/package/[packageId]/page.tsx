@@ -62,9 +62,10 @@ export default async function PackageDetailPage({ params }: Props) {
           </div>
         )}
 
-        {/* 진료 프로세스 */}
+        {/* 진료 프로세스 및 상세정보 */}
         {pkg.treatmentDetails && pkg.treatmentDetails.length > 0 && (
           <>
+            {/* 프로세스 */}
             <h2 className='text-lg font-semibold mb-4'>{t("processTitle")}</h2>
             <div className='grid grid-cols-3 gap-4 mb-8'>
               {pkg.treatmentDetails.map((step, i) => (
@@ -80,7 +81,7 @@ export default async function PackageDetailPage({ params }: Props) {
               ))}
             </div>
 
-            {/* 상세 설명 */}
+            {/* 상세 정보 */}
             <h2 className='text-lg font-semibold mb-4'>{t("detailsTitle")}</h2>
 
             <ol className='space-y-3'>
@@ -102,7 +103,7 @@ export default async function PackageDetailPage({ params }: Props) {
                               src={step.imageUrl!}
                               alt={step.title[loc]}
                               fill
-                              className='object-fit transition-transform duration-300 group-hover:scale-[1.02]'
+                              className='object-cover transition-transform duration-300 group-hover:scale-[1.02]'
                               sizes='(min-width: 768px) 160px, 100vw'
                             />
                           </div>
