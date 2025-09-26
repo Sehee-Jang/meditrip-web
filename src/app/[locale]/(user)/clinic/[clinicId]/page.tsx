@@ -325,7 +325,7 @@ export default async function ClinicDetailPage({
           )}
         </div>
 
-        {/* 탭 네비게이션 (비JS, 앵커/링크) */}
+        {/* 탭 네비게이션 */}
         <div className='mt-2'>
           <div className='border-b'>
             <nav className='grid grid-cols-2 text-sm'>
@@ -364,7 +364,7 @@ export default async function ClinicDetailPage({
                   <div className='leading-relaxed'>{address}</div>
                 </InfoRow>
 
-                {/* 영업시간(실제 시간표가 있을 때만 표시): 좌측 상태, 우측 안내 + ▾ */}
+                {/* 영업시간 */}
                 {hasHours &&
                   (() => {
                     const dayOrder: DayOfWeek[] = [
@@ -605,7 +605,14 @@ export default async function ClinicDetailPage({
             ) : (
               /* 탭 컨텐츠: reviews */
               <section id='reviews' className='px-4 mt-4'>
-                <p className='text-sm text-muted-foreground'>준비중입니다.</p>
+                <div className='grid place-items-center rounded-2xl border border-border bg-card px-6 py-20 text-center'>
+                  <h3 className='text-2xl md:text-3xl font-bold tracking-tight'>
+                    {t("reviews.comingSoon")}
+                  </h3>
+                  <p className='mt-2 text-sm text-muted-foreground'>
+                    {t("reviews.comingSoonDesc")}
+                  </p>
+                </div>
               </section>
             )}
           </div>
