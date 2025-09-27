@@ -42,8 +42,8 @@ export const NAMESPACES = [
   "footer",
   "header",
   "hero-section",
-
   "login-page",
+  "messages",
   "my-favorite",
   "mypage",
   "package-detail",
