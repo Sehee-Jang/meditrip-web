@@ -5,6 +5,7 @@ import { getTranslations } from "next-intl/server";
 import TourGridClient from "@/components/tour/TourGridClient";
 import TourFiltersClient from "@/services/tour/TourFiltersClient";
 import Container from "@/components/common/Container";
+import TourNoticeBanner from "@/components/tour/TourNoticeBanner";
 
 type PageParams = { locale: string };
 type SearchParams = {
@@ -93,19 +94,8 @@ export default async function TourPage({
       />
 
       <Container>
+        <TourNoticeBanner />
         <TourFiltersClient lang={lang} />
-
-        {/* <p className='mb-6 text-sm text-muted-foreground'>
-          {[
-            mode ? `mode ${mode}` : null,
-            lDongRegnCd ? `시도 ${lDongRegnCd}` : null,
-            lDongSignguCd ? `시군구 ${lDongSignguCd}` : null,
-            wellnessThemaCd ? `테마 ${wellnessThemaCd}` : null,
-            keyword ? `키워드 "${keyword}"` : null,
-          ]
-            .filter(Boolean)
-            .join(" · ") || (lang === "ko" ? "전체" : "All")}
-        </p> */}
 
         {items.length === 0 ? (
           <div className='rounded-xl border p-6 text-center text-sm text-muted-foreground'>
