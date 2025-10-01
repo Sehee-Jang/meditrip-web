@@ -1,6 +1,6 @@
 import type { Timestamp } from "firebase/firestore";
 import { TagSlug } from "./tag";
-import type { CategoryKey } from "@/types/category";
+import type { CategoryKey } from "@/constants/categories";
 import {
   LocalizedNumber,
   LocalizedRichTextDoc,
@@ -69,6 +69,7 @@ export interface ClinicDoc {
     title: LocalizedTextDoc;
     subtitle: LocalizedTextDoc;
   };
+  isExclusive?: boolean;
   doctors?: Doctor[];
 
   // 영업시간 (선택)
@@ -144,6 +145,7 @@ export type ClinicListItem = Pick<
   | "id"
   | "name"
   | "address"
+  | "isExclusive"
   | "images"
   | "rating"
   | "reviewCount"

@@ -19,14 +19,12 @@ import {
 import type { ClinicDoc, ClinicWithId, Geo } from "@/types/clinic";
 import { clinicFormSchema, type ClinicFormValues } from "@/validations/clinic";
 import { LOCALES_TUPLE, type LocaleKey } from "@/constants/locales";
-
 import FormSheet from "@/components/admin/common/FormSheet";
 import SectionCard from "@/components/admin/common/SectionCard";
 import FormRow from "@/components/admin/common/FormRow";
 import LocalizedTabsField from "@/components/admin/common/LocalizedTabsField";
 import { LocalizedTiptapField } from "@/components/admin/common/LocalizedTiptapField";
 import ImagesUploader from "@/components/admin/common/ImagesUploader";
-
 import ContactsAndSocials from "./fields/ContactsAndSocials";
 import WeeklyHoursGrid from "./fields/WeeklyHoursGrid";
 import ClosedDaysChecklist from "./fields/ClosedDaysChecklist";
@@ -51,7 +49,7 @@ import {
   type CategoryKey,
 } from "@/constants/categories";
 import type { JSONContent } from "@/types/tiptap";
-
+import { Checkbox } from "@/components/ui/checkbox";
 
 /* ====== 카테고리 다중선택 UI (체크리스트) ====== */
 function CategoriesChecklist({
@@ -155,6 +153,7 @@ export default function ClinicFormDialog({
         subtitle: { ko: "", ja: "", zh: "", en: "" },
       },
       categoryKeys: [],
+      isExclusive: false,
       description: {
         ko: EMPTY_DOC,
         ja: EMPTY_DOC,
@@ -254,6 +253,7 @@ export default function ClinicFormDialog({
         )
           ? (data as { categoryKeys: CategoryKey[] }).categoryKeys
           : [],
+        isExclusive: data.isExclusive ?? false,
         description: LOCALES_TUPLE.reduce(
           (acc, lc) => {
             acc[lc] = asDoc(
@@ -510,6 +510,21 @@ export default function ClinicFormDialog({
                       locale={currentLocale as LocaleKey}
                       placeholder='태그 검색 또는 클릭하여 선택'
                       disabled={tagsLoading}
+                    />
+                  }
+                />
+                <FormRow
+                  label='단독 입점 여부 (선택)'
+                  control={
+                    <Controller
+                      name='isExclusive'
+                      control={control}
+                      render={({ field }) => (
+                        <Checkbox
+                          checked={field.value}
+                          onCheckedChange={(v) => field.onChange(Boolean(v))}
+                        />
+                      )}
                     />
                   }
                 />

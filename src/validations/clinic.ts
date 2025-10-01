@@ -55,7 +55,6 @@ const socialsSchema = z
     instagram: z.string().optional(),
     line: z.string().optional(),
     whatsapp: z.string().optional(),
-    youtube: z.string().optional(),
   })
   .partial();
 
@@ -131,6 +130,7 @@ export const clinicFormSchema = z.object({
   name: localizedRequiredDynamicSchema,
   address: localizedRequiredDynamicSchema,
 
+  isExclusive: z.boolean().default(false),
   // 모두 선택
   intro: z.object({
     title: localizedStringDynamicSchema,
