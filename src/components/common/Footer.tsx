@@ -8,11 +8,21 @@ export default function Footer() {
     <footer className='w-full border-t px-4 py-8 text-sm text-muted-foreground'>
       <div className='max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6'>
         {/* 사업자 정보 */}
-        <div className='space-y-1'>
-          <p>{t("footer.companyName")}</p>
-          <p>{t("footer.ceo")}</p>
-          <p>{t("footer.businessNumber")}</p>
-          <p>{t("footer.foreignPatientBusiness")}</p>
+        <div className=''>
+          {/* 사업자 1 */}
+          <div className='border-b pb-3'>
+            <p>{t("footer.companyName1")}</p>
+            <p>{t("footer.ceo1")}</p>
+            <p>{t("footer.businessNumber1")}</p>
+          </div>
+
+          {/* 사업자 2 */}
+          <div className='pt-3'>
+            <p>{t("footer.companyName2")}</p>
+            <p>{t("footer.ceo2")}</p>
+            <p>{t("footer.businessNumber2")}</p>
+            <p>{t("footer.foreignPatientBusiness2")}</p>
+          </div>
         </div>
 
         {/* 주소·문의 */}
@@ -33,17 +43,6 @@ export default function Footer() {
           </div>
           <span>ONYU © 2025. All rights reserved.</span>
         </div>
-
-        {/* 모바일: 순서 2 / 데스크탑: 왼쪽 */}
-        {/* <span className='order-2 md:order-1'>
-          ONYU © 2025. All rights reserved.
-        </span> */}
-
-        {/* 모바일: 순서 1 / 데스크탑: 오른쪽 */}
-        {/* <div className='order-1 md:order-2 flex gap-4'>
-          <Link href='/terms'>{t("terms-page.title")}</Link>
-          <Link href='/privacy'>{t("privacy-page.title")}</Link>
-        </div> */}
       </div>
     </footer>
   );
