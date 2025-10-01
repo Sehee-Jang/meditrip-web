@@ -147,6 +147,7 @@ const clinicConverter: FirestoreDataConverter<ClinicDoc> = {
       doctors: Array.isArray(d.doctors) ? d.doctors : [],
 
       // 기타
+      isExclusive: Boolean(d.isExclusive),
       isFavorite: Boolean(d.isFavorite),
       rating: typeof d.rating === "number" ? d.rating : 0,
       reviewCount: typeof d.reviewCount === "number" ? d.reviewCount : 0,

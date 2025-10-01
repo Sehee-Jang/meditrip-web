@@ -526,7 +526,7 @@ export default function ClinicFormDialog({
                           <Checkbox
                             id='isExclusive'
                             checked={!!field.value}
-                            onCheckedChange={field.onChange} // v: boolean | "indeterminate"
+                            onCheckedChange={(v) => field.onChange(v === true)}
                           />
                           <label
                             htmlFor='isExclusive'
