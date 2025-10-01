@@ -7,6 +7,9 @@
   "page": {
     "title": "ウェルネスプログラム"
   },
+  "badges": {
+    "exclusiveLabel": "単独入店"
+  },
   "clinicList": {
     "emptyMessage": "登録されたクリニックがありません。",
     "viewDetails": "詳細を見る",
