@@ -515,15 +515,25 @@ export default function ClinicFormDialog({
                 />
                 <FormRow
                   label='단독 입점 여부 (선택)'
+                  className='items-center'
                   control={
                     <Controller
                       name='isExclusive'
                       control={control}
                       render={({ field }) => (
-                        <Checkbox
-                          checked={field.value}
-                          onCheckedChange={(v) => field.onChange(Boolean(v))}
-                        />
+                        <div className='flex items-center gap-2 pt-2'>
+                          <Checkbox
+                            id='isExclusive'
+                            checked={!!field.value}
+                            onCheckedChange={field.onChange} // v: boolean | "indeterminate"
+                          />
+                          <label
+                            htmlFor='isExclusive'
+                            className='text-sm text-foreground'
+                          >
+                            단독 입점
+                          </label>
+                        </div>
                       )}
                     />
                   }
