@@ -28,6 +28,7 @@ import type { AmenityKey, Doctor } from "@/types/clinic";
 import { getTagsCatalogServer } from "@/services/clinics/getTagsCatalog";
 import ClinicCarousel from "@/components/clinics/ClinicCarousel";
 import { renderTiptapHTML, isDocEmpty } from "@/utils/tiptapRender";
+import IntroSubtitle from "@/components/admin/clinics/IntroSubtitle";
 
 type PageParams = Promise<{ locale: string; clinicId: string }>;
 type SearchParams = Promise<{ tab?: string }>;
@@ -195,6 +196,8 @@ export default async function ClinicDetailPage({
 
   const name = pickText(clinic.name, loc);
   const address = pickText(clinic.address, loc);
+  const introTitle = pickText(clinic.intro?.title ?? null, loc);
+  const introSubtitle = pickText(clinic.intro?.subtitle ?? null, loc);
   const descriptionDoc =
     (clinic.description as Record<string, unknown>)?.[loc] ?? null;
   const highlightsDoc =
@@ -249,6 +252,10 @@ export default async function ClinicDetailPage({
     typeof v === "string" && v in AMENITY_ICONS;
 
   // 표시 여부 플래그
+  const hasIntroTitle =
+    typeof introTitle === "string" && introTitle.trim().length > 0;
+  const hasIntroSubtitle =
+    typeof introSubtitle === "string" && introSubtitle.trim().length > 0;
   const hasDescription = !isDocEmpty(descriptionDoc ?? undefined);
   const hasHighlights = !isDocEmpty(highlightsDoc ?? undefined);
   const hasDoctors = (doctors?.length ?? 0) > 0;
@@ -295,11 +302,25 @@ export default async function ClinicDetailPage({
         <div className='px-4 pt-4'>
           {/* 병원명 */}
           <h1 className='text-2xl font-semibold'>{name}</h1>
+
+          {/* intro.title */}
+          {hasIntroTitle && (
+            <p className='mt-3 text-base md:text-lg font-medium leading-snug'>
+              {introTitle}
+            </p>
+          )}
+
+          {/* intro.subtitle — 1줄만 보여주고 버튼으로 펼치기 */}
+          {hasIntroSubtitle && (
+            <IntroSubtitle text={introSubtitle} minLengthToShowToggle={50} />
+          )}
+
           {/* 주소 */}
-          <div className='mt-1 flex items-center gap-2 text-sm text-muted-foreground'>
+          <div className='mt-2 flex items-center gap-2 text-base text-primary/90'>
             <MapPin size={16} />
             <span className='truncate'>{address}</span>
           </div>
+
           {/* 별점 */}
           {typeof ratingAvg === "number" && (
             <div className='mt-1 flex items-center gap-1 text-sm'>
@@ -310,6 +331,7 @@ export default async function ClinicDetailPage({
               )}
             </div>
           )}
+
           {/* 태그 */}
           {tagLabels.length > 0 && (
             <div className='mt-2 flex flex-wrap gap-2'>

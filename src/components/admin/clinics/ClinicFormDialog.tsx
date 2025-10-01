@@ -50,6 +50,7 @@ import {
 } from "@/constants/categories";
 import type { JSONContent } from "@/types/tiptap";
 import { Checkbox } from "@/components/ui/checkbox";
+import { uploadClinicRichImage } from "@/services/storage/uploadClinicRichImage";
 
 /* ====== 카테고리 다중선택 UI (체크리스트) ====== */
 function CategoriesChecklist({
@@ -515,15 +516,25 @@ export default function ClinicFormDialog({
                 />
                 <FormRow
                   label='단독 입점 여부 (선택)'
+                  className='items-center'
                   control={
                     <Controller
                       name='isExclusive'
                       control={control}
                       render={({ field }) => (
-                        <Checkbox
-                          checked={field.value}
-                          onCheckedChange={(v) => field.onChange(Boolean(v))}
-                        />
+                        <div className='flex items-center gap-2 pt-2'>
+                          <Checkbox
+                            id='isExclusive'
+                            checked={!!field.value}
+                            onCheckedChange={(v) => field.onChange(v === true)}
+                          />
+                          <label
+                            htmlFor='isExclusive'
+                            className='text-sm text-foreground'
+                          >
+                            단독 입점
+                          </label>
+                        </div>
                       )}
                     />
                   }
@@ -587,6 +598,7 @@ export default function ClinicFormDialog({
                     locales={LOCALES_TUPLE}
                     placeholder='병원 소개/설명을 입력하세요.'
                     minHeight={100}
+                    onUploadImage={uploadClinicRichImage}
                   />
                 </div>
               </SectionCard>
@@ -609,6 +621,7 @@ export default function ClinicFormDialog({
                     locales={LOCALES_TUPLE}
                     placeholder='예) 기관 인증/선정 이력을 항목별로 작성'
                     minHeight={100}
+                    onUploadImage={uploadClinicRichImage}
                   />
                 </div>
               </SectionCard>

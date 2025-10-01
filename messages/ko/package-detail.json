@@ -1,6 +1,6 @@
 {
-  "processTitle": "진료 프로세스",
-  "detailsTitle": "진료 상세 정보",
+  "processTitle": "진행순서",
+  "detailsTitle": "상세내용",
   "noteTitle": "주의사항",
   "noteContent": "예약 전 반드시 확인해주세요! 모든 진료는 병원과 상담 후 개인 맞춤으로 진행됩니다.",
   "reserveButton": "예약하기",
