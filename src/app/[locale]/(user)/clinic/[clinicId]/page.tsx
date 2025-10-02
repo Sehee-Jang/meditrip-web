@@ -26,7 +26,7 @@ import {
 } from "lucide-react";
 import type { AmenityKey, Doctor } from "@/types/clinic";
 import { getTagsCatalogServer } from "@/services/clinics/getTagsCatalog";
-import ClinicCarousel from "@/components/clinics/ClinicCarousel";
+import CarouselLoader from "@/components/clinics/CarouselLoader";
 import { renderTiptapHTML, isDocEmpty } from "@/utils/tiptapRender";
 import IntroSubtitle from "@/components/admin/clinics/IntroSubtitle";
 
@@ -289,7 +289,7 @@ export default async function ClinicDetailPage({
       <section className='max-w-4xl mx-auto px-4 py-6 flex flex-col gap-8'>
         {/* 대표 이미지 슬라이더 */}
         <div className='relative '>
-          <ClinicCarousel photos={clinic.images} />
+          <CarouselLoader photos={clinic.images} />
           <div className='absolute top-3 right-3 hidden md:block'>
             <FavoriteButton
               clinicId={clinic.id}
