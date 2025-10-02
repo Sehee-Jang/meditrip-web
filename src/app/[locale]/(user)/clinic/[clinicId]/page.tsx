@@ -1,11 +1,14 @@
-import React from "react";
+import React, { Suspense } from "react";
 import { notFound } from "next/navigation";
 import PageHeader from "@/components/common/PageHeader";
 import Image from "next/image";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
-import { getClinicById } from "@/services/clinics/getClinicById";
-import type { ClinicDetail, DayOfWeek } from "@/types/clinic";
+import {
+  getClinicBaseById,
+  getClinicPackages,
+} from "@/services/clinics/getClinicById";
+import type { ClinicDetail, DayOfWeek, PackageWithId } from "@/types/clinic";
 import type { Locale } from "@/i18n/routing";
 import FavoriteButton from "@/components/clinics/FavoriteButton";
 import GoogleMapEmbed from "@/components/common/GoogleMapEmbed";
@@ -188,9 +191,12 @@ export default async function ClinicDetailPage({
   const t = await getTranslations("clinic-detail");
   const tAmenity = await getTranslations("amenities");
 
-  // 단일 문서만 읽기
-  const clinic: ClinicDetail | null = await getClinicById(clinicId);
+  // 병원 기본 문서 즉시 조회
+  const clinic = await getClinicBaseById(clinicId);
   if (!clinic) return notFound();
+
+  // 패키지 서브컬렉션은 지연 로딩을 위해 Promise만 준비
+  const packagesPromise = getClinicPackages(clinic.id);
 
   const loc: Locale = toSupportedLocale(locale);
 
@@ -235,6 +241,10 @@ export default async function ClinicDetailPage({
 
   const doctors: Doctor[] = clinic.doctors ?? [];
 
+  const packagesLabel = t("packagesLabel");
+  const highlightsLabel = t("highlightsLabel") ?? "Highlights";
+  const eventsLabel = t("eventsLabel") ?? "예약 이벤트";
+
   // 편의시설 아이콘/라벨 매핑
   const AMENITY_ICONS: Record<AmenityKey, React.ReactNode> = {
     parking: <Car size={24} />,
@@ -261,7 +271,7 @@ export default async function ClinicDetailPage({
   const hasDoctors = (doctors?.length ?? 0) > 0;
   const hasAmenities = amenities.some(isAmenityKey);
   const hasEvents = (events?.length ?? 0) > 0;
-  const hasPackages = (clinic.packagesList?.length ?? 0) > 0;
+  // const hasPackages = (clinic.packagesList?.length ?? 0) > 0;
   const hasReservationNotices = (reservationNotices?.length ?? 0) > 0;
   const hasAddress = !!address && address.trim().length > 0;
   const hasPhone = !!clinic.phone && clinic.phone.trim().length > 0;
@@ -669,7 +679,7 @@ export default async function ClinicDetailPage({
         )}
 
         {/* Highlights */}
-        {hasHighlights && (
+        {/* {hasHighlights && (
           <section className='space-y-2'>
             <details className='group rounded-2xl border bg-card'>
               <summary className='list-none cursor-pointer px-4 py-3 flex items-center justify-between'>
@@ -694,7 +704,17 @@ export default async function ClinicDetailPage({
               </div>
             </details>
           </section>
-        )}
+        )} */}
+
+        <Suspense
+          fallback={<ClinicHighlightsSkeleton label={highlightsLabel} />}
+        >
+          <ClinicHighlightsSection
+            hasHighlights={hasHighlights}
+            highlightsDoc={highlightsDoc}
+            label={highlightsLabel}
+          />
+        </Suspense>
 
         {/* 의료진 소개 */}
         {hasDoctors && (
@@ -787,7 +807,7 @@ export default async function ClinicDetailPage({
         )}
 
         {/* 이벤트 안내 */}
-        {hasEvents && (
+        {/* {hasEvents && (
           <section className='space-y-2'>
             <details className='group rounded-2xl border bg-card'>
               <summary className='list-none cursor-pointer px-4 py-3 flex items-center justify-between'>
@@ -809,7 +829,14 @@ export default async function ClinicDetailPage({
               </div>
             </details>
           </section>
-        )}
+        )} */}
+        <Suspense fallback={<ClinicEventsSkeleton label={eventsLabel} />}>
+          <ClinicEventsSection
+            hasEvents={hasEvents}
+            events={events}
+            label={eventsLabel}
+          />
+        </Suspense>
 
         {/* 지도 */}
         {hasMap && (
@@ -829,65 +856,15 @@ export default async function ClinicDetailPage({
         )}
 
         {/* 패키지 리스트 */}
-        {hasPackages && (
-          <section className='space-y-2 '>
-            <h2 className='text-xl font-semibold'>{t("packagesLabel")}</h2>
-
-            <div className='grid grid-cols-1 sm:grid-cols-2 gap-6'>
-              {clinic.packagesList.map((pkg) => {
-                const pkgId = encodeURIComponent(pkg.id);
-
-                const title = pickText(pkg.title, loc);
-                const subtitle = pickText(pkg.subtitle, loc);
-
-                const durationVal = pickLocalized<number>(pkg.duration, loc);
-                const priceVal = pickLocalized<number>(pkg.price, loc);
-
-                const durationText =
-                  durationVal !== undefined
-                    ? formatDuration(loc, durationVal)
-                    : "";
-                const priceText =
-                  priceVal !== undefined ? formatPrice(loc, priceVal) : "";
-
-                return (
-                  <Link
-                    key={pkg.id}
-                    href={`/${locale}/clinic/${clinicId}/package/${pkgId}`}
-                    className='border rounded-2xl overflow-hidden hover:shadow-sm transition hover:bg-accent'
-                  >
-                    {/* 1. 패키지 이미지 */}
-                    {pkg.packageImages?.map((img, i) => (
-                      <div key={i} className='relative w-full h-80'>
-                        <Image
-                          src={img}
-                          alt={title || "package image"}
-                          fill
-                          sizes='(max-width: 640px) 100vw, 50vw'
-                          className='object-cover'
-                        />
-                      </div>
-                    ))}
-
-                    <div className='p-4 space-y-2'>
-                      {/* 2. 제목/부제 */}
-                      <h3 className='font-medium text-lg'>{title}</h3>
-                      <p className='text-sm text-muted-foreground'>
-                        {subtitle}
-                      </p>
-
-                      {/* 3. 가격·시간 */}
-                      <div className='mt-2 flex items-center justify-between text-foreground/80'>
-                        <span>{durationText}</span>
-                        <span>{priceText}</span>
-                      </div>
-                    </div>
-                  </Link>
-                );
-              })}
-            </div>
-          </section>
-        )}
+        <Suspense fallback={<ClinicPackagesSkeleton label={packagesLabel} />}>
+          <ClinicPackagesSection
+            locale={locale}
+            clinicId={clinicId}
+            loc={loc}
+            label={packagesLabel}
+            packagesPromise={packagesPromise}
+          />
+        </Suspense>
 
         {/* 예약 시 주의사항 */}
         {hasReservationNotices && (
@@ -906,5 +883,222 @@ export default async function ClinicDetailPage({
         )}
       </section>
     </main>
+  );
+}
+
+
+async function ClinicPackagesSection({
+  locale,
+  clinicId,
+  loc,
+  label,
+  packagesPromise,
+}: {
+  locale: string;
+  clinicId: string;
+  loc: Locale;
+  label: string;
+  packagesPromise: Promise<PackageWithId[]>;
+}) {
+  const packages = await packagesPromise;
+  if (packages.length === 0) return null;
+
+  return (
+    <section className='space-y-2 '>
+      <h2 className='text-xl font-semibold'>{label}</h2>
+
+      <div className='grid grid-cols-1 gap-6 sm:grid-cols-2'>
+        {packages.map((pkg) => {
+          const pkgId = encodeURIComponent(pkg.id);
+
+          const title = pickText(pkg.title, loc);
+          const subtitle = pickText(pkg.subtitle, loc);
+
+          const durationVal = pickLocalized<number>(pkg.duration, loc);
+          const priceVal = pickLocalized<number>(pkg.price, loc);
+
+          const durationText =
+            durationVal !== undefined ? formatDuration(loc, durationVal) : "";
+          const priceText =
+            priceVal !== undefined ? formatPrice(loc, priceVal) : "";
+
+          return (
+            <Link
+              key={pkg.id}
+              href={`/${locale}/clinic/${clinicId}/package/${pkgId}`}
+              className='overflow-hidden rounded-2xl border transition hover:bg-accent hover:shadow-sm'
+            >
+              {pkg.packageImages?.map((img, i) => (
+                <div key={i} className='relative h-80 w-full'>
+                  <Image
+                    src={img}
+                    alt={title || "package image"}
+                    fill
+                    sizes='(max-width: 640px) 100vw, 50vw'
+                    className='object-cover'
+                  />
+                </div>
+              ))}
+
+              <div className='space-y-2 p-4'>
+                <h3 className='text-lg font-medium'>{title}</h3>
+                <p className='text-sm text-muted-foreground'>{subtitle}</p>
+
+                <div className='mt-2 flex items-center justify-between text-foreground/80'>
+                  <span>{durationText}</span>
+                  <span>{priceText}</span>
+                </div>
+              </div>
+            </Link>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
+async function ClinicHighlightsSection({
+  hasHighlights,
+  highlightsDoc,
+  label,
+}: {
+  hasHighlights: boolean;
+  highlightsDoc: unknown;
+  label: string;
+}) {
+  if (!hasHighlights) return null;
+
+  return (
+    <section className='space-y-2'>
+      <details className='group rounded-2xl border bg-card'>
+        <summary className='flex cursor-pointer list-none items-center justify-between px-4 py-3'>
+          <span className='text-xl font-semibold'>{label}</span>
+          <ChevronDown
+            size={18}
+            className='text-muted-foreground transition-transform group-open:rotate-180'
+          />
+        </summary>
+
+        <div className='flex flex-col gap-4 px-8 py-4 text-sm leading-7 text-foreground/90'>
+          <div
+            className='prose prose-sm max-w-none dark:prose-invert prose-p:my-3 prose-ul:my-2 prose-li:my-0.5 prose-img:rounded-xl'
+            dangerouslySetInnerHTML={{
+              __html: renderTiptapHTML(highlightsDoc),
+            }}
+          />
+        </div>
+      </details>
+    </section>
+  );
+}
+
+async function ClinicEventsSection({
+  hasEvents,
+  events,
+  label,
+}: {
+  hasEvents: boolean;
+  events: string[];
+  label: string;
+}) {
+  if (!hasEvents) return null;
+
+  return (
+    <section className='space-y-2'>
+      <details className='group rounded-2xl border bg-card'>
+        <summary className='flex cursor-pointer list-none items-center justify-between px-4 py-3'>
+          <span className='text-xl font-semibold'>{label}</span>
+          <ChevronDown
+            size={18}
+            className='text-muted-foreground transition-transform group-open:rotate-180'
+          />
+        </summary>
+
+        <div className='flex flex-col px-8 pb-4 text-sm leading-7 text-foreground/90'>
+          <ul className='mt-2 list-disc list-inside space-y-1 text-sm text-foreground/80'>
+            {events.map((ev, idx) => (
+              <li key={`${ev}-${idx}`}>{ev}</li>
+            ))}
+          </ul>
+        </div>
+      </details>
+    </section>
+  );
+}
+
+function ClinicPackagesSkeleton({ label }: { label: string }) {
+  return (
+    <section className='space-y-2'>
+      <h2 className='text-xl font-semibold text-muted-foreground/80'>
+        {label}
+      </h2>
+      <div className='grid grid-cols-1 gap-6 sm:grid-cols-2'>
+        {Array.from({ length: 2 }).map((_, i) => (
+          <div
+            key={i}
+            className='overflow-hidden rounded-2xl border border-border bg-card'
+          >
+            <div
+              className='h-40 w-full bg-muted/70 animate-pulse'
+              aria-hidden
+            />
+            <div className='space-y-3 p-4'>
+              <div className='h-4 w-3/4 rounded bg-muted/70 animate-pulse' />
+              <div className='h-3 w-2/3 rounded bg-muted/60 animate-pulse' />
+              <div className='mt-2 flex items-center justify-between'>
+                <div className='h-3 w-16 rounded bg-muted/60 animate-pulse' />
+                <div className='h-3 w-20 rounded bg-muted/60 animate-pulse' />
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function ClinicHighlightsSkeleton({ label }: { label: string }) {
+  return (
+    <section className='space-y-2'>
+      <div className='rounded-2xl border bg-card'>
+        <div className='flex items-center justify-between px-4 py-3'>
+          <span className='text-xl font-semibold text-muted-foreground/80'>
+            {label}
+          </span>
+          <ChevronDown size={18} className='text-muted-foreground/60' />
+        </div>
+        <div className='space-y-3 px-8 pb-6'>
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div
+              key={i}
+              className='h-3 w-full rounded bg-muted/60 animate-pulse'
+            />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ClinicEventsSkeleton({ label }: { label: string }) {
+  return (
+    <section className='space-y-2'>
+      <div className='rounded-2xl border bg-card'>
+        <div className='flex items-center justify-between px-4 py-3'>
+          <span className='text-xl font-semibold text-muted-foreground/80'>
+            {label}
+          </span>
+          <ChevronDown size={18} className='text-muted-foreground/60' />
+        </div>
+        <div className='space-y-2 px-8 pb-6'>
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div
+              key={i}
+              className='h-3 w-full rounded bg-muted/60 animate-pulse'
+            />
+          ))}
+        </div>
+      </div>
+    </section>
   );
 }

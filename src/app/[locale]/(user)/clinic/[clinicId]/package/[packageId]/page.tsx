@@ -26,7 +26,7 @@ export default async function PackageDetailPage({ params }: Props) {
   const clinic: ClinicDetail | null = await getClinicById(clinicId);
   if (!clinic) return notFound();
 
-  const pkg = clinic.packagesList.find((p) => p.id === packageId);
+  const pkg = clinic.packagesList?.find((p) => p.id === packageId);
   if (!pkg) return notFound();
 
   const loc: Locale = toSupportedLocale(locale);

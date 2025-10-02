@@ -136,11 +136,11 @@ export default function ClinicListClient() {
         </div>
 
         {/* 결과 개수 */}
-        <div className='text-[13px] text-muted-foreground'>
+        {/* <div className='text-[13px] text-muted-foreground'>
           <span className='font-medium text-foreground'>
             {t("clinicList.resultCount", { count: filtered.length })}
           </span>
-        </div>
+        </div> */}
 
         {/* 바디 영역 */}
         {loading ? (

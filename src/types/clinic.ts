@@ -136,7 +136,7 @@ export type ClinicWithId = ClinicDoc & { id: string };
  *   새 화면에서는 packagesList를 사용하도록 유도
  */
 export type ClinicDetail = ClinicWithId & {
-  packagesList: PackageWithId[]; // ← 새 구조
+  packagesList?: PackageWithId[]; // ← 새 구조 (선택, 지연 로딩 대응)
 };
 
 /** 리스트 전용(불필요한 필드 가지치기 가능) */
