@@ -92,11 +92,6 @@ export default function ClinicList({ clinics }: ClinicListProps) {
                         <h2 className='text-lg font-medium text-card-foreground'>
                           {c.name?.[loc]}
                         </h2>
-
-                        {/* 하단 태그(필 칩) */}
-                        {isExclusive && (
-                          <ExclusiveTagChip text={exclusiveLabel} />
-                        )}
                       </div>
 
                       {/* 주소 */}
@@ -106,16 +101,23 @@ export default function ClinicList({ clinics }: ClinicListProps) {
                     </div>
 
                     {/* 리뷰 및 별점 */}
-                    <div className='mt-3 flex items-center text-sm text-foreground/80'>
-                      <Star className='h-4 w-4 text-yellow-500 dark:text-yellow-400' />
-                      <span className='ml-1 font-medium'>
-                        {typeof c.rating === "number"
-                          ? c.rating.toFixed(1)
-                          : "-"}
-                      </span>
-                      <span className='ml-2 text-muted-foreground'>
-                        ({c.reviewCount ?? 0})
-                      </span>
+                    <div className='mt-3 flex flex-row items-center justify-between text-sm text-foreground/80'>
+                      <div className='flex'>
+                        <Star className='h-4 w-4 text-yellow-500 dark:text-yellow-400' />
+                        <span className='ml-1 font-medium'>
+                          {typeof c.rating === "number"
+                            ? c.rating.toFixed(1)
+                            : "-"}
+                        </span>
+                        <span className='ml-2 text-muted-foreground'>
+                          ({c.reviewCount ?? 0})
+                        </span>
+                      </div>
+
+                      {/* 하단 태그(필 칩) */}
+                      {isExclusive && (
+                        <ExclusiveTagChip text={exclusiveLabel} />
+                      )}
                     </div>
                   </CardContent>
 
