@@ -1,48 +1,57 @@
-"use client"
+"use client";
 
-import * as React from "react"
+import * as React from "react";
+import { useTheme } from "next-themes";
 
 // --- UI Primitives ---
-import { Button } from "@/components/tiptap-ui-primitive/button"
+import { Button } from "@/components/tiptap-ui-primitive/button";
 
 // --- Icons ---
-import { MoonStarIcon } from "@/components/tiptap-icons/moon-star-icon"
-import { SunIcon } from "@/components/tiptap-icons/sun-icon"
+import { MoonStarIcon } from "@/components/tiptap-icons/moon-star-icon";
+import { SunIcon } from "@/components/tiptap-icons/sun-icon";
 
 export function ThemeToggle() {
-  const [isDarkMode, setIsDarkMode] = React.useState<boolean>(false)
+  const { theme, resolvedTheme, setTheme } = useTheme();
+  const initialThemeRef = React.useRef<string | null>(null);
+  const initialResolvedThemeRef = React.useRef<string | null>(null);
 
   React.useEffect(() => {
-    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)")
-    const handleChange = () => setIsDarkMode(mediaQuery.matches)
-    mediaQuery.addEventListener("change", handleChange)
-    return () => mediaQuery.removeEventListener("change", handleChange)
-  }, [])
+    if (!initialThemeRef.current && theme) {
+      initialThemeRef.current = theme;
+    }
+    if (!initialResolvedThemeRef.current && resolvedTheme) {
+      initialResolvedThemeRef.current = resolvedTheme;
+    }
+  }, [theme, resolvedTheme]);
 
   React.useEffect(() => {
-    const initialDarkMode =
-      !!document.querySelector('meta[name="color-scheme"][content="dark"]') ||
-      window.matchMedia("(prefers-color-scheme: dark)").matches
-    setIsDarkMode(initialDarkMode)
-  }, [])
+    return () => {
+      const initialTheme = initialThemeRef.current;
+      if (initialTheme) {
+        setTheme(initialTheme);
+      }
+    };
+  }, [setTheme]);
 
-  React.useEffect(() => {
-    document.documentElement.classList.toggle("dark", isDarkMode)
-  }, [isDarkMode])
+  const isDarkMode =
+    (resolvedTheme ?? initialResolvedThemeRef.current ?? "light") === "dark";
 
-  const toggleDarkMode = () => setIsDarkMode((isDark) => !isDark)
+  const toggleDarkMode = () => {
+    const nextTheme = isDarkMode ? "light" : "dark";
+    setTheme(nextTheme);
+  };
 
   return (
     <Button
       onClick={toggleDarkMode}
       aria-label={`Switch to ${isDarkMode ? "light" : "dark"} mode`}
-      data-style="ghost"
+      data-style='ghost'
     >
       {isDarkMode ? (
-        <MoonStarIcon className="tiptap-button-icon" />
+        <MoonStarIcon className='tiptap-button-icon' />
       ) : (
-        <SunIcon className="tiptap-button-icon" />
+        <SunIcon className='tiptap-button-icon' />
       )}
     </Button>
-  )
+  );
 }
