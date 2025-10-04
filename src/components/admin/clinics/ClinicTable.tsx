@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import type { ClinicWithId } from "@/types/clinic";
 import AdminDataTable, {
   type DataTableColumn,
@@ -8,8 +8,6 @@ import AdminDataTable, {
 import ClinicFormDialog from "./ClinicFormDialog";
 import PackagesPanel from "./PackagesPanel";
 import ClinicTableRow from "./ClinicTableRow";
-import { Button } from "@/components/ui/button";
-import { Save, RotateCcw } from "lucide-react";
 import { updateClinicOrders } from "@/services/admin/clinics/clinics";
 
 interface Props {
@@ -23,6 +21,10 @@ interface Props {
   loading?: boolean;
   /** 상단 타이틀 */
   title?: string;
+  // 상위에 dirty 상태 통지
+  onDirtyChange?: (dirty: boolean) => void;
+  // 상위에 저장/취소 액션 바인딩
+  onBindActions?: (actions: { save: () => void; cancel: () => void }) => void;
 }
 
 export default function ClinicTable({
@@ -31,32 +33,41 @@ export default function ClinicTable({
   onChanged,
   loading = false,
   title = "병원 목록",
+  onDirtyChange,
+  onBindActions,
 }: Props) {
   const [editId, setEditId] = useState<string | null>(null);
   const [pkgClinicId, setPkgClinicId] = useState<string | null>(null);
 
-  // ① 로컬 정렬 상태
+  // 로컬 정렬 상태
   const [rows, setRows] = useState<ClinicWithId[]>(() =>
     [...items].sort(compareByDisplayOrder)
   );
   const [dirty, setDirty] = useState<boolean>(false);
   const [saving, setSaving] = useState<boolean>(false);
 
+  // 행 이동 시 잠깐 강조할 id
+  const [flashRowId, setFlashRowId] = useState<string | null>(null);
+
   // 서버 데이터 변경 → 로컬 동기화
   useEffect(() => {
     setRows([...items].sort(compareByDisplayOrder));
     setDirty(false);
   }, [items]);
-  // ② 위/아래 이동 스왑 유틸
+
+  // 부모에 dirty 상태를 안전하게 동기화
+  useEffect(() => {
+    onDirtyChange?.(dirty);
+  }, [dirty, onDirtyChange]);
+
+  // 위/아래 이동 스왑 유틸
   const swap = (arr: ClinicWithId[], i: number, j: number): ClinicWithId[] => {
     const next = [...arr];
-    const tmp = next[i];
-    next[i] = next[j];
-    next[j] = tmp;
+    [next[i], next[j]] = [next[j], next[i]];
     return next;
   };
 
-  // ③ 이동 핸들러
+  // 이동 핸들러
   const move = (id: string, dir: "up" | "down") => {
     setRows((prev) => {
       const i = prev.findIndex((x) => x.id === id);
@@ -64,105 +75,101 @@ export default function ClinicTable({
       const j = dir === "up" ? i - 1 : i + 1;
       if (j < 0 || j >= prev.length) return prev;
       const next = swap(prev, i, j);
-      setDirty(true);
+
+      if (!dirty) {
+        setDirty(true);
+      }
+
+      // 행 하이라이트(짧게)
+      setFlashRowId(next[j].id);
+      window.setTimeout(() => setFlashRowId(null), 450);
+
       return next;
     });
   };
 
-  // ④ 저장/취소
-  const saveOrder = async () => {
+  // 저장/취소
+  const saveOrder = useCallback(async () => {
     try {
       setSaving(true);
-      const orderMap = rows.map((c, idx) => ({
-        id: c.id,
-        displayOrder: idx, // 0부터 순차 부여(작을수록 상단)
-      }));
+      const orderMap = rows.map((c, idx) => ({ id: c.id, displayOrder: idx }));
       await updateClinicOrders(orderMap);
       setDirty(false);
-      onChanged(); // 서버 재조회
+
+      onChanged();
     } finally {
       setSaving(false);
     }
-  };
+  }, [rows, onChanged]);
 
-  const tableKey = React.useMemo(() => rows.map((r) => r.id).join("|"), [rows]);
-
-  const cancelChanges = () => {
+  const cancelChanges = useCallback(() => {
     setRows([...items].sort(compareByDisplayOrder));
     setDirty(false);
-  };
+  }, [items]);
 
-  // ⑤ 테이블 헤더(기존 유지)
+  // 부모에 액션 바인딩
+  useEffect(() => {
+    onBindActions?.({ save: saveOrder, cancel: cancelChanges });
+  }, [onBindActions, saveOrder, cancelChanges]);
+
+  // 테이블 리마운트 키(순서 변경 시 강제 재렌더)
+  const tableKey = React.useMemo(() => rows.map((r) => r.id).join("|"), [rows]);
+
+  // 테이블 헤더
   const columns = useMemo(
     () =>
       [
+        { header: "No.", widthClass: "w-[56px]", align: "center" },
         { header: "이름" }, // 가변
-        { header: "카테고리", widthClass: "w-[20%]" },
-        { header: "상태", widthClass: "w-[16%]", align: "center" },
-        { header: "액션", widthClass: "w-[24%]", align: "right" },
+        { header: "카테고리", widthClass: "w-[28%]" },
+        { header: "상태", widthClass: "w-[120px]", align: "center" },
+        { header: "순서", widthClass: "w-[112px]", align: "center" },
+        { header: "액션", widthClass: "w-[88px]", align: "right" },
       ] as const satisfies ReadonlyArray<DataTableColumn>,
     []
   );
 
   return (
     <>
-      {/* 상단 툴바: 저장/취소 */}
-      <div className='mb-3 flex items-center justify-between'>
-        <div className='text-sm text-muted-foreground'>
-          총 {totalCount.toLocaleString()}개
-          {dirty && <span className='ml-2 text-amber-600'>(변경됨)</span>}
-        </div>
-        <div className='flex items-center gap-2'>
-          <Button
-            type='button'
-            variant='outline'
-            onClick={cancelChanges}
-            disabled={!dirty || saving || loading}
-            title='변경 취소'
-          >
-            <RotateCcw className='mr-2 h-4 w-4' />
-            취소
-          </Button>
-          <Button
-            type='button'
-            onClick={saveOrder}
-            disabled={!dirty || saving || loading}
-            title='변경사항 저장'
-          >
-            <Save className='mr-2 h-4 w-4' />
-            {saving ? "저장 중…" : "변경사항 저장"}
-          </Button>
-        </div>
+      <div
+        className={dirty ? "rounded-lg ring-1 ring-[var(--primary)]/30" : ""}
+      >
+        <AdminDataTable<ClinicWithId>
+          key={tableKey}
+          title={title}
+          items={rows.slice()}
+          totalCount={totalCount}
+          loading={loading}
+          columns={columns}
+          countLabel={(n, total) => (
+            <>
+              총 {total.toLocaleString()}건{dirty ? " (변경됨)" : ""}
+            </>
+          )}
+          getRowKey={(c) => c.id}
+          renderRow={(c) => {
+            const idx = rows.findIndex((x) => x.id === c.id);
+            const isFirst = idx <= 0;
+            const isLast = idx === rows.length - 1;
+            return (
+              <ClinicTableRow
+                clinic={c}
+                index={idx}
+                flash={flashRowId === c.id}
+                onUpdated={onChanged}
+                onOpenPackages={setPkgClinicId}
+                onEdit={setEditId}
+                onMoveUp={() => move(c.id, "up")}
+                onMoveDown={() => move(c.id, "down")}
+                isFirst={isFirst}
+                isLast={isLast}
+                sortingDisabled={saving || loading}
+              />
+            );
+          }}
+          emptyMessage='등록된 병원이 없습니다.'
+        />
       </div>
-
-      <AdminDataTable<ClinicWithId>
-        key={tableKey}
-        title={title}
-        items={rows.slice()}
-        totalCount={totalCount}
-        loading={loading}
-        columns={columns}
-        getRowKey={(c) => c.id}
-        renderRow={(c) => {
-          const idx = rows.findIndex((x) => x.id === c.id);
-          const isFirst = idx <= 0;
-          const isLast = idx === rows.length - 1;
-          return (
-            <ClinicTableRow
-              clinic={c}
-              onUpdated={onChanged}
-              onOpenPackages={setPkgClinicId}
-              onEdit={setEditId}
-              onMoveUp={() => move(c.id, "up")}
-              onMoveDown={() => move(c.id, "down")}
-              isFirst={isFirst}
-              isLast={isLast}
-              sortingDisabled={saving || loading}
-            />
-          );
-        }}
-        emptyMessage='등록된 병원이 없습니다.'
-      />
 
       {/* 편집 다이얼로그 */}
       {editId && (

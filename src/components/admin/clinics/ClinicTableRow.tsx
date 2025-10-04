@@ -22,6 +22,8 @@ type ClinicStatus = "visible" | "hidden";
 
 type Props = {
   clinic: ClinicWithId;
+  index: number;
+  flash?: boolean;
   onUpdated: () => void; // 상태 변경/삭제 후 목록 갱신
   onOpenPackages: (clinicId: string) => void;
   onEdit: (clinicId: string) => void;
@@ -34,6 +36,8 @@ type Props = {
 
 export default function ClinicTableRow({
   clinic,
+  index,
+  flash = false,
   onUpdated,
   onOpenPackages,
   onEdit,
@@ -68,7 +72,16 @@ export default function ClinicTableRow({
   const categoryLabels = categoryKeys.map((k) => CATEGORY_LABELS_KO[k] ?? k);
 
   return (
-    <tr className='border-t hover:bg-muted/20'>
+    <tr
+      className={[
+        "border-t transition-colors",
+        flash ? "bg-black/5 dark:bg-white/5" : "hover:bg-muted/20",
+      ].join(" ")}
+    >
+      {/* No. */}
+      <td className='px-4 py-3 text-center text-muted-foreground'>
+        {index + 1}
+      </td>
       {/* 병원명 */}
       <td className='px-4 py-3'>{clinic.name?.ko ?? "-"}</td>
 
@@ -97,7 +110,7 @@ export default function ClinicTableRow({
           onValueChange={(v) => handleChangeStatus(v as ClinicStatus)}
           disabled={updating}
         >
-          <SelectTrigger className='w-[120px]'>
+          <SelectTrigger className='h-8 w-[96px] px-2 text-xs'>
             <SelectValue placeholder='상태' />
           </SelectTrigger>
           <SelectContent>
@@ -107,22 +120,9 @@ export default function ClinicTableRow({
         </Select>
       </td>
 
-      {/* <td className='px-4 py-3 text-right pr-4'>
-        <div className='inline-flex items-center justify-end gap-2'>
-          <Button variant='outline' onClick={() => onOpenPackages(clinic.id)}>
-            패키지
-          </Button>
-
-          <ClinicRowActions
-            onEdit={() => onEdit(clinic.id)}
-            onDelete={handleDelete}
-          />
-        </div>
-      </td> */}
-      {/* 액션 셀 */}
-      <td className='whitespace-nowrap text-right'>
-        {/* ↑/↓ 이동 버튼 (정렬) */}
-        <div className='inline-flex items-center gap-1 mr-2 align-middle'>
+      {/* 이동 버튼 */}
+      <td className='px-4 py-3 text-center'>
+        <div className='inline-flex items-center gap-1'>
           <Button
             type='button'
             variant='outline'
@@ -146,11 +146,17 @@ export default function ClinicTableRow({
             <ArrowDown className='h-4 w-4' />
           </Button>
         </div>
+      </td>
 
-        {/* 기존 액션 버튼들(수정/패키지 등) 그대로 */}
-        {/* 예: */}
-        <Button onClick={() => onEdit(clinic.id)}>수정</Button>
-        <Button onClick={() => onOpenPackages(clinic.id)}>패키지</Button>
+      {/* 액션: 패키지, 더보기 */}
+      <td className='px-4 py-3 text-right pr-4'>
+        <div className='inline-flex items-center justify-end gap-2'>
+          <ClinicRowActions
+            onEdit={() => onEdit(clinic.id)}
+            onDelete={handleDelete}
+            onOpenPackages={() => onOpenPackages(clinic.id)}
+          />
+        </div>
       </td>
     </tr>
   );

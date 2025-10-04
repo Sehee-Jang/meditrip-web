@@ -34,6 +34,8 @@ type Props = {
   size?: "icon" | "sm" | "md" | "lg";
   className?: string;
   disabled?: boolean;
+  /** 아이콘 hover 회전 모션 비활성화 */
+  disableHoverSpin?: boolean; //
 };
 
 export default function IconOnlyAddButton({
@@ -45,6 +47,7 @@ export default function IconOnlyAddButton({
   size = "icon",
   className,
   disabled = false,
+  disableHoverSpin = false,
 }: Props) {
   return (
     <TooltipProvider>
@@ -61,13 +64,16 @@ export default function IconOnlyAddButton({
             className={[
               // 아이콘 전용 버튼 크기(원형)
               size === "icon" ? "h-9 w-9 rounded-full p-0" : "",
-              // hover 시 아이콘 회전(모션 선호도 따라 정지)
-              "group",
+              !disableHoverSpin ? "group" : "",
               className ?? "",
             ].join(" ")}
           >
             <Icon
-              className='transition-transform duration-300 motion-safe:group-hover:rotate-90'
+              className={
+                disableHoverSpin
+                  ? "" // 모션 없음
+                  : "transition-transform duration-300 motion-safe:group-hover:rotate-90"
+              }
               aria-hidden='true'
             />
           </Button>

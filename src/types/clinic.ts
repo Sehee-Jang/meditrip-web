@@ -156,4 +156,6 @@ export type ClinicListItem = Pick<
   | "reviewCount"
   | "status"
   | "categoryKeys"
+  | "displayOrder"
+  | "createdAt"
 >;

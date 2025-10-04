@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { ClinicWithId } from "@/types/clinic";
 import { listClinics } from "@/services/admin/clinics/clinics";
@@ -13,6 +13,7 @@ import {
 import ClinicFormDialog from "./ClinicFormDialog";
 import ClinicTable from "./ClinicTable";
 import IconOnlyAddButton from "../common/IconOnlyAddButton";
+import { RotateCcw, Save, Plus } from "lucide-react";
 
 export default function ClinicAdminClient() {
   const [open, setOpen] = useState(false);
@@ -43,28 +44,64 @@ export default function ClinicAdminClient() {
     });
   }, [items, keyword, status]);
 
-  useEffect(() => {
-    // 필요 시 실시간 onSnapshot으로 대체 가능
-  }, []);
+  // 정렬 변경 상태(dirty) + Table 액션 바인딩
+  const [tableDirty, setTableDirty] = useState(false);
+  const actionsRef = React.useRef<{
+    save: () => void;
+    cancel: () => void;
+  } | null>(null);
 
   return (
     <div className='space-y-4'>
-      {/* Toolbar */}
-      <div className='flex flex-col gap-3 md:flex-row md:items-center md:justify-between'>
-        <FilterRow>
-          <SearchInput
-            value={keyword}
-            onChange={setKeyword}
-            placeholder='이름/주소로 검색'
-            icon
-          />
-          <VisibilitySelect value={status} onChange={setStatus} />
-        </FilterRow>
+      {/* Toolbar: 데스크탑에서 한 줄 고정 */}
+      <div className='flex flex-col gap-3 lg:flex-row lg:items-center lg:flex-nowrap'>
+        {/* 왼쪽: 검색 + 필터 (영역 전체가 늘어나도록 flex-1) */}
+        <div className='flex-1 min-w-0'>
+          <FilterRow>
+            {/* 검색창은 남는 폭을 전부 사용 */}
+            <div className='flex-1 min-w-[300px] md:min-w-[360px] lg:min-w-[420px]'>
+              <SearchInput
+                value={keyword}
+                onChange={setKeyword}
+                placeholder='이름/주소로 검색'
+                icon
+                className='w-full'
+              />
+            </div>
+            <div className='shrink-0'>
+              <VisibilitySelect value={status} onChange={setStatus} />
+            </div>
+          </FilterRow>
+        </div>
 
-        <div className='flex shrink-0 items-center gap-2'>
+        {/* 오른쪽: 아이콘들(취소/저장/등록) */}
+        <div className='ml-auto flex items-center gap-2 shrink-0'>
+          {tableDirty && (
+            <>
+              <IconOnlyAddButton
+                label='변경 취소'
+                ariaLabel='변경 취소'
+                icon={RotateCcw}
+                variant='outline'
+                onClick={() => actionsRef.current?.cancel()}
+                disableHoverSpin
+              />
+              <IconOnlyAddButton
+                label='변경사항 저장'
+                ariaLabel='변경사항 저장'
+                icon={Save}
+                variant='brand'
+                onClick={() => actionsRef.current?.save()}
+                disableHoverSpin
+              />
+            </>
+          )}
+
           <IconOnlyAddButton
             label='병원 추가'
             ariaLabel='병원 추가'
+            icon={Plus}
+            variant='brand'
             onClick={() => setOpen(true)}
           />
         </div>
@@ -81,6 +118,10 @@ export default function ClinicAdminClient() {
         totalCount={items.length}
         onChanged={refetch}
         loading={isFetching}
+        onDirtyChange={setTableDirty}
+        onBindActions={(a) => {
+          actionsRef.current = a;
+        }}
       />
 
       <ClinicFormDialog
