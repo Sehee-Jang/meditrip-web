@@ -11,19 +11,33 @@ import {
   VisibilitySelect,
 } from "@/components/admin/common/FilterControls";
 import ClinicFormDialog from "./ClinicFormDialog";
+
 import ClinicTable from "./ClinicTable";
 import IconOnlyAddButton from "../common/IconOnlyAddButton";
-import { RotateCcw, Save, Plus } from "lucide-react";
+import { RotateCcw, Save, Plus, Download, Loader2 } from "lucide-react";
+import { auth } from "@/lib/firebase";
 
 export default function ClinicAdminClient() {
   const [open, setOpen] = useState(false);
   const [keyword, setKeyword] = useState("");
   const [status, setStatus] = useState<"all" | "visible" | "hidden">("all");
+  const [isExporting, setIsExporting] = useState(false);
+  const [exportError, setExportError] = useState<string | null>(null);
 
   const { data, refetch, isFetching, error } = useQuery({
     queryKey: ["admin-clinics"],
     queryFn: () => listClinics(100),
   });
+
+  const exportIcon = useMemo(() => {
+    if (!isExporting) return Download;
+    return function SpinnerIcon(props: React.SVGProps<SVGSVGElement>) {
+      const className = props.className
+        ? `${props.className} animate-spin`
+        : "animate-spin";
+      return <Loader2 {...props} className={className} />;
+    };
+  }, [isExporting]);
 
   const items = useMemo<ClinicWithId[]>(
     () => (data?.items ?? []) as ClinicWithId[],
@@ -50,6 +64,53 @@ export default function ClinicAdminClient() {
     save: () => void;
     cancel: () => void;
   } | null>(null);
+
+  const handleExport = async () => {
+    try {
+      setExportError(null);
+      setIsExporting(true);
+
+      const user = auth.currentUser;
+      if (!user) {
+        throw new Error("로그인이 필요합니다.");
+      }
+
+      const idToken = await user.getIdToken();
+      const res = await fetch("/api/admin/clinics/export", {
+        headers: {
+          Authorization: `Bearer ${idToken}`,
+        },
+      });
+
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(text || "엑셀 내보내기에 실패했습니다.");
+      }
+
+      const blob = await res.blob();
+      const disposition = res.headers.get("Content-Disposition") ?? "";
+      const match = disposition.match(/filename="?([^";]+)"?/);
+      const fallbackName = `clinics-export-${new Date()
+        .toISOString()
+        .slice(0, 10)}.xlsx`;
+      const filename = match ? decodeURIComponent(match[1]) : fallbackName;
+
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "알 수 없는 오류가 발생했습니다.";
+      setExportError(message);
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   return (
     <div className='space-y-4'>
@@ -98,6 +159,18 @@ export default function ClinicAdminClient() {
           )}
 
           <IconOnlyAddButton
+            label='엑셀 다운로드'
+            ariaLabel='엑셀 다운로드'
+            icon={exportIcon}
+            variant='outline'
+            onClick={() => {
+              void handleExport();
+            }}
+            disabled={isExporting}
+            disableHoverSpin={isExporting}
+          />
+
+          <IconOnlyAddButton
             label='병원 추가'
             ariaLabel='병원 추가'
             icon={Plus}
@@ -106,6 +179,12 @@ export default function ClinicAdminClient() {
           />
         </div>
       </div>
+
+      {exportError && (
+        <div className='rounded-md border border-red-200 bg-red-50 px-3 py-2 text-[12px] text-red-700'>
+          엑셀 다운로드 실패: {exportError}
+        </div>
+      )}
 
       {error && (
         <div className='rounded-md border border-red-200 bg-red-50 px-3 py-2 text-[12px] text-red-700'>
