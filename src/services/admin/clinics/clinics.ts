@@ -12,6 +12,7 @@ import {
   startAfter,
   Timestamp,
   updateDoc,
+  writeBatch,
   type DocumentData,
   type FirestoreDataConverter,
   type QueryDocumentSnapshot,
@@ -113,6 +114,9 @@ const clinicConverter: FirestoreDataConverter<ClinicDoc> = {
       address: d.address,
       geo: d.geo,
       intro: d.intro,
+      displayOrder:
+        typeof d.displayOrder === "number" ? d.displayOrder : undefined,
+
       categoryKeys: asCategoryKeys(
         (d as { categoryKeys?: unknown }).categoryKeys
       ),
@@ -191,26 +195,82 @@ export interface ListResult<T> {
 export async function listClinics(
   pageSize = 20,
   cursor?: QueryDocumentSnapshot<DocumentData>,
-  sortKey: string = "createdAt"
+  sortKey: string = "displayOrder",
+  direction: "asc" | "desc" = "asc"
 ): Promise<ListResult<ClinicWithId>> {
   const base = clinicsColRef().withConverter(clinicConverter);
-  const q = cursor
-    ? query(
-        base,
-        orderBy(sortKey as never, "desc" as never),
-        startAfter(cursor),
-        limitFn(pageSize)
-      )
-    : query(
-        base,
-        orderBy(sortKey as never, "desc" as never),
-        limitFn(pageSize)
-      );
 
-  const snap = await getDocs(q);
-  const items = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-  const last = snap.docs.length > 0 ? snap.docs[snap.docs.length - 1] : null;
-  return { items, cursor: last };
+  // 우선 시도: displayOrder asc + createdAt desc (보조 정렬)
+  const primaryQuery = (() => {
+    if (sortKey === "displayOrder") {
+      return cursor
+        ? query(
+            base,
+            orderBy("displayOrder", "asc" as never),
+            orderBy("createdAt", "desc" as never),
+            startAfter(cursor),
+            limitFn(pageSize)
+          )
+        : query(
+            base,
+            orderBy("displayOrder", "asc" as never),
+            orderBy("createdAt", "desc" as never),
+            limitFn(pageSize)
+          );
+    }
+    // 그 외 일반 정렬
+    return cursor
+      ? query(
+          base,
+          orderBy(sortKey as never, direction as never),
+          startAfter(cursor),
+          limitFn(pageSize)
+        )
+      : query(
+          base,
+          orderBy(sortKey as never, direction as never),
+          limitFn(pageSize)
+        );
+  })();
+
+  try {
+    const snap = await getDocs(primaryQuery);
+    // 결과가 비정상적으로 비면 폴백(기존 createdAt desc)
+    if (snap.empty && sortKey === "displayOrder") {
+      const fallbackQ = cursor
+        ? query(
+            base,
+            orderBy("createdAt", "desc" as never),
+            startAfter(cursor),
+            limitFn(pageSize)
+          )
+        : query(base, orderBy("createdAt", "desc" as never), limitFn(pageSize));
+      const fbSnap = await getDocs(fallbackQ);
+      const fbItems = fbSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      const fbLast =
+        fbSnap.docs.length > 0 ? fbSnap.docs[fbSnap.docs.length - 1] : null;
+      return { items: fbItems, cursor: fbLast };
+    }
+
+    const items = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    const last = snap.docs.length > 0 ? snap.docs[snap.docs.length - 1] : null;
+    return { items, cursor: last };
+  } catch {
+    // 쿼리 에러 시(인덱스 미생성 등)도 createdAt desc로 폴백
+    const fallbackQ = cursor
+      ? query(
+          base,
+          orderBy("createdAt", "desc" as never),
+          startAfter(cursor),
+          limitFn(pageSize)
+        )
+      : query(base, orderBy("createdAt", "desc" as never), limitFn(pageSize));
+    const fbSnap = await getDocs(fallbackQ);
+    const fbItems = fbSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    const fbLast =
+      fbSnap.docs.length > 0 ? fbSnap.docs[fbSnap.docs.length - 1] : null;
+    return { items: fbItems, cursor: fbLast };
+  }
 }
 
 export async function getClinicByIdAdmin(
@@ -238,6 +298,11 @@ export async function createClinic(
 
   const data: ClinicDoc = {
     ...(base as Omit<ClinicDoc, "createdAt" | "updatedAt">),
+    // 전달 안되면 기본값 부여
+    displayOrder:
+      typeof (base as { displayOrder?: unknown }).displayOrder === "number"
+        ? (base as { displayOrder?: number }).displayOrder
+        : -Date.now(),
     createdAt: now as unknown as Timestamp,
     updatedAt: now as unknown as Timestamp,
   };
@@ -348,4 +413,18 @@ export async function deletePackage(
   await updateDoc(doc(db, "clinics", clinicId), {
     updatedAt: serverTimestamp(),
   });
+}
+
+// displayOrder 일괄 업데이트(batch)
+export async function updateClinicOrders(
+  orderMap: ReadonlyArray<{ id: string; displayOrder: number }>
+): Promise<void> {
+  const batch = writeBatch(db);
+  for (const { id, displayOrder } of orderMap) {
+    batch.update(clinicDocRef(id), {
+      displayOrder,
+      updatedAt: serverTimestamp(),
+    });
+  }
+  await batch.commit();
 }

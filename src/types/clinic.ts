@@ -99,6 +99,7 @@ export interface ClinicDoc {
   status: ClinicStatus; // 노출 제어
   createdAt: Timestamp;
   updatedAt: Timestamp;
+  displayOrder?: number; // 기본 오름차순 정렬; 작을수록 상단
 }
 
 // 서브컬렉션 "clinics/{id}/packages/{pid}"
@@ -128,7 +129,11 @@ export interface PackageWithId extends PackageDoc {
 // }
 
 /** 병원 문서 + id (조회용) */
-export type ClinicWithId = ClinicDoc & { id: string };
+export type ClinicWithId = ClinicDoc & {
+  id: string;
+  createdAt?: { seconds: number; nanoseconds: number } | Date;
+  updatedAt?: { seconds: number; nanoseconds: number } | Date;
+};
 
 /**
  * 상세 화면 전용: 서브컬렉션에서 가져온 배열 형태 병행
