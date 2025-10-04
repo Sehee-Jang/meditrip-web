@@ -2,7 +2,7 @@
 
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
-import { BellIcon, Moon, Sun, UserCircleIcon } from "lucide-react";
+import { Moon, Sun } from "lucide-react";
 import { DatePicker } from "../ui/date-picker";
 
 export default function Topbar() {
