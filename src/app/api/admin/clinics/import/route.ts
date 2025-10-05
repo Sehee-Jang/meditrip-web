@@ -159,6 +159,115 @@ function buildLocalizedStringArray(
   return hasValue ? result : undefined;
 }
 
+function convertPlainTextToRichTextDoc(text: string): JSONContent {
+  const lines = text.split(/\r?\n/);
+  const content: JSONContent[] = [];
+
+  let paragraphBuffer: string[] = [];
+  let currentList: JSONContent[] | null = null;
+
+  function flushParagraph() {
+    if (paragraphBuffer.length === 0) return;
+    const paragraphText = paragraphBuffer.join(" ").trimEnd();
+    if (paragraphText.length === 0) {
+      paragraphBuffer = [];
+      return;
+    }
+    content.push({
+      type: "paragraph",
+      content: [
+        {
+          type: "text",
+          text: paragraphText,
+        },
+      ],
+    });
+    paragraphBuffer = [];
+  }
+
+  function flushList() {
+    if (!currentList || currentList.length === 0) {
+      currentList = null;
+      return;
+    }
+    content.push({
+      type: "bulletList",
+      content: currentList,
+    });
+    currentList = null;
+  }
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+
+    if (trimmed.length === 0) {
+      flushParagraph();
+      flushList();
+      continue;
+    }
+
+    const bulletMatch = trimmed.match(/^-\s+(.*)$/);
+    if (bulletMatch) {
+      flushParagraph();
+      if (!currentList) {
+        currentList = [];
+      }
+      currentList.push({
+        type: "listItem",
+        content: [
+          {
+            type: "paragraph",
+            content: bulletMatch[1]
+              ? [
+                  {
+                    type: "text",
+                    text: bulletMatch[1],
+                  },
+                ]
+              : [],
+          },
+        ],
+      });
+      continue;
+    }
+
+    flushList();
+    paragraphBuffer.push(trimmed);
+  }
+
+  flushParagraph();
+  flushList();
+
+  if (content.length === 0) {
+    throw new Error("Empty rich text content");
+  }
+
+  return {
+    type: "doc",
+    content,
+  };
+}
+
+function parseRichTextCell(
+  raw: string,
+  label: string,
+  errors: string[]
+): JSONContent | undefined {
+  const trimmed = raw.trim();
+  if (!trimmed) return undefined;
+
+  try {
+    return JSON.parse(trimmed) as JSONContent;
+  } catch {
+    try {
+      return convertPlainTextToRichTextDoc(trimmed);
+    } catch {
+      errors.push(`${label} JSON 파싱에 실패했습니다.`);
+      return undefined;
+    }
+  }
+}
+
 function buildLocalizedRichText(
   row: Record<string, string>,
   prefix: string,
@@ -167,14 +276,12 @@ function buildLocalizedRichText(
   const result: Partial<LocalizedRichTextDoc> = {};
   let hasValue = false;
   for (const locale of LOCALES_TUPLE) {
-    const raw = (row[`${prefix}_${locale}`] ?? "").trim();
+    const raw = row[`${prefix}_${locale}`];
     if (!raw) continue;
-    try {
-      result[locale] = JSON.parse(raw) as JSONContent;
-      hasValue = true;
-    } catch {
-      errors.push(`${prefix}_${locale} JSON 파싱에 실패했습니다.`);
-    }
+    const parsed = parseRichTextCell(raw, `${prefix}_${locale}`, errors);
+    if (!parsed) continue;
+    result[locale] = parsed;
+    hasValue = true;
   }
   return hasValue ? (result as LocalizedRichTextDoc) : undefined;
 }
