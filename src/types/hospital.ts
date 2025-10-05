@@ -30,7 +30,6 @@ export interface Hospital {
   name: string;
   address: string;
   photos: string[];
-  isFavorite: boolean;
   rating: number;
   reviewCount: number;
   packages: Package[];
