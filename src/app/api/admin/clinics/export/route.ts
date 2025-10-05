@@ -1,63 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 import ExcelJS from "exceljs";
 import { adminDb, getFirebaseUserFromRequest } from "@/lib/firebaseAdmin";
-import { LOCALES_TUPLE } from "@/constants/locales";
 import type { ClinicDoc, PackageDoc } from "@/types/clinic";
-import type { LocalizedRichTextDoc, LocalizedTextDoc } from "@/types/common";
 import type { Timestamp as AdminTimestamp } from "firebase-admin/firestore";
+import {
+  CLINIC_COLUMNS,
+  PACKAGE_COLUMNS,
+  formatArray,
+  formatJson,
+  localizedRichToRow,
+  localizedStringArrayToRow,
+  localizedToRow,
+} from "@/services/admin/clinics/excelSchema";
+import { LocalizedRichTextDoc, LocalizedTextDoc } from "@/types/common";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-
-const CLINIC_COLUMNS: readonly string[] = [
-  "id",
-  "status",
-  "displayOrder",
-  "isExclusive",
-  "isFavorite",
-  "rating",
-  "reviewCount",
-  "phone",
-  "website",
-  "categoryKeys",
-  "tagSlugs",
-  "amenities",
-  "weeklyClosedDays",
-  "images",
-  "socialsJson",
-  "geo_lat",
-  "geo_lng",
-  "weeklyHoursJson",
-  "doctorsJson",
-  "createdAt",
-  "updatedAt",
-  ...LOCALES_TUPLE.map((locale) => `name_${locale}`),
-  ...LOCALES_TUPLE.map((locale) => `address_${locale}`),
-  ...LOCALES_TUPLE.map((locale) => `introTitle_${locale}`),
-  ...LOCALES_TUPLE.map((locale) => `introSubtitle_${locale}`),
-  ...LOCALES_TUPLE.map((locale) => `hoursNote_${locale}`),
-  ...LOCALES_TUPLE.map((locale) => `events_${locale}`),
-  ...LOCALES_TUPLE.map((locale) => `reservationNotices_${locale}`),
-  ...LOCALES_TUPLE.map((locale) => `description_${locale}`),
-  ...LOCALES_TUPLE.map((locale) => `highlights_${locale}`),
-];
-
-const PACKAGE_COLUMNS: readonly string[] = [
-  "clinicId",
-  "clinicName_ko",
-  "packageId",
-  "createdAt",
-  "updatedAt",
-  ...LOCALES_TUPLE.map((locale) => `title_${locale}`),
-  ...LOCALES_TUPLE.map((locale) => `subtitle_${locale}`),
-  "price_ko",
-  "price_ja",
-  "duration_ko",
-  "duration_ja",
-  "packageImages",
-  "treatmentDetailsJson",
-  ...LOCALES_TUPLE.map((locale) => `precautions_${locale}`),
-];
 
 type FirestoreTimestamp = AdminTimestamp | Date | null | undefined;
 
@@ -68,53 +26,6 @@ function timestampToIso(ts: FirestoreTimestamp): string {
     return (ts as AdminTimestamp).toDate().toISOString();
   }
   return "";
-}
-
-function localizedToRow(
-  value: Partial<LocalizedTextDoc> | undefined,
-  prefix: string,
-  target: Record<string, string | number | boolean | null>
-) {
-  for (const locale of LOCALES_TUPLE) {
-    const key = `${prefix}_${locale}`;
-    target[key] = value?.[locale] ?? "";
-  }
-}
-
-function localizedRichToRow(
-  value: Partial<LocalizedRichTextDoc> | undefined,
-  prefix: string,
-  target: Record<string, string | number | boolean | null>
-) {
-  for (const locale of LOCALES_TUPLE) {
-    const key = `${prefix}_${locale}`;
-    target[key] = value?.[locale] ? JSON.stringify(value[locale]) : "";
-  }
-}
-
-function localizedStringArrayToRow(
-  value: Record<string, string[]> | undefined,
-  prefix: string,
-  target: Record<string, string | number | boolean | null>
-) {
-  for (const locale of LOCALES_TUPLE) {
-    const key = `${prefix}_${locale}`;
-    const items = value?.[locale];
-    target[key] = Array.isArray(items) ? items.join("\n") : "";
-  }
-}
-
-function formatArray(value: unknown): string {
-  if (Array.isArray(value)) {
-    return value
-      .map((v) => (typeof v === "object" ? JSON.stringify(v) : String(v)))
-      .join("\n");
-  }
-  return "";
-}
-
-function formatJson(value: unknown): string {
-  return value ? JSON.stringify(value) : "";
 }
 
 async function buildWorkbook() {
