@@ -152,7 +152,6 @@ const clinicConverter: FirestoreDataConverter<ClinicDoc> = {
 
       // 기타
       isExclusive: Boolean(d.isExclusive),
-      isFavorite: Boolean(d.isFavorite),
       rating: typeof d.rating === "number" ? d.rating : 0,
       reviewCount: typeof d.reviewCount === "number" ? d.reviewCount : 0,
       status: (d.status as "visible" | "hidden") ?? "visible",

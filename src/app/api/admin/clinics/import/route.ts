@@ -520,7 +520,6 @@ export async function POST(req: NextRequest) {
             ? { lat: geoLat, lng: geoLng }
             : undefined,
         amenities: ensureArrayOrUndefined(amenities) as ClinicDoc["amenities"],
-        isFavorite: parseBoolean(values.isFavorite),
         rating,
         reviewCount,
         status: status as ClinicDoc["status"],

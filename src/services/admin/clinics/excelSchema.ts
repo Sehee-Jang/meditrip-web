@@ -12,7 +12,6 @@ export const CLINIC_COLUMNS: readonly string[] = [
   "status",
   "displayOrder",
   "isExclusive",
-  "isFavorite",
   "rating",
   "reviewCount",
   "phone",
@@ -39,6 +38,16 @@ export const CLINIC_COLUMNS: readonly string[] = [
   ...LOCALES_TUPLE.map((locale) => `description_${locale}`),
   ...LOCALES_TUPLE.map((locale) => `highlights_${locale}`),
 ];
+
+export const HIDDEN_CLINIC_COLUMNS = new Set<string>([
+  "id",
+  "displayOrder",
+  "rating",
+  "reviewCount",
+
+  "createdAt",
+  "updatedAt",
+]);
 
 export const PACKAGE_COLUMNS: readonly string[] = [
   "clinicId",

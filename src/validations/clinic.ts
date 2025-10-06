@@ -175,8 +175,6 @@ export const clinicFormSchema = z.object({
   // 편의시설(문자열 키 배열)
   amenities: z.array(z.string()).default([]),
 
-  // 기타
-  isFavorite: z.boolean().default(false),
   rating: z.number().default(0),
   reviewCount: z.number().default(0),
   status: z.enum(["visible", "hidden"]).default("visible"),

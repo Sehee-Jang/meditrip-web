@@ -92,8 +92,6 @@ export interface ClinicDoc {
 
   // 편의시설
   amenities?: AmenityKey[];
-
-  isFavorite: boolean; // 기본 false
   rating: number; // 기본 0
   reviewCount: number; // 기본 0
   status: ClinicStatus; // 노출 제어
