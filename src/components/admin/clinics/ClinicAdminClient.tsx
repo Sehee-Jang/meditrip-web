@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { ClinicWithId } from "@/types/clinic";
 import { listClinics } from "@/services/admin/clinics/clinics";
@@ -11,10 +11,9 @@ import {
   VisibilitySelect,
 } from "@/components/admin/common/FilterControls";
 import ClinicFormDialog from "./ClinicFormDialog";
-
 import ClinicTable from "./ClinicTable";
 import IconOnlyAddButton from "../common/IconOnlyAddButton";
-import { RotateCcw, Save, Plus, Download, Loader2, UploadCloud } from "lucide-react";
+import { Plus, Download, Loader2 } from "lucide-react";
 import { auth } from "@/lib/firebase";
 import { toast } from "@/hooks/use-toast";
 
@@ -30,15 +29,15 @@ export default function ClinicAdminClient() {
   const [status, setStatus] = useState<"all" | "visible" | "hidden">("all");
   const [isExporting, setIsExporting] = useState(false);
   const [exportError, setExportError] = useState<string | null>(null);
- const [isImporting, setIsImporting] = useState(false);
- const [importError, setImportError] = useState<string | null>(null);
- const [importValidationErrors, setImportValidationErrors] = useState<
-   ImportRowError[]
- >([]);
- const [importSummaryNote, setImportSummaryNote] = useState<string | null>(
-   null
- );
-  
+  const [isImporting, setIsImporting] = useState(false);
+  const [importError, setImportError] = useState<string | null>(null);
+  const [importValidationErrors, setImportValidationErrors] = useState<
+    ImportRowError[]
+  >([]);
+  const [importSummaryNote, setImportSummaryNote] = useState<string | null>(
+    null
+  );
+
   const { data, refetch, isFetching, error } = useQuery({
     queryKey: ["admin-clinics"],
     queryFn: () => listClinics(100),
@@ -54,17 +53,16 @@ export default function ClinicAdminClient() {
     };
   }, [isExporting]);
 
-    const importIcon = useMemo(() => {
-      if (!isImporting) return UploadCloud;
-      return function SpinnerIcon(props: React.SVGProps<SVGSVGElement>) {
-        const className = props.className
-          ? `${props.className} animate-spin`
-          : "animate-spin";
-        return <Loader2 {...props} className={className} />;
-      };
-    }, [isImporting]);
+  // const importIcon = useMemo(() => {
+  //   if (!isImporting) return UploadCloud;
+  //   return function SpinnerIcon(props: React.SVGProps<SVGSVGElement>) {
+  //     const className = props.className
+  //       ? `${props.className} animate-spin`
+  //       : "animate-spin";
+  //     return <Loader2 {...props} className={className} />;
+  //   };
+  // }, [isImporting]);
 
-  
   const items = useMemo<ClinicWithId[]>(
     () => (data?.items ?? []) as ClinicWithId[],
     [data]
@@ -84,14 +82,9 @@ export default function ClinicAdminClient() {
     });
   }, [items, keyword, status]);
 
-  // 정렬 변경 상태(dirty) + Table 액션 바인딩
-  const [tableDirty, setTableDirty] = useState(false);
-  const actionsRef = React.useRef<{
-    save: () => void;
-    cancel: () => void;
-  } | null>(null);
-  const fileInputRef = React.useRef<HTMLInputElement | null>(null);
-  
+  // 숨겨진 파일 입력 참조
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
   const handleExport = async () => {
     try {
       setExportError(null);
@@ -243,29 +236,8 @@ export default function ClinicAdminClient() {
           </FilterRow>
         </div>
 
-        {/* 오른쪽: 아이콘들(취소/저장/등록) */}
+        {/* 오른쪽: 아이콘들(다운로드/업로드/등록) */}
         <div className='ml-auto flex items-center gap-2 shrink-0'>
-          {tableDirty && (
-            <>
-              <IconOnlyAddButton
-                label='변경 취소'
-                ariaLabel='변경 취소'
-                icon={RotateCcw}
-                variant='outline'
-                onClick={() => actionsRef.current?.cancel()}
-                disableHoverSpin
-              />
-              <IconOnlyAddButton
-                label='변경사항 저장'
-                ariaLabel='변경사항 저장'
-                icon={Save}
-                variant='brand'
-                onClick={() => actionsRef.current?.save()}
-                disableHoverSpin
-              />
-            </>
-          )}
-
           <IconOnlyAddButton
             label='엑셀 다운로드'
             ariaLabel='엑셀 다운로드'
@@ -278,7 +250,7 @@ export default function ClinicAdminClient() {
             disableHoverSpin={isExporting}
           />
 
-          <IconOnlyAddButton
+          {/* <IconOnlyAddButton
             label='엑셀 업로드'
             ariaLabel='엑셀 업로드'
             icon={importIcon}
@@ -288,7 +260,7 @@ export default function ClinicAdminClient() {
             }}
             disabled={isImporting}
             disableHoverSpin={isImporting}
-          />
+          /> */}
 
           <IconOnlyAddButton
             label='병원 추가'
@@ -335,7 +307,7 @@ export default function ClinicAdminClient() {
           </ul>
         </div>
       )}
-      
+
       {error && (
         <div className='rounded-md border border-red-200 bg-red-50 px-3 py-2 text-[12px] text-red-700'>
           불러오기 실패: {(error as Error).message}
@@ -347,10 +319,6 @@ export default function ClinicAdminClient() {
         totalCount={items.length}
         onChanged={refetch}
         loading={isFetching}
-        onDirtyChange={setTableDirty}
-        onBindActions={(a) => {
-          actionsRef.current = a;
-        }}
       />
 
       <ClinicFormDialog

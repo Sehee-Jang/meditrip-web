@@ -22,6 +22,8 @@ interface AdminDataTableProps<T> {
   className?: string;
   // 카운트 라벨을 커스터마이즈하고 싶으면 주입
   countLabel?: (itemsCount: number, totalCount: number) => React.ReactNode;
+  // 카운트 왼쪽에 추가 액션 영역이 필요할 때
+  countPrefix?: React.ReactNode;
 }
 
 export default function AdminDataTable<T>({
@@ -35,6 +37,7 @@ export default function AdminDataTable<T>({
   emptyMessage = "데이터가 없습니다.",
   className,
   countLabel,
+  countPrefix,
 }: AdminDataTableProps<T>) {
   const defaultCount =
     items.length === totalCount
@@ -48,10 +51,15 @@ export default function AdminDataTable<T>({
       }`}
     >
       {/* 상단 헤더 */}
-      <div className='flex items-center justify-between border-b bg-muted px-4 py-3'>
+      <div className='flex items-center justify-between border-b bg-muted px-4 py-3 gap-3'>
         <div className='font-medium'>{title}</div>
-        <div className='text-sm text-muted-foreground'>
-          {countLabel ? countLabel(items.length, totalCount) : defaultCount}
+        <div className='flex items-center gap-2'>
+          {countPrefix ? (
+            <div className='flex items-center gap-2'>{countPrefix}</div>
+          ) : null}
+          <div className='text-sm text-muted-foreground'>
+            {countLabel ? countLabel(items.length, totalCount) : defaultCount}
+          </div>
         </div>
       </div>
 

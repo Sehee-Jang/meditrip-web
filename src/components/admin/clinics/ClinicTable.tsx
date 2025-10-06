@@ -9,6 +9,8 @@ import ClinicFormDialog from "./ClinicFormDialog";
 import PackagesPanel from "./PackagesPanel";
 import ClinicTableRow from "./ClinicTableRow";
 import { updateClinicOrders } from "@/services/admin/clinics/clinics";
+import IconOnlyAddButton from "@/components/admin/common/IconOnlyAddButton";
+import { RotateCcw, Save } from "lucide-react";
 
 interface Props {
   /** 필터 적용된 결과 */
@@ -23,8 +25,6 @@ interface Props {
   title?: string;
   // 상위에 dirty 상태 통지
   onDirtyChange?: (dirty: boolean) => void;
-  // 상위에 저장/취소 액션 바인딩
-  onBindActions?: (actions: { save: () => void; cancel: () => void }) => void;
 }
 
 export default function ClinicTable({
@@ -34,7 +34,6 @@ export default function ClinicTable({
   loading = false,
   title = "병원 목록",
   onDirtyChange,
-  onBindActions,
 }: Props) {
   const [editId, setEditId] = useState<string | null>(null);
   const [pkgClinicId, setPkgClinicId] = useState<string | null>(null);
@@ -107,11 +106,6 @@ export default function ClinicTable({
     setDirty(false);
   }, [items]);
 
-  // 부모에 액션 바인딩
-  useEffect(() => {
-    onBindActions?.({ save: saveOrder, cancel: cancelChanges });
-  }, [onBindActions, saveOrder, cancelChanges]);
-
   // 테이블 리마운트 키(순서 변경 시 강제 재렌더)
   const tableKey = React.useMemo(() => rows.map((r) => r.id).join("|"), [rows]);
 
@@ -146,6 +140,30 @@ export default function ClinicTable({
               총 {total.toLocaleString()}건{dirty ? " (변경됨)" : ""}
             </>
           )}
+          countPrefix={
+            dirty ? (
+              <>
+                <IconOnlyAddButton
+                  label='변경 취소'
+                  ariaLabel='변경 취소'
+                  icon={RotateCcw}
+                  variant='outline'
+                  onClick={cancelChanges}
+                  disableHoverSpin
+                  disabled={saving || loading}
+                />
+                <IconOnlyAddButton
+                  label='변경사항 저장'
+                  ariaLabel='변경사항 저장'
+                  icon={Save}
+                  variant='brand'
+                  onClick={() => void saveOrder()}
+                  disableHoverSpin
+                  disabled={saving || loading}
+                />
+              </>
+            ) : null
+          }
           getRowKey={(c) => c.id}
           renderRow={(c) => {
             const idx = rows.findIndex((x) => x.id === c.id);
