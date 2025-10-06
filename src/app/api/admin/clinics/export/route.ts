@@ -5,6 +5,7 @@ import type { ClinicDoc, PackageDoc } from "@/types/clinic";
 import type { Timestamp as AdminTimestamp } from "firebase-admin/firestore";
 import {
   CLINIC_COLUMNS,
+  HIDDEN_CLINIC_COLUMNS,
   PACKAGE_COLUMNS,
   formatArray,
   formatJson,
@@ -43,7 +44,6 @@ async function buildWorkbook() {
       status: (data.status as string) ?? "",
       displayOrder: (data.displayOrder as number | undefined) ?? null,
       isExclusive: Boolean(data.isExclusive),
-      isFavorite: Boolean(data.isFavorite),
       rating: (data.rating as number | undefined) ?? 0,
       reviewCount: (data.reviewCount as number | undefined) ?? 0,
       phone: typeof data.phone === "string" ? data.phone : "",
@@ -184,6 +184,12 @@ async function buildWorkbook() {
   workbook.creator = "MediTrip";
   const clinicsSheet = workbook.addWorksheet("Clinics");
   clinicsSheet.columns = CLINIC_COLUMNS.map((key) => ({ header: key, key }));
+  for (const columnKey of HIDDEN_CLINIC_COLUMNS) {
+    const column = clinicsSheet.getColumn(columnKey);
+    if (column) {
+      column.hidden = true;
+    }
+  }
   clinicsSheet.addRows(clinicRows);
 
   const packagesSheet = workbook.addWorksheet("Packages");
