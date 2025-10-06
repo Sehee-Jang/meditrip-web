@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import ExcelJS from "exceljs";
 import { adminDb, getFirebaseUserFromRequest } from "@/lib/firebaseAdmin";
 import type { ClinicDoc, PackageDoc } from "@/types/clinic";
-import type { Timestamp as AdminTimestamp } from "firebase-admin/firestore";
 import {
   CLINIC_COLUMNS,
   HIDDEN_CLINIC_COLUMNS,
@@ -17,17 +16,6 @@ import { LocalizedRichTextDoc, LocalizedTextDoc } from "@/types/common";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-
-type FirestoreTimestamp = AdminTimestamp | Date | null | undefined;
-
-function timestampToIso(ts: FirestoreTimestamp): string {
-  if (!ts) return "";
-  if (ts instanceof Date) return ts.toISOString();
-  if (typeof (ts as AdminTimestamp).toDate === "function") {
-    return (ts as AdminTimestamp).toDate().toISOString();
-  }
-  return "";
-}
 
 async function buildWorkbook() {
   const db = adminDb();
@@ -68,8 +56,6 @@ async function buildWorkbook() {
           : null,
       weeklyHoursJson: formatJson(data.weeklyHours),
       doctorsJson: formatJson(data.doctors),
-      createdAt: timestampToIso((data.createdAt as FirestoreTimestamp) ?? null),
-      updatedAt: timestampToIso((data.updatedAt as FirestoreTimestamp) ?? null),
     };
 
     localizedToRow(
@@ -134,12 +120,6 @@ async function buildWorkbook() {
             ? ((data.name as Record<string, string>).ko as string)
             : "",
         packageId: pkgDoc.id,
-        createdAt: timestampToIso(
-          (pkg.createdAt as FirestoreTimestamp) ?? null
-        ),
-        updatedAt: timestampToIso(
-          (pkg.updatedAt as FirestoreTimestamp) ?? null
-        ),
         price_ko:
           typeof (pkg.price as { ko?: number } | undefined)?.ko === "number"
             ? (pkg.price as { ko?: number }).ko!

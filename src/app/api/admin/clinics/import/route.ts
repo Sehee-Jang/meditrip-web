@@ -31,8 +31,6 @@ interface RowError {
 interface ClinicRowPayload {
   id?: string;
   data: Partial<ClinicDoc>;
-  createdAt?: Date;
-  updatedAt?: Date;
   rowNumber: number;
 }
 
@@ -40,8 +38,6 @@ interface PackageRowPayload {
   clinicId: string;
   packageId?: string;
   data: Partial<PackageDoc>;
-  createdAt?: Date;
-  updatedAt?: Date;
   rowNumber: number;
 }
 
@@ -95,20 +91,6 @@ function parseRequiredNumber(
     return undefined;
   }
   return num;
-}
-
-function parseDate(
-  raw: string,
-  label: string,
-  errors: string[]
-): Date | undefined {
-  if (!raw) return undefined;
-  const date = new Date(raw);
-  if (Number.isNaN(date.getTime())) {
-    errors.push(`${label} 값이 올바른 ISO 날짜 형식이 아닙니다.`);
-    return undefined;
-  }
-  return date;
 }
 
 function safeParseJson<T>(
@@ -474,9 +456,6 @@ export async function POST(req: NextRequest) {
       const description = buildLocalizedRichText(values, "description", errors);
       const highlights = buildLocalizedRichText(values, "highlights", errors);
 
-      const createdAt = parseDate(values.createdAt, "createdAt", errors);
-      const updatedAt = parseDate(values.updatedAt, "updatedAt", errors);
-
       if (errors.length > 0) {
         rowErrors.push({ sheet: "Clinics", row: rowNumber, errors });
         return;
@@ -529,8 +508,6 @@ export async function POST(req: NextRequest) {
       clinicRows.push({
         id,
         data: sanitize(clinicData),
-        createdAt,
-        updatedAt,
         rowNumber,
       });
     });
@@ -577,9 +554,6 @@ export async function POST(req: NextRequest) {
       );
       const precautions = buildOptionalLocalizedText(values, "precautions");
 
-      const createdAt = parseDate(values.createdAt, "createdAt", errors);
-      const updatedAt = parseDate(values.updatedAt, "updatedAt", errors);
-
       if (errors.length > 0 || !clinicId) {
         rowErrors.push({ sheet: "Packages", row: rowNumber, errors });
         return;
@@ -599,8 +573,6 @@ export async function POST(req: NextRequest) {
         clinicId,
         packageId: values.packageId?.trim() || undefined,
         data: sanitize(packageData),
-        createdAt,
-        updatedAt,
         rowNumber,
       });
     });
@@ -620,20 +592,24 @@ export async function POST(req: NextRequest) {
         ? clinicsCollection.doc(clinic.id)
         : clinicsCollection.doc();
       let exists = false;
+      let existingCreatedAt: unknown;
       if (clinic.id) {
         const snap = await docRef.get();
         exists = snap.exists;
+         if (exists) {
+           existingCreatedAt = snap.get("createdAt");
+         }
       }
       const isCreate = !clinic.id || !exists;
 
       const payload: Record<string, unknown> = {
         ...clinic.data,
-        updatedAt: clinic.updatedAt ?? FieldValue.serverTimestamp(),
+        updatedAt: FieldValue.serverTimestamp(),
       };
       if (isCreate) {
-        payload.createdAt = clinic.createdAt ?? FieldValue.serverTimestamp();
-      } else if (clinic.createdAt) {
-        payload.createdAt = clinic.createdAt;
+        payload.createdAt = FieldValue.serverTimestamp();
+      } else if (existingCreatedAt !== undefined) {
+        payload.createdAt = existingCreatedAt;
       }
 
       await docRef.set(sanitize(payload), { merge: false });
@@ -682,20 +658,24 @@ export async function POST(req: NextRequest) {
           ? packagesCollection.doc(row.packageId)
           : packagesCollection.doc();
         let exists = false;
+        let existingCreatedAt: unknown;
         if (row.packageId) {
           const snap = await docRef.get();
           exists = snap.exists;
+          if (exists) {
+            existingCreatedAt = snap.get("createdAt");
+          }
         }
         const isCreate = !row.packageId || !exists;
 
         const payload: Record<string, unknown> = {
           ...row.data,
-          updatedAt: row.updatedAt ?? FieldValue.serverTimestamp(),
+          updatedAt: FieldValue.serverTimestamp(),
         };
         if (isCreate) {
-          payload.createdAt = row.createdAt ?? FieldValue.serverTimestamp();
-        } else if (row.createdAt) {
-          payload.createdAt = row.createdAt;
+          payload.createdAt = FieldValue.serverTimestamp();
+        } else if (existingCreatedAt !== undefined) {
+          payload.createdAt = existingCreatedAt;
         }
 
         await docRef.set(sanitize(payload), { merge: false });

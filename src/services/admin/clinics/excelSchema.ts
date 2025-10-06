@@ -26,8 +26,6 @@ export const CLINIC_COLUMNS: readonly string[] = [
   "geo_lng",
   "weeklyHoursJson",
   "doctorsJson",
-  "createdAt",
-  "updatedAt",
   ...LOCALES_TUPLE.map((locale) => `name_${locale}`),
   ...LOCALES_TUPLE.map((locale) => `address_${locale}`),
   ...LOCALES_TUPLE.map((locale) => `introTitle_${locale}`),
@@ -44,17 +42,12 @@ export const HIDDEN_CLINIC_COLUMNS = new Set<string>([
   "displayOrder",
   "rating",
   "reviewCount",
-
-  "createdAt",
-  "updatedAt",
 ]);
 
 export const PACKAGE_COLUMNS: readonly string[] = [
   "clinicId",
   "clinicName_ko",
   "packageId",
-  "createdAt",
-  "updatedAt",
   ...LOCALES_TUPLE.map((locale) => `title_${locale}`),
   ...LOCALES_TUPLE.map((locale) => `subtitle_${locale}`),
   "price_ko",
