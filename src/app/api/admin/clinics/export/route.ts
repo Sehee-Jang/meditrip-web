@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import ExcelJS from "exceljs";
 import { adminDb, getFirebaseUserFromRequest } from "@/lib/firebaseAdmin";
 import type { ClinicDoc, PackageDoc } from "@/types/clinic";
+import type { LocalizedTagLabel } from "@/types/tag";
 import {
   CLINIC_COLUMNS,
   HIDDEN_CLINIC_COLUMNS,
@@ -21,6 +22,14 @@ async function buildWorkbook() {
   const db = adminDb();
   const clinicsSnap = await db.collection("clinics").get();
 
+  const tagsSnap = await db.collection("tags").get();
+  const tagLabelMap = new Map<string, string>();
+  for (const doc of tagsSnap.docs) {
+    const data = doc.data() as { labels?: LocalizedTagLabel };
+    const koLabel = data.labels?.ko?.trim();
+    tagLabelMap.set(doc.id, koLabel && koLabel.length > 0 ? koLabel : doc.id);
+  }
+
   const clinicRows: Record<string, string | number | boolean | null>[] = [];
   const packageRows: Record<string, string | number | boolean | null>[] = [];
 
@@ -39,7 +48,9 @@ async function buildWorkbook() {
       categoryKeys: Array.isArray(data.categoryKeys)
         ? data.categoryKeys.join(", ")
         : "",
-      tagSlugs: Array.isArray(data.tagSlugs) ? data.tagSlugs.join(", ") : "",
+      tagSlugs: Array.isArray(data.tagSlugs)
+        ? data.tagSlugs.map((slug) => tagLabelMap.get(slug) ?? slug).join(", ")
+        : "",
       amenities: Array.isArray(data.amenities) ? data.amenities.join(", ") : "",
       weeklyClosedDays: Array.isArray(data.weeklyClosedDays)
         ? data.weeklyClosedDays.join(", ")
