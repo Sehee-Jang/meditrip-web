@@ -1,6 +1,6 @@
 {
   "title": "My Page",
-  "greeting": "{name}さん、こんにちは！ 👋",
+  "greeting": "{name}さん、こんにちは！",
   "avatar": {
     "alt": "プロフィール画像",
     "change": "プロフィールを変更",
@@ -34,7 +34,7 @@
     "logLoading": "読み込み中..."
   },
   "mypage": {
-    "title": "お気に入りの病院"
+    "title": "お気に入りのプログラム"
   },
   "questions": {
     "title": "私が作成した質問",

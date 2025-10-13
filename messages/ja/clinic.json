@@ -1,7 +1,7 @@
 {
   "section": {
-    "title": "K-ウェルネスって？",
-    "desc": "",
+    "title": "ウェルネスプログラム",
+    "desc": "さまざまなウェルネスプログラムをご覧ください。",
     "button": "もっと見る"
   },
   "page": {
@@ -11,18 +11,17 @@
     "exclusiveLabel": "単独入店"
   },
   "clinicList": {
-    "emptyMessage": "登録されたクリニックがありません。",
+    "emptyMessage": "登録されたプログラムがありません。",
     "viewDetails": "詳細を見る",
     "searchPlaceholder": "ウェルネスプログラムを検索",
-    "searchHelper": "興味のあるウェルネスプログラムを探してみましょう。",
-    "loading": "Loading...",
-    "recommendedTitle": "おすすめの病院",
-    "resultCount": "{count} 件の病院",
-    "emptyFilteredTitle": "選択された条件に合う病院はまだありません。",
+    "searchHelper": "気になるウェルネスプログラムを探してみましょう。",
+    "loading": "読み込み中...",
+    "recommendedTitle": "おすすめのプログラム",
+    "resultCount": "{count}件のプログラム",
+    "emptyFilteredTitle": "選択された条件に合うプログラムはまだありません。",
     "emptyFilteredHelper": "ほかのカテゴリを見るか、全体一覧をご確認ください。",
     "resetButton": "すべて見る"
   },
-
   "book": {
     "bookButton": "予約",
     "shareButton": "共有",
