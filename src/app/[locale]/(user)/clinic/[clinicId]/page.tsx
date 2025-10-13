@@ -328,7 +328,7 @@ export default async function ClinicDetailPage({
           {/* 주소 */}
           <div className='mt-2 flex items-center gap-2 text-base text-primary/90'>
             <MapPin size={16} />
-            <span className='truncate'>{address}</span>
+            <span>{address}</span>
           </div>
 
           {/* 별점 */}

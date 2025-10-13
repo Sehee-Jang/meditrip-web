@@ -41,7 +41,7 @@ export default function IntroSubtitle({
           aria-expanded={expanded}
           aria-label={expanded ? "설명 접기" : "설명 펼치기"}
           className='mt-0.5 inline-flex h-7 w-7 shrink-0 items-center justify-center
-                     rounded-full border border-border bg-card hover:bg-accent
+                     hover:rounded-full hover:border hover:bg-accent
                      focus:outline-none focus-visible:ring-2'
         >
           <ChevronDown
