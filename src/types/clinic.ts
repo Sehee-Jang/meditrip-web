@@ -41,6 +41,10 @@ export interface Doctor {
 }
 
 /** ===== 패키지 ===== */
+export interface TreatmentProcessStep {
+  title: LocalizedTextDoc; // 예: "예약 상담"
+}
+
 export interface TreatmentStep {
   title: LocalizedTextDoc; // 예: "검사 및 검진"
   description: LocalizedTextDoc; // 예: 상세 설명
@@ -53,6 +57,7 @@ export interface PackageInfo {
   price: LocalizedNumber;
   duration: LocalizedNumber;
   packageImages?: string[];
+  treatmentProcess?: TreatmentProcessStep[];
   treatmentDetails?: TreatmentStep[]; // 진료 상세 설명 (텍스트 + 이미지 포함)
   precautions?: LocalizedTextDoc; // 주의사항 텍스트
 }

@@ -114,3 +114,7 @@ export const treatmentStepSchema = z.object({
   description: localizedStringDynamicSchema, // 단계 설명: 선택
   imageUrl: z.string().url().optional(),
 });
+
+export const treatmentProcessStepSchema = z.object({
+  title: localizedRequiredDynamicSchema,
+});

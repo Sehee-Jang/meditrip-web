@@ -56,6 +56,7 @@ export default function PackageFormDialog({
           price: pkg.price,
           duration: pkg.duration,
           packageImages: pkg.packageImages ?? [],
+          treatmentProcess: pkg.treatmentProcess ?? [],
           treatmentDetails: pkg.treatmentDetails ?? [],
           precautions: pkg.precautions,
         }
@@ -65,6 +66,7 @@ export default function PackageFormDialog({
           price: { ko: 0, ja: 0 },
           duration: { ko: 0, ja: 0 },
           packageImages: [],
+          treatmentProcess: [],
           treatmentDetails: [],
           precautions: undefined,
         },
@@ -83,10 +85,25 @@ export default function PackageFormDialog({
     clearErrors,
   } = form;
 
-  const { fields, append, remove, move } = useFieldArray({
-    control,
-    name: "treatmentDetails",
-  });
+const {
+  fields: processFields,
+  append: appendProcess,
+  remove: removeProcess,
+  move: moveProcess,
+} = useFieldArray({
+  control,
+  name: "treatmentProcess",
+});
+
+const {
+  fields: detailFields,
+  append: appendDetail,
+  remove: removeDetail,
+  move: moveDetail,
+} = useFieldArray({
+  control,
+  name: "treatmentDetails",
+});
 
   useEffect(() => {
     reset(
@@ -97,6 +114,7 @@ export default function PackageFormDialog({
             price: pkg.price,
             duration: pkg.duration,
             packageImages: pkg.packageImages ?? [],
+            treatmentProcess: pkg.treatmentProcess ?? [],
             treatmentDetails: pkg.treatmentDetails ?? [],
             precautions: pkg.precautions,
           }
@@ -106,6 +124,7 @@ export default function PackageFormDialog({
             price: { ko: 0, ja: 0 },
             duration: { ko: 0, ja: 0 },
             packageImages: [],
+            treatmentProcess: [],
             treatmentDetails: [],
             precautions: undefined,
           }
@@ -270,7 +289,84 @@ export default function PackageFormDialog({
           />
         </SectionCard>
 
-        {/* 단계 편집 */}
+        {/* 진행 단계 */}
+        <SectionCard
+          title='진행 단계'
+          description='사용자 페이지 진행순서 영역에 Step 01, Step 02 등으로 노출됩니다.'
+        >
+          <div className='px-5 py-4'>
+            <div className='flex justify-end'>
+              <Button
+                type='button'
+                variant='outline'
+                onClick={() =>
+                  appendProcess({
+                    title: { ko: "", ja: "" },
+                  })
+                }
+              >
+                단계 추가
+              </Button>
+            </div>
+
+            <div className='mt-3 space-y-4'>
+              {processFields.map((f, i) => (
+                <div key={f.id} className='rounded-xl border p-4'>
+                  <div className='mb-3 flex items-center justify-between'>
+                    <div className='text-[12px] font-semibold text-muted-foreground'>
+                      Step {String(i + 1).padStart(2, "0")}
+                    </div>
+                    <div className='flex gap-2'>
+                      <Button
+                        type='button'
+                        variant='secondary'
+                        onClick={() => i > 0 && moveProcess(i, i - 1)}
+                      >
+                        ↑
+                      </Button>
+                      <Button
+                        type='button'
+                        variant='secondary'
+                        onClick={() =>
+                          i < processFields.length - 1 && moveProcess(i, i + 1)
+                        }
+                      >
+                        ↓
+                      </Button>
+                      <Button
+                        type='button'
+                        variant='destructive'
+                        onClick={() => removeProcess(i)}
+                      >
+                        제거
+                      </Button>
+                    </div>
+                  </div>
+
+                  <FormRow
+                    label='제목'
+                    control={
+                      <LocalizedTabsField
+                        register={register}
+                        basePath={`treatmentProcess.${i}.title`}
+                        locales={LOCALES_TUPLE}
+                        placeholder='진행 단계 제목'
+                        errors={formState.errors}
+                      />
+                    }
+                  />
+                </div>
+              ))}
+              {processFields.length === 0 && (
+                <div className='rounded-lg border border-dashed p-6 text-center text-[12px] text-muted-foreground'>
+                  아직 단계가 없습니다. ‘단계 추가’를 눌러 시작하세요.
+                </div>
+              )}
+            </div>
+          </div>
+        </SectionCard>
+
+        {/* 상세 단계 */}
         <SectionCard
           title='진료 상세 단계'
           description='각 단계의 제목/설명/이미지(선택)를 입력하세요.'
@@ -281,7 +377,7 @@ export default function PackageFormDialog({
                 type='button'
                 variant='outline'
                 onClick={() =>
-                  append({
+                  appendDetail({
                     title: { ko: "", ja: "" },
                     description: { ko: "", ja: "" },
                     imageUrl: undefined,
@@ -293,7 +389,7 @@ export default function PackageFormDialog({
             </div>
 
             <div className='mt-3 space-y-4'>
-              {fields.map((f, i) => (
+              {detailFields.map((f, i) => (
                 <div key={f.id} className='rounded-xl border p-4'>
                   <div className='mb-3 flex items-center justify-between'>
                     <div className='text-[12px] font-semibold text-muted-foreground'>
@@ -303,21 +399,21 @@ export default function PackageFormDialog({
                       <Button
                         type='button'
                         variant='secondary'
-                        onClick={() => i > 0 && move(i, i - 1)}
+                        onClick={() => i > 0 && moveDetail(i, i - 1)}
                       >
                         ↑
                       </Button>
                       <Button
                         type='button'
                         variant='secondary'
-                        onClick={() => i < fields.length - 1 && move(i, i + 1)}
+                        onClick={() => i < detailFields.length - 1 && moveDetail(i, i + 1)}
                       >
                         ↓
                       </Button>
                       <Button
                         type='button'
                         variant='destructive'
-                        onClick={() => remove(i)}
+                        onClick={() => removeDetail(i)}
                       >
                         제거
                       </Button>
@@ -374,7 +470,7 @@ export default function PackageFormDialog({
                   </div>
                 </div>
               ))}
-              {fields.length === 0 && (
+              {detailFields.length === 0 && (
                 <div className='rounded-lg border border-dashed p-6 text-center text-[12px] text-muted-foreground'>
                   아직 단계가 없습니다. ‘단계 추가’를 눌러 시작하세요.
                 </div>

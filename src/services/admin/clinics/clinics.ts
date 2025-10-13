@@ -173,6 +173,9 @@ const packageConverter: FirestoreDataConverter<PackageDoc> = {
       packageImages: Array.isArray(d.packageImages)
         ? (d.packageImages as string[])
         : [],
+      treatmentProcess: Array.isArray(d.treatmentProcess)
+        ? (d.treatmentProcess as PackageDoc["treatmentProcess"])
+        : undefined,
       treatmentDetails: Array.isArray(d.treatmentDetails)
         ? (d.treatmentDetails as PackageDoc["treatmentDetails"])
         : undefined,

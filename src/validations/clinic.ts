@@ -5,6 +5,7 @@ import {
   localizedStringDynamicSchema,
   localizedStringArrayDynamicSchema,
   treatmentStepSchema,
+  treatmentProcessStepSchema,
 } from "./common";
 import {
   LOCALES_TUPLE,
@@ -199,6 +200,7 @@ export const packageFormSchema = z.object({
   duration: localizedNumberKoJaRequiredSchema,
 
   packageImages: z.array(z.string().url()).min(1, "이미지 1장 이상"),
+  treatmentProcess: z.array(treatmentProcessStepSchema).default([]),
   treatmentDetails: z.array(treatmentStepSchema).default([]),
 });
 export type PackageFormValues = z.infer<typeof packageFormSchema>;

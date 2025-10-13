@@ -56,6 +56,7 @@ export const PACKAGE_COLUMNS: readonly string[] = [
   "duration_ko",
   "duration_ja",
   "packageImages",
+  "treatmentProcessJson",
   "treatmentDetailsJson",
   ...LOCALES_TUPLE.map((locale) => `precautions_${locale}`),
 ];

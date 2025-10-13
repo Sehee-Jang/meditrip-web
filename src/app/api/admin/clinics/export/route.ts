@@ -148,6 +148,7 @@ async function buildWorkbook() {
             ? (pkg.duration as { ja?: number }).ja!
             : null,
         packageImages: formatArray(pkg.packageImages),
+        treatmentProcessJson: formatJson(pkg.treatmentProcess),
         treatmentDetailsJson: formatJson(pkg.treatmentDetails),
       };
 
