@@ -141,8 +141,8 @@ export default function ClinicAdminClient() {
           />
 
           <IconOnlyAddButton
-            label='병원 추가'
-            ariaLabel='병원 추가'
+            label='업체 추가'
+            ariaLabel='업체 추가'
             icon={Plus}
             variant='brand'
             onClick={() => setOpen(true)}

@@ -40,7 +40,7 @@ const MENU: ReadonlyArray<MenuItem> = [
   { href: "articles", label: "아티클 관리", icon: Newspaper },
   { href: "shorts", label: "쇼츠 관리", icon: Youtube },
   { href: "community", label: "1:1 상담 관리", icon: MessageCircleMore },
-  { href: "clinics", label: "병원 관리", icon: Hospital },
+  { href: "clinics", label: "업체 관리", icon: Hospital },
   { href: "event", label: "이벤트 관리", icon: CalendarCheck },
 ];
 

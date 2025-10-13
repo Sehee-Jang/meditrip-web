@@ -93,7 +93,7 @@ export default function EventSettingForm({ onEventSaved }: Props) {
           <SelectContent>
             <SelectItem value='community_post'>커뮤니티 글 작성 시</SelectItem>
             <SelectItem value='community_comment'>댓글 작성 시</SelectItem>
-            <SelectItem value='clinic_review'>병원 리뷰 작성 시</SelectItem>
+            <SelectItem value='clinic_review'>업체 리뷰 작성 시</SelectItem>
             <SelectItem value='login_daily'>매일 로그인 시</SelectItem>
             <SelectItem value='consultation_request'>
               진료 예약 신청 시

@@ -114,7 +114,7 @@ export default function ReservationForm({
         </select>
       </div>
 
-      <CommonInput label='병원명' value={clinicName} disabled />
+      <CommonInput label='업체명' value={clinicName} disabled />
       <CommonInput label='진료 패키지' value={packageName} disabled />
       <CommonInput
         label='예약 날짜'

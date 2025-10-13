@@ -173,11 +173,11 @@ export default function ClinicListClient() {
                 </div>
               </div>
 
-              {/* 대체: 추천 병원 */}
+              {/* 대체: 추천 업체 */}
               {recommended.length > 0 ? (
                 <section className='mx-auto max-w-6xl px-1 sm:px-2'>
                   <h2 className='text-base font-semibold mb-3 text-center md:text-left'>
-                    {t("clinicList.recommendedTitle", { default: "추천 병원" })}
+                    {t("clinicList.recommendedTitle", { default: "추천 프로그램" })}
                   </h2>
                   <ClinicList clinics={recommended} />
                 </section>

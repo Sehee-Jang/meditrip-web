@@ -22,7 +22,7 @@ export default async function PackageDetailPage({ params }: Props) {
   const { locale, clinicId, packageId } = await params;
   const t = await getTranslations("package-detail");
 
-  // 병원 상세(서브컬렉션 우선 + 레거시 fallback)
+  // 업체 상세(서브컬렉션 우선 + 레거시 fallback)
   const clinic: ClinicDetail | null = await getClinicById(clinicId);
   if (!clinic) return notFound();
 

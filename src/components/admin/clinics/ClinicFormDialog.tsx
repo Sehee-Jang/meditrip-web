@@ -409,7 +409,7 @@ export default function ClinicFormDialog({
     <FormSheet
       open={open}
       onOpenChange={onOpenChange}
-      title={mode === "create" ? "병원 등록" : "병원 수정"}
+      title={mode === "create" ? "업체 등록" : "업체 수정"}
       description='필수 정보를 입력하세요.'
       formId={formId}
       submitLabel={mode === "create" ? "등록" : "수정"}
@@ -430,14 +430,14 @@ export default function ClinicFormDialog({
             >
               <SectionCard title='기본 정보'>
                 <FormRow
-                  label='병원명'
+                  label='업체명'
                   control={
                     <LocalizedTabsField
                       register={register}
                       basePath='name'
                       locales={LOCALES_TUPLE}
                       errors={formState.errors}
-                      placeholder='병원명을 입력하세요.'
+                      placeholder='업체명을 입력하세요.'
                       mode='input'
                     />
                   }
@@ -579,13 +579,13 @@ export default function ClinicFormDialog({
               </SectionCard>
             </section>
 
-            {/* ===== 병원 소개 ===== */}
+            {/* ===== 업체 소개 ===== */}
             <section
               id='sec-intro'
               data-section='sec-intro'
               className='scroll-mt-24'
             >
-              <SectionCard title='병원 소개 (선택)'>
+              <SectionCard title='업체 소개 (선택)'>
                 <div className='px-5 py-4 space-y-2'>
                   <div className='text-xs text-muted-foreground'>
                     설명(Description)
@@ -594,7 +594,7 @@ export default function ClinicFormDialog({
                     control={control}
                     basePath='description'
                     locales={LOCALES_TUPLE}
-                    placeholder='병원 소개/설명을 입력하세요.'
+                    placeholder='업체 소개/설명을 입력하세요.'
                     minHeight={100}
                     onUploadImage={uploadClinicRichImage}
                   />

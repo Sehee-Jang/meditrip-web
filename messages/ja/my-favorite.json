@@ -1,6 +1,6 @@
 {
-  "title": "お気に入りの病院",
-  "empty": "お気に入りの病院がありません。",
+  "title": "お気に入りのプログラム",
+  "empty": "お気に入りのプログラムがありません。",
   "loading": "読み込み中です...",
   "aria": {
     "favorite": "お気に入りに追加",
@@ -8,12 +8,12 @@
   },
   "dialog": {
     "title": "お気に入りの解除",
-    "description": "この病院のお気に入りを解除しますか？",
+    "description": "このプログラムのお気に入りを解除しますか？",
     "cancel": "キャンセル",
     "confirm": "解除"
   },
   "toast": {
     "favoriteSuccess": "お気に入りに追加しました！",
-    "favoriteDescription": "マイページ > お気に入りの病院から確認できます。"
+    "favoriteDescription": "マイページ > お気に入りのプログラムから確認できます。"
   }
 }

@@ -85,7 +85,7 @@ export default function Header() {
           <MessageCircleIcon size={20} />
         </Link> */}
 
-        {/* 병원 */}
+        {/* 업체 */}
         <Link href='/clinic' aria-label='clinic'>
           <HospitalIcon size={20} />
         </Link>

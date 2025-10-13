@@ -62,7 +62,7 @@ export default function ClinicSection() {
           </Link>
         </div>
 
-        {/* 병원 리스트 */}
+        {/* 업체 리스트 */}
         {loading ? (
           <div className='min-h-[16rem] grid place-items-center text-muted-foreground'>
             {t("clinicList.loading")}

@@ -60,7 +60,7 @@ export default function PageHeader({
         <div className='w-6' />
 
         <div className='text-center flex-1'>
-          {/* 가운데 병원명 */}
+          {/* 가운데 업체명 */}
           <h1 className='md:text-4xl font-bold mb-2'>{desktopTitle}</h1>
 
           {/* 설명 */}

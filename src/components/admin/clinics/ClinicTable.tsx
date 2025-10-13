@@ -32,7 +32,7 @@ export default function ClinicTable({
   totalCount,
   onChanged,
   loading = false,
-  title = "병원 목록",
+  title = "업체 목록",
   onDirtyChange,
 }: Props) {
   const [editId, setEditId] = useState<string | null>(null);
@@ -185,7 +185,7 @@ export default function ClinicTable({
               />
             );
           }}
-          emptyMessage='등록된 병원이 없습니다.'
+          emptyMessage='등록된 업체가 없습니다.'
         />
       </div>
 

@@ -26,7 +26,7 @@ export default function ReservationTable({
     { header: "예약번호", widthClass: "w-[12%]" },
     { header: "환자명", widthClass: "w-[12%]" },
     { header: "국적", widthClass: "w-[8%]", align: "center" },
-    { header: "병원명" }, // 가변
+    { header: "업체명" }, // 가변
     { header: "예약내용", widthClass: "w-[18%]" },
     { header: "상태", widthClass: "w-[10%]", align: "center" },
     { header: "예약일시", widthClass: "w-[18%]", align: "center" },

@@ -15,7 +15,7 @@ export default async function HospitalPage() {
         center
       />
 
-      {/* 병원 카드 목록 */}
+      {/* 업체 카드 목록 */}
       <ClinicListClient />
     </main>
   );

@@ -643,7 +643,7 @@ export async function POST(req: NextRequest) {
               sheet: "Packages",
               row: row.rowNumber,
               errors: [
-                "clinicId에 해당하는 병원을 찾을 수 없어 패키지를 건너뛰었습니다.",
+                "clinicId에 해당하는 업체룰 찾을 수 없어 패키지를 건너뛰었습니다.",
               ],
             });
           }

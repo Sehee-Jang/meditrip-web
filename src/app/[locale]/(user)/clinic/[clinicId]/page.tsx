@@ -191,7 +191,7 @@ export default async function ClinicDetailPage({
   const t = await getTranslations("clinic-detail");
   const tAmenity = await getTranslations("amenities");
 
-  // 병원 기본 문서 즉시 조회
+  // 업체 기본 문서 즉시 조회
   const clinic = await getClinicBaseById(clinicId);
   if (!clinic) return notFound();
 
@@ -310,7 +310,7 @@ export default async function ClinicDetailPage({
 
         {/* 타이틀 + 위치 + 별점 + 태그 */}
         <div className='px-4 pt-4'>
-          {/* 병원명 */}
+          {/* 업체명 */}
           <h1 className='text-2xl font-semibold'>{name}</h1>
 
           {/* intro.title */}
@@ -885,7 +885,6 @@ export default async function ClinicDetailPage({
     </main>
   );
 }
-
 
 async function ClinicPackagesSection({
   locale,

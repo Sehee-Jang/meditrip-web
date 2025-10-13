@@ -1,6 +1,6 @@
 {
-  "title": "찜한 병원",
-  "empty": "찜한 병원이 없습니다.",
+  "title": "찜한 프로그램",
+  "empty": "찜한 프로그램이 없습니다.",
   "loading": "불러오는 중입니다...",
   "aria": {
     "favorite": "즐겨찾기 추가",
@@ -8,12 +8,12 @@
   },
   "dialog": {
     "title": "찜 해제",
-    "description": "정말 이 병원을 찜 해제할까요?",
+    "description": "정말 이 프로그램을 찜 해제할까요?",
     "cancel": "취소",
     "confirm": "해제"
   },
   "toast": {
     "favoriteSuccess": "찜 완료!",
-    "favoriteDescription": "마이페이지 > 찜한 병원 목록에서 확인할 수 있어요."
+    "favoriteDescription": "마이페이지 > 찜한 프로그램 목록에서 확인할 수 있어요."
   }
 }

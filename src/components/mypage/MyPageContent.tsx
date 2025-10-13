@@ -172,7 +172,7 @@ export default function MyPageContent() {
         {/* 예약 내역 */}
         <ReservationsSection reservations={reservations} />
 
-        {/* 찜한 병원 */}
+        {/* 찜한 업체 */}
         <MyFavoriteClinics />
 
         {/* 포인트 */}

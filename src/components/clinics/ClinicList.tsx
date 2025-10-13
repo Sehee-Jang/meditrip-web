@@ -85,10 +85,10 @@ export default function ClinicList({ clinics }: ClinicListProps) {
                   </div>
 
                   <CardContent className='p-4'>
-                    {/* 병원 이름, 주소, 설명 */}
+                    {/* 업체 이름, 주소, 설명 */}
                     <div className='flex flex-col justify-between items-start'>
                       <div className='flex flex-row items-center space-around gap-2'>
-                        {/* 병원명 */}
+                        {/* 업체명 */}
                         <h2 className='text-lg font-medium text-card-foreground'>
                           {c.name?.[loc]}
                         </h2>

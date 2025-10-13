@@ -82,7 +82,7 @@ export default function ClinicTableRow({
       <td className='px-4 py-3 text-center text-muted-foreground'>
         {index + 1}
       </td>
-      {/* 병원명 */}
+      {/* 업체명 */}
       <td className='px-4 py-3'>{clinic.name?.ko ?? "-"}</td>
 
       {/* 카테고리 */}
