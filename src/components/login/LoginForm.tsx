@@ -28,7 +28,11 @@ const LoginForm = () => {
       await loginWithEmail(email, password);
       router.push(redirectTo);
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : t("errorGeneric"));
+      if (err instanceof Error && err.message === "EMAIL_NOT_VERIFIED") {
+        setError(t("errorEmailNotVerified"));
+      } else {
+        setError(err instanceof Error ? err.message : t("errorGeneric"));
+      }
     } finally {
       setLoadingEmail(false);
     }

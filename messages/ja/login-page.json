@@ -5,6 +5,7 @@
   "login": "ログイン",
   "loading": "ログイン中",
   "errorGeneric": "ログイン中にエラーが発生しました。",
+  "errorEmailNotVerified": "メールアドレスがまだ認証されていません。受信トレイで認証メールをご確認ください。",
   "googleLogin": "Googleアカウントでログイン",
   "or": "または",
   "findPassword": "パスワードをお忘れですか？",

@@ -5,6 +5,7 @@
   "login": "로그인",
   "loading": "로그인중...",
   "errorGeneric": "로그인 중 오류가 발생했습니다.",
+  "errorEmailNotVerified": "이메일 인증이 완료되지 않았습니다. 받은 편지함에서 인증 메일을 확인해 주세요.",
   "googleLogin": "구글 계정으로 로그인",
   "or": "또는",
   "findPassword": "비밀번호를 잊으셨나요?",

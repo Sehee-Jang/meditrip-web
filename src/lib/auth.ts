@@ -22,6 +22,19 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { UserRole, AppLocale } from "@/types/user";
+import { resolveBaseUrl } from "@/utils/baseUrl";
+
+const EMAIL_VERIFICATION_BYPASS = new Set(
+  (process.env.NEXT_PUBLIC_EMAIL_VERIFICATION_BYPASS ?? "")
+    .split(",")
+    .map((email) => email.trim().toLowerCase())
+    .filter(Boolean)
+);
+
+const shouldBypassEmailVerification = (email?: string | null) => {
+  if (!email) return false;
+  return EMAIL_VERIFICATION_BYPASS.has(email.trim().toLowerCase());
+};
 
 export interface RegisterParams {
   email: string;
@@ -68,6 +81,8 @@ export const registerWithEmail = async ({
   const credential = EmailAuthProvider.credential(email, password);
   let user: User;
 
+  let shouldSignOutAfterRegister = false;
+
   if (currentUser && currentUser.isAnonymous) {
     // 1) 익명 계정과 연결
     const result = await linkWithCredential(currentUser, credential);
@@ -78,9 +93,18 @@ export const registerWithEmail = async ({
     const result = await createUserWithEmailAndPassword(auth, email, password);
     user = result.user;
     await updateProfile(user, { displayName: nickname });
+    shouldSignOutAfterRegister = true;
   }
-  // 3) 이메일 인증 메일 발송
-  await sendEmailVerification(user);
+  const bypassEmailVerification = shouldBypassEmailVerification(email);
+
+  if (!bypassEmailVerification) {
+    // 3) 이메일 인증 메일 발송 (인증 후 해당 언어의 로그인 페이지로 이동)
+    const verificationRedirectUrl = `${resolveBaseUrl()}/${preferredLocale}/login`;
+    await sendEmailVerification(user, {
+      url: verificationRedirectUrl,
+      handleCodeInApp: false,
+    });
+  }
 
   // 4) Firestore에 사용자 프로필 저장 (merge: 중복 호출 대비)
   const ref = doc(db, "users", user.uid);
@@ -109,13 +133,25 @@ export const registerWithEmail = async ({
     { merge: true }
   );
 
+  if (shouldSignOutAfterRegister) {
+    await signOut(auth);
+  }
+
   return user;
 };
 
 // 이메일 로그인 함수
-export const loginWithEmail = (email: string, password: string) =>
-  signInWithEmailAndPassword(auth, email, password);
+export const loginWithEmail = async (email: string, password: string) => {
+  const result = await signInWithEmailAndPassword(auth, email, password);
+  const bypassEmailVerification = shouldBypassEmailVerification(email);
 
+  if (!result.user.emailVerified && !bypassEmailVerification) {
+    await signOut(auth);
+    throw new Error("EMAIL_NOT_VERIFIED");
+  }
+
+  return result.user;
+};
 // Google OAuth 로그인 함수
 const googleProvider = new GoogleAuthProvider();
 
