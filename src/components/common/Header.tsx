@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { observeAuth } from "@/lib/auth";
 import LanguageSwitcher from "../LanguageSwitcher";
+import Image from "next/image";
 
 export default function Header() {
   const t = useTranslations("header");
@@ -35,10 +36,15 @@ export default function Header() {
 
   return (
     <header className='flex justify-between items-center px-4 py-3 border-b'>
-      <Link href='/' className='text-xl font-bold'>
-        ONYU
+      <Link href='/' className='flex items-center gap-2'>
+        <Image
+          src='/images/logo/logo.svg'
+          alt='ONYU 로고'
+          width={80}
+          height={30}
+          priority
+        />
       </Link>
-
       {/* 데스크탑 메뉴 */}
       <nav className='hidden md:flex items-center gap-6 text-sm'>
         <Link href='/'>{t("main")}</Link>
