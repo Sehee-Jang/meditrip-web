@@ -9,8 +9,8 @@ export function ArticleTableHeader() {
     <div className='flex items-center border-b border-border px-4 py-2 text-xs text-muted-foreground bg-background'>
       <div className='w-12 text-center'>No.</div>
       <div className='flex-1 text-center'>글 제목</div>
-      <div className='w-20 text-right'>조회수</div>
-      <div className='w-28 text-right'>작성일</div>
+      <div className='hidden text-right md:block md:w-20'>조회수</div>
+      <div className='hidden text-right md:block md:w-28'>작성일</div>
     </div>
   );
 }
@@ -45,10 +45,10 @@ export function ArticleRow({
       <span className='min-w-0 flex-1 truncate text-sm md:text-base text-foreground'>
         {title}
       </span>
-      <span className='w-20 whitespace-nowrap text-right text-xs text-muted-foreground'>
+      <span className='hidden text-right text-xs text-gray-500 whitespace-nowrap md:block md:w-20'>
         {viewCount.toLocaleString()}
       </span>
-      <span className='w-28 whitespace-nowrap text-right text-xs text-muted-foreground'>
+      <span className='hidden text-right text-xs text-gray-500 whitespace-nowrap md:block md:w-28'>
         {createdAt ? createdAt.toLocaleDateString() : ""}
       </span>
     </div>
