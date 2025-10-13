@@ -150,7 +150,7 @@ export default function PackagesPanel({
                           </div>
 
                           <div className='text-[12px] text-muted-foreground'>
-                            {formatDuration("ko", p.duration.ko)} ·{" "}
+                            {formatDuration("ko", p.duration)} ·{" "}
                             {formatPrice("ko", p.price.ko)}
                           </div>
 

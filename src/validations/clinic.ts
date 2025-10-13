@@ -195,10 +195,12 @@ export const packageFormSchema = z.object({
   subtitle: localizedStringDynamicSchema,
   precautions: localizedStringDynamicSchema,
 
-  // 가격/소요시간은 ko/ja 필수 숫자, zh/en 선택 숫자
+  // 가격은 ko/ja 필수 숫자, zh/en 선택 숫자
   price: localizedNumberKoJaRequiredSchema,
-  duration: localizedNumberKoJaRequiredSchema,
-
+  duration: z.coerce
+    .number()
+    .refine((v) => Number.isFinite(v), "숫자 입력")
+    .min(0, "0 이상"),
   packageImages: z.array(z.string().url()).min(1, "이미지 1장 이상"),
   treatmentProcess: z.array(treatmentProcessStepSchema).default([]),
   treatmentDetails: z.array(treatmentStepSchema).default([]),

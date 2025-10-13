@@ -31,19 +31,44 @@ export async function getClinicPackages(
   try {
     const pkgQ = query(pkgColRef, orderBy("createdAt", "desc"));
     const pkgSnap = await getDocs(pkgQ);
-    return pkgSnap.docs.map((d) => ({
-      id: d.id,
-      clinicId,
-      ...(d.data() as PackageDoc),
-    }));
-  } catch {
+    return pkgSnap.docs.map((d) => {
+      const data = d.data() as PackageDoc & Record<string, unknown>;
+      const duration =
+        typeof data.duration === "number"
+          ? data.duration
+          : typeof (data.duration as { ko?: number })?.ko === "number"
+          ? ((data.duration as { ko?: number }).ko as number)
+          : typeof (data.duration as { ja?: number })?.ja === "number"
+          ? ((data.duration as { ja?: number }).ja as number)
+          : 0;
 
+      return {
+        id: d.id,
+        clinicId,
+        ...data,
+        duration,
+      };
+    });
+  } catch {
     const pkgSnap = await getDocs(pkgColRef);
-    return pkgSnap.docs.map((d) => ({
-      id: d.id,
-      clinicId,
-      ...(d.data() as PackageDoc),
-    }));
+      return pkgSnap.docs.map((d) => {
+      const data = d.data() as PackageDoc & Record<string, unknown>;
+      const duration =
+        typeof data.duration === "number"
+          ? data.duration
+          : typeof (data.duration as { ko?: number })?.ko === "number"
+            ? ((data.duration as { ko?: number }).ko as number)
+            : typeof (data.duration as { ja?: number })?.ja === "number"
+              ? ((data.duration as { ja?: number }).ja as number)
+              : 0;
+
+      return {
+        id: d.id,
+        clinicId,
+        ...data,
+        duration,
+      };
+    });
   }
 }
 

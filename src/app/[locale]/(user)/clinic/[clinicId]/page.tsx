@@ -913,11 +913,13 @@ async function ClinicPackagesSection({
           const title = pickText(pkg.title, loc);
           const subtitle = pickText(pkg.subtitle, loc);
 
-          const durationVal = pickLocalized<number>(pkg.duration, loc);
+          // const durationVal = pickLocalized<number>(pkg.duration, loc);
           const priceVal = pickLocalized<number>(pkg.price, loc);
 
           const durationText =
-            durationVal !== undefined ? formatDuration(loc, durationVal) : "";
+            typeof pkg.duration === "number" && Number.isFinite(pkg.duration)
+              ? formatDuration(loc, pkg.duration)
+              : "";
           const priceText =
             priceVal !== undefined ? formatPrice(loc, priceVal) : "";
 

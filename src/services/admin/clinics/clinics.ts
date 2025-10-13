@@ -169,7 +169,14 @@ const packageConverter: FirestoreDataConverter<PackageDoc> = {
       title: d.title,
       subtitle: d.subtitle,
       price: d.price,
-      duration: d.duration,
+      duration:
+        typeof d.duration === "number"
+          ? d.duration
+          : typeof (d.duration as { ko?: number })?.ko === "number"
+          ? ((d.duration as { ko?: number }).ko as number)
+          : typeof (d.duration as { ja?: number })?.ja === "number"
+          ? ((d.duration as { ja?: number }).ja as number)
+          : 0,
       packageImages: Array.isArray(d.packageImages)
         ? (d.packageImages as string[])
         : [],

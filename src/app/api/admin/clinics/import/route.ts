@@ -536,14 +536,15 @@ export async function POST(req: NextRequest) {
       const subtitle = buildLocalizedText(values, "subtitle");
       const priceKo = parseRequiredNumber(values.price_ko, "price_ko", errors);
       const priceJa = parseRequiredNumber(values.price_ja, "price_ja", errors);
-      const durationKo = parseRequiredNumber(
-        values.duration_ko,
-        "duration_ko",
-        errors
-      );
-      const durationJa = parseRequiredNumber(
-        values.duration_ja,
-        "duration_ja",
+     const durationMinutes = parseRequiredNumber(
+       values.duration_minutes,
+       "duration_minutes",
+       errors
+     );
+
+      const treatmentProcess = safeParseJson<PackageDoc["treatmentProcess"]>(
+        values.treatmentProcessJson,
+        "treatmentProcessJson",
         errors
       );
 
@@ -563,8 +564,9 @@ export async function POST(req: NextRequest) {
         title,
         subtitle,
         price: { ko: priceKo!, ja: priceJa! },
-        duration: { ko: durationKo!, ja: durationJa! },
+        duration: durationMinutes!,
         packageImages: splitLines(values.packageImages ?? ""),
+        treatmentProcess,
         treatmentDetails,
         precautions,
       };

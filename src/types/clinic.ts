@@ -55,7 +55,7 @@ export interface PackageInfo {
   title: LocalizedTextDoc;
   subtitle: LocalizedTextDoc;
   price: LocalizedNumber;
-  duration: LocalizedNumber;
+  duration: number;
   packageImages?: string[];
   treatmentProcess?: TreatmentProcessStep[];
   treatmentDetails?: TreatmentStep[]; // 진료 상세 설명 (텍스트 + 이미지 포함)

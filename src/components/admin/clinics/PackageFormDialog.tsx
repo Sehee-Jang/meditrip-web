@@ -20,6 +20,7 @@ import LocalizedTabsField from "@/components/admin/common/LocalizedTabsField";
 import ImagesUploader from "@/components/admin/common/ImagesUploader";
 import SingleImageUploader from "@/components/admin/common/SingleImageUploader";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { LOCALES_TUPLE } from "@/constants/locales";
 
 type PackageFormInput = z.input<typeof packageFormSchema>;
@@ -64,7 +65,7 @@ export default function PackageFormDialog({
           title: { ko: "", ja: "" },
           subtitle: { ko: "", ja: "" },
           price: { ko: 0, ja: 0 },
-          duration: { ko: 0, ja: 0 },
+          duration: 0,
           packageImages: [],
           treatmentProcess: [],
           treatmentDetails: [],
@@ -85,25 +86,25 @@ export default function PackageFormDialog({
     clearErrors,
   } = form;
 
-const {
-  fields: processFields,
-  append: appendProcess,
-  remove: removeProcess,
-  move: moveProcess,
-} = useFieldArray({
-  control,
-  name: "treatmentProcess",
-});
+  const {
+    fields: processFields,
+    append: appendProcess,
+    remove: removeProcess,
+    move: moveProcess,
+  } = useFieldArray({
+    control,
+    name: "treatmentProcess",
+  });
 
-const {
-  fields: detailFields,
-  append: appendDetail,
-  remove: removeDetail,
-  move: moveDetail,
-} = useFieldArray({
-  control,
-  name: "treatmentDetails",
-});
+  const {
+    fields: detailFields,
+    append: appendDetail,
+    remove: removeDetail,
+    move: moveDetail,
+  } = useFieldArray({
+    control,
+    name: "treatmentDetails",
+  });
 
   useEffect(() => {
     reset(
@@ -122,7 +123,7 @@ const {
             title: { ko: "", ja: "" },
             subtitle: { ko: "", ja: "" },
             price: { ko: 0, ja: 0 },
-            duration: { ko: 0, ja: 0 },
+            duration: 0,
             packageImages: [],
             treatmentProcess: [],
             treatmentDetails: [],
@@ -229,7 +230,7 @@ const {
           />
           <FormRow
             label='가격(숫자)'
-            helpText='단위(원/円)는 사용자 페이지에서 자동 표기'
+            helpText='가격은 숫자만 입력해주세요. 통화 기호는 자동 표기되므로, 각 언어의 통화 기준에 맞는 금액만 입력하시면 됩니다.'
             control={
               <LocalizedTabsField
                 register={register}
@@ -243,15 +244,17 @@ const {
           />
           <FormRow
             label='소요시간(분)'
-            helpText='단위(분/分)는 사용자 페이지에서 자동 표기'
+            helpText='표시 단위는 자동 처리되므로, 소요 시간만 숫자로 입력해주세요.'
+            errorText={formState.errors.duration?.message}
             control={
-              <LocalizedTabsField
-                register={register}
-                basePath='duration'
-                locales={LOCALES_TUPLE}
-                errors={formState.errors}
+              <Input
+                type='number'
+                inputMode='numeric'
+                min={0}
+                step={1}
                 placeholder='예) 60'
-                mode='number'
+                aria-invalid={formState.errors.duration ? true : false}
+                {...register("duration", { valueAsNumber: true })}
               />
             }
           />
@@ -406,7 +409,9 @@ const {
                       <Button
                         type='button'
                         variant='secondary'
-                        onClick={() => i < detailFields.length - 1 && moveDetail(i, i + 1)}
+                        onClick={() =>
+                          i < detailFields.length - 1 && moveDetail(i, i + 1)
+                        }
                       >
                         ↓
                       </Button>

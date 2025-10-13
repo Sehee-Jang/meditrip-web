@@ -155,6 +155,14 @@ async function buildWorkbook() {
 
     for (const pkgDoc of packagesSnap.docs) {
       const pkg = pkgDoc.data() as PackageDoc & Record<string, unknown>;
+      const durationMinutes =
+        typeof pkg.duration === "number"
+          ? pkg.duration
+          : typeof (pkg.duration as { ko?: number })?.ko === "number"
+          ? (pkg.duration as { ko?: number }).ko!
+          : typeof (pkg.duration as { ja?: number })?.ja === "number"
+          ? (pkg.duration as { ja?: number }).ja!
+          : null;
       const packageRow: Record<string, string | number | boolean | null> = {
         clinicName_ko:
           typeof (data.name as Record<string, unknown>)?.ko === "string"
@@ -168,14 +176,7 @@ async function buildWorkbook() {
           typeof (pkg.price as { ja?: number } | undefined)?.ja === "number"
             ? (pkg.price as { ja?: number }).ja!
             : null,
-        duration_ko:
-          typeof (pkg.duration as { ko?: number } | undefined)?.ko === "number"
-            ? (pkg.duration as { ko?: number }).ko!
-            : null,
-        duration_ja:
-          typeof (pkg.duration as { ja?: number } | undefined)?.ja === "number"
-            ? (pkg.duration as { ja?: number }).ja!
-            : null,
+        duration_minutes: durationMinutes,
         treatmentProcessJson: formatJson(pkg.treatmentProcess),
         treatmentDetailsJson: formatJson(pkg.treatmentDetails),
       };
