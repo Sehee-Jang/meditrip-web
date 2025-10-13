@@ -4,15 +4,16 @@ import { adminDb, getFirebaseUserFromRequest } from "@/lib/firebaseAdmin";
 import type { ClinicDoc, PackageDoc } from "@/types/clinic";
 import type { LocalizedTagLabel } from "@/types/tag";
 import {
-  CLINIC_COLUMNS,
+  CLINIC_COLUMNS_EXPORT,
   HIDDEN_CLINIC_COLUMNS,
-  PACKAGE_COLUMNS,
-  formatArray,
+  PACKAGE_COLUMNS_EXPORT,
   formatJson,
   localizedRichToRow,
   localizedStringArrayToRow,
   localizedToRow,
 } from "@/services/admin/clinics/excelSchema";
+import { CATEGORY_LABELS_KO } from "@/constants/categories";
+import { AMENITY_LABELS_KO } from "@/constants/amenities";
 import { LocalizedRichTextDoc, LocalizedTextDoc } from "@/types/common";
 
 export const runtime = "nodejs";
@@ -33,8 +34,41 @@ async function buildWorkbook() {
   const clinicRows: Record<string, string | number | boolean | null>[] = [];
   const packageRows: Record<string, string | number | boolean | null>[] = [];
 
+  const mapKeysToLabels = (
+    values: unknown,
+    labelMap: Record<string, string>
+  ): string[] => {
+    if (!Array.isArray(values)) {
+      return [];
+    }
+
+    return values
+      .map((value) => {
+        if (typeof value !== "string") {
+          return undefined;
+        }
+
+        const trimmed = value.trim();
+        if (!trimmed) {
+          return undefined;
+        }
+
+        return labelMap[trimmed] ?? trimmed;
+      })
+      .filter((label): label is string => Boolean(label));
+  };
+
   for (const doc of clinicsSnap.docs) {
     const data = doc.data() as ClinicDoc & Record<string, unknown>;
+
+    const categoryLabels = mapKeysToLabels(
+      data.categoryKeys,
+      CATEGORY_LABELS_KO as Record<string, string>
+    );
+    const amenityLabels = mapKeysToLabels(
+      data.amenities,
+      AMENITY_LABELS_KO as Record<string, string>
+    );
 
     const clinicRow: Record<string, string | number | boolean | null> = {
       id: doc.id,
@@ -45,17 +79,14 @@ async function buildWorkbook() {
       reviewCount: (data.reviewCount as number | undefined) ?? 0,
       phone: typeof data.phone === "string" ? data.phone : "",
       website: typeof data.website === "string" ? data.website : "",
-      categoryKeys: Array.isArray(data.categoryKeys)
-        ? data.categoryKeys.join(", ")
-        : "",
+      categoryKeys: categoryLabels.join(", "),
       tagSlugs: Array.isArray(data.tagSlugs)
         ? data.tagSlugs.map((slug) => tagLabelMap.get(slug) ?? slug).join(", ")
         : "",
-      amenities: Array.isArray(data.amenities) ? data.amenities.join(", ") : "",
+      amenities: amenityLabels.join(", "),
       weeklyClosedDays: Array.isArray(data.weeklyClosedDays)
         ? data.weeklyClosedDays.join(", ")
         : "",
-      images: Array.isArray(data.images) ? data.images.join("\n") : "",
       socialsJson: formatJson(data.socials),
       geo_lat:
         typeof (data.geo as { lat?: number } | undefined)?.lat === "number"
@@ -125,12 +156,10 @@ async function buildWorkbook() {
     for (const pkgDoc of packagesSnap.docs) {
       const pkg = pkgDoc.data() as PackageDoc & Record<string, unknown>;
       const packageRow: Record<string, string | number | boolean | null> = {
-        clinicId: doc.id,
         clinicName_ko:
           typeof (data.name as Record<string, unknown>)?.ko === "string"
             ? ((data.name as Record<string, string>).ko as string)
             : "",
-        packageId: pkgDoc.id,
         price_ko:
           typeof (pkg.price as { ko?: number } | undefined)?.ko === "number"
             ? (pkg.price as { ko?: number }).ko!
@@ -147,7 +176,6 @@ async function buildWorkbook() {
           typeof (pkg.duration as { ja?: number } | undefined)?.ja === "number"
             ? (pkg.duration as { ja?: number }).ja!
             : null,
-        packageImages: formatArray(pkg.packageImages),
         treatmentProcessJson: formatJson(pkg.treatmentProcess),
         treatmentDetailsJson: formatJson(pkg.treatmentDetails),
       };
@@ -175,7 +203,10 @@ async function buildWorkbook() {
   const workbook = new ExcelJS.Workbook();
   workbook.creator = "MediTrip";
   const clinicsSheet = workbook.addWorksheet("Clinics");
-  clinicsSheet.columns = CLINIC_COLUMNS.map((key) => ({ header: key, key }));
+  clinicsSheet.columns = CLINIC_COLUMNS_EXPORT.map((key) => ({
+    header: key,
+    key,
+  }));
   for (const columnKey of HIDDEN_CLINIC_COLUMNS) {
     const column = clinicsSheet.getColumn(columnKey);
     if (column) {
@@ -185,7 +216,10 @@ async function buildWorkbook() {
   clinicsSheet.addRows(clinicRows);
 
   const packagesSheet = workbook.addWorksheet("Packages");
-  packagesSheet.columns = PACKAGE_COLUMNS.map((key) => ({ header: key, key }));
+  packagesSheet.columns = PACKAGE_COLUMNS_EXPORT.map((key) => ({
+    header: key,
+    key,
+  }));
   packagesSheet.addRows(packageRows);
 
   return workbook;

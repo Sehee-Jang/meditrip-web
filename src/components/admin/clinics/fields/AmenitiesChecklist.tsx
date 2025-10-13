@@ -1,19 +1,11 @@
-// src/components/admin/clinics/fields/AmenitiesChecklist.tsx
 "use client";
 
 import { useFormContext } from "react-hook-form";
 import type { ClinicFormInput } from "../form-context";
 import { AMENITY_VALUES } from "../form-utils";
 import type { AmenityKey } from "@/types/clinic";
+import { AMENITY_LABELS_KO } from "@/constants/amenities";
 import { Car, Wifi, Info, Shield, Plane } from "lucide-react";
-
-const LABELS: Record<AmenityKey, string> = {
-  parking: "주차",
-  freeWifi: "무료 Wi-Fi",
-  infoDesk: "안내 데스크",
-  privateCare: "프라이빗 케어",
-  airportPickup: "공항 픽업",
-};
 
 const ICONS: Record<AmenityKey, React.ComponentType<{ className?: string }>> = {
   parking: Car,
@@ -46,7 +38,7 @@ export default function AmenitiesChecklist() {
                                inline-flex items-center gap-2'
               >
                 <Icon className='h-4 w-4' />
-                {LABELS[k]}
+                {AMENITY_LABELS_KO[k]}
               </span>
             </label>
           );

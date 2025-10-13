@@ -38,6 +38,11 @@ export const CLINIC_COLUMNS: readonly string[] = [
   ...LOCALES_TUPLE.map((locale) => `highlights_${locale}`),
 ];
 
+const CLINIC_EXPORT_EXCLUDED_COLUMNS = new Set<string>(["images"]);
+export const CLINIC_COLUMNS_EXPORT: readonly string[] = CLINIC_COLUMNS.filter(
+  (column) => !CLINIC_EXPORT_EXCLUDED_COLUMNS.has(column)
+);
+
 export const HIDDEN_CLINIC_COLUMNS = new Set<string>([
   "id",
   "displayOrder",
@@ -60,6 +65,15 @@ export const PACKAGE_COLUMNS: readonly string[] = [
   "treatmentDetailsJson",
   ...LOCALES_TUPLE.map((locale) => `precautions_${locale}`),
 ];
+
+const PACKAGE_EXPORT_EXCLUDED_COLUMNS = new Set<string>([
+  "clinicId",
+  "packageId",
+  "packageImages",
+]);
+export const PACKAGE_COLUMNS_EXPORT: readonly string[] = PACKAGE_COLUMNS.filter(
+  (column) => !PACKAGE_EXPORT_EXCLUDED_COLUMNS.has(column)
+);
 
 export function localizedToRow(
   value: Partial<LocalizedTextDoc> | undefined,
