@@ -29,7 +29,7 @@ export default function HeroSection() {
             <CarouselItem key={item}>
               <div className='relative w-full h-[360px] md:h-[480px]'>
                 <Image
-                  src={`/images/hero${item}.webp`}
+                  src={`/images/hero/hero${item}.webp`}
                   alt={`슬라이드 ${item}`}
                   fill
                   sizes='(min-width: 768px) 100vw, 100vw'
