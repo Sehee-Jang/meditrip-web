@@ -38,8 +38,8 @@ export default function ArticleDetailClient({ id }: { id: string }) {
 
   return (
     <article className='article-content prose max-w-none dark:prose-invert'>
-      <header className='mb-6 border-b border-border p-10 text-center'>
-        <h1 className='text-2xl font-bold tracking-tight md:text-3xl text-foreground'>
+      <header className='mb-6 text-center border-b px-4 py-6 md:px-10 md:py-10'>
+        <h1 className='text-2xl md:text-3xl font-bold tracking-tight text-gray-900 break-words'>
           {title}
         </h1>
         {excerpt ? (
