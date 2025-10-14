@@ -394,59 +394,21 @@ export default async function ClinicDetailPage({
                       ["sun", null],
                     ];
 
-                    const DAY_LABELS: Record<
+                    const dayLabels = t.raw("hours.dayLabels") as Record<
                       Locale,
                       Record<DayOfWeek, string>
-                    > = {
-                      ko: {
-                        mon: "월",
-                        tue: "화",
-                        wed: "수",
-                        thu: "목",
-                        fri: "금",
-                        sat: "토",
-                        sun: "일",
-                      },
-                      ja: {
-                        mon: "月",
-                        tue: "火",
-                        wed: "水",
-                        thu: "木",
-                        fri: "金",
-                        sat: "土",
-                        sun: "日",
-                      },
-                      zh: {
-                        mon: "周一",
-                        tue: "周二",
-                        wed: "周三",
-                        thu: "周四",
-                        fri: "周五",
-                        sat: "周六",
-                        sun: "周日",
-                      },
-                      en: {
-                        mon: "Mon",
-                        tue: "Tue",
-                        wed: "Wed",
-                        thu: "Thu",
-                        fri: "Fri",
-                        sat: "Sat",
-                        sun: "Sun",
-                      },
-                    };
-                    const CLOSED: Record<Locale, string> = {
-                      ko: "휴무",
-                      ja: "休み",
-                      zh: "休息",
-                      en: "Closed",
-                    };
-                    const NOINFO: Record<Locale, string> = {
-                      ko: "영업시간 정보가 없습니다.",
-                      ja: "営業時間情報がありません。",
-                      zh: "暂无营业时间信息。",
-                      en: "No hours information.",
-                    };
+                    >;
+                    const closedShort = t.raw("hours.closedShort") as Record<
+                      Locale,
+                      string
+                    >;
+                    const noInfo = t.raw("hours.noInfo") as Record<
+                      Locale,
+                      string
+                    >;
+                    const dayLabelsForLocale = dayLabels[loc] ?? dayLabels.en;
+                    const closedText = closedShort[loc] ?? closedShort.en;
+                    const noInfoText = noInfo[loc] ?? noInfo.en;
 
                     const hours = clinic.weeklyHours ?? {};
                     const closedDays = clinic.weeklyClosedDays ?? [];
@@ -473,7 +435,7 @@ export default async function ClinicDetailPage({
                         ? hours[d]!.map((r) => `${r.open} – ${r.close}`).join(
                             ", "
                           )
-                        : CLOSED[loc];
+                        : closedText;
 
                     const Cell = ({ d }: { d: DayOfWeek }) => (
                       <div className='grid grid-cols-[28px_1fr] items-baseline gap-3'>
@@ -483,7 +445,7 @@ export default async function ClinicDetailPage({
                             todayKey === d ? "text-foreground font-medium" : "",
                           ].join(" ")}
                         >
-                          {(DAY_LABELS[loc] ?? DAY_LABELS.en)[d]}
+                          {dayLabelsForLocale[d] ?? dayLabels.en[d]}
                         </span>
                         <span
                           className={[
@@ -536,7 +498,7 @@ export default async function ClinicDetailPage({
                             </div>
                           ) : (
                             <p className='text-sm text-muted-foreground'>
-                              {NOINFO[loc]}
+                              {noInfoText}
                             </p>
                           )}
                         </div>

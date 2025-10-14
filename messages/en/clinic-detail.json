@@ -15,7 +15,57 @@
   "hours": {
     "open": "Open",
     "closed": "Closed",
-    "unknown": "No business hours available"
+    "unknown": "No business hours available",
+    "closedShort": {
+      "ko": "휴무",
+      "ja": "休み",
+      "en": "Closed",
+      "zh": "休息"
+    },
+    "noInfo": {
+      "ko": "영업시간 정보가 없습니다.",
+      "ja": "営業時間情報がありません。",
+      "en": "No hours information.",
+      "zh": "暂无营业时间信息。"
+    },
+    "dayLabels": {
+      "ko": {
+        "mon": "월",
+        "tue": "화",
+        "wed": "수",
+        "thu": "목",
+        "fri": "금",
+        "sat": "토",
+        "sun": "일"
+      },
+      "ja": {
+        "mon": "月",
+        "tue": "火",
+        "wed": "水",
+        "thu": "木",
+        "fri": "金",
+        "sat": "土",
+        "sun": "日"
+      },
+      "en": {
+        "mon": "Mon",
+        "tue": "Tue",
+        "wed": "Wed",
+        "thu": "Thu",
+        "fri": "Fri",
+        "sat": "Sat",
+        "sun": "Sun"
+      },
+      "zh": {
+        "mon": "周一",
+        "tue": "周二",
+        "wed": "周三",
+        "thu": "周四",
+        "fri": "周五",
+        "sat": "周六",
+        "sun": "周日"
+      }
+    }
   },
   "reservationNoticesLabel": "Reservation Notices",
   "noDescription": "No description available.",
