@@ -1,66 +1,39 @@
-"use client";
+import path from "node:path";
+import { readdir } from "node:fs/promises";
 
-import { useTranslations } from "next-intl";
-import Autoplay from "embla-carousel-autoplay";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-} from "@/components/ui/carousel";
-import Image from "next/image";
-import CommonButton from "../common/CommonButton";
-import Container from "../common/Container";
-import { useRef } from "react";
-import { Link } from "@/i18n/navigation";
+import type { FC } from "react";
+import HeroSectionClient from "./HeroSectionClient";
 
-export default function HeroSection() {
-  const t = useTranslations("hero-section");
+// public/images/hero 안의 이미지 파일명만 허용할 확장자
+const ALLOWED_EXTS = new Set<string>([
+  ".jpg",
+  ".jpeg",
+  ".png",
+  ".webp",
+  ".avif",
+]);
 
-  const autoplay = useRef(
-    Autoplay({ delay: 3000, stopOnInteraction: true, stopOnMouseEnter: true })
-  );
-
-  return (
-    <section className='relative w-full h-[360px] md:h-[480px] mb-10'>
-      {/* 슬라이드 이미지 */}
-      <Carousel opts={{ loop: true }} plugins={[autoplay.current]}>
-        <CarouselContent>
-          {[1, 2, 3].map((item) => (
-            <CarouselItem key={item}>
-              <div className='relative w-full h-[360px] md:h-[480px]'>
-                <Image
-                  src={`/images/hero/hero${item}.webp`}
-                  alt={`슬라이드 ${item}`}
-                  fill
-                  sizes='(min-width: 768px) 100vw, 100vw'
-                  className='object-cover object-center'
-                  priority={item === 1}
-                />
-              </div>
-            </CarouselItem>
-          ))}
-        </CarouselContent>
-      </Carousel>
-
-      {/* 오버레이 텍스트 영역 */}
-      <div className='absolute inset-0 flex items-center justify-center'>
-        <Container className='!pb-0 text-center text-white px-4'>
-          <h2 className='text-2xl md:text-4xl font-bold whitespace-pre-line drop-shadow-lg'>
-            {t("title")}
-          </h2>
-          <p className='mt-2 text-sm md:text-lg drop-shadow-md'>
-            {t("subtitle")}
-          </p>
-          <CommonButton asChild className='mt-4 w-32 md:w-40'>
-            <Link
-              href={{ pathname: "/", hash: "signup-section" }}
-              aria-controls='signup-section'
-            >
-              {t("button")}
-            </Link>
-          </CommonButton>
-        </Container>
-      </div>
-    </section>
-  );
+async function getHeroImages(): Promise<string[]> {
+  const dir = path.join(process.cwd(), "public", "images", "hero");
+  let files: string[] = [];
+  try {
+    const entries = await readdir(dir, { withFileTypes: true });
+    files = entries
+      .filter((e) => e.isFile())
+      .map((e) => e.name)
+      .filter((name) => ALLOWED_EXTS.has(path.extname(name).toLowerCase()))
+      .sort((a, b) => a.localeCompare(b, "en", { numeric: true }));
+  } catch {
+    // 폴더가 없거나 오류가 나도 안전하게 빈 배열 반환
+    files = [];
+  }
+  // public 하위 경로로 변환
+  return files.map((name) => `/images/hero/${name}`);
 }
+
+const HeroSection: FC = async () => {
+  const images = await getHeroImages();
+  return <HeroSectionClient images={images} />;
+};
+
+export default HeroSection;
