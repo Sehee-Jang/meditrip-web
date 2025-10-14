@@ -17,8 +17,10 @@ export async function fetchClinics(): Promise<ClinicListItem[]> {
     ...d.data(),
   })) as ClinicListItem[];
 
+  const visibleItems = items.filter((item) => item.isDeleted !== true);
+
   // 안전 보정: displayOrder가 없는 문서는 끝으로 보냄(+ createdAt DESC로 동률 정렬)
-  items.sort((a, b) => {
+  visibleItems.sort((a, b) => {
     const ax =
       typeof a.displayOrder === "number"
         ? a.displayOrder
@@ -46,5 +48,5 @@ export async function fetchClinics(): Promise<ClinicListItem[]> {
     return toMs(b.createdAt) - toMs(a.createdAt);
   });
 
-  return items;
+  return visibleItems;
 }

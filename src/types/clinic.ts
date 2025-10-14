@@ -100,6 +100,8 @@ export interface ClinicDoc {
   rating: number; // 기본 0
   reviewCount: number; // 기본 0
   status: ClinicStatus; // 노출 제어
+  isDeleted?: boolean; // 삭제 여부(soft delete)
+  deletedAt?: Timestamp | null; // 삭제 시각
   createdAt: Timestamp;
   updatedAt: Timestamp;
   displayOrder?: number; // 기본 오름차순 정렬; 작을수록 상단
@@ -136,6 +138,7 @@ export type ClinicWithId = ClinicDoc & {
   id: string;
   createdAt?: { seconds: number; nanoseconds: number } | Date;
   updatedAt?: { seconds: number; nanoseconds: number } | Date;
+  deletedAt?: { seconds: number; nanoseconds: number } | Date | null;
 };
 
 /**
@@ -161,4 +164,6 @@ export type ClinicListItem = Pick<
   | "categoryKeys"
   | "displayOrder"
   | "createdAt"
+  | "isDeleted"
+  | "deletedAt"
 >;

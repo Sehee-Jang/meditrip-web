@@ -17,9 +17,14 @@ export async function getClinicBaseById(
 
   if (!clinicSnap.exists()) return null;
 
+  const data = clinicSnap.data() as ClinicDoc;
+  if (data.isDeleted) {
+    return null;
+  }
+
   return {
     id: clinicSnap.id,
-    ...(clinicSnap.data() as ClinicDoc),
+    ...data,
   };
 }
 /** 병원 패키지 서브컬렉션 조회 */
@@ -51,16 +56,16 @@ export async function getClinicPackages(
     });
   } catch {
     const pkgSnap = await getDocs(pkgColRef);
-      return pkgSnap.docs.map((d) => {
+    return pkgSnap.docs.map((d) => {
       const data = d.data() as PackageDoc & Record<string, unknown>;
       const duration =
         typeof data.duration === "number"
           ? data.duration
           : typeof (data.duration as { ko?: number })?.ko === "number"
-            ? ((data.duration as { ko?: number }).ko as number)
-            : typeof (data.duration as { ja?: number })?.ja === "number"
-              ? ((data.duration as { ja?: number }).ja as number)
-              : 0;
+          ? ((data.duration as { ko?: number }).ko as number)
+          : typeof (data.duration as { ja?: number })?.ja === "number"
+          ? ((data.duration as { ja?: number }).ja as number)
+          : 0;
 
       return {
         id: d.id,

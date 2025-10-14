@@ -61,7 +61,10 @@ export default function ClinicTableRow({
   };
 
   const handleDelete = async () => {
-    const ok = confirm("정말 삭제할까요?");
+    const ok = confirm(
+      "삭제된 항목 탭에서 언제든 복구할 수 있습니다. 정말 삭제할까요?"
+    );
+
     if (!ok) return;
     await deleteClinic(clinic.id);
     onUpdated();

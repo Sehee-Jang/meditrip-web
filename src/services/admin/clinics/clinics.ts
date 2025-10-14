@@ -1,7 +1,6 @@
 import {
   addDoc,
   collection,
-  deleteDoc,
   doc,
   getDoc,
   getDocs,
@@ -155,6 +154,11 @@ const clinicConverter: FirestoreDataConverter<ClinicDoc> = {
       rating: typeof d.rating === "number" ? d.rating : 0,
       reviewCount: typeof d.reviewCount === "number" ? d.reviewCount : 0,
       status: (d.status as "visible" | "hidden") ?? "visible",
+      isDeleted: d.isDeleted === true,
+      deletedAt:
+        d.deletedAt instanceof Timestamp
+          ? (d.deletedAt as Timestamp)
+          : undefined,
       createdAt: d.createdAt as Timestamp,
       updatedAt: d.updatedAt as Timestamp,
     };
@@ -312,6 +316,8 @@ export async function createClinic(
       typeof (base as { displayOrder?: unknown }).displayOrder === "number"
         ? (base as { displayOrder?: number }).displayOrder
         : -Date.now(),
+    isDeleted: false,
+    deletedAt: null,
     createdAt: now as unknown as Timestamp,
     updatedAt: now as unknown as Timestamp,
   };
@@ -340,7 +346,23 @@ export async function updateClinic(
 }
 
 export async function deleteClinic(id: string): Promise<void> {
-  await deleteDoc(clinicDocRef(id));
+  const ref = clinicDocRef(id);
+  await updateDoc(ref, {
+    isDeleted: true,
+    deletedAt: serverTimestamp(),
+    status: "hidden",
+    updatedAt: serverTimestamp(),
+  });
+}
+
+export async function restoreClinic(id: string): Promise<void> {
+  const ref = clinicDocRef(id);
+  await updateDoc(ref, {
+    isDeleted: false,
+    deletedAt: null,
+    status: "hidden",
+    updatedAt: serverTimestamp(),
+  });
 }
 
 export async function updateClinicStatus(
@@ -418,10 +440,15 @@ export async function deletePackage(
   clinicId: string,
   packageId: string
 ): Promise<void> {
-  await deleteDoc(doc(db, "clinics", clinicId, "packages", packageId));
-  await updateDoc(doc(db, "clinics", clinicId), {
-    updatedAt: serverTimestamp(),
-  });
+const batch = writeBatch(db);
+const packageRef = doc(db, "clinics", clinicId, "packages", packageId);
+const clinicRef = doc(db, "clinics", clinicId);
+
+batch.delete(packageRef);
+batch.update(clinicRef, {
+  updatedAt: serverTimestamp(),
+});
+    await batch.commit();
 }
 
 // displayOrder 일괄 업데이트(batch)
