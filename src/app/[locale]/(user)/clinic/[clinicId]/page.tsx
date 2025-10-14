@@ -10,6 +10,7 @@ import {
 } from "@/services/clinics/getClinicById";
 import type { ClinicDetail, DayOfWeek, PackageWithId } from "@/types/clinic";
 import type { Locale } from "@/i18n/routing";
+import ClinicTabsBar from "@/components/clinics/ClinicTabsBar";
 import FavoriteButton from "@/components/clinics/FavoriteButton";
 import GoogleMapEmbed from "@/components/common/GoogleMapEmbed";
 import { formatPrice, formatDuration } from "@/lib/format";
@@ -359,32 +360,10 @@ export default async function ClinicDetailPage({
 
         {/* 탭 네비게이션 */}
         <div className='mt-2'>
-          <div className='border-b'>
-            <nav className='grid grid-cols-2 text-sm'>
-              <Link
-                href={`/${locale}/clinic/${clinicId}?tab=info`}
-                className={`block text-center no-underline py-3 border-b-2 ${
-                  activeTab === "info"
-                    ? "text-brand border-brand font-medium"
-                    : "text-muted-foreground border-transparent"
-                }`}
-                aria-current={activeTab === "info" ? "page" : undefined}
-              >
-                {t("infoTab")}
-              </Link>
-              <Link
-                href={`/${locale}/clinic/${clinicId}?tab=reviews`}
-                className={`block text-center no-underline py-3 border-b-2 ${
-                  activeTab === "reviews"
-                    ? "text-brand border-brand font-medium"
-                    : "text-muted-foreground border-transparent"
-                }`}
-                aria-current={activeTab === "reviews" ? "page" : undefined}
-              >
-                {t("reviewsTab")}
-              </Link>
-            </nav>
-          </div>
+          <ClinicTabsBar
+            initialValue={activeTab}
+            labels={{ info: t("infoTab"), reviews: t("reviewsTab") }}
+          />
 
           {/* 탭 컨텐츠: info / reviews */}
           <div>
