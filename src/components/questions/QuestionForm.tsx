@@ -1,18 +1,19 @@
 "use client";
 
 import { useRouter } from "@/i18n/navigation";
-
 import { toast } from "sonner";
-
 import { auth } from "@/lib/firebase";
 import { createQuestion } from "@/services/questions/createQuestion";
-
 import { awardViaApi } from "@/services/points/awardViaApi";
 import QuestionFormFields from "./QuestionFormFields";
 import {
   useQuestionForm,
   type QuestionFormValues,
 } from "../../hooks/useQuestionForm";
+import {
+  FILE_TOO_LARGE_ERROR_CODE,
+  MAX_UPLOAD_FILE_SIZE_LABEL,
+} from "@/constants/uploads";
 
 export default function QuestionForm() {
   const router = useRouter();
@@ -64,6 +65,12 @@ export default function QuestionForm() {
       resetPreview();
       router.push(`/community/questions/${newId}`);
     } catch (err) {
+      if (err instanceof Error && err.message === FILE_TOO_LARGE_ERROR_CODE) {
+        toast.error(
+          tToast("fileTooLarge", { size: MAX_UPLOAD_FILE_SIZE_LABEL })
+        );
+        return;
+      }
       console.error(err);
       toast.error(tToast("failed"));
     }

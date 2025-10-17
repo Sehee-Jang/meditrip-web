@@ -4,6 +4,10 @@ import * as React from "react";
 import { supabase } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import { resolveStorage, type StoragePreset } from "@/constants/storage";
+import {
+  MAX_UPLOAD_FILE_SIZE,
+  MAX_UPLOAD_FILE_SIZE_LABEL,
+} from "@/constants/uploads";
 
 interface Props {
   value: string[]; // 현재 이미지 URL 배열(제어형)
@@ -61,11 +65,23 @@ export default function ImagesUploader({
   // 파일 업로드
   async function handleFiles(files: FileList | null): Promise<void> {
     if (!files || files.length === 0) return;
+    const fileArray = Array.from(files);
+    const oversizedFile = fileArray.find(
+      (file) => file.size > MAX_UPLOAD_FILE_SIZE
+    );
+
+    if (oversizedFile) {
+      alert(
+        `이미지 파일은 최대 ${MAX_UPLOAD_FILE_SIZE_LABEL}MB까지 업로드할 수 있습니다.\n(${oversizedFile.name})`
+      );
+      if (inputRef.current) inputRef.current.value = ""; // 동일 파일 재선택 허용
+      return;
+    }
     setUploading(true);
     try {
       const newUrls: string[] = [];
 
-      for (const file of Array.from(files)) {
+      for (const file of fileArray) {
         // 폴더/랜덤 파일명 + 원본명(특수문자 안전)
         const safeName = toSafeFileName(file.name);
         const path = `${finalDir}/${crypto.randomUUID()}-${safeName}`;

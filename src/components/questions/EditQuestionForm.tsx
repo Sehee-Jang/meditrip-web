@@ -9,6 +9,10 @@ import {
 } from "../../hooks/useQuestionForm";
 import { useRouter } from "@/i18n/navigation";
 import { updateQuestion } from "@/services/questions/updateQuestion";
+import {
+  FILE_TOO_LARGE_ERROR_CODE,
+  MAX_UPLOAD_FILE_SIZE_LABEL,
+} from "@/constants/uploads";
 
 export default function EditQuestionForm({ question }: { question: Question }) {
   const router = useRouter();
@@ -48,6 +52,12 @@ export default function EditQuestionForm({ question }: { question: Question }) {
 
       router.push(`/community/questions/${question.id}`);
     } catch (err) {
+      if (err instanceof Error && err.message === FILE_TOO_LARGE_ERROR_CODE) {
+        toast.error(
+          tToast("fileTooLarge", { size: MAX_UPLOAD_FILE_SIZE_LABEL })
+        );
+        return;
+      }
       console.error(err);
       toast.error(tToast("editFailed"));
     }

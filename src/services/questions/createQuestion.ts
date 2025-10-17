@@ -3,6 +3,10 @@ import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { supabase } from "@/lib/supabase";
 import { v4 as uuidv4 } from "uuid";
 import type { Category } from "@/types/category";
+import {
+  FILE_TOO_LARGE_ERROR_CODE,
+  MAX_UPLOAD_FILE_SIZE,
+} from "@/constants/uploads";
 
 export interface CreateQuestionInput {
   title: string;
@@ -12,6 +16,10 @@ export interface CreateQuestionInput {
 }
 
 export async function uploadImageToSupabase(file: File): Promise<string> {
+    if (file.size > MAX_UPLOAD_FILE_SIZE) {
+      throw new Error(FILE_TOO_LARGE_ERROR_CODE);
+    }
+
   const ext = file.name.split(".").pop();
   const filename = `${uuidv4()}.${ext}`;
   const path = `${filename}`;

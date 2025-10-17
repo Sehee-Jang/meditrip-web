@@ -68,7 +68,8 @@ import { useWindowSize } from "@/hooks/use-window-size";
 import { useCursorVisibility } from "@/hooks/use-cursor-visibility";
 
 // --- Lib ---
-import { handleImageUpload, MAX_FILE_SIZE } from "@/lib/tiptap-utils";
+import { handleImageUpload } from "@/lib/tiptap-utils";
+import { MAX_UPLOAD_FILE_SIZE } from "@/constants/uploads";
 
 // --- Styles ---
 import "@/components/tiptap-templates/simple/simple-editor.scss";
@@ -263,7 +264,7 @@ export function SimpleEditor({
       Placeholder.configure({ placeholder }),
       ImageUploadNode.configure({
         accept: "image/*",
-        maxSize: MAX_FILE_SIZE,
+        maxSize: MAX_UPLOAD_FILE_SIZE,
         limit: 10,
         upload: async (file: File) => {
           if (onUploadImage) return await onUploadImage(file);

@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { getFirebaseUserFromRequest } from "@/lib/firebaseAdmin";
+import {
+  FILE_TOO_LARGE_ERROR_MESSAGE,
+  MAX_UPLOAD_FILE_SIZE,
+} from "@/constants/uploads";
 
 export const runtime = "nodejs"; // Edge 아님
 export const dynamic = "force-dynamic";
@@ -18,6 +22,13 @@ export async function POST(req: NextRequest) {
     const file = form.get("file");
     if (!(file instanceof File)) {
       return NextResponse.json({ error: "file is required" }, { status: 400 });
+    }
+
+    if (file.size > MAX_UPLOAD_FILE_SIZE) {
+      return NextResponse.json(
+        { error: FILE_TOO_LARGE_ERROR_MESSAGE },
+        { status: 400 }
+      );
     }
 
     // 3) Supabase 클라이언트 (Service Role)

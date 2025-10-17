@@ -3,6 +3,13 @@
 import * as React from "react"
 import { useHotkeys } from "react-hotkeys-hook"
 import { type Editor } from "@tiptap/react"
+import { toast } from "sonner";
+
+import {
+  FILE_TOO_LARGE_ERROR_CODE,
+  FILE_TOO_LARGE_TOAST_FALLBACK_MESSAGE,
+  MAX_UPLOAD_FILE_SIZE,
+} from "@/constants/uploads";
 
 // --- Hooks ---
 import { useTiptapEditor } from "@/hooks/use-tiptap-editor"
@@ -148,6 +155,40 @@ export function useImageUpload(config?: UseImageUploadConfig) {
   const canInsert = canInsertImage(editor)
   const isActive = isImageActive(editor)
 
+  React.useEffect(() => {
+    if (!editor) return;
+
+    const extension = editor.extensionManager.extensions.find(
+      (ext) => ext.name === "imageUpload"
+    );
+    if (!extension) return;
+
+    const previousMaxSize = extension.options.maxSize;
+    const previousOnError = extension.options.onError;
+
+    extension.options.maxSize = MAX_UPLOAD_FILE_SIZE;
+    extension.options.onError = (error: Error) => {
+      if (
+        error?.message === FILE_TOO_LARGE_ERROR_CODE ||
+        error?.message?.toLowerCase().includes("file size exceeds")
+      ) {
+        toast.error(FILE_TOO_LARGE_TOAST_FALLBACK_MESSAGE);
+        return;
+      }
+
+      if (previousOnError) {
+        previousOnError(error);
+      } else {
+        console.error(error);
+      }
+    };
+
+    return () => {
+      extension.options.maxSize = previousMaxSize;
+      extension.options.onError = previousOnError;
+    };
+  }, [editor]);
+  
   React.useEffect(() => {
     if (!editor) return
 
