@@ -16,7 +16,7 @@ function ExclusiveBadgeIconOnly({ label }: { label: string }) {
   return (
     <span
       className='inline-flex h-7 w-7 items-center justify-center rounded-full text-white shadow-md ring-white/70 backdrop-blur
-      bg-gradient-to-br from-amber-500 to-rose-500'
+                 bg-gradient-to-br from-amber-500 to-rose-500'
       aria-label={label}
       title={label}
     >
@@ -42,23 +42,25 @@ function ExclusiveTagChip({ text }: { text: string }) {
 
 export default function ClinicList({ clinics }: ClinicListProps) {
   const t = useTranslations("clinic");
-  const locale = useLocale(); // 링크 경로용
-  const loc: "ko" | "ja" = locale === "ja" ? "ja" : "ko"; // 다국어 텍스트 선택용
+  const locale = useLocale();
+  const loc: "ko" | "ja" = locale === "ja" ? "ja" : "ko";
 
   const EXCLUSIVE_LABEL = t("badges.exclusiveLabel", { default: "단독 입점" });
 
   return (
     <div className='p-4'>
-      <ul className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'>
+      {/* items-stretch로 열마다 동일 높이, 카드 h-full로 행 높이에 맞춰 스트레치 */}
+      <ul className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch'>
         {clinics.map((c) => {
           const isExclusive = c.isExclusive === true;
           const exclusiveLabel = t("badges.exclusiveLabel");
           return (
-            <li key={c.id}>
-              <Card className='group hover:shadow-lg transition-shadow rounded-2xl overflow-hidden'>
-                <Link href={`/clinic/${c.id}`} className='block'>
-                  {/* 대표 이미지 */}
-                  <div className='relative w-full h-40'>
+            <li key={c.id} className='h-full'>
+              {/* 카드: 고정(반응형) 높이 + flex column → 푸터가 항상 하단 */}
+              <Card className='group h-[320px] sm:h-[340px] lg:h-[360px] flex flex-col rounded-2xl overflow-hidden transition-shadow hover:shadow-lg'>
+                <Link href={`/clinic/${c.id}`} className='flex h-full flex-col'>
+                  {/* 대표 이미지: 고정 높이/비율로 통일 */}
+                  <div className='relative w-full h-44'>
                     <Image
                       src={c.images?.[0] ?? "/images/placeholder.png"}
                       alt={c.name?.[loc] ?? ""}
@@ -66,43 +68,37 @@ export default function ClinicList({ clinics }: ClinicListProps) {
                       className='object-cover'
                       sizes='(max-width: 768px) 100vw, 33vw'
                     />
-
-                    {/* 상단 그라데이션(배지 가독성 보조) */}
                     <div className='pointer-events-none absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-black/25 to-transparent' />
 
-                    {/* 단독 입점 배지: 북마크 */}
                     {isExclusive && (
                       <div className='absolute left-2 top-2 z-10'>
                         <ExclusiveBadgeIconOnly label={EXCLUSIVE_LABEL} />
                       </div>
                     )}
 
-                    {/* 찜 아이콘(배지보다 위에 올리고 싶으면 z-30) */}
                     <FavoriteButton
                       clinicId={c.id}
                       className='absolute right-2 top-2 z-30 rounded-full bg-card/90 p-2 shadow backdrop-blur hover:bg-card'
                     />
                   </div>
 
-                  <CardContent className='p-4'>
-                    {/* 업체 이름, 주소, 설명 */}
-                    <div className='flex flex-col justify-between items-start'>
-                      <div className='flex flex-row items-center space-around gap-2'>
-                        {/* 업체명 */}
-                        <h2 className='text-lg font-medium text-card-foreground'>
+                  {/* 본문: flex-1로 남은 공간 채움, 내부는 column */}
+                  <CardContent className='p-4 flex-1 flex flex-col'>
+                    {/* 상단 정보 블록 */}
+                    <div>
+                      <div className='flex items-center gap-2'>
+                        <h2 className='text-base sm:text-[17px] font-medium text-card-foreground leading-snug line-clamp-2'>
                           {c.name?.[loc]}
                         </h2>
                       </div>
-
-                      {/* 주소 */}
-                      <p className='text-muted-foreground'>
+                      <p className='mt-1 text-muted-foreground text-sm leading-snug line-clamp-2'>
                         {c.address?.[loc]}
                       </p>
                     </div>
 
-                    {/* 리뷰 및 별점 */}
-                    <div className='mt-3 flex flex-row items-center justify-between text-sm text-foreground/80'>
-                      <div className='flex'>
+                    {/* 하단(본문 내부) 메타: 위와 간격 확보 후 고정 높이 느낌 */}
+                    <div className='mt-auto pt-3 flex items-center justify-between text-sm text-foreground/80'>
+                      <div className='flex items-center'>
                         <Star className='h-4 w-4 text-yellow-500 dark:text-yellow-400' />
                         <span className='ml-1 font-medium'>
                           {typeof c.rating === "number"
@@ -113,14 +109,13 @@ export default function ClinicList({ clinics }: ClinicListProps) {
                           ({c.reviewCount ?? 0})
                         </span>
                       </div>
-
-                      {/* 하단 태그(필 칩) */}
                       {isExclusive && (
                         <ExclusiveTagChip text={exclusiveLabel} />
                       )}
                     </div>
                   </CardContent>
 
+                  {/* 푸터: 카드 맨 아래 고정 */}
                   <CardFooter className='px-4 py-2 border-t'>
                     <div className='flex items-center justify-between w-full'>
                       <span className='text-sm font-medium text-primary group-hover:underline'>
