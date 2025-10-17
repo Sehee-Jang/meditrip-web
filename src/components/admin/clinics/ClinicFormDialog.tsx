@@ -182,6 +182,7 @@ export default function ClinicFormDialog({
       reviewCount: 0,
       status: "visible",
       doctors: [],
+      isRecommended: false,
     },
     mode: "onChange",
     shouldFocusError: true,
@@ -254,6 +255,7 @@ export default function ClinicFormDialog({
           ? (data as { categoryKeys: CategoryKey[] }).categoryKeys
           : [],
         isExclusive: data.isExclusive ?? false,
+        isRecommended: data.isRecommended ?? false,
         description: LOCALES_TUPLE.reduce(
           (acc, lc) => {
             acc[lc] = asDoc(
@@ -531,6 +533,31 @@ export default function ClinicFormDialog({
                             className='text-sm text-foreground'
                           >
                             단독 입점
+                          </label>
+                        </div>
+                      )}
+                    />
+                  }
+                />
+                <FormRow
+                  label='추천 클리닉 여부(선택)'
+                  className='items-center'
+                  control={
+                    <Controller
+                      name='isRecommended'
+                      control={control}
+                      render={({ field }) => (
+                        <div className='flex items-center gap-2 pt-2'>
+                          <Checkbox
+                            id='isRecommended'
+                            checked={!!field.value}
+                            onCheckedChange={(v) => field.onChange(v === true)}
+                          />
+                          <label
+                            htmlFor='isRecommended'
+                            className='text-sm text-foreground'
+                          >
+                            메인 추천 클리닉으로 노출
                           </label>
                         </div>
                       )}

@@ -151,6 +151,7 @@ const clinicConverter: FirestoreDataConverter<ClinicDoc> = {
 
       // 기타
       isExclusive: Boolean(d.isExclusive),
+      isRecommended: d.isRecommended === true,
       rating: typeof d.rating === "number" ? d.rating : 0,
       reviewCount: typeof d.reviewCount === "number" ? d.reviewCount : 0,
       status: (d.status as "visible" | "hidden") ?? "visible",
@@ -373,6 +374,17 @@ export async function updateClinicStatus(
   await updateDoc(ref, { status, updatedAt: serverTimestamp() });
 }
 
+export async function updateClinicRecommendation(
+  clinicId: string,
+  isRecommended: boolean
+): Promise<void> {
+  const ref = doc(db, "clinics", clinicId);
+  await updateDoc(ref, {
+    isRecommended,
+    updatedAt: serverTimestamp(),
+  });
+}
+
 /* ===============================
  * Packages (subcollection)
  * =============================== */
@@ -440,15 +452,15 @@ export async function deletePackage(
   clinicId: string,
   packageId: string
 ): Promise<void> {
-const batch = writeBatch(db);
-const packageRef = doc(db, "clinics", clinicId, "packages", packageId);
-const clinicRef = doc(db, "clinics", clinicId);
+  const batch = writeBatch(db);
+  const packageRef = doc(db, "clinics", clinicId, "packages", packageId);
+  const clinicRef = doc(db, "clinics", clinicId);
 
-batch.delete(packageRef);
-batch.update(clinicRef, {
-  updatedAt: serverTimestamp(),
-});
-    await batch.commit();
+  batch.delete(packageRef);
+  batch.update(clinicRef, {
+    updatedAt: serverTimestamp(),
+  });
+  await batch.commit();
 }
 
 // displayOrder 일괄 업데이트(batch)

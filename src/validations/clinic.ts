@@ -132,6 +132,7 @@ export const clinicFormSchema = z.object({
   address: localizedRequiredDynamicSchema,
 
   isExclusive: z.boolean().default(false),
+  isRecommended: z.boolean().default(false),
   // 모두 선택
   intro: z.object({
     title: localizedStringDynamicSchema,

@@ -3,6 +3,7 @@
 import React from "react";
 import {
   deleteClinic,
+  updateClinicRecommendation,
   updateClinicStatus,
 } from "@/services/admin/clinics/clinics";
 import {
@@ -16,6 +17,7 @@ import ClinicRowActions from "./ClinicRowActions";
 import { ClinicWithId } from "@/types/clinic";
 import { CATEGORY_LABELS_KO, type CategoryKey } from "@/constants/categories";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 import { ArrowUp, ArrowDown } from "lucide-react";
 
 type ClinicStatus = "visible" | "hidden";
@@ -48,6 +50,8 @@ export default function ClinicTableRow({
   sortingDisabled = false,
 }: Props) {
   const [updating, setUpdating] = React.useState(false);
+  const [recommendationUpdating, setRecommendationUpdating] =
+    React.useState(false);
 
   const handleChangeStatus = async (next: ClinicStatus) => {
     if (next === clinic.status) return;
@@ -60,6 +64,16 @@ export default function ClinicTableRow({
     }
   };
 
+    const handleToggleRecommendation = async (checked: boolean) => {
+      try {
+        setRecommendationUpdating(true);
+        await updateClinicRecommendation(clinic.id, checked);
+        onUpdated();
+      } finally {
+        setRecommendationUpdating(false);
+      }
+    };
+  
   const handleDelete = async () => {
     const ok = confirm(
       "삭제된 항목 탭에서 언제든 복구할 수 있습니다. 정말 삭제할까요?"
@@ -106,6 +120,18 @@ export default function ClinicTableRow({
         )}
       </td>
 
+      {/* 추천 토글 */}
+      <td className='px-4 py-3 text-center'>
+        <Switch
+          checked={clinic.isRecommended === true}
+          onCheckedChange={handleToggleRecommendation}
+          disabled={recommendationUpdating}
+          aria-label={
+            clinic.isRecommended === true ? "추천 해제" : "추천으로 설정"
+          }
+        />
+      </td>
+      
       {/* 상태관리 */}
       <td className='px-4 py-3 text-center'>
         <Select

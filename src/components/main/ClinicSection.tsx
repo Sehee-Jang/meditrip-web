@@ -14,7 +14,7 @@ export default function ClinicSection() {
   const locale = useLocale();
 
   const [allClinics, setAllClinics] = useState<ClinicListItem[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let mounted = true;
@@ -37,6 +37,12 @@ export default function ClinicSection() {
     [allClinics]
   );
 
+   const shouldRenderSection = loading || recommended.length > 0;
+
+   if (!shouldRenderSection) {
+     return null;
+   }
+  
   return (
     <section className='py-10'>
       <Container>

@@ -75,6 +75,7 @@ export interface ClinicDoc {
     subtitle: LocalizedTextDoc;
   };
   isExclusive?: boolean;
+  isRecommended?: boolean;
   doctors?: Doctor[];
 
   // 영업시간 (선택)
@@ -157,6 +158,7 @@ export type ClinicListItem = Pick<
   | "name"
   | "address"
   | "isExclusive"
+  | "isRecommended"
   | "images"
   | "rating"
   | "reviewCount"
