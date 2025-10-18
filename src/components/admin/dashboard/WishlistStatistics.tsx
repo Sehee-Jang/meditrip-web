@@ -9,7 +9,6 @@ import {
   Loader2,
   Sparkles,
   Users,
-  TrendingUp,
 } from "lucide-react";
 
 import SectionCard from "@/components/admin/common/SectionCard";
@@ -142,11 +141,15 @@ function KPICard(props: {
 }
 
 /* ----- 라인차트 ----- */
-/* 기존 WishlistTrendChart 대체 */
 function WishlistTrendChart({ data }: WishlistTrendChartProps) {
+  // 항상 최상단에서 Hook 호출
+  const [hoverIdx, setHoverIdx] = React.useState<number | null>(null);
+  const gradId = React.useId();
+
+  // 빈 데이터 처리는 Hook 호출 이후에
   if (!data.length) {
     return (
-      <div className='flex h-[220px] items-center justify-center text-sm text-muted-foreground'>
+      <div className="flex h-[220px] items-center justify-center text-sm text-muted-foreground">
         집계할 데이터가 없습니다.
       </div>
     );
@@ -172,7 +175,7 @@ function WishlistTrendChart({ data }: WishlistTrendChartProps) {
 
   const toPathD = (p: Array<{ x: number; y: number }>): string => {
     if (p.length <= 1) return `M ${p[0]?.x ?? 0},${p[0]?.y ?? 0}`;
-    const s = 0.18; // 더 직선에 가깝게
+    const s = 0.18;
     const out: string[] = [`M ${p[0].x},${p[0].y}`];
     for (let i = 0; i < p.length - 1; i += 1) {
       const p0 = p[i - 1] ?? p[i];
@@ -189,11 +192,8 @@ function WishlistTrendChart({ data }: WishlistTrendChartProps) {
   };
 
   // 수평 가이드 3개만
-  const gridYs = [0, 0.5, 1, 1]
-    .slice(0, 3)
-    .map((t) => y(minY + (maxY - minY) * t));
+  const gridYs = [0, 0.5, 1].map((t) => y(minY + (maxY - minY) * t));
 
-  const [hoverIdx, setHoverIdx] = React.useState<number | null>(null);
   const onMove = (e: React.MouseEvent<SVGRectElement>) => {
     const rect = (e.currentTarget as SVGRectElement).getBoundingClientRect();
     const px = e.clientX - rect.left;
@@ -208,33 +208,18 @@ function WishlistTrendChart({ data }: WishlistTrendChartProps) {
     }
     setHoverIdx(best);
   };
-
   const onLeave = () => setHoverIdx(null);
-  const gradId = React.useId();
-
-  // 라벨(좌/중/우)
-  const xLabels: Array<{ i: number; label: string }> = (() => {
-    if (data.length <= 3) return data.map((d, i) => ({ i, label: d.label }));
-    const left = 0;
-    const right = data.length - 1;
-    const mid = Math.round((left + right) / 2);
-    return [
-      { i: left, label: data[left].label },
-      { i: mid, label: data[mid].label },
-      { i: right, label: data[right].label },
-    ];
-  })();
 
   return (
-    <div className='flex flex-col gap-2'>
-      <div className='text-xs text-muted-foreground'>최근 8주간 주간 추이</div>
+    <div className="flex flex-col gap-2">
+      <div className="text-xs text-muted-foreground">최근 8주간 주간 추이</div>
 
-      <div className='relative'>
-        <svg viewBox={`0 0 ${width} ${height}`} className='h-[220px] w-full'>
+      <div className="relative">
+        <svg viewBox={`0 0 ${width} ${height}`} className="h-[220px] w-full">
           <defs>
-            <linearGradient id={gradId} x1='0' y1='0' x2='0' y2='1'>
-              <stop offset='0%' stopColor='rgb(99 102 241 / 0.12)' />
-              <stop offset='100%' stopColor='rgb(99 102 241 / 0)' />
+            <linearGradient id={gradId} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="rgb(99 102 241 / 0.12)" />
+              <stop offset="100%" stopColor="rgb(99 102 241 / 0)" />
             </linearGradient>
           </defs>
 
@@ -245,14 +230,14 @@ function WishlistTrendChart({ data }: WishlistTrendChartProps) {
               x2={width - pad.right}
               y1={gy}
               y2={gy}
-              stroke='currentColor'
-              className='text-muted-foreground/20'
+              stroke="currentColor"
+              className="text-muted-foreground/20"
               strokeWidth={1}
-              shapeRendering='crispEdges'
+              shapeRendering="crispEdges"
             />
           ))}
 
-          {/* 면적(아주 옅게) */}
+          {/* 면적 */}
           <path
             d={`${toPathD(pts)} L ${pts.at(-1)?.x ?? 0},${y(0)} L ${
               pts[0]?.x ?? 0
@@ -260,13 +245,13 @@ function WishlistTrendChart({ data }: WishlistTrendChartProps) {
             fill={`url(#${gradId})`}
           />
 
-          {/* 라인(더 가늘게) */}
+          {/* 라인 */}
           <path
             d={toPathD(pts)}
-            fill='none'
-            stroke='rgb(99 102 241)'
+            fill="none"
+            stroke="rgb(99 102 241)"
             strokeWidth={1.75}
-            strokeLinecap='round'
+            strokeLinecap="round"
           />
 
           {/* 인터랙션 */}
@@ -275,12 +260,12 @@ function WishlistTrendChart({ data }: WishlistTrendChartProps) {
             y={pad.top}
             width={width - pad.left - pad.right}
             height={height - pad.top - pad.bottom}
-            fill='transparent'
+            fill="transparent"
             onMouseMove={onMove}
             onMouseLeave={onLeave}
           />
 
-          {/* 호버 가이드 + 점(기본 숨김) */}
+          {/* 호버 가이드 + 점 */}
           {hoverIdx !== null && (
             <>
               <line
@@ -288,57 +273,58 @@ function WishlistTrendChart({ data }: WishlistTrendChartProps) {
                 x2={x(hoverIdx)}
                 y1={pad.top}
                 y2={height - pad.bottom}
-                stroke='currentColor'
-                className='text-muted-foreground/35'
-                strokeDasharray='3 3'
+                stroke="currentColor"
+                className="text-muted-foreground/35"
+                strokeDasharray="3 3"
               />
               <circle
                 cx={x(hoverIdx)}
                 cy={y(data[hoverIdx].count)}
                 r={3.5}
-                fill='rgb(99 102 241)'
+                fill="rgb(99 102 241)"
               />
             </>
           )}
         </svg>
 
-        {/* 툴팁: 알약 모양, 아주 연한 배경 */}
+        {/* 툴팁 */}
         {hoverIdx !== null && (
           <div
-            className='
+            className="
               pointer-events-none absolute -translate-x-1/2 -translate-y-2
               rounded-full border border-border/70 bg-background/95
               px-2.5 py-1 text-[11px] shadow-sm
-            '
+            "
             style={{
               left: `${((x(hoverIdx) / width) * 100).toFixed(3)}%`,
               top: `${((y(data[hoverIdx].count) / height) * 100).toFixed(3)}%`,
             }}
           >
-            <span className='font-medium text-foreground tabular-nums'>
+            <span className="font-medium text-foreground tabular-nums">
               {data[hoverIdx].count}회
             </span>
-            <span className='ml-1.5 text-muted-foreground'>
+            <span className="ml-1.5 text-muted-foreground">
               {data[hoverIdx].label}
             </span>
           </div>
         )}
       </div>
 
-      <div className='relative mt-1 h-5'>
-        {xLabels.map(({ i, label }) => (
+      <div className="relative mt-1 h-5">
+        {[0, Math.round((data.length - 1) / 2), data.length - 1].map((i) => (
           <span
             key={i}
-            className='absolute -translate-x-1/2 text-[11px] text-muted-foreground'
+            className="absolute -translate-x-1/2 text-[11px] text-muted-foreground"
             style={{ left: `${((x(i) / width) * 100).toFixed(3)}%` }}
           >
-            {label}
+            {data[i].label}
           </span>
         ))}
       </div>
     </div>
   );
 }
+
 
 /* ----- 메인 컴포넌트 ----- */
 export default function WishlistStatistics() {
