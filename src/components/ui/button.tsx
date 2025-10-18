@@ -24,8 +24,21 @@ const buttonVariants = cva(
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
 
-        /** 선택: 보조용 미세 톤 */
         subtle: "bg-slate-100 text-slate-800 hover:bg-slate-200",
+        chip:
+          // 비선택 상태: 연한 캡슐
+          "rounded-full border border-input bg-muted/30 text-foreground/90 " +
+          "hover:bg-muted/40 " +
+          // 선택/열림 상태: brand 토큰으로 확실히 채우기
+          "data-[pressed=true]:border-[hsl(var(--info))] " +
+          "data-[pressed=true]:bg-[hsl(var(--info))] " +
+          "data-[pressed=true]:text-[hsl(var(--info-foreground))] " +
+          "data-[pressed=true]:shadow-sm " +
+          "data-[state=open]:border-[hsl(var(--info))] " +
+          "data-[state=open]:bg-[hsl(var(--info))] " +
+          "data-[state=open]:text-[hsl(var(--info-foreground))] " +
+          // 포커스 링도 brand로
+          "focus-visible:ring-2 focus-visible:ring-[hsl(var(--info))]",
       },
       size: {
         default: "h-9 px-4 py-2",
