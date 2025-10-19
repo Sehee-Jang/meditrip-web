@@ -178,6 +178,13 @@ function formatDateLabel(value: string): string {
   if (!isValid(parsed)) return value;
   return format(parsed, "MM.dd");
 }
+
+function formatTooltipDate(value: string): string {
+  const parsed = parseISO(value);
+  if (!isValid(parsed)) return value;
+  return format(parsed, "yyyy.MM.dd");
+}
+
 function renderDelta(
   delta: DeltaSummary | undefined,
   mode: ComparisonMode,
@@ -269,7 +276,8 @@ function KPICard(props: {
 /* ---------- 듀얼 라인차트(신규/취소) ---------- */
 function WishlistTrendChart({ data }: { data: TrendPoint[] }) {
   const gradId = React.useId();
-
+  const [hoverIndex, setHoverIndex] = React.useState<number | null>(null);
+  
   if (!data.length) {
     return (
       <div className='flex h-[220px] items-center justify-center text-sm text-muted-foreground'>
@@ -325,12 +333,54 @@ function WishlistTrendChart({ data }: { data: TrendPoint[] }) {
           label: formatDateLabel(data[i].date),
         }));
 
+  const chartWidth = width - pad.left - pad.right;
+
+  const handlePointerMove = (
+    event: React.MouseEvent<SVGSVGElement> | React.TouchEvent<SVGSVGElement>
+  ) => {
+    const native = event.nativeEvent;
+    let clientX: number | null = null;
+    if ("touches" in native) {
+      const touch = native.touches[0] ?? native.changedTouches[0];
+      clientX = touch?.clientX ?? null;
+    } else if ("clientX" in native) {
+      clientX = native.clientX;
+    }
+    if (clientX === null) return;
+    const rect = event.currentTarget.getBoundingClientRect();
+    const relX = ((clientX - rect.left) / rect.width) * width;
+    const ratio = (relX - pad.left) / (chartWidth || 1);
+    const nextIndex = Math.round(ratio * xCount);
+    const clamped = Math.max(0, Math.min(data.length - 1, nextIndex));
+    setHoverIndex(clamped);
+  };
+
+  const handlePointerLeave = () => setHoverIndex(null);
+
+  const activeIndex = hoverIndex ?? null;
+  const activePoint = activeIndex !== null ? data[activeIndex] ?? null : null;
+  const tooltipX =
+    activeIndex !== null ? x(activeIndex) : (pad.left + width - pad.right) / 2;
+  const tooltipAdditionY =
+    activeIndex !== null ? y(activePoint?.additions ?? 0) : 0;
+  const tooltipCancellationY =
+    activeIndex !== null ? y(activePoint?.cancellations ?? 0) : 0;
+  const tooltipTop = Math.min(tooltipAdditionY, tooltipCancellationY);
+
   return (
     <div className='flex flex-col gap-2'>
       <div className='text-xs text-muted-foreground'>기간 내 일자별 추이</div>
 
       <div className='relative'>
-        <svg viewBox={`0 0 ${width} ${height}`} className='h-[240px] w-full'>
+        <svg
+          viewBox={`0 0 ${width} ${height}`}
+          className='h-[240px] w-full touch-none'
+          onMouseMove={handlePointerMove}
+          onMouseLeave={handlePointerLeave}
+          onTouchStart={handlePointerMove}
+          onTouchMove={handlePointerMove}
+          onTouchEnd={handlePointerLeave}
+        >
           <defs>
             <linearGradient id={gradId} x1='0' y1='0' x2='0' y2='1'>
               <stop offset='0%' stopColor='rgb(99 102 241 / 0.14)' />
@@ -376,7 +426,62 @@ function WishlistTrendChart({ data }: { data: TrendPoint[] }) {
             strokeWidth={1.6}
             strokeDasharray='3 3'
           />
+
+          {activePoint ? (
+            <g className='pointer-events-none'>
+              <line
+                x1={tooltipX}
+                x2={tooltipX}
+                y1={pad.top}
+                y2={height - pad.bottom}
+                stroke='currentColor'
+                className='text-muted-foreground/40'
+                strokeWidth={1}
+                strokeDasharray='4 4'
+              />
+              <circle
+                cx={tooltipX}
+                cy={y(activePoint.additions)}
+                r={4}
+                fill='rgb(99 102 241)'
+                stroke='white'
+                strokeWidth={1.5}
+              />
+              <circle
+                cx={tooltipX}
+                cy={y(activePoint.cancellations)}
+                r={4}
+                fill='rgb(239 68 68)'
+                stroke='white'
+                strokeWidth={1.5}
+              />
+            </g>
+          ) : null}
         </svg>
+
+        {activePoint ? (
+          <div
+            className='pointer-events-none absolute z-10 -translate-x-1/2 whitespace-nowrap rounded-lg border border-border/70 bg-background/95 px-3 py-2 text-xs shadow-lg backdrop-blur'
+            style={{
+              left: `${((tooltipX / width) * 100).toFixed(3)}%`,
+              top: `${Math.max(tooltipTop - 12, pad.top).toFixed(2)}px`,
+            }}
+          >
+            <div className='text-[11px] font-medium text-muted-foreground'>
+              {formatTooltipDate(activePoint.date)}
+            </div>
+            <div className='mt-1 flex items-center gap-2 font-medium text-foreground'>
+              <span className='flex items-center gap-1'>
+                <span className='h-2 w-2 rounded-full bg-primary' />
+                신규: {integerFormatter.format(activePoint.additions)}건
+              </span>
+              <span className='flex items-center gap-1 text-destructive'>
+                <span className='h-2 w-2 rounded-full bg-destructive' />
+                취소: {integerFormatter.format(activePoint.cancellations)}건
+              </span>
+            </div>
+          </div>
+        ) : null}
       </div>
 
       {/* x축 라벨 */}
