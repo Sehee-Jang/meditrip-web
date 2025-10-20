@@ -170,6 +170,8 @@ const packageConverter: FirestoreDataConverter<PackageDoc> = {
   toFirestore: (data): DocumentData => data,
   fromFirestore: (snap): PackageDoc => {
     const d = snap.data() as DocumentData;
+    const createdAt = d.createdAt as Timestamp;
+
     return {
       title: d.title,
       subtitle: d.subtitle,
@@ -192,7 +194,13 @@ const packageConverter: FirestoreDataConverter<PackageDoc> = {
         ? (d.treatmentDetails as PackageDoc["treatmentDetails"])
         : undefined,
       precautions: d.precautions,
-      createdAt: d.createdAt as Timestamp,
+      displayOrder:
+        typeof d.displayOrder === "number"
+          ? (d.displayOrder as number)
+          : createdAt instanceof Timestamp
+          ? -createdAt.toMillis()
+          : undefined,
+      createdAt: createdAt,
       updatedAt: d.updatedAt as Timestamp,
     };
   },
@@ -395,12 +403,41 @@ export function packagesCol(clinicId: string) {
 export async function listPackagesAdmin(
   clinicId: string
 ): Promise<PackageWithId[]> {
-  const q = query(
-    packagesCol(clinicId).withConverter(packageConverter),
+  const base = packagesCol(clinicId).withConverter(packageConverter);
+  const ordered = query(
+    base,
+    orderBy("displayOrder", "asc"),
     orderBy("createdAt", "desc")
   );
-  const snap = await getDocs(q);
-  return snap.docs.map((d) => ({ id: d.id, clinicId, ...d.data() }));
+  try {
+    const snap = await getDocs(ordered);
+    return snap.docs.map((d) => ({ id: d.id, clinicId, ...d.data() }));
+  } catch {
+    const fallbackSnap = await getDocs(
+      query(base, orderBy("createdAt", "desc"))
+    );
+    const items = fallbackSnap.docs.map((d) => ({
+      id: d.id,
+      clinicId,
+      ...d.data(),
+    }));
+    return items.sort((a, b) => {
+      const aOrder =
+        typeof a.displayOrder === "number"
+          ? a.displayOrder
+          : Number.POSITIVE_INFINITY;
+      const bOrder =
+        typeof b.displayOrder === "number"
+          ? b.displayOrder
+          : Number.POSITIVE_INFINITY;
+      if (aOrder !== bOrder) return aOrder - bOrder;
+      const aCreated =
+        a.createdAt instanceof Timestamp ? a.createdAt.toMillis() : 0;
+      const bCreated =
+        b.createdAt instanceof Timestamp ? b.createdAt.toMillis() : 0;
+      return bCreated - aCreated;
+    });
+  }
 }
 
 export async function createPackage(
@@ -411,9 +448,12 @@ export async function createPackage(
 
   // zh/en 숫자 필드가 비어있으면 undefined일 수 있으니, 저장 전 제거
   const cleaned = stripUndefinedDeep(values);
+  const base = cleaned as Omit<PackageDoc, "createdAt" | "updatedAt">;
 
   const data: PackageDoc = {
-    ...(cleaned as Omit<PackageDoc, "createdAt" | "updatedAt">),
+    ...base,
+    displayOrder:
+      typeof base.displayOrder === "number" ? base.displayOrder : -Date.now(),
     createdAt: now as unknown as Timestamp,
     updatedAt: now as unknown as Timestamp,
   };
@@ -474,5 +514,29 @@ export async function updateClinicOrders(
       updatedAt: serverTimestamp(),
     });
   }
+  await batch.commit();
+}
+
+export async function updatePackageOrders(
+  clinicId: string,
+  orderMap: ReadonlyArray<{ id: string; displayOrder: number }>
+): Promise<void> {
+  if (orderMap.length === 0) return;
+
+  const batch = writeBatch(db);
+  const clinicRef = clinicDocRef(clinicId);
+
+  for (const { id, displayOrder } of orderMap) {
+    const pkgRef = doc(db, "clinics", clinicId, "packages", id);
+    batch.update(pkgRef, {
+      displayOrder,
+      updatedAt: serverTimestamp(),
+    });
+  }
+
+  batch.update(clinicRef, {
+    updatedAt: serverTimestamp(),
+  });
+
   await batch.commit();
 }

@@ -110,6 +110,7 @@ export interface ClinicDoc {
 
 // 서브컬렉션 "clinics/{id}/packages/{pid}"
 export interface PackageDoc extends PackageInfo {
+  displayOrder?: number;
   createdAt: Timestamp;
   updatedAt: Timestamp;
 }
