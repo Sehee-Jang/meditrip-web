@@ -19,8 +19,9 @@ import { Card } from "@/components/ui/card";
 import SectionCard from "@/components/admin/common/SectionCard";
 import PackageFormDialog from "./PackageFormDialog";
 import { formatDuration, formatPrice } from "@/lib/format";
-import { ArrowDown, ArrowUp, Loader2 } from "lucide-react";
+import { ChevronDown, ChevronUp, Loader2, Plus } from "lucide-react";
 import PackageRowActions from "./PackageRowActions";
+import IconOnlyAddButton from "../common/IconOnlyAddButton";
 
 export interface PackagesPanelProps {
   clinicId: string;
@@ -148,12 +149,19 @@ export default function PackagesPanel({
                 </SheetHeader>
                 <div className='flex items-center gap-2'>
                   {/* 저장 버튼은 하단 고정 바로 이동 */}
-                  <Button
+                  <IconOnlyAddButton
+                    label='패키지 추가'
+                    ariaLabel='패키지 추가'
+                    icon={Plus}
+                    variant='brand'
+                    onClick={handleCreate}
+                  />
+                  {/* <Button
                     className='bg-indigo-700 hover:bg-indigo-800'
                     onClick={handleCreate}
                   >
                     패키지 추가
-                  </Button>
+                  </Button> */}
                   <Button variant='outline' onClick={() => onOpenChange(false)}>
                     닫기
                   </Button>
@@ -198,7 +206,7 @@ export default function PackagesPanel({
                                 onClick={() => moveItem(index, -1)}
                                 className='h-8 w-8'
                               >
-                                <ArrowUp className='h-4 w-4' />
+                                <ChevronUp className='h-4 w-4' />
                                 <span className='sr-only'>위로</span>
                               </Button>
                               {/* Index */}
@@ -213,7 +221,7 @@ export default function PackagesPanel({
                                 onClick={() => moveItem(index, 1)}
                                 className='h-8 w-8'
                               >
-                                <ArrowDown className='h-4 w-4' />
+                                <ChevronDown className='h-4 w-4' />
                                 <span className='sr-only'>아래로</span>
                               </Button>
                             </div>

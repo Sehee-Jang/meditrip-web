@@ -18,7 +18,7 @@ import { ClinicWithId } from "@/types/clinic";
 import { CATEGORY_LABELS_KO, type CategoryKey } from "@/constants/categories";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { ArrowUp, ArrowDown } from "lucide-react";
+import { ChevronDown, ChevronUp } from "lucide-react";
 
 type ClinicStatus = "visible" | "hidden";
 
@@ -64,16 +64,16 @@ export default function ClinicTableRow({
     }
   };
 
-    const handleToggleRecommendation = async (checked: boolean) => {
-      try {
-        setRecommendationUpdating(true);
-        await updateClinicRecommendation(clinic.id, checked);
-        onUpdated();
-      } finally {
-        setRecommendationUpdating(false);
-      }
-    };
-  
+  const handleToggleRecommendation = async (checked: boolean) => {
+    try {
+      setRecommendationUpdating(true);
+      await updateClinicRecommendation(clinic.id, checked);
+      onUpdated();
+    } finally {
+      setRecommendationUpdating(false);
+    }
+  };
+
   const handleDelete = async () => {
     const ok = confirm(
       "삭제된 항목 탭에서 언제든 복구할 수 있습니다. 정말 삭제할까요?"
@@ -131,7 +131,7 @@ export default function ClinicTableRow({
           }
         />
       </td>
-      
+
       {/* 상태관리 */}
       <td className='px-4 py-3 text-center'>
         <Select
@@ -161,7 +161,7 @@ export default function ClinicTableRow({
             aria-label='위로'
             title='위로'
           >
-            <ArrowUp className='h-4 w-4' />
+            <ChevronUp className='h-4 w-4' />
           </Button>
           <Button
             type='button'
@@ -172,7 +172,7 @@ export default function ClinicTableRow({
             aria-label='아래로'
             title='아래로'
           >
-            <ArrowDown className='h-4 w-4' />
+            <ChevronDown className='h-4 w-4' />
           </Button>
         </div>
       </td>
