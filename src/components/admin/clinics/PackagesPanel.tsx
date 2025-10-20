@@ -20,6 +20,7 @@ import SectionCard from "@/components/admin/common/SectionCard";
 import PackageFormDialog from "./PackageFormDialog";
 import { formatDuration, formatPrice } from "@/lib/format";
 import { ArrowDown, ArrowUp, Loader2 } from "lucide-react";
+import PackageRowActions from "./PackageRowActions";
 
 export interface PackagesPanelProps {
   clinicId: string;
@@ -36,10 +37,11 @@ export default function PackagesPanel({
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [savingOrder, setSavingOrder] = useState<boolean>(false);
-  
+
   const [openForm, setOpenForm] = useState<boolean>(false);
   const [editing, setEditing] = useState<PackageWithId | undefined>(undefined);
 
+  // 최초 순서를 기억해두었다가 취소 시 복원
   const initialOrderRef = useRef<string[]>([]);
 
   const currentOrder = useMemo(() => items.map((item) => item.id), [items]);
@@ -116,6 +118,20 @@ export default function PackagesPanel({
     }
   };
 
+  // 순서 변경 취소: 최초 순서로 복원
+  const resetOrder = (): void => {
+    const desiredOrder = new Map<string, number>(
+      initialOrderRef.current.map((id, i) => [id, i])
+    );
+    setItems((prev) =>
+      [...prev]
+        .sort(
+          (a, b) =>
+            (desiredOrder.get(a.id) ?? 0) - (desiredOrder.get(b.id) ?? 0)
+        )
+        .map((pkg, idx) => ({ ...pkg, displayOrder: idx }))
+    );
+  };
 
   return (
     <>
@@ -123,7 +139,7 @@ export default function PackagesPanel({
         <SheetContent side='right' className='w-full sm:max-w-[920px] p-0'>
           <div className='flex h-full flex-col'>
             {/* Header */}
-            <div className='sticky top-0 z-10 border-b bg-background'>
+            <div className='sticky top-0 z-10 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60'>
               <div className='flex items-center justify-between px-6 py-4'>
                 <SheetHeader className='space-y-0'>
                   <SheetTitle className='text-base font-semibold'>
@@ -131,20 +147,7 @@ export default function PackagesPanel({
                   </SheetTitle>
                 </SheetHeader>
                 <div className='flex items-center gap-2'>
-                  <Button
-                    variant='outline'
-                    disabled={!isOrderDirty || savingOrder}
-                    onClick={() => void handleSaveOrder()}
-                  >
-                    {savingOrder ? (
-                      <>
-                        <Loader2 className='mr-2 h-4 w-4 animate-spin' />
-                        저장 중...
-                      </>
-                    ) : (
-                      "순서 저장"
-                    )}
-                  </Button>
+                  {/* 저장 버튼은 하단 고정 바로 이동 */}
                   <Button
                     className='bg-indigo-700 hover:bg-indigo-800'
                     onClick={handleCreate}
@@ -173,78 +176,73 @@ export default function PackagesPanel({
 
                 <div className='px-5 py-5'>
                   {!loading && items.length === 0 ? (
-                    <div className='rounded-lg border border-dashed p-6 text-center text-[12px] text-muted-foreground'>
+                    <div className='rounded-2xl border border-dashed p-6 text-center text-[12px] text-muted-foreground'>
                       등록된 패키지가 없습니다.
                     </div>
                   ) : (
-                    <div className='flex flex-col gap-4'>
+                    <div className='flex flex-col gap-3'>
                       {items.map((p, index) => (
-                        <Card key={p.id} className='p-4'>
-                          <div className='mb-3 flex items-start justify-between gap-4'>
-                            <div className='flex items-center gap-3'>
-                              <div className='flex h-8 w-8 items-center justify-center rounded-md border text-[12px] font-medium text-muted-foreground'>
-                                {index + 1}
-                              </div>
-                              <div className='min-w-0'>
-                                <div className='truncate text-[14px] font-medium'>
-                                  {p.title.ko}
-                                </div>
-                                {p.subtitle?.ko && (
-                                  <div className='truncate text-[12px] text-muted-foreground'>
-                                    {p.subtitle.ko}
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                            <div className='flex shrink-0 items-center gap-2'>
+                        <Card
+                          key={p.id}
+                          className='rounded-2xl border bg-card p-4 transition-shadow hover:shadow-sm'
+                        >
+                          {/* 3열 그리드: 번호 / 본문 / 액션 */}
+                          <div className='grid grid-cols-[auto_1fr_auto] items-center gap-3 sm:gap-4'>
+                            {/* 이동 버튼, 번호 */}
+                            <div className='flex flex-col gap-1 self-start sm:self-auto'>
                               <Button
                                 size='icon'
-                                variant='outline'
-                                disabled={index === 0}
+                                variant='ghost'
                                 aria-label='위로 이동'
+                                disabled={index === 0}
                                 onClick={() => moveItem(index, -1)}
+                                className='h-8 w-8'
                               >
                                 <ArrowUp className='h-4 w-4' />
+                                <span className='sr-only'>위로</span>
                               </Button>
+                              {/* Index */}
+                              <div className='flex h-8 w-8 items-center justify-center text-[12px] font-medium text-muted-foreground'>
+                                {index + 1}
+                              </div>
                               <Button
                                 size='icon'
-                                variant='outline'
-                                disabled={index === items.length - 1}
+                                variant='ghost'
                                 aria-label='아래로 이동'
+                                disabled={index === items.length - 1}
                                 onClick={() => moveItem(index, 1)}
+                                className='h-8 w-8'
                               >
                                 <ArrowDown className='h-4 w-4' />
+                                <span className='sr-only'>아래로</span>
                               </Button>
                             </div>
-                          </div>
 
-                          <div className='mb-3 flex flex-wrap items-center gap-2 text-[12px] text-muted-foreground'>
-                            <span>{formatDuration("ko", p.duration)}</span>
-                            <span>·</span>
-                            <span>{formatPrice("ko", p.price.ko)}</span>
-                          </div>
-
-                          {p.packageImages && p.packageImages.length > 0 && (
-                            <div className='mt-1 text-[11px] text-muted-foreground'>
-                              이미지 {p.packageImages.length}장
+                            {/* 본문 */}
+                            <div className='min-w-0 space-y-1'>
+                              <div className='text-[14px] font-medium leading-5 break-keep line-clamp-1'>
+                                {p.title.ko}
+                              </div>
+                              {p.subtitle?.ko && (
+                                <p className='text-[12px] text-muted-foreground leading-4 break-keep line-clamp-1'>
+                                  {p.subtitle.ko}
+                                </p>
+                              )}
+                              <div className='flex flex-wrap items-center gap-1.5 text-[12px] text-muted-foreground'>
+                                <span>{formatDuration("ko", p.duration)}</span>
+                                <span aria-hidden>·</span>
+                                <span>{formatPrice("ko", p.price.ko)}</span>
+                              </div>
                             </div>
-                          )}
 
-                          <div className='flex items-center justify-end gap-2'>
-                            <Button
-                              size='sm'
-                              variant='outline'
-                              onClick={() => handleEdit(p)}
-                            >
-                              수정
-                            </Button>
-                            <Button
-                              size='sm'
-                              variant='destructive'
-                              onClick={() => void handleRemove(p)}
-                            >
-                              삭제
-                            </Button>
+                            {/* 더보기 */}
+                            <div className='flex flex-col items-end gap-2 whitespace-nowrap sm:flex-row sm:items-center sm:justify-end'>
+                              {/* 병원 목록과 동일한 더보기 액션 */}
+                              <PackageRowActions
+                                onEdit={() => handleEdit(p)}
+                                onDelete={() => void handleRemove(p)}
+                              />
+                            </div>
                           </div>
                         </Card>
                       ))}
@@ -253,6 +251,36 @@ export default function PackagesPanel({
                 </div>
               </SectionCard>
             </div>
+
+            {/* 순서 변경용 하단 고정 바: 변경 시에만 표시 */}
+            {isOrderDirty && (
+              <div className='sticky bottom-0 z-20 border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60'>
+                <div className='mx-auto flex max-w-[920px] items-center justify-between px-6 py-3'>
+                  <span className='text-sm text-muted-foreground'>
+                    패키지 순서가 변경되었습니다.
+                  </span>
+                  <div className='flex gap-2'>
+                    <Button variant='outline' onClick={resetOrder}>
+                      변경 취소
+                    </Button>
+                    <Button
+                      onClick={() => void handleSaveOrder()}
+                      disabled={savingOrder}
+                      className='bg-indigo-700 hover:bg-indigo-800'
+                    >
+                      {savingOrder ? (
+                        <>
+                          <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+                          저장 중…
+                        </>
+                      ) : (
+                        "순서 저장"
+                      )}
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </SheetContent>
       </Sheet>
