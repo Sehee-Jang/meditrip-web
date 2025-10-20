@@ -19,6 +19,7 @@ import { CATEGORY_LABELS_KO, type CategoryKey } from "@/constants/categories";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { ChevronDown, ChevronUp } from "lucide-react";
+import { toast } from "sonner";
 
 type ClinicStatus = "visible" | "hidden";
 
@@ -67,8 +68,16 @@ export default function ClinicTableRow({
   const handleToggleRecommendation = async (checked: boolean) => {
     try {
       setRecommendationUpdating(true);
+      toast.success(
+        checked
+          ? "추천 클리닉으로 설정되었습니다."
+          : "추천 클리닉이 해제되었습니다."
+      );
       await updateClinicRecommendation(clinic.id, checked);
       onUpdated();
+    } catch (error) {
+      console.error(error);
+      toast.error("추천 상태 변경에 실패했습니다.");
     } finally {
       setRecommendationUpdating(false);
     }
