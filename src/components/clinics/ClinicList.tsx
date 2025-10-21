@@ -11,6 +11,8 @@ interface ClinicListProps {
   clinics: ClinicListItem[];
 }
 
+const CLINIC_CARD_IMAGE_SIZES = "(max-width: 768px) 100vw, 360px";
+
 /* 이미지 위 배지: 아이콘만(원형) */
 function ExclusiveBadgeIconOnly({ label }: { label: string }) {
   return (
@@ -66,7 +68,7 @@ export default function ClinicList({ clinics }: ClinicListProps) {
                       alt={c.name?.[loc] ?? ""}
                       fill
                       className='object-cover'
-                      sizes='(max-width: 768px) 100vw, 33vw'
+                      sizes={CLINIC_CARD_IMAGE_SIZES}
                     />
                     <div className='pointer-events-none absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-black/25 to-transparent' />
 

@@ -18,6 +18,10 @@ interface Props {
   }>;
 }
 
+const PACKAGE_HERO_IMAGE_SIZES =
+  "(min-width: 1600px) 1280px, (min-width: 1024px) 1024px, (min-width: 768px) 768px, 100vw";
+const PACKAGE_STEP_IMAGE_SIZES = "(min-width: 768px) 160px, 100vw";
+
 export default async function PackageDetailPage({ params }: Props) {
   const { locale, clinicId, packageId } = await params;
   const t = await getTranslations("package-detail");
@@ -59,7 +63,13 @@ export default async function PackageDetailPage({ params }: Props) {
                 key={i}
                 className='relative w-full h-60 sm:h-80 md:h-[360px]'
               >
-                <Image src={img} alt={title} fill className='object-cover' />
+                <Image
+                  src={img}
+                  alt={title}
+                  fill
+                  className='object-cover'
+                  sizes={PACKAGE_HERO_IMAGE_SIZES}
+                />
               </div>
             ))}
           </div>
@@ -123,7 +133,7 @@ export default async function PackageDetailPage({ params }: Props) {
                                   alt={stepTitle ?? title}
                                   fill
                                   className='object-cover transition-transform duration-300 group-hover:scale-[1.02]'
-                                  sizes='(min-width: 768px) 160px, 100vw'
+                                  sizes={PACKAGE_STEP_IMAGE_SIZES}
                                 />
                               </div>
                             ) : (

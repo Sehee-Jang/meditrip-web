@@ -40,6 +40,8 @@ const securityHeaders = [{ key: "Content-Security-Policy", value: csp }];
 
 const nextConfig: NextConfig = {
   images: {
+    deviceSizes: [360, 414, 768, 1024, 1280, 1600],
+    imageSizes: [160, 240, 320, 360, 420, 480, 640, 800],
     remotePatterns: [
       { protocol: "https", hostname: "lh3.googleusercontent.com" },
       { protocol: "https", hostname: "pfzwkpvubunanobhsicu.supabase.co" },

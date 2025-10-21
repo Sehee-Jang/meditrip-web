@@ -9,6 +9,8 @@ type Props = {
   className?: string; // 부모에서 relative 컨테이너 제공 필요
 };
 
+const CARD_THUMB_IMAGE_SIZES = "(max-width: 640px) 100vw, 360px";
+
 export default function CardThumb({ src, alt, className }: Props) {
   const [failed, setFailed] = useState(false);
   const url = typeof src === "string" ? src.trim() : "";
@@ -20,6 +22,7 @@ export default function CardThumb({ src, alt, className }: Props) {
         src='/images/placeholders/community_default_img.webp'
         alt={alt}
         fill
+        sizes={CARD_THUMB_IMAGE_SIZES}
         loading='lazy'
         className={`absolute inset-0 h-full w-full object-cover ${
           className ?? ""
@@ -33,7 +36,7 @@ export default function CardThumb({ src, alt, className }: Props) {
       src={url}
       alt={alt}
       fill
-      sizes='(max-width: 640px) 100vw, 400px'
+      sizes={CARD_THUMB_IMAGE_SIZES}
       className={`object-cover ${className ?? ""}`}
       onError={() => setFailed(true)}
     />

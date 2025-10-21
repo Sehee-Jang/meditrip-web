@@ -17,6 +17,9 @@ interface Props {
   images: string[]; // 예: ['/images/hero/hero1.webp', ...]
 }
 
+const HERO_IMAGE_SIZES =
+  "(min-width: 1600px) 1600px, (min-width: 1024px) 1024px, (min-width: 768px) 768px, 100vw";
+
 const HeroSectionClient: FC<Props> = ({ images }) => {
   const t = useTranslations("hero-section");
 
@@ -38,7 +41,7 @@ const HeroSectionClient: FC<Props> = ({ images }) => {
                   src={src}
                   alt={`메인 슬라이드 ${idx + 1}`}
                   fill
-                  sizes='(min-width: 768px) 100vw, 100vw'
+                  sizes={HERO_IMAGE_SIZES}
                   className='object-cover object-center'
                   priority={idx === 0}
                 />

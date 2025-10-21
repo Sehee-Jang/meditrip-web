@@ -15,6 +15,9 @@ type Props = {
   className?: string;
 };
 
+const CLINIC_CAROUSEL_IMAGE_SIZES =
+  "(min-width: 1600px) 1280px, (min-width: 1024px) 1024px, (min-width: 768px) 768px, 100vw";
+
 export default function ClinicCarousel({ photos, className }: Props) {
   const hostRef = useRef<HTMLDivElement | null>(null);
   const [enableAuto, setEnableAuto] = useState(false);
@@ -57,8 +60,7 @@ export default function ClinicCarousel({ photos, className }: Props) {
                   alt={`hospital image ${idx + 1}`}
                   fill
                   className='object-cover'
-                  // 해상도 힌트로 과다 다운로드 방지
-                  sizes='(max-width: 640px) 100vw, (max-width: 768px) 100vw, 1024px'
+                  sizes={CLINIC_CAROUSEL_IMAGE_SIZES}
                   // 첫 장만 우선 디코딩
                   priority={idx === 0}
                 />

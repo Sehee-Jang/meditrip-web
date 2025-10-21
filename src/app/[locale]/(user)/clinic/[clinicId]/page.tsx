@@ -39,6 +39,8 @@ type SearchParams = Promise<{ tab?: string }>;
 
 export const revalidate = 120;
 
+const PACKAGE_CARD_IMAGE_SIZES = "(max-width: 640px) 100vw, 480px";
+
 /** 오늘 지금 시각 기준 영업중 판단 (타임존/오버나이트/마감분 포함 제외) */
 function isOpenNow(
   weeklyHours: ClinicDetail["weeklyHours"] | undefined,
@@ -876,7 +878,7 @@ async function ClinicPackagesSection({
                     src={img}
                     alt={title || "package image"}
                     fill
-                    sizes='(max-width: 640px) 100vw, 50vw'
+                    sizes={PACKAGE_CARD_IMAGE_SIZES}
                     className='object-cover'
                   />
                 </div>

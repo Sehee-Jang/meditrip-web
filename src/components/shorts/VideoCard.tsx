@@ -12,6 +12,9 @@ type VideoCardProps = {
   isBlocked?: boolean;
 };
 
+const VIDEO_CARD_IMAGE_SIZES =
+  "(max-width: 640px) 200px, (max-width: 1024px) 180px, (max-width: 1280px) 200px, 220px";
+
 export default function VideoCard({
   id,
   title,
@@ -41,7 +44,7 @@ export default function VideoCard({
             alt={title}
             fill
             className='object-cover'
-            sizes='(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1280px) 25vw, 20vw'
+            sizes={VIDEO_CARD_IMAGE_SIZES}
             priority={false}
           />
         </div>
