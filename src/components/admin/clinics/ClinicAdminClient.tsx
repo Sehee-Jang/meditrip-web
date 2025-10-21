@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import React, { useMemo, useState, useCallback } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ClinicWithId } from "@/types/clinic";
-import { listClinics } from "@/services/admin/clinics/clinics";
+import { listClinics, type ListResult } from "@/services/admin/clinics/clinics";
 import SearchInput from "@/components/common/SearchInput";
 import {
   FilterRow,
@@ -26,10 +26,29 @@ export default function ClinicAdminClient() {
   const [tab, setTab] = useState<TabValue>("active");
   const [isExporting, setIsExporting] = useState(false);
   const [exportError, setExportError] = useState<string | null>(null);
+  const queryClient = useQueryClient();
   const { data, refetch, isFetching, error } = useQuery({
     queryKey: ["admin-clinics"],
     queryFn: () => listClinics(100),
   });
+
+   const patchClinic = useCallback(
+     (clinicId: string, patch: Partial<ClinicWithId>) => {
+       queryClient.setQueryData<ListResult<ClinicWithId> | undefined>(
+         ["admin-clinics"],
+         (prev) => {
+           if (!prev) return prev;
+           return {
+             ...prev,
+             items: prev.items.map((clinic) =>
+               clinic.id === clinicId ? { ...clinic, ...patch } : clinic
+             ),
+           };
+         }
+       );
+     },
+     [queryClient]
+   );
 
   const exportIcon = useMemo(() => {
     if (!isExporting) return Download;
@@ -235,6 +254,7 @@ export default function ClinicAdminClient() {
             totalCount={activeItems.length}
             onChanged={refetch}
             loading={isFetching}
+            onClinicPatched={patchClinic}
           />
         </TabsContent>
 

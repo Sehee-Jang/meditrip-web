@@ -25,6 +25,7 @@ interface Props {
   title?: string;
   // 상위에 dirty 상태 통지
   onDirtyChange?: (dirty: boolean) => void;
+  onClinicPatched?: (clinicId: string, patch: Partial<ClinicWithId>) => void;
 }
 
 export default function ClinicTable({
@@ -34,6 +35,7 @@ export default function ClinicTable({
   loading = false,
   title = "업체 목록",
   onDirtyChange,
+  onClinicPatched,
 }: Props) {
   const [editId, setEditId] = useState<string | null>(null);
   const [pkgClinicId, setPkgClinicId] = useState<string | null>(null);
@@ -109,6 +111,18 @@ export default function ClinicTable({
   // 테이블 리마운트 키(순서 변경 시 강제 재렌더)
   const tableKey = React.useMemo(() => rows.map((r) => r.id).join("|"), [rows]);
 
+  const applyClinicPatch = useCallback(
+    (clinicId: string, patch: Partial<ClinicWithId>) => {
+      setRows((prev) =>
+        prev.map((clinic) =>
+          clinic.id === clinicId ? { ...clinic, ...patch } : clinic
+        )
+      );
+      onClinicPatched?.(clinicId, patch);
+    },
+    [onClinicPatched]
+  );
+
   // 테이블 헤더
   const columns = useMemo(
     () =>
@@ -175,6 +189,7 @@ export default function ClinicTable({
                 index={idx}
                 flash={flashRowId === c.id}
                 onUpdated={onChanged}
+                onClinicPatched={(patch) => applyClinicPatch(c.id, patch)}
                 onOpenPackages={setPkgClinicId}
                 onEdit={setEditId}
                 onMoveUp={() => move(c.id, "up")}

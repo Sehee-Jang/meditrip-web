@@ -21,6 +21,7 @@ type Props = {
   flash?: boolean;
   onUpdated: () => void; // 상태 변경/삭제 후 목록 갱신
   onOpenPackages: (clinicId: string) => void;
+  onClinicPatched: (patch: Partial<ClinicWithId>) => void;
   onEdit: (clinicId: string) => void;
   onMoveUp: () => void;
   onMoveDown: () => void;
@@ -34,6 +35,7 @@ export default function ClinicTableRow({
   index,
   flash = false,
   onUpdated,
+  onClinicPatched,
   onOpenPackages,
   onEdit,
   onMoveUp,
@@ -49,12 +51,36 @@ export default function ClinicTableRow({
   const [deleting, setDeleting] = React.useState(false);
 
   const handleToggleRecommendation = async (checked: boolean) => {
+    const prev = clinic.isRecommended === true;
+    if (checked === prev) return;
+
     try {
       setRecommendationUpdating(true);
+      onClinicPatched({ isRecommended: checked });
       await updateClinicRecommendation(clinic.id, checked);
-      onUpdated();
+    } catch (err) {
+      console.error(err);
+      toast.error("추천 설정 변경에 실패했습니다.");
+      onClinicPatched({ isRecommended: prev });
     } finally {
       setRecommendationUpdating(false);
+    }
+  };
+
+  const handleToggleStatus = async (checked: boolean) => {
+    const nextStatus: ClinicWithId["status"] = checked ? "visible" : "hidden";
+    const prevStatus = clinic.status;
+    if (nextStatus === prevStatus) return;
+    try {
+      setUpdating(true);
+      onClinicPatched({ status: nextStatus });
+      await updateClinicStatus(clinic.id, nextStatus);
+    } catch (err) {
+      console.error(err);
+      toast.error("상태 변경에 실패했습니다.");
+      onClinicPatched({ status: prevStatus });
+    } finally {
+      setUpdating(false);
     }
   };
 
@@ -151,42 +177,12 @@ export default function ClinicTableRow({
         />
       </td>
 
-      {/* 추천 토글 */}
-      {/* <td className='px-4 py-3 text-center'>
-        <div className='inline-flex items-center justify-center gap-2'>
-          <Switch
-            checked={clinic.isRecommended === true}
-            onCheckedChange={handleToggleRecommendation}
-            disabled={recommendationUpdating}
-            aria-label={
-              clinic.isRecommended === true ? "추천 해제" : "추천으로 설정"
-            }
-          />
-          <span className='text-[12px] text-gray-500'>
-            {clinic.isRecommended ? "추천" : "일반"}
-          </span>
-        </div>
-      </td> */}
-
       {/* 노출 상태관리 */}
       <td className='px-4 py-3 text-center'>
         <div className='inline-flex items-center justify-center gap-2'>
           <Switch
             checked={clinic.status === "visible"}
-            onCheckedChange={async (checked) => {
-              const next = checked ? "visible" : "hidden";
-              if (next === clinic.status) return;
-              try {
-                setUpdating(true);
-                await updateClinicStatus(clinic.id, next);
-                onUpdated();
-              } catch (err) {
-                console.error(err);
-                toast.error("상태 변경에 실패했습니다.");
-              } finally {
-                setUpdating(false);
-              }
-            }}
+            onCheckedChange={handleToggleStatus}
             disabled={updating}
             aria-label='노출 상태 전환'
           />
