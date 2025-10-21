@@ -7,6 +7,7 @@ import ArticlesTableRow from "./ArticlesTableRow";
 import ArticlesFormDialog from "./ArticlesFormDialog";
 import { deleteArticle } from "@/services/articles/deleteArticle";
 import { toast } from "sonner";
+import ConfirmDialog from "@/components/admin/common/ConfirmDialog";
 
 interface Props {
   items: Article[];
@@ -24,6 +25,9 @@ export default function ArticlesTable({
   onChanged,
 }: Props) {
   const [editId, setEditId] = useState<string | null>(null);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [targetId, setTargetId] = useState<string | null>(null);
 
   const columns = [
     { header: "제목" },
@@ -34,17 +38,24 @@ export default function ArticlesTable({
   ] as const satisfies ReadonlyArray<DataTableColumn>;
 
   const handleDelete = async (id: string) => {
-    const ok = confirm("정말 삭제할까요?");
-    if (!ok) return;
-    try {
-      await deleteArticle(id);
-      toast.success("삭제되었습니다.");
-      onChanged?.(); // 👈 목록 갱신
-    } catch {
-      toast.error("삭제에 실패했어요.");
-    }
+    setTargetId(id);
+    setDeleteOpen(true);
   };
 
+  const confirmDelete = async (): Promise<void> => {
+    if (!targetId) return;
+    try {
+      setDeleting(true);
+      await deleteArticle(targetId);
+      toast.success("삭제되었습니다.");
+      onChanged?.(); // 목록 갱신
+    } catch {
+      toast.error("삭제에 실패했어요.");
+    } finally {
+      setDeleting(false);
+      setTargetId(null);
+    }
+  };
   return (
     <>
       <AdminDataTable<Article>
@@ -76,6 +87,21 @@ export default function ArticlesTable({
           }}
         />
       )}
+
+      <ConfirmDialog
+        open={deleteOpen}
+        onOpenChange={(o) => {
+          setDeleteOpen(o);
+          if (!o) setTargetId(null);
+        }}
+        title='아티클을 삭제할까요?'
+        description='삭제 후 되돌릴 수 없습니다.'
+        confirmText='삭제'
+        cancelText='취소'
+        confirmVariant='destructive'
+        loading={deleting}
+        onConfirm={confirmDelete}
+      />
     </>
   );
 }

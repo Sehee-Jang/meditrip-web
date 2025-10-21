@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { restoreClinic } from "@/services/admin/clinics/clinics";
 import type { ClinicWithId } from "@/types/clinic";
 import { RotateCcw } from "lucide-react";
+import ConfirmDialog from "@/components/admin/common/ConfirmDialog";
 
 interface Props {
   items: ClinicWithId[];
@@ -23,6 +24,9 @@ export default function ClinicDeletedTable({
   loading = false,
 }: Props) {
   const [restoringId, setRestoringId] = React.useState<string | null>(null);
+  const [confirmOpen, setConfirmOpen] = React.useState(false);
+  const [targetId, setTargetId] = React.useState<string | null>(null);
+  const [restoring, setRestoring] = React.useState(false);
 
   const columns = React.useMemo(
     () =>
@@ -35,20 +39,25 @@ export default function ClinicDeletedTable({
     []
   );
 
-  const handleRestore = async (id: string) => {
-    const ok = confirm(
-      "삭제된 업체를 복구할까요? 복구 시 상태는 숨김으로 전환됩니다."
-    );
-    if (!ok) return;
-    try {
-      setRestoringId(id);
-      await restoreClinic(id);
-      onChanged();
-    } finally {
-      setRestoringId(null);
-    }
+  const handleRestore = (id: string) => {
+    setTargetId(id);
+    setConfirmOpen(true);
   };
 
+  // 실제 복구 실행
+  const confirmRestore = async (): Promise<void> => {
+    if (!targetId) return;
+    try {
+      setRestoring(true);
+      setRestoringId(targetId);
+      await restoreClinic(targetId);
+      onChanged();
+    } finally {
+      setRestoring(false);
+      setRestoringId(null);
+      setTargetId(null);
+    }
+  };
   return (
     <AdminDataTable<ClinicWithId>
       title='삭제된 업체 목록'
@@ -72,7 +81,7 @@ export default function ClinicDeletedTable({
               type='button'
               variant='outline'
               size='sm'
-              onClick={() => void handleRestore(clinic.id)}
+              onClick={() => handleRestore(clinic.id)}
               disabled={restoringId === clinic.id || loading}
               className='inline-flex items-center gap-2'
             >
@@ -80,6 +89,21 @@ export default function ClinicDeletedTable({
               복구
             </Button>
           </td>
+
+          <ConfirmDialog
+            open={confirmOpen}
+            onOpenChange={(o) => {
+              setConfirmOpen(o);
+              if (!o) setTargetId(null);
+            }}
+            title='업체를 복구할까요?'
+            description='복구 시 상태는 ‘숨김’으로 전환됩니다.'
+            confirmText='복구'
+            cancelText='취소'
+            confirmVariant='destructive'
+            loading={restoring}
+            onConfirm={confirmRestore}
+          />
         </tr>
       )}
     />

@@ -1,4 +1,3 @@
-/** 개별 답변 카드 + 답글 토글/입력/목록 */
 "use client";
 
 import { useState } from "react";

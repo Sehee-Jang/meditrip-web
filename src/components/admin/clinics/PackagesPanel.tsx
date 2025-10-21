@@ -17,6 +17,7 @@ import { formatDuration, formatPrice } from "@/lib/format";
 import { ChevronDown, ChevronUp, Plus } from "lucide-react";
 import PackageRowActions from "./PackageRowActions";
 import IconOnlyAddButton from "../common/IconOnlyAddButton";
+import ConfirmDialog from "@/components/admin/common/ConfirmDialog";
 
 export interface PackagesPanelProps {
   clinicId: string;
@@ -37,6 +38,12 @@ export default function PackagesPanel({
 
   const [openForm, setOpenForm] = useState<boolean>(false);
   const [editing, setEditing] = useState<PackageWithId | undefined>(undefined);
+
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [targetPackage, setTargetPackage] = useState<PackageWithId | null>(
+    null
+  );
 
   // 최초 순서를 기억해두었다가 취소 시 복원
   const initialOrderRef = useRef<string[]>([]);
@@ -78,9 +85,20 @@ export default function PackagesPanel({
   };
 
   const handleRemove = async (p: PackageWithId): Promise<void> => {
-    if (!confirm(`패키지 "${p.title.ko}" 를 삭제하시겠어요?`)) return;
-    await deletePackage(clinicId, p.id);
-    await reload();
+    setTargetPackage(p);
+    setDeleteOpen(true);
+  };
+
+  const confirmRemove = async (): Promise<void> => {
+    if (!targetPackage) return;
+    try {
+      setDeleting(true);
+      await deletePackage(clinicId, targetPackage.id);
+      await reload();
+    } finally {
+      setDeleting(false);
+      setTargetPackage(null);
+    }
   };
 
   const moveItem = (index: number, delta: number): void => {
@@ -283,6 +301,25 @@ export default function PackagesPanel({
           setOpenForm(false);
           setEditing(undefined);
         }}
+      />
+
+      <ConfirmDialog
+        open={deleteOpen}
+        onOpenChange={(o) => {
+          setDeleteOpen(o);
+          if (!o) setTargetPackage(null);
+        }}
+        title='패키지를 삭제할까요?'
+        description={
+          targetPackage
+            ? `“${targetPackage.title.ko}” 항목이 삭제됩니다.`
+            : undefined
+        }
+        confirmText='삭제'
+        cancelText='취소'
+        confirmVariant='destructive'
+        loading={deleting}
+        onConfirm={confirmRemove}
       />
     </>
   );

@@ -19,6 +19,7 @@ import { CATEGORY_LABELS_KO, type CategoryKey } from "@/constants/categories";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { ChevronDown, ChevronUp } from "lucide-react";
+import ConfirmDialog from "@/components/admin/common/ConfirmDialog";
 
 type ClinicStatus = "visible" | "hidden";
 
@@ -52,6 +53,8 @@ export default function ClinicTableRow({
   const [updating, setUpdating] = React.useState(false);
   const [recommendationUpdating, setRecommendationUpdating] =
     React.useState(false);
+  const [deleteOpen, setDeleteOpen] = React.useState(false);
+  const [deleting, setDeleting] = React.useState(false);
 
   const handleChangeStatus = async (next: ClinicStatus) => {
     if (next === clinic.status) return;
@@ -75,13 +78,18 @@ export default function ClinicTableRow({
   };
 
   const handleDelete = async () => {
-    const ok = confirm(
-      "삭제된 항목 탭에서 언제든 복구할 수 있습니다. 정말 삭제할까요?"
-    );
+    setDeleteOpen(true);
+  };
 
-    if (!ok) return;
-    await deleteClinic(clinic.id);
-    onUpdated();
+  // 삭제 확정 로직 분리
+  const confirmDelete = async (): Promise<void> => {
+    try {
+      setDeleting(true);
+      await deleteClinic(clinic.id);
+      onUpdated();
+    } finally {
+      setDeleting(false);
+    }
   };
 
   // categoryKeys를 한국어 라벨로 변환
@@ -191,6 +199,18 @@ export default function ClinicTableRow({
           />
         </div>
       </td>
+
+      <ConfirmDialog
+        open={deleteOpen}
+        onOpenChange={setDeleteOpen}
+        title='업체를 삭제할까요?'
+        description='삭제된 항목 탭에서 언제든 복구할 수 있습니다.'
+        confirmText='삭제'
+        cancelText='취소'
+        confirmVariant='destructive'
+        loading={deleting}
+        onConfirm={confirmDelete}
+      />
     </tr>
   );
 }
