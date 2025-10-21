@@ -179,33 +179,7 @@ export default function ClinicTableRow({
         </Select>
       </td>
 
-      {/* 이동 버튼 */}
-      {/* <td className='px-4 py-3 text-center'>
-        <div className='inline-flex items-center gap-1'>
-          <Button
-            type='button'
-            variant='outline'
-            size='icon'
-            onClick={onMoveUp}
-            disabled={isFirst || sortingDisabled}
-            aria-label='위로'
-            title='위로'
-          >
-            <ChevronUp className='h-4 w-4' />
-          </Button>
-          <Button
-            type='button'
-            variant='outline'
-            size='icon'
-            onClick={onMoveDown}
-            disabled={isLast || sortingDisabled}
-            aria-label='아래로'
-            title='아래로'
-          >
-            <ChevronDown className='h-4 w-4' />
-          </Button>
-        </div>
-      </td> */}
+      
 
       {/* 액션: 패키지, 더보기 */}
       <td className='px-4 py-3 text-right pr-4'>
