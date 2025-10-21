@@ -11,6 +11,7 @@
   "edit": "編集",
   "delete": "削除",
   "confirmDelete": "本当に削除しますか？",
+  "cancel": "キャンセル",
   "deleteFailed": "削除に失敗しました。しばらくしてから再度お試しください。",
   "noDate": "日付なし"
 }
