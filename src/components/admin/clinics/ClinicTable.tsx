@@ -116,8 +116,8 @@ export default function ClinicTable({
         { header: "No.", widthClass: "w-[56px]", align: "center" },
         { header: "이름" }, // 가변
         { header: "카테고리", widthClass: "w-[28%]" },
-        { header: "추천", widthClass: "w-[100px]", align: "center" },
-        { header: "상태", widthClass: "w-[120px]", align: "center" },
+        { header: "추천 설정", widthClass: "w-[100px]", align: "center" },
+        { header: "노출 설정", widthClass: "w-[120px]", align: "center" },
         { header: "액션", widthClass: "w-[88px]", align: "right" },
       ] as const satisfies ReadonlyArray<DataTableColumn>,
     []

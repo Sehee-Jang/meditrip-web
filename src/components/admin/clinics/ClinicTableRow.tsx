@@ -6,13 +6,7 @@ import {
   updateClinicRecommendation,
   updateClinicStatus,
 } from "@/services/admin/clinics/clinics";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { toast } from "sonner";
 import ClinicRowActions from "./ClinicRowActions";
 import { ClinicWithId } from "@/types/clinic";
 import { CATEGORY_LABELS_KO, type CategoryKey } from "@/constants/categories";
@@ -20,8 +14,6 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import ConfirmDialog from "@/components/admin/common/ConfirmDialog";
-
-type ClinicStatus = "visible" | "hidden";
 
 type Props = {
   clinic: ClinicWithId;
@@ -55,17 +47,6 @@ export default function ClinicTableRow({
     React.useState(false);
   const [deleteOpen, setDeleteOpen] = React.useState(false);
   const [deleting, setDeleting] = React.useState(false);
-
-  const handleChangeStatus = async (next: ClinicStatus) => {
-    if (next === clinic.status) return;
-    try {
-      setUpdating(true);
-      await updateClinicStatus(clinic.id, next);
-      onUpdated();
-    } finally {
-      setUpdating(false);
-    }
-  };
 
   const handleToggleRecommendation = async (checked: boolean) => {
     try {
@@ -170,24 +151,50 @@ export default function ClinicTableRow({
         />
       </td>
 
-      {/* 상태관리 */}
-      <td className='px-4 py-3 text-center'>
-        <Select
-          value={clinic.status}
-          onValueChange={(v) => handleChangeStatus(v as ClinicStatus)}
-          disabled={updating}
-        >
-          <SelectTrigger className='h-8 w-[96px] px-2 text-xs'>
-            <SelectValue placeholder='상태' />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value='visible'>노출</SelectItem>
-            <SelectItem value='hidden'>숨김</SelectItem>
-          </SelectContent>
-        </Select>
-      </td>
+      {/* 추천 토글 */}
+      {/* <td className='px-4 py-3 text-center'>
+        <div className='inline-flex items-center justify-center gap-2'>
+          <Switch
+            checked={clinic.isRecommended === true}
+            onCheckedChange={handleToggleRecommendation}
+            disabled={recommendationUpdating}
+            aria-label={
+              clinic.isRecommended === true ? "추천 해제" : "추천으로 설정"
+            }
+          />
+          <span className='text-[12px] text-gray-500'>
+            {clinic.isRecommended ? "추천" : "일반"}
+          </span>
+        </div>
+      </td> */}
 
-      
+      {/* 노출 상태관리 */}
+      <td className='px-4 py-3 text-center'>
+        <div className='inline-flex items-center justify-center gap-2'>
+          <Switch
+            checked={clinic.status === "visible"}
+            onCheckedChange={async (checked) => {
+              const next = checked ? "visible" : "hidden";
+              if (next === clinic.status) return;
+              try {
+                setUpdating(true);
+                await updateClinicStatus(clinic.id, next);
+                onUpdated();
+              } catch (err) {
+                console.error(err);
+                toast.error("상태 변경에 실패했습니다.");
+              } finally {
+                setUpdating(false);
+              }
+            }}
+            disabled={updating}
+            aria-label='노출 상태 전환'
+          />
+          {/* <span className='text-[12px] text-gray-500'>
+            {clinic.status === "visible" ? "노출" : "숨김"}
+          </span> */}
+        </div>
+      </td>
 
       {/* 액션: 패키지, 더보기 */}
       <td className='px-4 py-3 text-right pr-4'>
