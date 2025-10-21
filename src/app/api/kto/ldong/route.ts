@@ -11,6 +11,8 @@ export const revalidate = 0;
 type Option = { label: string; value: string };
 
 const LDONG_CACHE_TTL = 1000 * 60 * 10; // 10분
+const LDONG_MAX_PAGES = 20; // 기존 while 루프 상한 유지
+const LDONG_FETCH_CONCURRENCY = 4; // 외부 API 과부하 방지용 동시 요청 제한
 
 type LdongCacheEntry = {
   expires: number;
@@ -92,35 +94,66 @@ async function fetchAllLdong(params: {
   }
 
   const all: KtoLdongCodeItem[] = [];
-  let pageNo = params.pageNo ?? 1;
+  const firstPageNo = params.pageNo ?? 1;
   const numOfRows = params.numOfRows ?? 1000;
 
-  // 최대 20페이지 안전장치
-  for (let i = 0; i < 20; i++) {
-    const resp = await getLdongCode({
-      locale: params.locale,
-      lDongRegnCd: params.lDongRegnCd,
-      pageNo,
-      numOfRows,
-    });
+  const firstResp = await getLdongCode({
+    locale: params.locale,
+    lDongRegnCd: params.lDongRegnCd,
+    pageNo: firstPageNo,
+    numOfRows,
+  });
+  const firstChunk = itemsOfLoose<KtoLdongCodeItem>(firstResp);
+  all.push(...firstChunk);
 
-    const chunk = itemsOfLoose<KtoLdongCodeItem>(resp);
-    all.push(...chunk);
+  const totalRaw = firstResp.response?.body?.totalCount;
+  const total =
+    typeof totalRaw === "number"
+      ? totalRaw
+      : Number.isFinite(Number(totalRaw))
+      ? Number(totalRaw)
+      : firstChunk.length;
 
-    // any 제거: totalCount 안전 변환
-    const totalRaw = resp.response?.body?.totalCount;
-    const total =
-      typeof totalRaw === "number"
-        ? totalRaw
-        : Number(totalRaw ?? chunk.length);
+  const totalPages = Math.max(
+    firstPageNo,
+    Math.min(
+      Number.isFinite(total) && total > 0
+        ? Math.ceil(total / numOfRows)
+        : firstPageNo,
+      firstPageNo + LDONG_MAX_PAGES - 1
+    )
+  );
+  if (totalPages > firstPageNo) {
+    const pageNumbers: number[] = [];
+    for (let page = firstPageNo + 1; page <= totalPages; page += 1) {
+      pageNumbers.push(page);
+    }
+    for (let i = 0; i < pageNumbers.length; i += LDONG_FETCH_CONCURRENCY) {
+      const slice = pageNumbers.slice(i, i + LDONG_FETCH_CONCURRENCY);
+      const settled = await Promise.allSettled(
+        slice.map((pageNo) =>
+          getLdongCode({
+            locale: params.locale,
+            lDongRegnCd: params.lDongRegnCd,
+            pageNo,
+            numOfRows,
+          }).then((resp) => itemsOfLoose<KtoLdongCodeItem>(resp))
+        )
+      );
 
-    if (pageNo * numOfRows >= total || chunk.length === 0) break;
-    pageNo += 1;
+      for (const result of settled) {
+        if (result.status === "fulfilled") {
+          all.push(...result.value);
+        } else {
+          console.error("[/api/kto/ldong] page fetch failed", result.reason);
+        }
+      }
+    }
   }
   const expires = Date.now() + LDONG_CACHE_TTL;
   const dataToCache = all.map((item) => ({ ...item }));
   ldongCache.set(key, { expires, data: dataToCache });
-  
+
   return all;
 }
 
