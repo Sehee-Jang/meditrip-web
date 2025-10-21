@@ -95,10 +95,40 @@ export default function ClinicTableRow({
         flash ? "bg-black/5 dark:bg-white/5" : "hover:bg-muted/20",
       ].join(" ")}
     >
-      {/* No. */}
-      <td className='px-4 py-3 text-center text-muted-foreground'>
-        {index + 1}
+      <td className='px-2 py-2 align-middle'>
+        <div className='flex flex-col items-center gap-1'>
+          <Button
+            type='button'
+            size='icon'
+            variant='ghost' // 테두리 제거
+            aria-label='위로'
+            title='위로'
+            onClick={onMoveUp}
+            disabled={isFirst || sortingDisabled}
+            className='h-7 w-7'
+          >
+            <ChevronUp className='h-4 w-4' />
+          </Button>
+
+          <div className='flex h-7 w-7 items-center justify-center text-xs font-medium text-muted-foreground'>
+            {index + 1}
+          </div>
+
+          <Button
+            type='button'
+            size='icon'
+            variant='ghost' // 테두리 제거
+            aria-label='아래로'
+            title='아래로'
+            onClick={onMoveDown}
+            disabled={isLast || sortingDisabled}
+            className='h-7 w-7'
+          >
+            <ChevronDown className='h-4 w-4' />
+          </Button>
+        </div>
       </td>
+
       {/* 업체명 */}
       <td className='px-4 py-3'>{clinic.name?.ko ?? "-"}</td>
 
@@ -150,7 +180,7 @@ export default function ClinicTableRow({
       </td>
 
       {/* 이동 버튼 */}
-      <td className='px-4 py-3 text-center'>
+      {/* <td className='px-4 py-3 text-center'>
         <div className='inline-flex items-center gap-1'>
           <Button
             type='button'
@@ -175,7 +205,7 @@ export default function ClinicTableRow({
             <ChevronDown className='h-4 w-4' />
           </Button>
         </div>
-      </td>
+      </td> */}
 
       {/* 액션: 패키지, 더보기 */}
       <td className='px-4 py-3 text-right pr-4'>

@@ -216,10 +216,12 @@ export default function PackagesPanel({
                             <ChevronUp className='h-4 w-4' />
                             <span className='sr-only'>위로</span>
                           </Button>
+
                           {/* Index */}
                           <div className='flex h-8 w-8 items-center justify-center text-[12px] font-medium text-muted-foreground'>
                             {index + 1}
                           </div>
+
                           <Button
                             type='button'
                             size='icon'
@@ -233,6 +235,7 @@ export default function PackagesPanel({
                             <span className='sr-only'>아래로</span>
                           </Button>
                         </div>
+                        
                         {/* 본문 */}
                         <div className='min-w-0 space-y-1'>
                           <div className='text-[14px] font-medium leading-5 break-keep line-clamp-1'>
