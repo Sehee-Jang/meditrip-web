@@ -37,11 +37,21 @@ function buildQueryBasis(params: HiraHospBasisParams): URLSearchParams {
   return qs;
 }
 
+function resolveServiceKey(): string {
+  const raw = process.env.KTO_SERVICE_KEY;
+  if (!raw) throw new Error("KTO_SERVICE_KEY 누락");
+
+  try {
+    return decodeURIComponent(raw);
+  } catch {
+    return raw;
+  }
+}
+
 export async function getHospBasisListPage(
   params: HiraHospBasisParams
 ): Promise<HiraHospBasisResponse> {
-  const key = process.env.KTO_SERVICE_KEY;
-  if (!key) throw new Error("KTO_SERVICE_KEY 누락");
+  const key = resolveServiceKey();
 
   const qs = buildQueryBasis(params);
   qs.set("serviceKey", key);
@@ -60,8 +70,7 @@ async function fetchDetailList2_7<T>(
   path: string,
   ykiho: string
 ): Promise<T[]> {
-  const key = process.env.KTO_SERVICE_KEY;
-  if (!key) throw new Error("KTO_SERVICE_KEY 누락");
+  const key = resolveServiceKey();
 
   // JSON 시도
   {
