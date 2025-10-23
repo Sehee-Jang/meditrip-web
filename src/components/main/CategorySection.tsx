@@ -15,23 +15,12 @@ const categoryKeys: CategoryKey[] = Object.keys(CATEGORIES) as CategoryKey[];
 type Mode = "link" | "interactive";
 
 type Props = {
-  /** 링크 or 인터랙션 */
-  mode?: Mode; // 기본 interactive
-
-  /** 아래 4개는 mode==="interactive"일 때만 의미 */
-
-  /** 선택 UI를 켤지 여부 */
+  mode?: Mode;
   selectable?: boolean;
-  /** 다중 선택 허용 여부 */
   multiple?: boolean;
-  /** 선택된 카테고리들 */
   selected?: CategoryKey[];
-  /** 선택 변경 콜백 */
   onChange?: (nextSelected: CategoryKey[]) => void;
-
-  /** mode==="link"일 때 이동할 기본 경로 */
-  linkHref?: string; // 기본 "/articles"
-
+  linkHref?: string;
   className?: string;
 };
 
@@ -48,7 +37,6 @@ export default function CategorySection({
 
   const handleClick = (key: CategoryKey) => {
     if (mode !== "interactive" || !selectable || !onChange) return;
-
     if (multiple) {
       const exists = selected.includes(key);
       const next = exists
@@ -62,53 +50,59 @@ export default function CategorySection({
   };
 
   return (
-    <section className='md:y-10'>
-      <Container className={clsx("px-0 md:px-6", className)}>
-        <div className='grid grid-cols-5 gap-2 sm:gap-3 md:gap-4'>
+    <section className='md:py-10'>
+      <Container className={clsx("px-4 md:px-6", className)}>
+        {/* 모바일: 줄바꿈되는 고정 그리드(쿠캣 스타일) / 데스크톱: 여유 5열 */}
+        <div
+          className={clsx(
+            "grid gap-3 md:gap-6",
+            // 모바일 그리드: 기기폭 차이를 흡수하기 위해 4열 기본, 390px 이상에선 5열
+            "grid-cols-4 [@media(min-width:390px)]:grid-cols-5",
+            // 데스크톱은 5열 유지
+            "md:grid-cols-5"
+          )}
+          role={mode === "interactive" ? "listbox" : undefined}
+          aria-multiselectable={mode === "interactive" ? multiple : undefined}
+        >
           {categoryKeys.map((key) => {
             const Icon = CATEGORY_ICONS[key];
             const isActive =
               mode === "interactive" && selectable && selected.includes(key);
 
-            const classes = clsx(
-              // 컨테이너: 카드 톤 + 테두리
-              "h-[88px] rounded-md border border-border bg-card",
-              // 레이아웃
-              "flex flex-col items-center justify-center",
-              // 인터랙션
-              "transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-              mode === "interactive" && selectable
-                ? "hover:bg-accent hover:text-accent-foreground"
-                : "hover:bg-muted/50",
-              // 활성 상태 강조
-              isActive && "ring-2 ring-ring"
-            );
-            const labelClasses = clsx(
-              "text-xs font-medium",
-              isActive ? "text-foreground" : "text-foreground/90"
-            );
-
-            const iconClasses = clsx(
-              "mb-1",
-              isActive ? "text-foreground" : "text-muted-foreground"
-            );
+            // 타일: 셀 중앙 정렬 + 고정 크기, 라벨은 아래에서 두 줄까지
+            const tile =
+              "flex h-14 w-14 items-center justify-center rounded-2xl " +
+              "border border-border/60 bg-card shadow-sm transition-colors hover:bg-muted/80 " +
+              "md:h-[88px] md:w-[88px]";
+            const iconClass = !isActive ? "text-muted-foreground" : "";
+            const label =
+              // 두 줄 고정 영역(잘림 방지): 11px 폰트 + 14px 리딩 → 높이 28px
+              "mt-1.5 text-center text-[11px] leading-[14px] text-foreground/80 " +
+              "h-[28px] overflow-hidden break-keep " +
+              "md:mt-3 md:text-sm md:leading-tight md:h-auto md:text-foreground";
 
             const inner = (
-              <>
-                <Icon size={24} className={iconClasses} />
-                <span className={labelClasses}>{t(key)}</span>
-              </>
+              <div className='flex flex-col items-center'>
+                <div
+                  className={clsx(
+                    tile,
+                    isActive &&
+                      "bg-foreground text-background border-transparent"
+                  )}
+                >
+                  <Icon size={22} className={iconClass} />
+                </div>
+                {/* 라벨 폭을 제한해 셀 너비를 넘지 않게 함 */}
+                <span className={clsx(label, "max-w-[80px] md:max-w-none")}>
+                  {t(key)}
+                </span>
+              </div>
             );
 
             if (mode === "link") {
               const href = `${linkHref}?categories=${encodeURIComponent(key)}`;
               return (
-                <Link
-                  key={key}
-                  href={href}
-                  className={classes}
-                  aria-label={t(key)}
-                >
+                <Link key={key} href={href} aria-label={t(key)}>
                   {inner}
                 </Link>
               );
@@ -120,7 +114,8 @@ export default function CategorySection({
                 type='button'
                 onClick={() => handleClick(key)}
                 aria-pressed={isActive}
-                className={classes}
+                aria-label={t(key)}
+                role='option'
               >
                 {inner}
               </button>

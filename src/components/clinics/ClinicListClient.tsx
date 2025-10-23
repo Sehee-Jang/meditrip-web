@@ -112,6 +112,16 @@ export default function ClinicListClient() {
   return (
     <Container>
       <div className='flex flex-col space-y-4'>
+        {/*  카테고리 칩 (한 줄 / 모바일 가로 스크롤) */}
+        <div className='w-full md:max-w-2xl mx-auto rounded-xl bg-background'>
+          <CategoryChips
+            align='center'
+            value={new Set<CategoryKey>(selectedCategories)}
+            onChange={(next) => updateCategoriesOnURL(next)}
+            onReset={resetFilters}
+          />
+        </div>
+
         {/* 검색창 */}
         <div className='w-full md:max-w-lg mx-auto mb-4'>
           <SearchInput
@@ -123,16 +133,6 @@ export default function ClinicListClient() {
           <p className='text-sm text-center text-muted-foreground mt-2'>
             {t("clinicList.searchHelper")}
           </p>
-        </div>
-
-        {/*  카테고리 칩 (한 줄 / 모바일 가로 스크롤) */}
-        <div className='w-full md:max-w-2xl mx-auto rounded-xl bg-background p-4'>
-          <CategoryChips
-            align='center'
-            value={new Set<CategoryKey>(selectedCategories)}
-            onChange={(next) => updateCategoriesOnURL(next)}
-            onReset={resetFilters}
-          />
         </div>
 
         {/* 결과 개수 */}
@@ -177,7 +177,9 @@ export default function ClinicListClient() {
               {recommended.length > 0 ? (
                 <section className='mx-auto max-w-6xl px-1 sm:px-2'>
                   <h2 className='text-base font-semibold mb-3 text-center md:text-left'>
-                    {t("clinicList.recommendedTitle", { default: "추천 프로그램" })}
+                    {t("clinicList.recommendedTitle", {
+                      default: "추천 프로그램",
+                    })}
                   </h2>
                   <ClinicList clinics={recommended} />
                 </section>

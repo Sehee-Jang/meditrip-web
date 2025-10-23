@@ -124,44 +124,42 @@ export default function ArticlesListClient({
   return (
     <div className='space-y-6'>
       {/* 컨트롤 바 */}
-      <div className='bg-background p-4 shadow-sm rounded-xl'>
-        <div className='flex flex-col gap-3 md:flex-row md:items-center'>
-          {/* 카테고리 칩 */}
-          <CategoryChips
-            value={selected}
-            onChange={(next) => {
-              setSelected(next);
-              setPage(1);
-              setSelectedId(null);
-            }}
-            onReset={() => {
-              setSelected(new Set());
-              setKeyword("");
-              setPage(1);
-              setSelectedId(null);
-            }}
-          />
+      <div className='flex flex-col gap-3 md:flex-row md:items-center'>
+        {/* 카테고리 칩 */}
+        <CategoryChips
+          value={selected}
+          onChange={(next) => {
+            setSelected(next);
+            setPage(1);
+            setSelectedId(null);
+          }}
+          onReset={() => {
+            setSelected(new Set());
+            setKeyword("");
+            setPage(1);
+            setSelectedId(null);
+          }}
+        />
 
-          {/* 검색 */}
-          <div className='md:ml-auto'>
-            <label htmlFor={searchId} className='sr-only'>
-              검색어
-            </label>
-            <input
-              id={searchId}
-              value={keyword}
-              onChange={(e) => {
-                setKeyword(e.target.value);
-                setPage(1);
-                setSelectedId(null);
-              }}
-              placeholder='검색어를 입력하세요'
-              className='h-10 w-full rounded-lg border border-border px-3 text-sm
+        {/* 검색 */}
+        <div className='md:ml-auto'>
+          <label htmlFor={searchId} className='sr-only'>
+            검색어
+          </label>
+          <input
+            id={searchId}
+            value={keyword}
+            onChange={(e) => {
+              setKeyword(e.target.value);
+              setPage(1);
+              setSelectedId(null);
+            }}
+            placeholder='검색어를 입력하세요'
+            className='h-10 w-full rounded-lg border border-border px-3 text-sm
                          placeholder:text-muted-foreground
                          focus:outline-none focus-visible:ring-2 focus-visible:ring-ring
                          md:w-72'
-            />
-          </div>
+          />
         </div>
       </div>
 

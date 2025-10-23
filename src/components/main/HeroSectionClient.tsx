@@ -31,7 +31,7 @@ const HeroSectionClient: FC<Props> = ({ images }) => {
   const slides = hasImages ? images : ["/images/hero/hero1.webp"];
 
   return (
-    <section className='relative w-full h-[360px] md:h-[480px] mb-10'>
+    <section className='relative w-full h-[360px] md:h-[480px] mb-6'>
       <Carousel opts={{ loop: true }} plugins={[autoplay.current]}>
         <CarouselContent>
           {slides.map((src, idx) => (

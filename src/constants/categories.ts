@@ -1,10 +1,10 @@
 import type { LucideIcon } from "lucide-react";
 import {
-  Brain,
-  ShieldCheck,
-  Hourglass,
-  CircleEllipsis,
-  BookHeart,
+  Sprout, // stress 대체 예시
+  ShieldPlus, // immunity
+  Sparkles, // antiaging
+  HeartPulse, // therapy
+  CircleEllipsis, // etc
 } from "lucide-react";
 
 export const CATEGORIES = {
@@ -36,14 +36,12 @@ export type Category = (typeof CATEGORIES)[CategoryKey];
 export const CATEGORY_KEYS = Object.keys(CATEGORIES) as CategoryKey[];
 export const CATEGORY_VALUES = Object.values(CATEGORIES) as Category[];
 
-// 아이콘 매핑: React.ElementType 대신 LucideIcon으로 구체화
+// 아이콘 매핑
 export const CATEGORY_ICONS: Record<CategoryKey, LucideIcon> = {
-  stress: Brain,
-  // diet: Salad,
-  immunity: ShieldCheck,
-  // women: Stethoscope,
-  antiaging: Hourglass,
-  therapy: BookHeart,
+  stress: Sprout, 
+  immunity: ShieldPlus, 
+  antiaging: Sparkles, 
+  therapy: HeartPulse,
   etc: CircleEllipsis,
 };
 
